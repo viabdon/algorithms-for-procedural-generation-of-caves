@@ -1,0 +1,7 @@
+-r base.txt
+# ROCm exige instalação específica conforme versão do driver, GPU e PyTorch.
+# Exemplo, ajustar conforme documentação vigente:
+# pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/rocm6.2
+stable-baselines3>=2.3
+gymnasium>=0.29
+tensorboard>=2.15

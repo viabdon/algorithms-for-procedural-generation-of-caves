@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+.env
+
+# Notebooks
+.ipynb_checkpoints/
+
+# Data and generated artifacts
+/data/raw/*
+/data/processed/*
+/data/external/*
+/data/references/*
+/results/csv/*
+/results/figures/*
+/results/meshes/*
+/results/profiling/*
+/results/volumes/*
+/models/checkpoints/*
+
+# Keep directory placeholders
+!.gitkeep
+
+# Unity
+/unity/Library/
+/unity/Temp/
+/unity/Obj/
+/unity/Build/
+/unity/Builds/
+/unity/Logs/
+/unity/UserSettings/
+
+# OS / IDE
+.DS_Store
+.vscode/
+.idea/

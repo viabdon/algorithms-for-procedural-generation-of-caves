@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package cavegen;
+
+// Placeholder for the later gRPC integration phase.
+service CaveGeneratorService {
+  rpc GenerateCave (CaveRequest) returns (CaveResponse);
+}
+
+message CaveRequest {
+  uint32 seed = 1;
+  uint32 depth = 2;
+  uint32 height = 3;
+  uint32 width = 4;
+  string algorithm = 5;
+}
+
+message CaveResponse {
+  repeated uint32 shape = 1;
+  bytes packed_voxels = 2;
+  string metadata_json = 3;
+}

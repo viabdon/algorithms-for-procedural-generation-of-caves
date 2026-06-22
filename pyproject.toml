@@ -1,0 +1,45 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cavegen-tcc"
+version = "0.1.0"
+description = "Pipeline experimental para comparação quantitativa de algoritmos de geração procedural de cavernas 3D."
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [
+  { name = "Pablo Vinícius Abdon Oliveira" },
+  { name = "Felipe Claudino Cruz" }
+]
+dependencies = [
+  "numpy>=1.26",
+  "scipy>=1.11",
+  "scikit-image>=0.22",
+  "trimesh>=4.0",
+  "pandas>=2.0",
+  "psutil>=5.9",
+  "pyyaml>=6.0",
+  "typer>=0.12",
+  "rich>=13.0"
+]
+
+[project.optional-dependencies]
+ml = [
+  "torch>=2.2",
+  "stable-baselines3>=2.3",
+  "gymnasium>=0.29",
+  "tensorboard>=2.15"
+]
+profiling = [
+  "nvidia-ml-py>=12.0",
+  "scalene>=1.5",
+  "py-spy>=0.3"
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 100
+src = ["src"]

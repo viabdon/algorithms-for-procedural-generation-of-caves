@@ -1,0 +1,6 @@
+name: google_colab
+role: initial_training_and_prototyping
+expected_backend: cuda_or_cpu
+notes:
+  - GPU availability is not guaranteed in free runtimes.
+  - Do not mix Colab benchmarks with local/ROCm benchmarks in the same final table without identifying the environment.

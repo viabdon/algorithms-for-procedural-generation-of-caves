@@ -1,0 +1,6 @@
+algorithm: cellular_automata
+shape: [32, 32, 32]
+initial_open_probability: 0.45
+iterations: 5
+threshold_open_neighbors: 13
+connectivity_cleanup: true

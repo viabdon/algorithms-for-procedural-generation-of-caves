@@ -1,0 +1,7 @@
+-r base.txt
+# Em geral, o Colab já traz PyTorch instalado com CUDA.
+# Instale torch manualmente apenas se precisar fixar uma versão específica.
+stable-baselines3>=2.3
+gymnasium>=0.29
+tensorboard>=2.15
+nvidia-ml-py>=12.0

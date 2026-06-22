@@ -1,0 +1,6 @@
+name: local_amd_rocm
+role: optional_portability_experiment
+expected_backend: rocm_or_cpu
+notes:
+  - Treat ROCm as an optional backend, not a core methodological dependency.
+  - Report compatibility issues and VRAM constraints as technical limitations if tested.

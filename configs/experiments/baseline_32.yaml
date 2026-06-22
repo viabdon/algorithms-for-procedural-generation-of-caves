@@ -1,0 +1,14 @@
+experiment_name: baseline_32
+shape: [32, 32, 32]
+seeds: [0, 1, 2, 3, 4]
+algorithms:
+  random_walk:
+    steps: 6000
+    brush_radius: 1
+  cellular_automata:
+    initial_open_probability: 0.45
+    iterations: 5
+    threshold_open_neighbors: 13
+outputs:
+  volumes_dir: results/volumes
+  meshes_dir: results/meshes

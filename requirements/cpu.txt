@@ -1,0 +1,5 @@
+-r base.txt
+torch>=2.2
+stable-baselines3>=2.3
+gymnasium>=0.29
+tensorboard>=2.15

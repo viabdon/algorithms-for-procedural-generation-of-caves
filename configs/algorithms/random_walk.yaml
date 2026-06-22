@@ -1,0 +1,5 @@
+algorithm: random_walk
+shape: [32, 32, 32]
+steps: 6000
+brush_radius: 1
+connectivity_cleanup: true
