@@ -1,0 +1,8 @@
+voxelization:
+  resolutions: [32, 64, 128]
+  normalize_to_unit_cube: true
+  center: true
+  sample_points:
+    enabled: true
+    max_points: 2000000
+  output_dir: "data/processed/references"
