@@ -1,0 +1,16 @@
+datasets:
+  elaphes:
+    name: "Elaphes Cave"
+    type: "point_cloud"
+    format: "laz"
+    raw_path: "data/raw/elaphes/elaphes_cave.ply"
+    source: "LIRIS Elaphes Cave Dataset"
+    representation: "polygon_file_format"
+
+  nasa_indian_tunnel:
+    name: "NASA Indian Tunnel"
+    type: "point_cloud"
+    format: "f32"
+    raw_path: "data/raw/nasa/indian_tunnel.f32"
+    source: "NASA Planetary Pits and Caves Analog Dataset"
+    representation: "surface_point_cloud"
