@@ -37,3 +37,5 @@ __pycache__/
 .vscode/
 .idea/
 AGENTS.md
+Orientacao-codex.md
+prompt-professor-codex.md

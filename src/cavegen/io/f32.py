@@ -1,90 +1,101 @@
+"""Read fixed-record ``.f32`` point clouds incrementally.
+
+Each record contains seven ``float32`` attributes in this order::
+
+    x, y, z, nir_reflectance, red, green, blue
+
+The module validates that the file size is compatible with this layout and
+opens the data through :class:`numpy.memmap` in read-only mode. This avoids
+loading an entire point cloud into memory. ``iter_f32_xyz`` yields only the XYZ
+coordinates in bounded ``float32`` batches, which are suitable for subsequent
+normalization and voxelization passes.
+
+Notes
+-----
+The input represents sampled surface points, not a boolean cave-void volume.
+Voxelization must therefore preserve this distinction and document any later
+surface-to-void conversion.
+"""
+
 from __future__ import annotations
-
 from pathlib import Path
-
 import numpy as np
+from collections.abc import Iterator
 
-# ---------------------------------------------------------------------------
-# Estrutura de um arquivo .f32
-# ---------------------------------------------------------------------------
+# Estrutura de um arquivo .f32:
 # O arquivo é um binário contendo uma sequência de números float32.
 # Cada ponto da nuvem é descrito por 7 atributos, sempre nesta ordem:
 #
 #   [x_coord] [y_coord] [z_coord] [nir_reflectance] [red] [green] [blue]
 #
-# Portanto, o arquivo inteiro é:
+#   Portanto, o arquivo inteiro é:
 #
 #   ponto_1: x y z nir r g b | ponto_2: x y z nir r g b | ...
 #
-ATRIBUTOS_POR_PONTO = 7
-
-INDICE_COLUNA_X = 0
-INDICE_COLUNA_Y = 1
-INDICE_COLUNA_Z = 2
-INDICE_COLUNA_NIR = 3  # refletância no infravermelho próximo (sempre descartada)
-INDICE_COLUNA_RED = 4
-INDICE_COLUNA_GREEN = 5
-INDICE_COLUNA_BLUE = 6
-
-COLUNAS_XYZ = [INDICE_COLUNA_X, INDICE_COLUNA_Y, INDICE_COLUNA_Z]
-COLUNAS_RGB = [INDICE_COLUNA_RED, INDICE_COLUNA_GREEN, INDICE_COLUNA_BLUE]
 
 
-def load_f32_points(caminho_do_arquivo: str | Path, incluir_rgb: bool = False) -> np.ndarray:
-    """Lê uma nuvem de pontos de um arquivo binário ``.f32``.
+ATTRIBUTES_PER_POINT = 7
+BYTES_PER_POINT = ATTRIBUTES_PER_POINT*np.dtype(np.float32).itemsize
+COL_X_INDEX = 0
+COL_Y_INDEX = 1
+COL_Z_INDEX = 2
+COL_NIR_INDEX = 3  # refletância no infravermelho próximo (sempre descartada)
+COL_R_INDEX = 4
+COL_G_INDEX = 5
+COL_B_INDEX = 6
 
-    O arquivo é uma sequência de ``float32`` com 7 atributos por ponto, nesta ordem::
+XYZ_COLUMNS = [COL_X_INDEX, COL_Y_INDEX, COL_Z_INDEX]
+RGB_COLUMNS = [COL_R_INDEX, COL_G_INDEX, COL_B_INDEX]
 
-        [x_coord] [y_coord] [z_coord] [nir_reflectance] [red] [green] [blue]
+def count_f32_points(path: str | Path) -> int:
+    """Validate an .f32 file layout and return its record count."""
 
-    Parameters
-    ----------
-    caminho_do_arquivo:
-        Caminho para o arquivo ``.f32``.
-    incluir_rgb:
-        Se ``False`` (padrão), retorna apenas as coordenadas ``XYZ``.
-        Se ``True``, retorna ``XYZ`` concatenado com ``RGB``.
-        A refletância no infravermelho (NIR) é sempre descartada.
+    file_path: Path = Path(path)
 
-    Returns
-    -------
-    numpy.ndarray
-        Array ``float32`` de forma ``(numero_de_pontos, 3)`` quando
-        ``incluir_rgb=False`` ou ``(numero_de_pontos, 6)`` quando
-        ``incluir_rgb=True``.
-    """
-    caminho_do_arquivo = Path(caminho_do_arquivo)
+    if not file_path.exists():
+      raise FileNotFoundError(f"The .f32 file does not exist in the specified path: {file_path}")
 
-    # 1) Lê o arquivo inteiro como uma lista plana (1D) de números float32.
-    valores_em_sequencia = np.fromfile(caminho_do_arquivo, dtype=np.float32)
+    if not (file_path.is_file()):
+        raise ValueError(f"The specified path is not of the .f32 format: {file_path}")
 
-    # 2) Decide quais colunas vamos manter no resultado final.
-    if incluir_rgb:
-        colunas_desejadas = COLUNAS_XYZ + COLUNAS_RGB
-    else:
-        colunas_desejadas = COLUNAS_XYZ
+    file_byte_size: int = file_path.stat().st_size
 
-    # 3) Caso o arquivo esteja vazio, devolve um array vazio com o número
-    #    correto de colunas, evitando erros mais à frente.
-    if valores_em_sequencia.size == 0:
-        numero_de_colunas = len(colunas_desejadas)
-        return np.empty((0, numero_de_colunas), dtype=np.float32)
+    # If the size of the file is NOT a multiple of the bytesize we need for
+    # np.memmap() to work:
 
-    # 4) Validação: a quantidade de números precisa ser múltipla de 7,
-    #    senão o arquivo está corrompido ou não segue o formato esperado.
-    quantidade_de_valores = valores_em_sequencia.size
-    if quantidade_de_valores % ATRIBUTOS_POR_PONTO != 0:
-        raise ValueError(
-            f"Arquivo .f32 inválido: {quantidade_de_valores} valores não são "
-            f"múltiplos de {ATRIBUTOS_POR_PONTO} atributos por ponto "
-            f"({caminho_do_arquivo})."
-        )
+    if (file_byte_size % BYTES_PER_POINT != 0):
+        raise ValueError(f"The file found on the path: {file_path}, has a size of {file_byte_size} Bytes, which isn't a multiple of {BYTES_PER_POINT} as it is expected.")
 
-    # 5) Reorganiza a lista plana em uma tabela onde cada linha é um ponto
-    #    e cada coluna é um atributo. O -1 deixa o numpy calcular o número
-    #    de pontos automaticamente.
-    tabela_de_pontos = valores_em_sequencia.reshape(-1, ATRIBUTOS_POR_PONTO)
+    # Using specifically // to get an int!!!
+    points_amount: int = file_byte_size // BYTES_PER_POINT
+    return points_amount
 
-    # 6) Seleciona apenas as colunas desejadas (XYZ, e opcionalmente RGB).
-    pontos_filtrados = tabela_de_pontos[:, colunas_desejadas]
-    return pontos_filtrados
+def open_f32_records(path: str | Path) -> np.memmap:
+    """Open validated records with shape (n_points, 7), read-only."""
+
+    # Calls upon the function to validate and return the ammount of points in a .f32 file.
+    points_amount: int = count_f32_points(path)
+
+
+    if points_amount == 0:
+        raise ValueError(f"Cannot memory-map an empty .f32 file: {path}")
+
+    # Uses np.memmap() to create accessible data without running out of memory.
+    memmapped_data = np.memmap(path, dtype=np.float32, mode='r', shape=(points_amount,ATTRIBUTES_PER_POINT))
+
+    return memmapped_data
+
+def iter_f32_xyz(path: str | Path, batch_size: int) -> Iterator[np.ndarray]:
+    """Yield float32 XYZ batches with shape (batch_size, 3)."""
+
+    if (batch_size <= 0):
+        raise ValueError(f"The value of `batch_size` (currently: {batch_size}) must be a positive integer.")
+
+    records = open_f32_records(path)
+    points_amount: int = records.shape[0]
+
+    # Iterating through each batch
+    for start in range(0, points_amount, batch_size):
+        stop = min(start + batch_size, points_amount)
+        xyz = records[start:stop, XYZ_COLUMNS]
+        yield xyz
