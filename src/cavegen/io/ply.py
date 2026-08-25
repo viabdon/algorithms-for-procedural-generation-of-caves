@@ -18,14 +18,11 @@ later elements are intentionally not read.
 from __future__ import annotations
 
 from collections.abc import Iterator
-from dataclasses import dataclass
 from pathlib import Path
-from typing import Literal
 
 import numpy as np
 
-
-PlyFormat = Literal["ascii", "binary_little_endian", "binary_big_endian"]
+from cavegen.io.ply_types import PlyFormat, PlyHeader, PlyProperty
 
 _PLY_TYPE_CODES = {
     "char": "i1",
@@ -47,44 +44,6 @@ _PLY_TYPE_CODES = {
 }
 _SUPPORTED_FORMATS = frozenset({"ascii", "binary_little_endian", "binary_big_endian"})
 _XYZ_PROPERTY_NAMES = ("x", "y", "z")
-
-
-@dataclass(frozen=True, slots=True)
-class PlyProperty:
-    """A scalar property declared for a PLY vertex element.
-
-    Parameters
-    ----------
-    name:
-        Property name declared in the PLY header.
-    type_name:
-        PLY scalar type name, such as ``float`` or ``uchar``.
-    """
-
-    name: str
-    type_name: str
-
-
-@dataclass(frozen=True, slots=True)
-class PlyHeader:
-    """Validated PLY information required to stream vertex coordinates.
-
-    Parameters
-    ----------
-    format:
-        Payload encoding declared by the PLY header.
-    vertex_count:
-        Number of vertex records declared in the header.
-    vertex_properties:
-        Scalar properties of each vertex, in on-disk order.
-    data_offset:
-        Byte position immediately after the ``end_header`` line.
-    """
-
-    format: PlyFormat
-    vertex_count: int
-    vertex_properties: tuple[PlyProperty, ...]
-    data_offset: int
 
 
 def read_ply_header(path: str | Path) -> PlyHeader:
@@ -204,6 +163,7 @@ def iter_ply_xyz(path: str | Path, batch_size: int) -> Iterator[np.ndarray]:
 
 
 def _read_header_line(file: object, file_path: Path) -> str:
+    """Read one ASCII PLY header line or raise an informative error."""
     raw_line = file.readline()
     if raw_line == b"":
         raise ValueError(f"Invalid PLY file {file_path}: header ended before 'end_header'.")
@@ -214,12 +174,14 @@ def _read_header_line(file: object, file_path: Path) -> str:
 
 
 def _parse_format(fields: list[str], file_path: Path) -> PlyFormat:
+    """Validate a PLY ``format`` declaration and return its encoding."""
     if len(fields) != 3 or fields[2] != "1.0" or fields[1] not in _SUPPORTED_FORMATS:
         raise ValueError(f"Unsupported PLY format declaration in {file_path}: {' '.join(fields)!r}.")
     return fields[1]  # type: ignore[return-value]
 
 
 def _parse_element(fields: list[str], file_path: Path) -> tuple[str, int]:
+    """Validate an ``element`` declaration and return its name and count."""
     if len(fields) != 3:
         raise ValueError(f"Invalid element declaration in {file_path}: {' '.join(fields)!r}.")
     try:
@@ -232,6 +194,7 @@ def _parse_element(fields: list[str], file_path: Path) -> tuple[str, int]:
 
 
 def _parse_vertex_property(fields: list[str], file_path: Path) -> PlyProperty:
+    """Validate and describe one scalar property of the vertex element."""
     if len(fields) >= 2 and fields[1] == "list":
         raise ValueError(f"Unsupported PLY file {file_path}: vertex list properties are not supported.")
     if len(fields) != 3:
@@ -242,6 +205,7 @@ def _parse_vertex_property(fields: list[str], file_path: Path) -> PlyProperty:
 
 
 def _validate_vertex_properties(properties: list[PlyProperty], file_path: Path) -> None:
+    """Ensure that vertex properties are unique and include XYZ coordinates."""
     names = [property_.name for property_ in properties]
     if len(set(names)) != len(names):
         raise ValueError(f"Invalid PLY file {file_path}: duplicate vertex property names.")
@@ -251,6 +215,7 @@ def _validate_vertex_properties(properties: list[PlyProperty], file_path: Path) 
 
 
 def _iter_ascii_xyz(path: Path, header: PlyHeader, batch_size: int) -> Iterator[np.ndarray]:
+    """Stream ASCII vertex records and yield their XYZ coordinates in batches."""
     property_count = len(header.vertex_properties)
     xyz_indices = [
         next(index for index, property_ in enumerate(header.vertex_properties) if property_.name == name)
@@ -281,6 +246,7 @@ def _iter_ascii_xyz(path: Path, header: PlyHeader, batch_size: int) -> Iterator[
 
 
 def _iter_binary_xyz(path: Path, header: PlyHeader, batch_size: int) -> Iterator[np.ndarray]:
+    """Memory-map binary vertex records and yield XYZ coordinates in batches."""
     dtype = _vertex_dtype(header)
     records = np.memmap(
         path,
@@ -301,6 +267,7 @@ def _iter_binary_xyz(path: Path, header: PlyHeader, batch_size: int) -> Iterator
 
 
 def _vertex_dtype(header: PlyHeader) -> np.dtype:
+    """Build the structured NumPy dtype declared by a binary PLY header."""
     byte_order = "<" if header.format == "binary_little_endian" else ">"
     fields = [
         (property_.name, f"{byte_order}{_PLY_TYPE_CODES[property_.type_name]}")
@@ -310,5 +277,6 @@ def _vertex_dtype(header: PlyHeader) -> np.dtype:
 
 
 def _validate_finite_coordinates(xyz_batch: np.ndarray, path: Path) -> None:
+    """Reject batches containing NaN or infinite XYZ coordinates."""
     if not np.isfinite(xyz_batch).all():
         raise ValueError(f"PLY file contains non-finite XYZ coordinates: {path}")

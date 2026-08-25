@@ -7,6 +7,7 @@ import unittest
 import numpy as np
 
 from cavegen.io.ply import iter_ply_xyz, read_ply_header
+from cavegen.io.ply_types import PlyHeader
 
 
 class PlyReaderTests(unittest.TestCase):
@@ -38,6 +39,7 @@ class PlyReaderTests(unittest.TestCase):
 
         self.assertEqual(parsed_header.format, "binary_little_endian")
         self.assertEqual(parsed_header.vertex_count, 2)
+        self.assertIsInstance(parsed_header, PlyHeader)
         np.testing.assert_array_equal(
             np.vstack(batches),
             np.array([[1, 2, 3], [4, 5, 6]], dtype=np.float32),
