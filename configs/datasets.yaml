@@ -2,7 +2,7 @@ datasets:
   elaphes:
     name: "Elaphes Cave"
     type: "point_cloud"
-    format: "laz"
+    format: "ply"
     raw_path: "data/raw/elaphes/elaphes_cave.ply"
     source: "LIRIS Elaphes Cave Dataset"
     representation: "polygon_file_format"
