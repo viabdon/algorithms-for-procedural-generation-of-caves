@@ -37,3 +37,7 @@ __pycache__/
 .vscode/
 .idea/
 
+# IA .md's
+AGENTS.md
+Orientacao-codex.md
+prompt-professor-codex.md
