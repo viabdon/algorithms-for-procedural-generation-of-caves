@@ -36,6 +36,3 @@ __pycache__/
 .DS_Store
 .vscode/
 .idea/
-AGENTS.md
-Orientacao-codex.md
-prompt-professor-codex.md
