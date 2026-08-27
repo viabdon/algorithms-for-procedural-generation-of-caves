@@ -8,7 +8,7 @@ from typing import Any
 from cavegen.core.config import load_yaml
 from cavegen.generators.cellular_automata import generate_cellular_automata
 from cavegen.generators.random_walk import generate_random_walk
-from cavegen.io.voxel_io import save_volume_npz
+from cavegen.datastream.voxel_io import save_volume_npz
 from cavegen.metrics.connectivity import largest_component_ratio
 from cavegen.metrics.morphology import distance_transform_stats, open_ratio
 from cavegen.profiling.system_monitor import SystemMonitor

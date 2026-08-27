@@ -22,7 +22,7 @@ from pathlib import Path
 
 import numpy as np
 
-from cavegen.io.ply_types import PlyFormat, PlyHeader, PlyProperty
+from cavegen.datastream.ply_types import PlyFormat, PlyHeader, PlyProperty
 
 _PLY_TYPE_CODES = {
     "char": "i1",

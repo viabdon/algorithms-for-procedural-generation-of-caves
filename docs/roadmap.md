@@ -9,8 +9,8 @@ Criar pacote Python, diretórios, configurações, README, arquivos de dependên
 ### TODO — Calcular limites espaciais incrementais de nuvens de pontos
 
 **Estado:** os parsers ``.f32`` e ``.ply`` fornecem lotes XYZ ``float32`` de
-forma ``(n_no_lote, 3)`` por ``cavegen.io.f32.iter_f32_xyz`` e
-``cavegen.io.ply.iter_ply_xyz``, respectivamente. O leitor PLY suporta payload
+forma ``(n_no_lote, 3)`` por ``cavegen.datastream.f32.iter_f32_xyz`` e
+``cavegen.datastream.ply.iter_ply_xyz``, respectivamente. O leitor PLY suporta payload
 ASCII por streaming e payload binário por ``numpy.memmap``.
 
 **Objetivo:** calcular a caixa delimitadora alinhada aos eixos da nuvem sem

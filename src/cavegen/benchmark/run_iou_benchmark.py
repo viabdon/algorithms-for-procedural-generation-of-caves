@@ -4,7 +4,7 @@ import argparse
 import csv
 from pathlib import Path
 
-from cavegen.io.voxel_io import load_volume_npz
+from cavegen.datastream.voxel_io import load_volume_npz
 from cavegen.metrics.iou import voxel_iou
 
 

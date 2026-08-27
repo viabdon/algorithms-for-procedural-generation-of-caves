@@ -6,8 +6,8 @@ import unittest
 
 import numpy as np
 
-from cavegen.io.ply import iter_ply_xyz, read_ply_header
-from cavegen.io.ply_types import PlyHeader
+from cavegen.datastream.ply import iter_ply_xyz, read_ply_header
+from cavegen.datastream.ply_types import PlyHeader
 
 
 class PlyReaderTests(unittest.TestCase):
