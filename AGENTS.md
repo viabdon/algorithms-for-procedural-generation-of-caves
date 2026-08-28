@@ -38,10 +38,15 @@ representação padrão dos algoritmos é um `numpy.ndarray` booleano com forma
   ASCII por streaming e PLY binário com ``numpy.memmap``.
 - ``reservoir_sample_xyz`` em ``cavegen.datastream.sampling`` produz uma
   amostra uniforme e reprodutível, sem reter mais de ``max_points`` pontos.
-- Antes de usar o PLY do Elaphes, inspecione o cabeçalho real e confirme o
-  formato, as propriedades de vértice e a ordem dos elementos declarados.
-- A próxima etapa é calcular limites espaciais incrementalmente com esses
-  lotes. A voxelização deve primeiro produzir ``surface_voxels``; qualquer
+- O cabeçalho do PLY real do Elaphes foi validado: é ASCII 1.0, tem ``vertex``
+  como primeiro elemento e suas coordenadas XYZ podem ser entregues pelo
+  leitor como ``float32``.
+- ``calculate_xyz_bounds`` em ``cavegen.datastream.bounds`` consolida
+  ``min_xyz`` e ``max_xyz`` incrementalmente, com validações e testes
+  sintéticos. Ainda é preciso executar a varredura completa do Elaphes para
+  obter seus limites definitivos.
+- A próxima implementação é a normalização espacial dos lotes com esses
+  limites. Só então a voxelização deve produzir ``surface_voxels``; qualquer
   derivação de ``void_voxels`` exige decisão metodológica documentada.
 
 ## Modo de orientação

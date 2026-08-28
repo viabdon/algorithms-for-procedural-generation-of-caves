@@ -13,16 +13,22 @@
   inválido em `tests/test_ply.py`.
 - [ ] Inspecionar formalmente `data/raw/nasa/indian_tunnel.f32`: confirmar
   endianness, layout de sete atributos e valores plausíveis de XYZ.
-- [ ] Inspecionar o cabeçalho real de
-  `data/raw/elaphes/elaphes_cave.ply`: confirmar formato, propriedades de
-  vértice e que `vertex` é o primeiro elemento suportado pelo parser.
+- [x] Inspecionar o cabeçalho real de
+  `/run/media/midnavi/Pablo/TCC/DATA/RAW/elaphes_cave.ply`: PLY ASCII 1.0,
+  `94_465_067` vértices, `vertex` como primeiro elemento, XYZ `float64` e 16
+  atributos escalares adicionais. Um lote real de 2.048 pontos foi lido com
+  sucesso como XYZ `float32` finito.
 - [x] Adicionar `reservoir_sample_xyz` em `cavegen.datastream.sampling` para
   amostragem reprodutível por `max_points`, sem carregar o dataset inteiro.
 
 ## Pré-processamento e voxelização
 
-- [ ] Calcular `min_xyz` e `max_xyz` incrementalmente a partir dos lotes XYZ.
-  O contrato, as validações e o teste esperado estão em `docs/roadmap.md`.
+- [x] Implementar e testar `calculate_xyz_bounds` em
+  `src/cavegen/datastream/bounds.py`: mínimos e máximos incrementais,
+  `float32`, lotes vazios, validações e testes em `tests/test_bounds.py`.
+- [ ] Executar `calculate_xyz_bounds` sobre todos os `94_465_067` vértices do
+  Elaphes quando o HD estiver montado e registrar os limites definitivos para
+  a normalização.
 - [ ] Definir e implementar a normalização espacial, incluindo o tratamento de
   eixos degenerados e a decisão entre preservar proporção ou preencher o cubo.
 - [ ] Criar `src/cavegen/core/voxelization.py` para gerar

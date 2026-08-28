@@ -1,3 +1,5 @@
+"""Test PLY header parsing and incremental XYZ vertex reading."""
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -11,7 +13,10 @@ from cavegen.datastream.ply_types import PlyHeader
 
 
 class PlyReaderTests(unittest.TestCase):
+    """Verify supported PLY variants and invalid-header handling."""
+
     def test_iterates_ascii_vertices_in_batches(self) -> None:
+        """Stream ASCII vertices as float32 XYZ batches of the requested size."""
         header = b"""ply\nformat ascii 1.0\nelement vertex 3\nproperty float x\nproperty float y\nproperty float z\nproperty uchar red\nend_header\n"""
         payload = b"1 2 3 10\n4 5 6 20\n7 8 9 30\n"
 
@@ -27,6 +32,7 @@ class PlyReaderTests(unittest.TestCase):
         )
 
     def test_iterates_binary_vertices_with_properties_out_of_xyz_order(self) -> None:
+        """Select named XYZ fields from a binary vertex layout."""
         header = b"""ply\nformat binary_little_endian 1.0\nelement vertex 2\nproperty uchar red\nproperty float z\nproperty float x\nproperty float y\nelement face 0\nproperty list uchar int vertex_indices\nend_header\n"""
         dtype = np.dtype([("red", "u1"), ("z", "<f4"), ("x", "<f4"), ("y", "<f4")])
         vertices = np.array([(10, 3.0, 1.0, 2.0), (20, 6.0, 4.0, 5.0)], dtype=dtype)
@@ -46,6 +52,7 @@ class PlyReaderTests(unittest.TestCase):
         )
 
     def test_rejects_header_without_xyz_properties(self) -> None:
+        """Reject headers whose vertex element does not define XYZ."""
         content = b"""ply\nformat ascii 1.0\nelement vertex 1\nproperty float x\nproperty float y\nend_header\n0 1\n"""
 
         with TemporaryDirectory() as directory:

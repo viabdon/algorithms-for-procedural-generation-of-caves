@@ -201,7 +201,7 @@ Quando eu disser que implementei uma etapa:
 
 Se houver um erro muito específico, você pode mostrar um pequeno trecho ilustrativo da correção, mas preserve o caráter didático.
 
-## Estado atual da sessão (2026-08-20)
+## Estado atual da sessão (2026-08-27)
 
 O trabalho avançou até os parsers incrementais de ``.f32`` e ``.ply``:
 
@@ -211,13 +211,18 @@ O trabalho avançou até os parsers incrementais de ``.f32`` e ``.ply``:
 * ``iter_f32_xyz`` produz lotes XYZ de forma ``(n_no_lote, 3)``;
 * ``read_ply_header`` valida o cabeçalho PLY;
 * ``iter_ply_xyz`` produz lotes XYZ de PLY ASCII por streaming e de PLY
-  binário via ``numpy.memmap``.
+  binário via ``numpy.memmap``;
+* o cabeçalho do PLY real do Elaphes foi inspecionado: é ASCII 1.0, declara
+  ``94_465_067`` vértices, tem ``vertex`` como primeiro elemento e XYZ
+  ``float64`` compatível com a conversão controlada para ``float32``;
+* ``calculate_xyz_bounds`` em ``cavegen.datastream.bounds`` calcula mínimos e
+  máximos globais por lotes XYZ, e seus testes cobrem extremos, lote vazio e
+  entradas inválidas.
 
-Antes de avançar, inspecione o cabeçalho de um PLY real do Elaphes e confirme
-que o layout está dentro do contrato suportado. Em seguida, a próxima tarefa é
-calcular ``min_xyz`` e ``max_xyz`` incrementalmente. Não iniciar a voxelização
-nem tratar a superfície como volume de vazios sem discutir a decisão
-metodológica.
+Ainda falta executar o cálculo de limites sobre o PLY completo quando o HD
+estiver montado. A próxima tarefa de implementação é normalizar espacialmente
+os lotes com esses limites; a voxelização deve gerar ``surface_voxels`` e não
+tratar a superfície como volume de vazios sem discutir a decisão metodológica.
 
 ## Começando agora
 
