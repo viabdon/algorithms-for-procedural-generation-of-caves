@@ -1,15 +1,17 @@
 """Sequential seed volumes used as the starting point of every CA experiment.
 
 The research uses a fixed shape, so a seed is stored as the initial boolean
-grid itself (``data/seeds/seed_001.npz`` ...). What separates one seed from the
-next is the initial fraction of open voxels: 40%, 50% and 60%.
+grid itself (``seeds/seed_001.npz``, next to this module). What separates one
+seed from the next is the initial fraction of open voxels: 40%, 50% and 60%.
+
+The npz files are not versioned: they are reproduced from ``MASTER_SEED``.
 
 Each file is a ``Volume3D`` npz, so the parameters that produced it travel
 inside the file's metadata.
 
 Regenerate them with::
 
-    uv run python -m cavegen.generators.cellular_automata.seeds
+    uv run python -m cavegen.generators.cellular_automata
 """
 
 from __future__ import annotations
@@ -23,8 +25,11 @@ from cavegen.core.seed import numpy_rng
 from cavegen.core.volume import Volume3D
 from cavegen.io.voxel_io import load_volume_npz, save_volume_npz
 
+# Root of the repository, used by callers that write into results/.
 PROJECT_ROOT = Path(__file__).resolve().parents[4]
-SEEDS_DIR = PROJECT_ROOT / "data" / "seeds"
+
+# Seeds live inside the package: they are specific to this generator.
+SEEDS_DIR = Path(__file__).resolve().parent / "seeds"
 
 DEFAULT_SHAPE: tuple[int, int, int] = (64, 64, 64)
 DEFAULT_OPEN_RATIOS: tuple[float, ...] = (0.40, 0.50, 0.60)
