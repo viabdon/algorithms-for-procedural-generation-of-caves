@@ -1,6 +1,6 @@
 # Roadmap atualizado
 
-## Fase 0 — Esqueleto do repositório
+## Fase 0 — Esqueleto do repositório (concluída)
 
 Criar pacote Python, diretórios, configurações, README, arquivos de dependência e convenções de volume.
 
@@ -53,10 +53,18 @@ inclui as propriedades ``float64 x``, ``float64 y`` e ``float64 z``. As 16
 propriedades adicionais são escalares e podem ser ignoradas pelo leitor XYZ.
 Um lote real de 2.048 pontos foi lido como ``float32`` com coordenadas finitas.
 
-**Pendente no dataset real:** executar a função sobre o iterador PLY completo
-quando o HD do Elaphes estiver montado e preservar os dois limites resultantes
-nos metadados da referência. Essa execução é necessária antes de voxelizar os
-pontos reais.
+**Concluído no dataset real:** em 2026-08-30, a função foi executada sobre os
+``94_465_067`` vértices do PLY ASCII completo, em lotes de ``65_536`` pontos.
+Os limites definitivos ``float32`` são:
+
+```text
+min_xyz = [-9.9391, -3.23727, -6.96334]
+max_xyz = [73.7245, 12.9577, 69.7809]
+```
+
+Os metadados reproduzíveis, incluindo hash SHA-256 da fonte, estão em
+``data/params/elaphes_xyz_bounds.json``. Esses limites devem ser usados na
+normalização e não alteram a semântica dos pontos como superfície.
 
 ### TODO — Normalizar lotes XYZ para uma grade de voxels
 

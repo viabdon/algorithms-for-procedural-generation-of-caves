@@ -1,0 +1,22 @@
+{
+  "dataset": "Elaphes Cave",
+  "source": {
+    "path": "data/raw/elaphes/elaphes_cave.ply",
+    "format": "PLY ASCII 1.0",
+    "sha256": "f8cadf652a6da9311532ea20cd48fe076ca5c3ea45708b6c099cc345dd46593b",
+    "size_bytes": 6694894494,
+    "vertex_count": 94465067
+  },
+  "calculation": {
+    "function": "cavegen.datastream.bounds.calculate_xyz_bounds",
+    "iterator": "cavegen.datastream.ply.iter_ply_xyz",
+    "batch_size": 65536,
+    "coordinate_dtype": "float32",
+    "elapsed_seconds": 640.702597,
+    "completed_on": "2026-08-30"
+  },
+  "min_xyz": [-9.9391, -3.23727, -6.96334],
+  "max_xyz": [73.7245, 12.9577, 69.7809],
+  "representation": "surface_point_cloud",
+  "normalization_note": "These bounds apply to scanned surface coordinates. They do not define a void volume."
+}

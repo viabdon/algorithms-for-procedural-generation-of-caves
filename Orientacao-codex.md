@@ -26,9 +26,9 @@
 - [x] Implementar e testar `calculate_xyz_bounds` em
   `src/cavegen/datastream/bounds.py`: mínimos e máximos incrementais,
   `float32`, lotes vazios, validações e testes em `tests/test_bounds.py`.
-- [ ] Executar `calculate_xyz_bounds` sobre todos os `94_465_067` vértices do
-  Elaphes quando o HD estiver montado e registrar os limites definitivos para
-  a normalização.
+- [x] Executar `calculate_xyz_bounds` sobre todos os `94_465_067` vértices do
+  Elaphes e registrar os limites definitivos para a normalização em
+  `data/params/elaphes_xyz_bounds.json`.
 - [ ] Definir e implementar a normalização espacial, incluindo o tratamento de
   eixos degenerados e a decisão entre preservar proporção ou preencher o cubo.
 - [ ] Criar `src/cavegen/core/voxelization.py` para gerar
