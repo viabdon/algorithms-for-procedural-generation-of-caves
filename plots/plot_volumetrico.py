@@ -3,15 +3,13 @@
 Fundo preto, colormap jet, caixa wireframe (arestas de tras pontilhadas) e um
 gizmo de eixos no canto. Interativo, via plotly.
 
-    # o resultado do refatora.py (matriz 5x5x5 de contagem de vizinhos)
-    uv run python src/cavegen/generators/cellular_automata/refatora_test.py
+    # tamanho, probabilidade de uns, sensibilidade e iteracoes tem default
+    uv run python plots/plot_volumetrico.py
 
-    # ou um volume gerado pelo CA, colorido pela contagem de vizinhos abertos
-    uv run python src/cavegen/generators/cellular_automata/refatora_test.py results/volumes/ca_seed001_outside_open_it5_t13.npz
+    # ou passando os parametros do CA
+    uv run python plots/plot_volumetrico.py 20 0.45 14 3
 """
 
-import contextlib
-import io
 import sys
 from itertools import product
 from pathlib import Path
@@ -19,9 +17,9 @@ from pathlib import Path
 import numpy as np
 import plotly.graph_objects as go
 
-sys.path.append(str(Path(__file__).resolve().parent))
+from cavegen.generators.cellular_automata import cellular_automata, generate_seed_matrix
 
-RAIZ_PROJETO = Path(__file__).resolve().parents[4]
+RAIZ_PROJETO = Path(__file__).resolve().parents[1]
 PASTA_FIGURAS = RAIZ_PROJETO / "results" / "figures"
 
 # Vista isometrica: elevacao 25 graus, azimute -55 graus.
@@ -190,45 +188,30 @@ def figura_volumetrica(x, y, z, valores, titulo, minimos=None, maximos=None,
     return figura
 
 
-def dados_do_refatora():
-    """Matriz 5x5x5 de contagem de vizinhos produzida pelo refatora.py."""
-    with contextlib.redirect_stdout(io.StringIO()):
-        from refatora import cellular_automata, matrix
-        contagens = cellular_automata(matrix)
+def dados_do_ca(tamanho=20, probabilidade=0.45, sensibilidade=14, iteracoes=3):
+    """Roda o CA e devolve so as celulas vivas do resultado."""
+    inicial = generate_seed_matrix(tamanho, probabilidade)
+    final = cellular_automata(inicial, sensibilidade, "solid", iteracoes)
 
-    eixo_x, eixo_y, eixo_z = np.indices(contagens.shape)
-    return (eixo_x.ravel(), eixo_y.ravel(), eixo_z.ravel(), contagens.ravel(),
-            f"refatora.py - contagem de vizinhos {contagens.shape}", "vizinhos")
-
-
-def dados_do_volume(caminho):
-    """Volume do CA: plota so os voxels abertos, coloridos pela contagem de vizinhos."""
-    from cavegen.generators.cellular_automata.borders import BorderMode, count_open_neighbors
-    from cavegen.io.voxel_io import load_volume_npz
-
-    caminho = Path(caminho)
-    volume = load_volume_npz(caminho if caminho.is_absolute() else RAIZ_PROJETO / caminho)
-    contagens = count_open_neighbors(volume.data, BorderMode.OUTSIDE_SOLID)
-
-    abertos = np.argwhere(volume.data)
-    valores = contagens[volume.data]
-    return (abertos[:, 2], abertos[:, 1], abertos[:, 0], valores,
-            f"{caminho.stem} - {len(valores)} voxels abertos", "vizinhos abertos")
+    vivas = np.argwhere(final)
+    valores = np.ones(len(vivas), dtype=int)
+    titulo = (f"CA {tamanho}^3 - p={probabilidade} s={sensibilidade} "
+              f"it={iteracoes} - {len(vivas)} celulas vivas")
+    return vivas[:, 0], vivas[:, 1], vivas[:, 2], valores, titulo, "estado"
 
 
-def main(argumento=None, mostrar=True):
-    argumento = argumento if argumento is not None else (sys.argv[1] if len(sys.argv) > 1 else None)
-    x, y, z, valores, titulo, rotulo = (
-        dados_do_volume(argumento) if argumento else dados_do_refatora()
-    )
-    print(f"{titulo}\npontos: {valores.size}  faixa: {valores.min()} a {valores.max()}")
+def main(argumentos=None, mostrar=True):
+    argumentos = argumentos if argumentos is not None else sys.argv[1:]
+    tipos = (int, float, int, int)
+    parametros = [tipo(valor) for tipo, valor in zip(tipos, argumentos)]
+
+    x, y, z, valores, titulo, rotulo = dados_do_ca(*parametros)
+    print(f"{titulo}  pontos: {valores.size}")
 
     figura = figura_volumetrica(x, y, z, valores, titulo, rotulo_escala=rotulo)
 
     PASTA_FIGURAS.mkdir(parents=True, exist_ok=True)
-    destino = PASTA_FIGURAS / (
-        f"{Path(argumento).stem}_volumetrico.html" if argumento else "refatora_volumetrico.html"
-    )
+    destino = PASTA_FIGURAS / "ca_volumetrico.html"
     figura.write_html(destino, include_plotlyjs="cdn")
     print("figura salva em:", destino)
 

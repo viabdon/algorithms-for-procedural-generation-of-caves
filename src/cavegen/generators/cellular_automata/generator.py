@@ -1,99 +1,57 @@
-"""3D cave generation with a Moore-neighborhood cellular automaton."""
-
-from __future__ import annotations
-
-from dataclasses import asdict, dataclass, field
-from pathlib import Path
-
 import numpy as np
 
-from cavegen.core.volume import Volume3D
-from cavegen.generators.cellular_automata.borders import (
-    MAX_NEIGHBORS,
-    BorderMode,
-    count_open_neighbors,
-    neighbor_threshold,
-)
-from cavegen.generators.cellular_automata.seeds import load_seed
-
-
-@dataclass(frozen=True)
-class CellularAutomataParameters:
-    """Everything that defines one run, except the starting grid.
-
-    The starting grid comes from a numbered seed file (see ``seeds.py``), so
-    ``seed_id`` also fixes the shape and the initial open ratio.
+def cellular_automata(matrix: np.ndarray, sensitivity: int, border_treatment: str, iterations: int) -> np.ndarray:
     """
-
-    seed_id: int = 1
-    iterations: int = 5
-    border_mode: BorderMode = BorderMode.OUTSIDE_SOLID
-    threshold_open_neighbors: int = 13
-    threshold_open_ratio: float = 0.5
-    seeds_dir: Path | None = None
-
-    def __post_init__(self) -> None:
-        object.__setattr__(self, "border_mode", BorderMode(self.border_mode))
-
-        if self.iterations < 0:
-            raise ValueError("iterations must be non-negative.")
-        if not 0 <= self.threshold_open_neighbors <= MAX_NEIGHBORS:
-            raise ValueError(f"threshold_open_neighbors must be between 0 and {MAX_NEIGHBORS}.")
-        if not 0.0 <= self.threshold_open_ratio <= 1.0:
-            raise ValueError("threshold_open_ratio must be between 0 and 1.")
-
-    def describe(self) -> dict:
-        data = asdict(self)
-        data["border_mode"] = self.border_mode.value
-        data["seeds_dir"] = str(self.seeds_dir) if self.seeds_dir else None
-        return data
-
-
-def generate_cellular_automata(
-    params: CellularAutomataParameters | None = None,
-    initial: Volume3D | None = None,
-) -> Volume3D:
-    """Run the automaton and return the final volume.
-
-    Rule: a voxel is open at step ``t+1`` when at least ``threshold`` of its 26
-    neighbors are open at step ``t``. The threshold is a constant for the
-    ``OUTSIDE_*`` border modes and a per-voxel array for ``ADAPTIVE``. The
-    voxel's own state is not part of the rule.
+        Aplica o autômato celular sobre a matriz, repetindo o passo N vezes.
+        matrix: matriz binária inicial.
+        sensitivity: mínimo de vizinhos para a célula virar 1.
+        border_treatment: estratégia de borda, ainda sem efeito (ver TODO em count_neighbors).
+        iterations: quantas vezes o passo é repetido.
     """
-    params = params or CellularAutomataParameters()
-    initial = initial if initial is not None else load_seed(params.seed_id, params.seeds_dir)
+    for i in range(iterations):
+        matrix = iterate(matrix, sensitivity, border_treatment)
 
-    volume = np.array(initial.data, dtype=bool)
-    threshold = neighbor_threshold(
-        volume.shape,
-        params.border_mode,
-        params.threshold_open_neighbors,
-        params.threshold_open_ratio,
-    )
+    return matrix
 
-    open_ratio_history = [float(volume.mean())]
-    for _ in range(params.iterations):
-        volume = count_open_neighbors(volume, params.border_mode) >= threshold
-        open_ratio_history.append(float(volume.mean()))
+def iterate(matrix: np.ndarray, sensitivity: int, border_treatment: str) -> np.ndarray:
+    """
+        Executa um único passo do autômato, gerando a matriz seguinte.
+        matrix: matriz binária do passo anterior.
+        sensitivity: mínimo de vizinhos para a célula virar 1.
+        border_treatment: estratégia de borda, ainda sem efeito (ver TODO em count_neighbors).
+    """
+    temp_matrix = np.zeros(matrix.shape, dtype=int)
 
-    return Volume3D(
-        volume,
-        metadata={
-            "algorithm": "cellular_automata",
-            **params.describe(),
-            "seed": initial.metadata.get("seed"),
-            "initial_open_ratio": open_ratio_history[0],
-            "final_open_ratio": open_ratio_history[-1],
-            "open_ratio_history": open_ratio_history,
-        },
-    )
+    for x in range(matrix.shape[0]):
+        for y in range(matrix.shape[1]):
+            for z in range(matrix.shape[2]):
+                neighbors = count_neighbors(matrix, x, y, z)
+                if neighbors >= sensitivity:
+                    temp_matrix[x, y, z] = 1
+                else:
+                    temp_matrix[x, y, z] = 0
 
+    return temp_matrix
 
-@dataclass
-class CellularAutomataGenerator:
-    """Reusable generator, so benchmarks can hold a configured instance."""
+def count_neighbors(matrix: np.ndarray, x: int, y: int, z: int) -> int:
+    """
+        Soma as células vivas no cubo 3x3x3 centrado em (x, y, z), incluindo a própria célula.
+        matrix: matriz binária consultada.
+        x, y, z: índices da célula analisada.
+    """
+    neighbors = 0
+    base = np.array([x, y, z])
 
-    params: CellularAutomataParameters = field(default_factory=CellularAutomataParameters)
+    for i in range(3):
+        for j in range(3):
+            for k in range(3):
+                offset = np.array([i - 1, j - 1, k - 1])
+                current = base + offset
 
-    def generate(self, initial: Volume3D | None = None) -> Volume3D:
-        return generate_cellular_automata(self.params, initial=initial)
+                if (current < 0).any() or (current >= matrix.shape).any():
+                    # COLOCAR TRATAMENTO DE BORDA AQUI
+                    neighbors = neighbors + 0
+                else:
+                    neighbors = neighbors + matrix[tuple(current)]
+
+    return neighbors
