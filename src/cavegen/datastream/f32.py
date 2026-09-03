@@ -88,7 +88,9 @@ def open_f32_records(path: str | Path) -> np.memmap:
 def iter_f32_xyz(path: str | Path, batch_size: int) -> Iterator[np.ndarray]:
     """Yield float32 XYZ batches with shape (batch_size, 3)."""
 
-    if (batch_size <= 0):
+    if isinstance(batch_size, bool) or not isinstance(batch_size, (int, np.integer)):
+        raise TypeError("batch_size must be an integer.")
+    if batch_size <= 0:
         raise ValueError(f"The value of `batch_size` (currently: {batch_size}) must be a positive integer.")
 
     records = open_f32_records(path)
