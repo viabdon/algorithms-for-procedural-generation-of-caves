@@ -29,14 +29,20 @@
 - [x] Executar `calculate_xyz_bounds` sobre todos os `94_465_067` vértices do
   Elaphes e registrar os limites definitivos para a normalização em
   `data/params/elaphes_xyz_bounds.json`.
-- [ ] Definir e implementar a normalização espacial, incluindo o tratamento de
-  eixos degenerados e a decisão entre preservar proporção ou preencher o cubo.
-- [ ] Criar `src/cavegen/core/voxelization.py` para gerar
+- [x] Definir e implementar a normalização espacial em
+  `src/cavegen/core/normalization.py`, preservando proporções com uma escala
+  compartilhada, padding simétrico e tratamento de eixos degenerados.
+- [x] Criar `src/cavegen/core/voxelization.py` para gerar
   `surface_voxels: np.ndarray[bool]` a partir de pontos normalizados.
-- [ ] Testar primeiro uma referência pequena em resolução `32³`; só então
-  avaliar `64³` e `128³`.
-- [ ] Salvar referências de superfície em `.npz` com metadados de origem,
-  resolução e normalização.
+- [x] Integrar leitura PLY, limites persistidos, normalização e voxelização em
+  `src/cavegen/datastream/reference_preprocessing.py`, com teste de integração
+  em `tests/test_reference_preprocessing.py`.
+- [x] Voxelizar o Elaphes em `32³`: o arquivo
+  `elaphes_surface_32.npz` contém 245 voxels de superfície em 32.768 (0,75%).
+- [ ] Avaliar o Elaphes em `64³` e `128³` somente após inspecionar o resultado
+  salvo em `32³`.
+- [x] Salvar referências de superfície em `.npz` com metadados de origem,
+  resolução e normalização, em formato separado de `Volume3D`.
 - [ ] Documentar em `docs/` a diferença metodológica entre `surface_voxels` e
   `void_voxels`, incluindo as limitações de usar IoU diretamente entre ambos.
 - [ ] Definir e justificar qualquer conversão de superfície para volume vazio

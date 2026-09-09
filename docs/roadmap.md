@@ -66,36 +66,43 @@ Os metadados reproduzíveis, incluindo hash SHA-256 da fonte, estão em
 ``data/params/elaphes_xyz_bounds.json``. Esses limites devem ser usados na
 normalização e não alteram a semântica dos pontos como superfície.
 
-### TODO — Normalizar lotes XYZ para uma grade de voxels
+### Concluído — Normalizar e voxelizar uma referência PLY em lotes
 
-**Objetivo:** converter coordenadas contínuas, usando os limites globais já
-calculados, para índices inteiros válidos de uma grade com forma
-``(depth, height, width)``.
+**Estado:** ``normalize_xyz_to_zyx_indices`` em
+``cavegen.core.normalization`` converte lotes ``float32`` de coordenadas XYZ
+para índices ZYX válidos, com uma escala compartilhada, padding simétrico e
+tratamento explícito de eixos degenerados. ``voxelize_surface_zyx`` em
+``cavegen.core.voxelization`` marca os índices em uma grade booleana de
+superfície. Ambos possuem testes unitários.
 
-**Contrato proposto:** uma função de normalização deve receber um lote XYZ
-``float32``, ``min_xyz``, ``max_xyz`` e a resolução da grade; deve devolver um
-array inteiro de forma ``(N, 3)``. O mapeamento de eixos precisa ser explícito:
-XYZ representa coordenadas geométricas, enquanto o volume padrão usa a ordem
-``(depth, height, width)``.
+**Integração concluída:** ``cavegen.datastream.reference_preprocessing`` lê os
+limites persistidos, transmite os lotes de ``iter_ply_xyz`` pela normalização e
+os entrega diretamente ao voxelizador por ``voxelize_ply_surface``. O fluxo não
+armazena a nuvem inteira: mantém somente o lote corrente, seus índices e a
+grade final. Um teste de integração com PLY ASCII sintético verifica o fluxo.
 
-**Decisão necessária:** preservar a proporção espacial usando a maior extensão
-da caixa (recomendado para não deformar a caverna) ou escalar cada eixo de
-forma independente para preencher toda a grade. A decisão escolhida deve ser
-registrada nos metadados.
+**Decisão adotada:** uma única escala preserva as proporções espaciais; o espaço
+remanescente é dividido como padding ao redor da nuvem. A conversão de XYZ para
+ZYX torna o resultado compatível com volumes na forma ``(depth, height, width)``.
 
-**Casos de borda:** coordenadas no máximo global devem resultar no último
-índice válido, eixos degenerados requerem uma regra explícita e nenhum índice
-pode escapar da grade. A normalização não deve reter todos os pontos na
-memória.
+**Semântica:** ``True`` na grade retornada significa superfície observada, e não
+espaço aberto de caverna. Portanto, essa grade ainda não deve ser usada como um
+``Volume3D`` dos geradores nem comparada diretamente por IoU a eles.
 
-**Verificação:** usar uma caixa sintética pequena com extremos conhecidos e
-confirmar os índices mapeados, a preservação dos limites da grade e o
-tratamento de eixos degenerados.
+**Persistência concluída:** ``cavegen.datastream.surface_io`` salva e carrega
+grades de superfície em NPZ comprimido, sem usar ``Volume3D``. O arquivo inclui
+metadados de fonte, limites XYZ, resolução e convenção de normalização. O
+comando de voxelização exige o caminho de saída para não perder a inspeção.
 
-**Depois da normalização:** ``cavegen.core.voxelization`` poderá marcar cada
-índice normalizado em ``surface_voxels``. Essa operação continuará incremental,
-mas requer uma segunda varredura do arquivo porque os limites só são conhecidos
-após a primeira.
+**Verificação concluída — Elaphes em ``32³``:** o processamento completo dos
+``94_465_067`` vértices gerou ``elaphes_surface_32.npz`` com grade booleana
+``(32, 32, 32)``. Foram marcados 245 dos 32.768 voxels (0,75%). A estrutura do
+arquivo e seus metadados de limites, origem e normalização foram validados após
+a escrita.
+
+**Próxima verificação:** inspecionar esse resultado e só então repetir em
+``64³`` e ``128³``. Depois, definir uma conversão metodologicamente justificável
+para ``void_voxels``.
 
 ## Fase 1 — Baselines clássicos
 

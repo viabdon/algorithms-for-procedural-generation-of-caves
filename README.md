@@ -84,6 +84,34 @@ uv run python -m cavegen.benchmark.run_generation_benchmark \
 
 Os volumes gerados serão salvos em `results/volumes/` e a tabela de tempos em `results/csv/`.
 
+## Voxelização de referência PLY
+
+Para inspecionar uma nuvem de pontos PLY como grade de voxels de superfície,
+execute uma primeira passagem em baixa resolução. O leitor processa o arquivo
+em lotes, portanto não carrega toda a nuvem na memória:
+
+```bash
+uv run python -m cavegen.datastream.run_reference_voxelization \
+  --ply /caminho/para/elaphes_cave.ply \
+  --bounds data/params/elaphes_xyz_bounds.json \
+  --shape 32 32 32 \
+  --batch-size 65536 \
+  --progress-every 1000000 \
+  --output data/processed/references/elaphes_surface_32.npz \
+  --report-slices
+```
+
+O comando usa os limites XYZ previamente calculados, normaliza os pontos para
+índices ZYX, mostra o progresso a cada milhão de vértices e salva a grade como
+um `.npz` comprimido. O arquivo preserva os limites XYZ, a resolução, o caminho
+da fonte e a convenção de normalização. Nessa grade, `True` significa superfície
+observada, e não espaço aberto de caverna; por isso ela ainda não deve ser usada
+diretamente nas métricas dos volumes gerados.
+
+Execução registrada para o Elaphes em `32³`: 245 de 32.768 voxels (0,75%) foram
+marcados como superfície. O arquivo `elaphes_surface_32.npz` é um artefato local
+de dados processados e não faz parte do Git.
+
 ## Exportação para mesh
 
 ```bash
