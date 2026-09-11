@@ -38,4 +38,5 @@ __pycache__/
 .idea/
 
 # Instruções locais para agentes
+prompt-professor-codex.md
 AGENTS.md
