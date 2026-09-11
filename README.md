@@ -72,6 +72,32 @@ uv pip install -e . --system
 
 Os arquivos em `requirements/` ficam apenas como fallback/compatibilidade para ambientes em que `uv` não estiver disponível.
 
+## Validação para contribuições e forks
+
+Depois de sincronizar as dependências, execute a suíte unitária completa antes
+de abrir um PR, criar um commit importante ou integrar mudanças de outra
+branch:
+
+```bash
+uv run python -m unittest discover -s tests -v
+```
+
+Para investigar apenas um módulo, substitua o caminho pelo arquivo desejado:
+
+```bash
+uv run python -m unittest tests/test_normalization.py -v
+```
+
+Os comandos abaixo são verificações leves que não exigem os datasets externos:
+
+```bash
+# Confere se a interface de linha de comando pode ser importada.
+uv run python -m cavegen.datastream.run_reference_voxelization --help
+
+# Detecta espaços em branco e outros problemas de patch no Git.
+git diff --check
+```
+
 ## Primeiro teste
 
 Gere volumes de Random Walk e Cellular Automata em pequena escala:
