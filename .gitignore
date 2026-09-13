@@ -37,3 +37,8 @@ __pycache__/
 .vscode/
 .idea/
 
+# CA results
+/src/cavegen/generators/cellular_automata/results
+
+# Figuras do CA: refeitas a partir dos npz de results/
+/src/cavegen/generators/cellular_automata/plots
