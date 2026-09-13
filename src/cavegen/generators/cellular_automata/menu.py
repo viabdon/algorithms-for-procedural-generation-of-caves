@@ -9,6 +9,11 @@ aceita o valor X.
 """
 
 from cavegen.generators.cellular_automata.generator import BorderTreatment
+from cavegen.generators.cellular_automata.modifiers import (
+    ESPESSURA_PADRAO,
+    add_center_column,
+    celulas_da_coluna,
+)
 from cavegen.generators.cellular_automata.plot import figura_ja_existe, plotar_resultado
 from cavegen.generators.cellular_automata.results import (
     load_result,
@@ -108,7 +113,10 @@ def escolher_seed():
     print("\n  Seeds gravadas:")
     for numero in sorted(disponiveis):
         info = load_seed_info(numero)
-        print(f"    {numero:03d}  {info['size']}^3  p={info['one_probability']}")
+        origem = ""
+        if "origem_seed_id" in info:
+            origem = f"  <- seed {info['origem_seed_id']:03d} + {info['modificacao']}"
+        print(f"    {numero:03d}  {info['size']}^3  p={info['one_probability']}{origem}")
 
     while True:
         escolha = perguntar("seed", max(disponiveis), int)
@@ -261,10 +269,43 @@ def plotar():
     print("  copie este caminho no navegador:")
     print(f"    {destino}")
 
+def modificar_seed():
+    """
+        Crava uma coluna central em uma seed existente e grava o resultado como seed nova.
+    """
+    print("\n--- Modificar uma seed ---")
+    print("  Crava uma coluna de rocha atravessando o volume de cima a baixo,")
+    print("  centrada nos outros dois eixos, e grava como uma seed nova.")
+    print("  A seed de origem fica intacta, entao da para comparar as duas no CA.")
+
+    seed_id = escolher_seed()
+    if seed_id is None:
+        print("  Nenhuma seed gravada ainda. Use a opcao 1 primeiro.")
+        return
+
+    lado = load_seed_info(seed_id)["size"]
+
+    explicar(
+        "Espessura da coluna",
+        ("Lado da secao quadrada da coluna, em celulas.",
+         f"A coluna atravessa as {lado} celulas do eixo vertical, entao a",
+         "espessura so controla a grossura, nao o comprimento."),
+        faixa=f"1 a {lado}", tipico="3",
+    )
+    espessura = perguntar("espessura", ESPESSURA_PADRAO, int, minimo=1, maximo=lado)
+
+    destino = add_center_column(seed_id, espessura)
+    ocupadas = celulas_da_coluna(lado, espessura)
+
+    print(f"\n  seed gravada: {destino.name}")
+    print(f"  coluna {espessura}x{espessura}x{lado}: {ocupadas} celulas viraram rocha")
+    print(f"  ({100 * ocupadas / lado ** 3:.1f}% do volume)")
+
 OPCOES = {
     "1": ("Criar seed", criar_seed),
     "2": ("Rodar o CA sobre uma seed", rodar_ca),
     "3": ("Plotar um resultado", plotar),
+    "4": ("Modificar uma seed (coluna central)", modificar_seed),
 }
 
 def mostrar_menu():
@@ -294,7 +335,7 @@ def main():
             return
 
         if escolha not in OPCOES:
-            print("  opcao invalida, digite 0, 1, 2 ou 3.")
+            print("  opcao invalida, digite 0, 1, 2, 3 ou 4.")
             continue
 
         try:

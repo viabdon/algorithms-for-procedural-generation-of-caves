@@ -70,11 +70,18 @@ def load_seed_info(seed_id: int, directory: Path = SEEDS_DIR) -> dict:
         directory: pasta onde as seeds são gravadas.
     """
     with np.load(seed_path(seed_id, directory)) as arquivo:
-        return {
+        info = {
             "seed_id": int(arquivo["seed_id"]),
             "size": int(arquivo["size"]),
             "one_probability": float(arquivo["one_probability"]),
         }
+
+        # Seeds nascidas de uma modificação trazem a origem; as sorteadas não.
+        if "origem_seed_id" in arquivo.files:
+            info["origem_seed_id"] = int(arquivo["origem_seed_id"])
+            info["modificacao"] = str(arquivo["modificacao"])
+
+        return info
 
 def load_seed_matrix(seed_id: int, directory: Path = SEEDS_DIR) -> np.ndarray:
     """
