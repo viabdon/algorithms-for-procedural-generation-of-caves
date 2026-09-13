@@ -1,26 +1,28 @@
 """Visualizacao volumetrica 3D no estilo radar/sonar/GPR.
 
-Fundo preto, colormap jet, caixa wireframe (arestas de tras pontilhadas) e um
-gizmo de eixos no canto. Interativo, via plotly.
+Le um volume ja processado pelo CA (pasta results/) e monta a figura interativa
+do plotly: fundo preto, colormap jet, caixa wireframe (arestas de tras
+pontilhadas) e um gizmo de eixos no canto.
 
-    # tamanho, probabilidade de uns, sensibilidade e iteracoes tem default
-    uv run python plots/plot_volumetrico.py
+O HTML e so a janela de visualizacao, nao um resultado: vai para uma pasta
+temporaria do sistema e o caminho e impresso como link. A pasta results/ guarda
+apenas os npz.
 
-    # ou passando os parametros do CA
-    uv run python plots/plot_volumetrico.py 20 0.45 14 3
+    uv run python -m cavegen.generators.cellular_automata.plot 1
 """
 
 import sys
+import tempfile
 from itertools import product
 from pathlib import Path
 
 import numpy as np
 import plotly.graph_objects as go
 
-from cavegen.generators.cellular_automata import cellular_automata, generate_seed_matrix
+from cavegen.generators.cellular_automata.results import RESULTS_DIR, load_result
 
-RAIZ_PROJETO = Path(__file__).resolve().parents[1]
-PASTA_FIGURAS = RAIZ_PROJETO / "results" / "figures"
+# O HTML e descartavel: refeito em um segundo a partir do npz.
+PASTA_FIGURAS = Path(tempfile.gettempdir()) / "cavegen_ca"
 
 # Vista isometrica: elevacao 25 graus, azimute -55 graus.
 ELEVACAO, AZIMUTE, RAIO = 25.0, -55.0, 1.9
@@ -130,12 +132,12 @@ def gizmo_eixos(minimos, maximos):
 
 
 def figura_volumetrica(x, y, z, valores, titulo, minimos=None, maximos=None,
-                       rotulo_escala="intensidade"):
+                    rotulo_escala="intensidade"):
     x, y, z, valores = (np.asarray(v) for v in (x, y, z, valores))
     minimos = np.asarray(minimos if minimos is not None
-                         else [x.min() - 0.5, y.min() - 0.5, z.min() - 0.5], float)
+                        else [x.min() - 0.5, y.min() - 0.5, z.min() - 0.5], float)
     maximos = np.asarray(maximos if maximos is not None
-                         else [x.max() + 0.5, y.max() + 0.5, z.max() + 0.5], float)
+                        else [x.max() + 0.5, y.max() + 0.5, z.max() + 0.5], float)
 
     # Nuvens densas pedem ponto pequeno; poucos pontos somem se ficarem 2px.
     tamanho = 2 if valores.size > 5_000 else 6
@@ -188,36 +190,72 @@ def figura_volumetrica(x, y, z, valores, titulo, minimos=None, maximos=None,
     return figura
 
 
-def dados_do_ca(tamanho=20, probabilidade=0.45, sensibilidade=14, iteracoes=3):
-    """Roda o CA e devolve so as celulas vivas do resultado."""
-    inicial = generate_seed_matrix(tamanho, probabilidade)
-    final = cellular_automata(inicial, sensibilidade, "solid", iteracoes)
-
-    vivas = np.argwhere(final)
+def dados_da_matriz(matrix):
+    """
+        Converte a matriz binária nas coordenadas das células vivas.
+        matrix: matriz binária de um resultado do CA.
+    """
+    vivas = np.argwhere(matrix)
     valores = np.ones(len(vivas), dtype=int)
-    titulo = (f"CA {tamanho}^3 - p={probabilidade} s={sensibilidade} "
-              f"it={iteracoes} - {len(vivas)} celulas vivas")
-    return vivas[:, 0], vivas[:, 1], vivas[:, 2], valores, titulo, "estado"
+    return vivas[:, 0], vivas[:, 1], vivas[:, 2], valores
 
+def titulo_do_resultado(dados, celulas_vivas):
+    """
+        Monta o título da figura com os parâmetros que geraram o resultado.
+        dados: dicionário devolvido por load_result.
+        celulas_vivas: quantidade de células vivas no volume.
+    """
+    return (f"CA {dados['size']}^3 - seed {dados['seed_id']:03d} "
+            f"s={dados['sensitivity']} b={dados['border_treatment']} "
+            f"it={dados['iterations']} - {celulas_vivas} celulas vivas")
 
-def main(argumentos=None, mostrar=True):
-    argumentos = argumentos if argumentos is not None else sys.argv[1:]
-    tipos = (int, float, int, int)
-    parametros = [tipo(valor) for tipo, valor in zip(tipos, argumentos)]
+def caminho_da_figura(result_id, directory=PASTA_FIGURAS):
+    """
+        Caminho do HTML da figura, na pasta temporária de visualização.
+        result_id: número de identificação do resultado.
+        directory: pasta onde os HTML são gravados.
+    """
+    directory = Path(directory)
+    directory.mkdir(parents=True, exist_ok=True)
+    return directory / f"result_{result_id:03d}.html"
 
-    x, y, z, valores, titulo, rotulo = dados_do_ca(*parametros)
-    print(f"{titulo}  pontos: {valores.size}")
+def plotar_resultado(result_id, directory=RESULTS_DIR, mostrar=False):
+    """
+        Lê um resultado, grava o HTML da figura e devolve o caminho do arquivo.
+        result_id: número de identificação do resultado.
+        directory: pasta onde os resultados são gravados.
+        mostrar: abre a figura no navegador além de gravar o HTML.
+    """
+    dados = load_result(result_id, directory)
+    x, y, z, valores = dados_da_matriz(dados["matrix"])
+    titulo = titulo_do_resultado(dados, valores.size)
 
-    figura = figura_volumetrica(x, y, z, valores, titulo, rotulo_escala=rotulo)
+    # A caixa e o volume inteiro, nao a extensao das celulas vivas: mantem a
+    # escala comparavel entre resultados e sobrevive a um volume sem nenhuma viva.
+    lado = dados["size"]
+    figura = figura_volumetrica(
+        x, y, z, valores, titulo,
+        minimos=[-0.5, -0.5, -0.5],
+        maximos=[lado - 0.5, lado - 0.5, lado - 0.5],
+        rotulo_escala="estado",
+    )
 
-    PASTA_FIGURAS.mkdir(parents=True, exist_ok=True)
-    destino = PASTA_FIGURAS / "ca_volumetrico.html"
+    # directory e a pasta dos npz; o HTML tem casa propria, fora de results/.
+    destino = caminho_da_figura(result_id)
     figura.write_html(destino, include_plotlyjs="cdn")
-    print("figura salva em:", destino)
 
     if mostrar:
         figura.show()
 
+    return destino
+
+def main(argumentos=None):
+    argumentos = argumentos if argumentos is not None else sys.argv[1:]
+    if not argumentos:
+        raise SystemExit("informe o numero do resultado, ex: ... plot 1")
+
+    destino = plotar_resultado(int(argumentos[0]))
+    print("figura salva em:", destino.as_uri())
 
 if __name__ == "__main__":
     main()
