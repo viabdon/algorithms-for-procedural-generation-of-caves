@@ -37,5 +37,3 @@ __pycache__/
 .vscode/
 .idea/
 
-# Seeds do CA: regeradas a partir do MASTER_SEED
-/src/cavegen/generators/cellular_automata/seeds/
