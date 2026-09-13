@@ -132,8 +132,11 @@ def gizmo_eixos(minimos, maximos):
 
 
 def figura_volumetrica(x, y, z, valores, titulo, minimos=None, maximos=None,
-                    rotulo_escala="intensidade"):
+                    rotulo_escala="intensidade", limites_cor=None):
     x, y, z, valores = (np.asarray(v) for v in (x, y, z, valores))
+    # Sem limites explicitos o plotly normaliza pelo min/max dos proprios dados,
+    # o que muda a leitura da cor de um resultado para outro.
+    cor_minima, cor_maxima = limites_cor if limites_cor is not None else (None, None)
     minimos = np.asarray(minimos if minimos is not None
                         else [x.min() - 0.5, y.min() - 0.5, z.min() - 0.5], float)
     maximos = np.asarray(maximos if maximos is not None
@@ -153,6 +156,8 @@ def figura_volumetrica(x, y, z, valores, titulo, minimos=None, maximos=None,
                 size=tamanho,
                 color=valores,
                 colorscale="Jet",
+                cmin=cor_minima,
+                cmax=cor_maxima,
                 opacity=0.7,
                 showscale=True,
                 colorbar=dict(
@@ -196,8 +201,7 @@ def dados_da_matriz(matrix):
         matrix: matriz binária de um resultado do CA.
     """
     vivas = np.argwhere(matrix)
-    valores = np.ones(len(vivas), dtype=int)
-    return vivas[:, 0], vivas[:, 1], vivas[:, 2], valores
+    return vivas[:, 0], vivas[:, 1], vivas[:, 2]
 
 def titulo_do_resultado(dados, celulas_vivas):
     """
@@ -241,17 +245,23 @@ def plotar_resultado(result_id, directory=RESULTS_DIR, mostrar=False, refazer=Fa
         return destino
 
     dados = load_result(result_id, directory)
-    x, y, z, valores = dados_da_matriz(dados["matrix"])
-    titulo = titulo_do_resultado(dados, valores.size)
+    x, y, z = dados_da_matriz(dados["matrix"])
+    titulo = titulo_do_resultado(dados, x.size)
 
     # A caixa e o volume inteiro, nao a extensao das celulas vivas: mantem a
     # escala comparavel entre resultados e sobrevive a um volume sem nenhuma viva.
     lado = dados["size"]
+
+    # A celula viva nao tem intensidade: o volume e binario. Colorir pela altura
+    # e o que da leitura de profundidade a nuvem, no lugar de um bloco de uma cor
+    # so. Os limites sao o volume inteiro, entao a mesma cor significa a mesma
+    # altura em qualquer resultado.
     figura = figura_volumetrica(
-        x, y, z, valores, titulo,
+        x, y, z, z, titulo,
         minimos=[-0.5, -0.5, -0.5],
         maximos=[lado - 0.5, lado - 0.5, lado - 0.5],
-        rotulo_escala="estado",
+        rotulo_escala="altura (z)",
+        limites_cor=(0, lado - 1),
     )
 
     figura.write_html(destino, include_plotlyjs="cdn")
