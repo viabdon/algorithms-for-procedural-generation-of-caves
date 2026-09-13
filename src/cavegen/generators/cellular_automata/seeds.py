@@ -2,8 +2,11 @@ from pathlib import Path
 
 import numpy as np
 
+from cavegen.generators.cellular_automata.storage import build_path, next_id, storage_dir, used_ids
+
 # Pasta onde as seeds do CA sao gravadas, ao lado deste arquivo.
-SEEDS_DIR = Path(__file__).resolve().parent / "seeds"
+SEEDS_DIR = storage_dir("seeds")
+SEED_PREFIX = "seed"
 
 def generate_seed_matrix(size: int, one_probability: float) -> np.ndarray:
     """
@@ -17,22 +20,17 @@ def generate_seed_matrix(size: int, one_probability: float) -> np.ndarray:
 
 def used_seed_ids(directory: Path = SEEDS_DIR) -> set:
     """
-        Números de 3 dígitos já ocupados por arquivos na pasta de seeds.
+        Números de 3 dígitos já ocupados por seeds na pasta.
         directory: pasta onde as seeds são gravadas.
     """
-    return {int(caminho.stem[-3:]) for caminho in Path(directory).glob("seed_[0-9][0-9][0-9].npz")}
+    return used_ids(directory, SEED_PREFIX)
 
 def next_seed_id(directory: Path = SEEDS_DIR) -> int:
     """
         Próximo número da sequência, um acima do maior já usado na pasta.
         directory: pasta onde as seeds são gravadas.
     """
-    usados = used_seed_ids(directory)
-    seed_id = max(usados) + 1 if usados else 1
-    if seed_id > 999:
-        raise RuntimeError(f"A sequência de 3 dígitos chegou ao fim em {directory}.")
-
-    return seed_id
+    return next_id(directory, SEED_PREFIX)
 
 def seed_path(seed_id: int, directory: Path = SEEDS_DIR) -> Path:
     """
@@ -40,7 +38,7 @@ def seed_path(seed_id: int, directory: Path = SEEDS_DIR) -> Path:
         seed_id: número de identificação da seed.
         directory: pasta onde as seeds são gravadas.
     """
-    return Path(directory) / f"seed_{seed_id:03d}.npz"
+    return build_path(directory, SEED_PREFIX, seed_id)
 
 def save_seed_matrix(size: int, one_probability: float, directory: Path = SEEDS_DIR) -> Path:
     """
@@ -64,6 +62,19 @@ def save_seed_matrix(size: int, one_probability: float, directory: Path = SEEDS_
     )
 
     return seed_path(seed_id, directory)
+
+def load_seed_info(seed_id: int, directory: Path = SEEDS_DIR) -> dict:
+    """
+        Lê só os parâmetros gravados na seed, sem descomprimir a matriz.
+        seed_id: número de identificação da seed.
+        directory: pasta onde as seeds são gravadas.
+    """
+    with np.load(seed_path(seed_id, directory)) as arquivo:
+        return {
+            "seed_id": int(arquivo["seed_id"]),
+            "size": int(arquivo["size"]),
+            "one_probability": float(arquivo["one_probability"]),
+        }
 
 def load_seed_matrix(seed_id: int, directory: Path = SEEDS_DIR) -> np.ndarray:
     """
