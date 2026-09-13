@@ -57,24 +57,27 @@ def count_neighbors(matrix: np.ndarray, x: int, y: int, z: int, border_treatment
         border_treatment: membro de BorderTreatment, ou a string equivalente.
     """
     border_treatment = BorderTreatment(border_treatment)
+    depth, height, width = matrix.shape
     neighbors = 0
-    base = np.array([x, y, z])
 
     for i in range(3):
         for j in range(3):
             for k in range(3):
-                offset = np.array([i - 1, j - 1, k - 1])
-                current = base + offset
+                current_x = x + i - 1
+                current_y = y + j - 1
+                current_z = z + k - 1
+                inside = 0 <= current_x < depth and 0 <= current_y < height and 0 <= current_z < width
 
-                if (current < 0).any() or (current >= matrix.shape).any():
-                    match border_treatment:
-                        case BorderTreatment.ZEROS:
-                            neighbors = neighbors + 0
-                        case BorderTreatment.ONES:
-                            neighbors = neighbors + 1
-                        case BorderTreatment.RANDOM:
-                            neighbors = neighbors + np.random.randint(0, 2)
-                else:
-                    neighbors = neighbors + matrix[tuple(current)]
+                if inside:
+                    neighbors = neighbors + matrix[current_x, current_y, current_z]
+                    continue
+
+                match border_treatment:
+                    case BorderTreatment.ZEROS:
+                        neighbors = neighbors + 0
+                    case BorderTreatment.ONES:
+                        neighbors = neighbors + 1
+                    case BorderTreatment.RANDOM:
+                        neighbors = neighbors + np.random.randint(0, 2)
 
     return neighbors
