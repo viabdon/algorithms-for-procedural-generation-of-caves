@@ -13,18 +13,21 @@ class BorderTreatment(Enum):
     ONES = "ones"
     RANDOM = "random"
 
-def cellular_automata(matrix: np.ndarray, sensitivity: int, border_treatment: BorderTreatment, iterations: int) -> np.ndarray:
+def cellular_automata(matrix: np.ndarray, sensitivity: int, border_treatment: BorderTreatment, iterations: int, progress=None) -> np.ndarray:
     """
         Aplica o autômato celular sobre a matriz, repetindo o passo N vezes.
         matrix: matriz binária inicial.
         sensitivity: mínimo de vizinhos para a célula virar 1.
         border_treatment: membro de BorderTreatment, ou a string equivalente.
         iterations: quantas vezes o passo é repetido.
+        progress: função opcional chamada ao fim de cada passo com (passo, iterations).
     """
     border_treatment = BorderTreatment(border_treatment)
 
     for i in range(iterations):
         matrix = iterate(matrix, sensitivity, border_treatment)
+        if progress is not None:
+            progress(i + 1, iterations)
 
     return matrix
 
