@@ -9,7 +9,7 @@ aceita o valor X.
 """
 
 from cavegen.generators.cellular_automata.generator import BorderTreatment
-from cavegen.generators.cellular_automata.plot import plotar_resultado
+from cavegen.generators.cellular_automata.plot import figura_ja_existe, plotar_resultado
 from cavegen.generators.cellular_automata.results import (
     load_result,
     load_result_info,
@@ -252,10 +252,14 @@ def plotar():
         print("  Nenhum resultado gravado ainda. Use a opcao 2 primeiro.")
         return
 
-    print("\n  montando a figura...")
+    if figura_ja_existe(result_id):
+        print("\n  esta figura ja estava plotada, reaproveitando o arquivo.")
+    else:
+        print("\n  montando a figura...")
+
     destino = plotar_resultado(result_id)
-    print("  pronto, abra este link no navegador:")
-    print(f"    {destino.as_uri()}")
+    print("  copie este caminho no navegador:")
+    print(f"    {destino}")
 
 OPCOES = {
     "1": ("Criar seed", criar_seed),

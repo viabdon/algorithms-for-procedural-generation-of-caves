@@ -4,15 +4,13 @@ Le um volume ja processado pelo CA (pasta results/) e monta a figura interativa
 do plotly: fundo preto, colormap jet, caixa wireframe (arestas de tras
 pontilhadas) e um gizmo de eixos no canto.
 
-O HTML e so a janela de visualizacao, nao um resultado: vai para uma pasta
-temporaria do sistema e o caminho e impresso como link. A pasta results/ guarda
-apenas os npz.
+O HTML vai para plots/, ao lado do codigo, e o caminho e impresso para copiar
+no navegador. A pasta results/ guarda apenas os npz.
 
     uv run python -m cavegen.generators.cellular_automata.plot 1
 """
 
 import sys
-import tempfile
 from itertools import product
 from pathlib import Path
 
@@ -20,9 +18,11 @@ import numpy as np
 import plotly.graph_objects as go
 
 from cavegen.generators.cellular_automata.results import RESULTS_DIR, load_result
+from cavegen.generators.cellular_automata.storage import storage_dir
 
-# O HTML e descartavel: refeito em um segundo a partir do npz.
-PASTA_FIGURAS = Path(tempfile.gettempdir()) / "cavegen_ca"
+# Figuras ficam no pacote, nao no temp do sistema: o caminho e estavel e curto,
+# da para abrir pelo explorador de arquivos e colar no navegador.
+PASTA_FIGURAS = storage_dir("plots")
 
 # Vista isometrica: elevacao 25 graus, azimute -55 graus.
 ELEVACAO, AZIMUTE, RAIO = 25.0, -55.0, 1.9
@@ -211,7 +211,7 @@ def titulo_do_resultado(dados, celulas_vivas):
 
 def caminho_da_figura(result_id, directory=PASTA_FIGURAS):
     """
-        Caminho do HTML da figura, na pasta temporária de visualização.
+        Caminho do HTML da figura, na pasta plots/ do pacote.
         result_id: número de identificação do resultado.
         directory: pasta onde os HTML são gravados.
     """
@@ -219,13 +219,27 @@ def caminho_da_figura(result_id, directory=PASTA_FIGURAS):
     directory.mkdir(parents=True, exist_ok=True)
     return directory / f"result_{result_id:03d}.html"
 
-def plotar_resultado(result_id, directory=RESULTS_DIR, mostrar=False):
+def figura_ja_existe(result_id, directory=PASTA_FIGURAS) -> bool:
     """
-        Lê um resultado, grava o HTML da figura e devolve o caminho do arquivo.
+        Diz se a figura desse resultado já está gravada em plots/.
+        result_id: número de identificação do resultado.
+        directory: pasta onde os HTML são gravados.
+    """
+    return caminho_da_figura(result_id, directory).exists()
+
+def plotar_resultado(result_id, directory=RESULTS_DIR, mostrar=False, refazer=False):
+    """
+        Grava o HTML da figura e devolve o caminho do arquivo.
+        Se a figura já existir, devolve o caminho sem remontar.
         result_id: número de identificação do resultado.
         directory: pasta onde os resultados são gravados.
         mostrar: abre a figura no navegador além de gravar o HTML.
+        refazer: remonta a figura mesmo que o HTML já exista.
     """
+    destino = caminho_da_figura(result_id)
+    if destino.exists() and not refazer and not mostrar:
+        return destino
+
     dados = load_result(result_id, directory)
     x, y, z, valores = dados_da_matriz(dados["matrix"])
     titulo = titulo_do_resultado(dados, valores.size)
@@ -240,8 +254,6 @@ def plotar_resultado(result_id, directory=RESULTS_DIR, mostrar=False):
         rotulo_escala="estado",
     )
 
-    # directory e a pasta dos npz; o HTML tem casa propria, fora de results/.
-    destino = caminho_da_figura(result_id)
     figura.write_html(destino, include_plotlyjs="cdn")
 
     if mostrar:
@@ -254,8 +266,8 @@ def main(argumentos=None):
     if not argumentos:
         raise SystemExit("informe o numero do resultado, ex: ... plot 1")
 
-    destino = plotar_resultado(int(argumentos[0]))
-    print("figura salva em:", destino.as_uri())
+    destino = plotar_resultado(int(argumentos[0]), refazer=True)
+    print("figura salva em:", destino)
 
 if __name__ == "__main__":
     main()
