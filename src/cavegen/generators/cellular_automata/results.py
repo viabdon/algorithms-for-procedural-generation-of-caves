@@ -5,10 +5,22 @@ import numpy as np
 from cavegen.generators.cellular_automata.generator import BorderTreatment, cellular_automata
 from cavegen.generators.cellular_automata.seeds import load_seed_matrix
 from cavegen.generators.cellular_automata.storage import build_path, next_id, storage_dir, used_ids
+from cavegen.profiling.resource_tracker import track_resources
 
 # Pasta onde os volumes ja processados pelo CA sao gravados, ao lado deste arquivo.
 RESULTS_DIR = storage_dir("results")
 RESULT_PREFIX = "result"
+
+def config_do_run(argumentos: dict) -> str:
+    """
+        Rótulo da configuração de um run, para separar as linhas na planilha de recursos.
+        Sem isso duas execuções do CA com parâmetros diferentes ficariam
+        indistinguíveis na mesma tabela.
+        argumentos: argumentos da chamada de run_and_save, por nome.
+    """
+    borda = BorderTreatment(argumentos["border_treatment"]).value
+    return (f"seed{argumentos['seed_id']:03d} s{argumentos['sensitivity']} "
+            f"{borda} it{argumentos['iterations']}")
 
 def used_result_ids(directory: Path = RESULTS_DIR) -> set:
     """
@@ -32,6 +44,7 @@ def result_path(result_id: int, directory: Path = RESULTS_DIR) -> Path:
     """
     return build_path(directory, RESULT_PREFIX, result_id)
 
+@track_resources(label=config_do_run)
 def run_and_save(seed_id: int, sensitivity: int, border_treatment: BorderTreatment,
                 iterations: int, directory: Path = RESULTS_DIR, progress=None) -> Path:
     """
