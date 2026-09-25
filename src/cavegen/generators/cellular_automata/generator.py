@@ -1,6 +1,14 @@
 from enum import Enum
 
 import numpy as np
+from scipy.ndimage import convolve
+
+# Cubo 3x3x3 de uns: a contagem soma a vizinhança inteira de uma célula de uma
+# vez só. O centro vale 1, então a própria célula entra na própria soma, que é o
+# comportamento que a versão em laço tinha. Zerar o centro (contar 26 vizinhos em
+# vez de 27 células) é uma mudança de regra, não de implementação, e por isso
+# fica para uma decisão separada.
+KERNEL_VIZINHANCA = np.ones((3, 3, 3), dtype=np.int16)
 
 class BorderTreatment(Enum):
     """
@@ -42,49 +50,44 @@ def iterate(matrix: np.ndarray, sensitivity: int, border_treatment: BorderTreatm
         sensitivity: mínimo de vizinhos para a célula virar 1.
         border_treatment: membro de BorderTreatment, ou a string equivalente.
     """
-    border_treatment = BorderTreatment(border_treatment)
-    temp_matrix = np.zeros(matrix.shape, dtype=int)
+    vizinhos = neighbor_counts(matrix, border_treatment)
 
-    for x in range(matrix.shape[0]):
-        for y in range(matrix.shape[1]):
-            for z in range(matrix.shape[2]):
-                neighbors = count_neighbors(matrix, x, y, z, border_treatment)
-                if neighbors >= sensitivity:
-                    temp_matrix[x, y, z] = 1
-                else:
-                    temp_matrix[x, y, z] = 0
+    return (vizinhos >= sensitivity).astype(int)
 
-    return temp_matrix
-
-def count_neighbors(matrix: np.ndarray, x: int, y: int, z: int, border_treatment: BorderTreatment) -> int:
+def neighbor_counts(matrix: np.ndarray, border_treatment: BorderTreatment) -> np.ndarray:
     """
-        Soma as células vivas no cubo 3x3x3 centrado em (x, y, z), incluindo a própria célula.
+        Soma, para cada célula, as células vivas no cubo 3x3x3 centrado nela.
+        Devolve uma matriz de inteiros do mesmo tamanho da entrada, onde cada
+        posição é a soma da vizinhança daquela célula.
         matrix: matriz binária consultada.
-        x, y, z: índices da célula analisada.
         border_treatment: membro de BorderTreatment, ou a string equivalente.
     """
     border_treatment = BorderTreatment(border_treatment)
-    depth, height, width = matrix.shape
-    neighbors = 0
+    moldurada = aplicar_moldura(matrix, border_treatment)
+    # A moldura já fornece todo vizinho de fora de que as células originais
+    # precisam, então o modo de borda da convolução só afeta a própria moldura,
+    # que é descartada no recorte.
+    somas = convolve(moldurada, KERNEL_VIZINHANCA, mode="constant", cval=0)
 
-    for i in range(3):
-        for j in range(3):
-            for k in range(3):
-                current_x = x + i - 1
-                current_y = y + j - 1
-                current_z = z + k - 1
-                inside = 0 <= current_x < depth and 0 <= current_y < height and 0 <= current_z < width
+    return somas[1:-1, 1:-1, 1:-1]
 
-                if inside:
-                    neighbors = neighbors + matrix[current_x, current_y, current_z]
-                    continue
+def aplicar_moldura(matrix: np.ndarray, border_treatment: BorderTreatment) -> np.ndarray:
+    """
+        Envolve a matriz com uma camada de 1 célula representando o lado de fora.
+        Tratar a borda como dado, e não como caso especial da contagem, é o que
+        deixa os três tratamentos passarem pelo mesmo caminho de código.
+        matrix: matriz binária a ser envolvida.
+        border_treatment: membro de BorderTreatment, ou a string equivalente.
+    """
+    border_treatment = BorderTreatment(border_treatment)
+    tamanho_com_moldura = tuple(dimensao + 2 for dimensao in matrix.shape)
 
-                match border_treatment:
-                    case BorderTreatment.ZEROS:
-                        neighbors = neighbors + 0
-                    case BorderTreatment.ONES:
-                        neighbors = neighbors + 1
-                    case BorderTreatment.RANDOM:
-                        neighbors = neighbors + np.random.randint(0, 2)
+    if border_treatment is BorderTreatment.RANDOM:
+        moldurada = np.random.randint(0, 2, size=tamanho_com_moldura).astype(np.int16)
+    else:
+        valor = 1 if border_treatment is BorderTreatment.ONES else 0
+        moldurada = np.full(tamanho_com_moldura, valor, dtype=np.int16)
 
-    return neighbors
+    moldurada[1:-1, 1:-1, 1:-1] = matrix
+
+    return moldurada
