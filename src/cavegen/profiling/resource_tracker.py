@@ -158,7 +158,7 @@ def media_e_pico(valores: list[float | None]) -> tuple[float | None, float | Non
 
 
 def resumo_da_execucao(algorithm: str, label: str, status: str, error: str,
-                       duration_seconds: float, samples: list[ResourceSample]) -> dict[str, Any]:
+    duration_seconds: float, samples: list[ResourceSample]) -> dict[str, Any]:
     """Agrega as amostras de uma execução na linha que vai para o CSV."""
     cpu_media, cpu_pico = media_e_pico([amostra.cpu_percent for amostra in samples])
     rss_media, rss_pico = media_e_pico([amostra.rss_bytes for amostra in samples])
