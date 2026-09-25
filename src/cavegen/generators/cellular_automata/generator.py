@@ -13,9 +13,11 @@ class BorderTreatment(Enum):
     ONES = "ones"
     RANDOM = "random"
 
-def cellular_automata(matrix: np.ndarray, sensitivity: int, border_treatment: BorderTreatment, iterations: int, progress=None) -> np.ndarray:
+def cellular_automata(matrix: np.ndarray, sensitivity: int, border_treatment: BorderTreatment, iterations: int, progress=None) -> tuple[np.ndarray, np.ndarray]:
     """
         Aplica o autômato celular sobre a matriz, repetindo o passo N vezes.
+        Devolve a matriz final e a quantidade de células vivas em cada passo,
+        começando pela matriz inicial (passo 0), então o histórico tem iterations + 1 valores.
         matrix: matriz binária inicial.
         sensitivity: mínimo de vizinhos para a célula virar 1.
         border_treatment: membro de BorderTreatment, ou a string equivalente.
@@ -23,13 +25,15 @@ def cellular_automata(matrix: np.ndarray, sensitivity: int, border_treatment: Bo
         progress: função opcional chamada ao fim de cada passo com (passo, iterations).
     """
     border_treatment = BorderTreatment(border_treatment)
+    historico = [int(matrix.sum())]
 
     for i in range(iterations):
         matrix = iterate(matrix, sensitivity, border_treatment)
+        historico.append(int(matrix.sum()))
         if progress is not None:
             progress(i + 1, iterations)
 
-    return matrix
+    return matrix, np.array(historico, dtype=np.int64)
 
 def iterate(matrix: np.ndarray, sensitivity: int, border_treatment: BorderTreatment) -> np.ndarray:
     """

@@ -16,6 +16,7 @@ from pathlib import Path
 
 import numpy as np
 import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 
 from cavegen.generators.cellular_automata.results import RESULTS_DIR, load_result
 from cavegen.generators.cellular_automata.storage import storage_dir
@@ -29,6 +30,9 @@ ELEVACAO, AZIMUTE, RAIO = 25.0, -55.0, 1.9
 
 COR_CAIXA = "#ffffff"
 CORES_GIZMO = {"X": "#00e676", "Y": "#2196f3", "Z": "#b388ff"}  # verde, azul, roxo
+
+# Faixa da altura da figura (0 = base, 1 = topo) ocupada pelo grafico de linha.
+FAIXA_VERTICAL_HISTORICO = (0.2, 0.8)
 
 
 def camera_isometrica(elevacao=ELEVACAO, azimute=AZIMUTE, raio=RAIO):
@@ -131,8 +135,60 @@ def gizmo_eixos(minimos, maximos):
     return traces
 
 
+def adicionar_historico(figura, historico, total_celulas):
+    """
+        Linha de células vivas por iteração, no painel 2D da direita.
+        figura: figura de make_subplots com o painel xy na coluna 2.
+        historico: células vivas em cada passo, do 0 (seed) ao último.
+        total_celulas: tamanho do volume, para mostrar a porcentagem no hover.
+    """
+    historico = np.asarray(historico)
+    passos = np.arange(historico.size)
+    porcentagem = 100 * historico / total_celulas
+
+    figura.add_trace(
+        go.Scatter(
+            x=passos, y=historico,
+            mode="lines+markers",
+            line=dict(color=COR_CAIXA, width=2),
+            # Anel preto separa os marcadores da linha quando os pontos ficam colados.
+            marker=dict(color=COR_CAIXA, size=8, line=dict(color="black", width=2)),
+            customdata=porcentagem,
+            hovertemplate=("iteracao %{x}<br>%{y} celulas vivas"
+                            "<br>%{customdata:.1f}% do volume<extra></extra>"),
+            showlegend=False,
+        ),
+        row=1, col=2,
+    )
+
+    eixo = dict(
+        color="white", gridcolor="#333333", zeroline=False,
+        showline=True, linecolor="#666666", tickfont=dict(size=11),
+    )
+    figura.update_xaxes(eixo, title_text="iterações", tickformat="d",
+                        dtick=max(1, int(np.ceil(passos.size / 10))), row=1, col=2)
+    # O painel ocupa so a faixa central da altura: na altura toda da figura a
+    # linha ficava alta e estreita demais ao lado do 3D.
+    figura.update_yaxes(eixo, title_text="celulas vivas", tickformat=",d",
+                        domain=list(FAIXA_VERTICAL_HISTORICO), row=1, col=2)
+
+    inicio, fim = figura.layout.xaxis.domain
+    figura.add_annotation(
+        text="celulas vivas por iteração",
+        x=(inicio + fim) / 2, y=FAIXA_VERTICAL_HISTORICO[1],
+        xref="paper", yref="paper", xanchor="center", yanchor="bottom",
+        yshift=8, showarrow=False, font=dict(color="white", size=13),
+    )
+
+
 def figura_volumetrica(x, y, z, valores, titulo, minimos=None, maximos=None,
-                    rotulo_escala="intensidade", limites_cor=None):
+                    rotulo_escala="intensidade", limites_cor=None,
+                    historico=None, total_celulas=None):
+    """
+        Nuvem 3D; com historico, ganha ao lado a linha de células vivas por iteração.
+        historico: células vivas em cada passo, do 0 (seed) ao último.
+        total_celulas: tamanho do volume, para mostrar a porcentagem no hover.
+    """
     x, y, z, valores = (np.asarray(v) for v in (x, y, z, valores))
     # Sem limites explicitos o plotly normaliza pelo min/max dos proprios dados,
     # o que muda a leitura da cor de um resultado para outro.
@@ -146,7 +202,18 @@ def figura_volumetrica(x, y, z, valores, titulo, minimos=None, maximos=None,
     tamanho = 2 if valores.size > 5_000 else 6
 
     olho = camera_isometrica()
-    figura = go.Figure()
+    com_historico = historico is not None
+    if com_historico:
+        figura = make_subplots(
+            rows=1, cols=2,
+            specs=[[{"type": "scene"}, {"type": "xy"}]],
+            column_widths=[0.6, 0.4],
+            horizontal_spacing=0.06,
+        )
+        celula_3d = dict(row=1, col=1)
+    else:
+        figura = go.Figure()
+        celula_3d = {}
 
     figura.add_trace(
         go.Scatter3d(
@@ -169,11 +236,15 @@ def figura_volumetrica(x, y, z, valores, titulo, minimos=None, maximos=None,
             ),
             hovertemplate="(%{x}, %{y}, %{z})<br>" + rotulo_escala + "=%{marker.color}<extra></extra>",
             showlegend=False,
-        )
+        ),
+        **celula_3d,
     )
 
     for trace in caixa_wireframe(minimos, maximos, olho) + gizmo_eixos(minimos, maximos):
-        figura.add_trace(trace)
+        figura.add_trace(trace, **celula_3d)
+
+    if com_historico:
+        adicionar_historico(figura, historico, total_celulas)
 
     eixo_limpo = dict(
         showgrid=False, zeroline=False, showticklabels=False, showbackground=False,
@@ -183,7 +254,7 @@ def figura_volumetrica(x, y, z, valores, titulo, minimos=None, maximos=None,
         title=dict(text=titulo, font=dict(color="white", size=14), x=0.5),
         paper_bgcolor="black",
         plot_bgcolor="black",
-        width=950, height=800,
+        width=1400 if com_historico else 950, height=800,
         margin=dict(l=110, r=10, t=50, b=10),
         scene=dict(
             xaxis=eixo_limpo, yaxis=eixo_limpo, zaxis=eixo_limpo,
@@ -262,6 +333,8 @@ def plotar_resultado(result_id, directory=RESULTS_DIR, mostrar=False, refazer=Fa
         maximos=[lado - 0.5, lado - 0.5, lado - 0.5],
         rotulo_escala="altura (z)",
         limites_cor=(0, lado - 1),
+        historico=dados["live_cells_history"],
+        total_celulas=lado ** 3,
     )
 
     figura.write_html(destino, include_plotlyjs="cdn")

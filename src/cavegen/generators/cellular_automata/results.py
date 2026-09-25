@@ -61,12 +61,13 @@ def run_and_save(seed_id: int, sensitivity: int, border_treatment: BorderTreatme
     directory.mkdir(parents=True, exist_ok=True)
 
     inicial = load_seed_matrix(seed_id)
-    final = cellular_automata(inicial, sensitivity, border_treatment, iterations, progress)
+    final, historico = cellular_automata(inicial, sensitivity, border_treatment, iterations, progress)
 
     result_id = next_result_id(directory)
     np.savez_compressed(
         result_path(result_id, directory),
         matrix=final,
+        live_cells_history=historico,
         result_id=result_id,
         seed_id=seed_id,
         size=final.shape[0],
@@ -96,11 +97,14 @@ def load_result_info(result_id: int, directory: Path = RESULTS_DIR) -> dict:
 def load_result(result_id: int, directory: Path = RESULTS_DIR) -> dict:
     """
         Lê de volta a matriz de um resultado junto dos parâmetros que o geraram.
+        Resultados gravados antes do histórico existir devolvem live_cells_history como None.
         result_id: número de identificação do resultado.
         directory: pasta onde os resultados são gravados.
     """
     dados = load_result_info(result_id, directory)
     with np.load(result_path(result_id, directory)) as arquivo:
         dados["matrix"] = arquivo["matrix"]
+        dados["live_cells_history"] = (arquivo["live_cells_history"]
+                                    if "live_cells_history" in arquivo.files else None)
 
     return dados
