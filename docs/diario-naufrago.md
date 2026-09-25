@@ -24,7 +24,7 @@ diário sem quebrar o padrão.
    entendendo a contagem de vizinhos do CA"). Pode ter uma data real
    associada quando fizer sentido, mas o que importa é a fase, não a data.
 
-3. **Dois tipos de anotação dentro de um Dia:**
+3. **Três tipos de anotação dentro de um Dia:**
    - **Tipo A — Narrativa.** O Felipe descreve livremente o que fez, o que
      tentou, o que deu certo ou errado, e o que entendeu no processo. Escrito
      em primeira pessoa, tom pessoal mas tecnicamente preciso.
@@ -47,6 +47,15 @@ diário sem quebrar o padrão.
         diário, substituindo o placeholder de pendente.
      Nem todo Dia precisa desse bloco — só entra quando falta algo sobre o
      *processo/entendimento*, não sobre nomenclatura ou fatos soltos.
+   - **Tipo C — Dúvidas em aberto.** Perguntas rápidas que o próprio Felipe
+     levanta pra si mesmo enquanto pesquisa ou implementa — do tipo "será que
+     X ajudaria?" — mas sem desenvolver a resposta ali na hora. É basicamente
+     uma garrafa lançada ao mar: fica registrada pra talvez ser respondida
+     num Dia futuro, sem prazo. Diferente do Tipo B: aqui quem pergunta é o
+     **Felipe**, não a IA, e a IA não tenta responder nem aprofundar — só
+     registra a dúvida como citação curta, entre aspas, uma por linha, sem
+     elaboração. Também diferente do Tipo B, não precisa virar par
+     pergunta+resposta — pode ficar em aberto indefinidamente.
 
 4. **Passo a passo para adicionar uma nova entrada** (para uma IA que retome
    este arquivo sem contexto da conversa original):
@@ -57,15 +66,23 @@ diário sem quebrar o padrão.
       preservando a voz em primeira pessoa. Marque o(s) algoritmo(s)
       envolvido(s) (Random Walk 3D, Cellular Automata 3D, ou Geral) e, se der,
       os commits relacionados (hash curto), pra rastreabilidade com o código.
-   4. Avalie se falta algo pro Felipe conseguir reconstruir o raciocínio no
+   4. Se, durante a narrativa, o Felipe soltar uma dúvida rápida sem querer
+      discorrer sobre ela, registre como citação no bloco **Tipo C**, logo
+      depois do Tipo A (ou do Tipo B, se houver) — sem tentar responder.
+      Acrescente essa dúvida também na tabela "Em aberto" do índice de
+      [Dúvidas em aberto](#dúvidas-em-aberto).
+   5. Avalie se falta algo pro Felipe conseguir reconstruir o raciocínio no
       futuro (não nomenclatura — isso corrige direto no Tipo A). Se faltar,
       escreva de 1 a 5 perguntas objetivas num bloco **Tipo B** logo depois
       do Tipo A, com a resposta marcada como pendente, faça as mesmas
       perguntas no chat, e só preencha a resposta no diário depois que o
       Felipe responder ali.
-   5. Atualize a tabela do Sumário com o título e um resumo de uma linha da
+   6. Se uma entrada nova responder uma dúvida que estava em aberto no
+      índice, mova a linha correspondente de "Em aberto" pra "Respondidas",
+      apontando pro Dia onde ela foi resolvida.
+   7. Atualize a tabela do Sumário com o título e um resumo de uma linha da
       nova entrada.
-   6. Use o modelo em [Modelo para novas entradas](#modelo-para-novas-entradas)
+   8. Use o modelo em [Modelo para novas entradas](#modelo-para-novas-entradas)
       como esqueleto.
 
 5. **Idioma e tom.** Português, sempre. Estilo pessoal (é um diário), mas sem
@@ -83,6 +100,25 @@ diário sem quebrar o padrão.
 |---|---|---|---|
 | [Dia 0](#dia-0--abertura-do-diário) | Abertura do diário | Geral | Criação do arquivo e das regras de uso |
 | [Dia 1](#dia-1--primeiro-contato-com-o-cellular-automata-vizinhanças-e-sensibilidade) | Primeiro contato com o Cellular Automata: vizinhanças e sensibilidade | Cellular Automata 3D | Estudo das vizinhanças de Von Neumann e Moore, e a ideia de tornar o gerador mais parametrizável/não-determinístico |
+
+## Dúvidas em aberto
+
+Dúvidas rápidas (Tipo C) levantadas pelo próprio Felipe em algum Dia, sem
+resposta ainda. Quando uma delas for respondida — na narrativa de um Dia
+futuro, por exemplo — a linha se move pra "Respondidas", apontando pra onde
+a resposta ficou registrada.
+
+### Em aberto
+
+| Dúvida | Levantada em |
+|---|---|
+| *(nenhuma ainda)* | |
+
+### Respondidas
+
+| Dúvida | Levantada em | Respondida em |
+|---|---|---|
+| *(nenhuma ainda)* | | |
 
 ---
 
@@ -206,4 +242,13 @@ responder)*
 
 **P2:** [...]
 **R2:** *(pendente)*
+
+### Tipo C — Dúvidas em aberto
+
+[Citações curtas de dúvidas do próprio Felipe, sem elaborar. Adicione cada
+uma também na tabela "Em aberto" do índice de Dúvidas em aberto.]
+
+> "[dúvida do Felipe, como pergunta curta]"
+
+> "[...]"
 ```
