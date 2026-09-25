@@ -115,6 +115,7 @@ diário sem quebrar o padrão.
 | [Dia 1](#dia-1--primeiro-contato-com-o-cellular-automata-vizinhanças-e-sensibilidade) | Primeiro contato com o Cellular Automata: vizinhanças e sensibilidade | Cellular Automata 3D | Estudo das vizinhanças de Von Neumann e Moore, e a ideia de tornar o gerador mais parametrizável/não-determinístico |
 | [Dia 2](#dia-2--visualizando-resultados-padrões-de-decaimento-e-a-explosão-combinatória-de-parâmetros) | Visualizando resultados: padrões de decaimento e a explosão combinatória de parâmetros | Cellular Automata 3D | Plotagens 3D, padrões de crescimento/decaimento de células vivas ao longo das iterações, e o problema de escolher os melhores resultados entre milhares de combinações de parâmetros |
 | [Dia 3](#dia-3--dois-extremos-estruturais-vazio-contínuo-e-bolsões-de-ar-isolados) | Dois extremos estruturais: vazio contínuo e bolsões de ar isolados | Cellular Automata 3D | Padrões estruturais nos extremos de sensibilidade — grande vazio contínuo sem caminhos vs. bolsões de ar isolados dentro da rocha — e a constatação de que nenhum dos dois ainda é uma caverna. Também esclarece que a plotagem inverte rocha/vazio só pra visualização |
+| [Dia 4](#dia-4--hipótese-usar-random-walk-ou-l-system-como-conector-dos-bolsões-de-ar-do-ca) | Hipótese: usar Random Walk ou L-System como conector dos bolsões de ar do CA | Cellular Automata 3D, Random Walk 3D | Ideia (ainda sem conclusão) de usar o CA como esqueleto/"cérebro" e um algoritmo auxiliar pra conectar os bolsões de ar em nós, formando caminhos — e o problema de identificar esses bolsões como nós numa matriz 3D |
 
 ## Dúvidas em aberto
 
@@ -132,6 +133,8 @@ a resposta ficou registrada.
 | "Como escolher os melhores resultados entre as ~1620 combinações de parâmetros sem visualizar todas manualmente?" | [Dia 2](#dia-2--visualizando-resultados-padrões-de-decaimento-e-a-explosão-combinatória-de-parâmetros) |
 | "Dá pra descobrir padrões de carregamento de seed dentro da parametrização do CA, agrupar esses padrões, e será que certos grupos dão resultados visuais melhores que outros?" | [Dia 2](#dia-2--visualizando-resultados-padrões-de-decaimento-e-a-explosão-combinatória-de-parâmetros) |
 | "Como transformar essas estruturas (o grande vazio contínuo ou os bolsões de ar isolados) em algo que realmente pareça uma caverna, com espaços conectados e navegáveis?" | [Dia 3](#dia-3--dois-extremos-estruturais-vazio-contínuo-e-bolsões-de-ar-isolados) |
+| "Usar Random Walk (ou L-System) como conector dos bolsões de ar do CA entrega resultados melhores do que rodar o Random Walk sozinho?" | [Dia 4](#dia-4--hipótese-usar-random-walk-ou-l-system-como-conector-dos-bolsões-de-ar-do-ca) |
+| "Que técnica dá pra usar pra identificar os bolsões de ar como nós dentro de uma matriz 3D?" | [Dia 4](#dia-4--hipótese-usar-random-walk-ou-l-system-como-conector-dos-bolsões-de-ar-do-ca) |
 
 ### Respondidas
 
@@ -356,6 +359,48 @@ pensando em formas de resolver isso (ver Tipo C).
 > "Como transformar essas estruturas (o grande vazio contínuo ou os bolsões
 > de ar isolados) em algo que realmente pareça uma caverna, com espaços
 > conectados e navegáveis?"
+
+---
+
+## Dia 4 — Hipótese: usar Random Walk ou L-System como conector dos bolsões de ar do CA
+
+**Algoritmo:** Cellular Automata 3D, Random Walk 3D
+
+### Tipo A — Narrativa
+
+Depois de ver que nenhum dos extremos do autômato celular forma uma caverna
+de verdade, comecei a pensar em usar algo auxiliar pra criar caminhos
+conectados entre as regiões vazias. A ideia é usar o resultado do CA como
+uma espécie de esqueleto ("cérebro do autômato") e rodar um segundo
+algoritmo em cima dele pra conectar os pedaços.
+
+Já temos o Random Walk implementado como algoritmo próprio, que gera
+caverna sozinho. A ideia nova é diferente: usar esse mesmo Random Walk (ou
+talvez um L-System) não como gerador solo, mas como o algoritmo que
+conecta os bolsões de ar que o autômato celular já encontra. Ainda não
+tirei nenhuma conclusão sobre isso — é só uma hipótese que quero investigar
+(ver Tipo C).
+
+Pra essa ideia funcionar, tem um problema separado que preciso resolver:
+transformar os bolsões de ar — que são aglomerados de voxels, não pontos
+fixos — em algo que dá pra tratar como "nó". Isso significa identificar,
+dentro da matriz 3D, onde estão esses aglomerados e agrupá-los em nós, pra
+poder rodar o algoritmo conector a partir de um nó até encontrar os
+próximos. Ainda não sei que técnica vou usar pra essa identificação (ver
+Tipo C).
+
+De modo geral, ainda preciso discorrer mais sobre o que aplicar em cima dos
+melhores resultados do autômato celular pra conseguir, de fato, gerar uma
+caverna.
+
+### Tipo C — Dúvidas em aberto
+
+> "Usar Random Walk (ou um L-System) como 'cérebro' pra conectar os bolsões
+> de ar do autômato entrega resultados melhores do que rodar o Random Walk
+> sozinho?"
+
+> "Que técnica dá pra usar pra identificar os bolsões de ar como nós dentro
+> de uma matriz 3D?"
 
 ---
 
