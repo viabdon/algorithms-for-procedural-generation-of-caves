@@ -57,6 +57,11 @@ diário sem quebrar o padrão.
      elaboração. Também diferente do Tipo B, não precisa virar par
      pergunta+resposta — pode ficar em aberto indefinidamente.
 
+     Não é obrigatório ter dúvida em todo Dia. Mas é obrigatório **perguntar**
+     — depois que o Felipe terminar de narrar um Dia, a IA sempre pergunta se
+     tem alguma dúvida em aberto pra registrar antes de fechar a entrada. Só
+     não entra bloco Tipo C se a resposta for "não".
+
 4. **Passo a passo para adicionar uma nova entrada** (para uma IA que retome
    este arquivo sem contexto da conversa original):
    1. Leia o Sumário abaixo para saber em que fase a jornada parou.
@@ -70,7 +75,10 @@ diário sem quebrar o padrão.
       discorrer sobre ela, registre como citação no bloco **Tipo C**, logo
       depois do Tipo A (ou do Tipo B, se houver) — sem tentar responder.
       Acrescente essa dúvida também na tabela "Em aberto" do índice de
-      [Dúvidas em aberto](#dúvidas-em-aberto).
+      [Dúvidas em aberto](#dúvidas-em-aberto). Depois que o Felipe terminar
+      de narrar o Dia, pergunte explicitamente se tem mais alguma dúvida em
+      aberto pra registrar antes de fechar a entrada — mesmo que a resposta
+      seja "não" e o Tipo C fique de fora dessa vez.
    5. Avalie se falta algo pro Felipe conseguir reconstruir o raciocínio no
       futuro (não nomenclatura — isso corrige direto no Tipo A). Se faltar,
       escreva de 1 a 5 perguntas objetivas num bloco **Tipo B** logo depois
