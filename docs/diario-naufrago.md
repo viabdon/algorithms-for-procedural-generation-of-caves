@@ -28,12 +28,25 @@ diário sem quebrar o padrão.
    - **Tipo A — Narrativa.** O Felipe descreve livremente o que fez, o que
      tentou, o que deu certo ou errado, e o que entendeu no processo. Escrito
      em primeira pessoa, tom pessoal mas tecnicamente preciso.
+
+     Se, durante a narrativa, o Felipe cometer um engano factual simples
+     (nome errado de um conceito, número trocado etc.) e pedir correção, a
+     correção entra **direto no texto da narrativa**, de forma que o texto
+     fique consistente — isso **não** vira uma pergunta no Tipo B. O Tipo B
+     não serve pra registrar "qual é o nome de X" — isso é só copydesk.
    - **Tipo B — Perguntas & Respostas.** Usado *só quando necessário* — quando
-     a narrativa ficou inconclusiva, confusa, ou quando vale a pena fixar um
-     conceito de um jeito mais fácil de lembrar depois. Quem está assistindo
-     (Claude ou outra IA) faz perguntas objetivas sobre o tema, o Felipe
-     responde, e o par pergunta+resposta é registrado. Nem todo Dia precisa
-     desse bloco — só entra quando ajuda a clarear algo.
+     a narrativa ficou inconclusiva ou faltou algo que o Felipe vai precisar
+     pra lembrar depois **como e por que chegou a uma conclusão** (o objetivo
+     deste diário é ele conseguir reler no futuro e reconstruir o raciocínio,
+     não só o resultado). As perguntas são **sempre escritas por quem está
+     assistindo** (Claude ou outra IA) — nunca pelo Felipe. O fluxo é:
+     1. A IA identifica a lacuna e escreve a pergunta no diário, na entrada
+        do Dia correspondente, deixando a resposta marcada como pendente.
+     2. A IA faz a mesma pergunta no chat, pro Felipe responder ali.
+     3. Quando o Felipe responde no chat, a IA registra a resposta no
+        diário, substituindo o placeholder de pendente.
+     Nem todo Dia precisa desse bloco — só entra quando falta algo sobre o
+     *processo/entendimento*, não sobre nomenclatura ou fatos soltos.
 
 4. **Passo a passo para adicionar uma nova entrada** (para uma IA que retome
    este arquivo sem contexto da conversa original):
@@ -44,11 +57,12 @@ diário sem quebrar o padrão.
       preservando a voz em primeira pessoa. Marque o(s) algoritmo(s)
       envolvido(s) (Random Walk 3D, Cellular Automata 3D, ou Geral) e, se der,
       os commits relacionados (hash curto), pra rastreabilidade com o código.
-   4. Avalie se a explicação ficou completa e clara. Se não — se algo ficou
-      solto, contraditório, ou é um conceito que vale a pena fixar melhor —
-      monte de 2 a 5 perguntas objetivas sobre o tema, peça as respostas ao
-      Felipe, e registre como bloco **Tipo B** logo depois do Tipo A da mesma
-      entrada.
+   4. Avalie se falta algo pro Felipe conseguir reconstruir o raciocínio no
+      futuro (não nomenclatura — isso corrige direto no Tipo A). Se faltar,
+      escreva de 1 a 5 perguntas objetivas num bloco **Tipo B** logo depois
+      do Tipo A, com a resposta marcada como pendente, faça as mesmas
+      perguntas no chat, e só preencha a resposta no diário depois que o
+      Felipe responder ali.
    5. Atualize a tabela do Sumário com o título e um resumo de uma linha da
       nova entrada.
    6. Use o modelo em [Modelo para novas entradas](#modelo-para-novas-entradas)
@@ -178,9 +192,14 @@ o que ficou entendido.]
 
 ### Tipo B — Perguntas & Respostas
 
-**P1:** [pergunta objetiva sobre o tema]
-**R1:** [resposta do Felipe]
+[Perguntas escritas pela IA, sobre o processo/entendimento — nunca sobre
+nomenclatura ou fatos soltos (isso corrige direto no Tipo A). Faça as mesmas
+perguntas no chat antes de preencher a resposta aqui.]
+
+**P1:** [pergunta da IA]
+**R1:** *(pendente — perguntar no chat e preencher depois que o Felipe
+responder)*
 
 **P2:** [...]
-**R2:** [...]
+**R2:** *(pendente)*
 ```
