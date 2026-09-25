@@ -46,7 +46,12 @@ diário sem quebrar o padrão.
      3. Quando o Felipe responde no chat, a IA registra a resposta no
         diário, substituindo o placeholder de pendente.
      Nem todo Dia precisa desse bloco — só entra quando falta algo sobre o
-     *processo/entendimento*, não sobre nomenclatura ou fatos soltos.
+     *processo/entendimento*, não sobre nomenclatura ou fatos soltos. As
+     narrativas do Felipe vêm por ditado de voz — erros de transcrição
+     (palavra errada, nome trocado por outro parecido) **não** viram
+     pergunta de Tipo B: corrija direto no Tipo A, sem comentário. O Tipo B é
+     pra coisas que vão pesar na conclusão do TCC ou no entendimento do
+     processo — não pra copydesk de transcrição.
    - **Tipo C — Dúvidas em aberto.** Perguntas rápidas que o próprio Felipe
      levanta pra si mesmo enquanto pesquisa ou implementa — do tipo "será que
      X ajudaria?" — mas sem desenvolver a resposta ali na hora. É basicamente
