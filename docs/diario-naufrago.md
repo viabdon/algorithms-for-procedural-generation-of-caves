@@ -118,11 +118,19 @@ início do Random Walk 3D.
 
 Comecei estudando o que de fato é um autômato celular e percebi que o
 resultado final depende de várias variáveis — entre elas, a forma como o
-autômato "enxerga" os vizinhos de cada célula. Lembrei que existem (pelo
-menos) dois tipos clássicos de vizinhança: um em formato de cruz, e outro que
-enxerga tudo em volta, incluindo as diagonais, mas não tinha certeza dos
-nomes nem de quantos vizinhos cada um via em 3D — pedi correção sobre isso
-(ver Tipo B).
+autômato "enxerga" os vizinhos de cada célula. Existem dois tipos clássicos
+de vizinhança: **Von Neumann** (formato de cruz, só as faces ortogonais) e
+**Moore** (o cubo/quadrado completo, incluindo diagonais). Eu tinha as
+contagens de 3D erradas de cabeça — pensei que fossem 26 e 8. O certo é:
+
+| Vizinhança | 2D | 3D |
+|---|---|---|
+| Von Neumann | 4 vizinhos | 6 vizinhos |
+| Moore | 8 vizinhos | 26 vizinhos |
+
+O 8 que eu lembrava era o Moore em 2D; em 3D ele cresce pra 26 (6 faces + 12
+arestas + 8 cantos do cubo 3x3x3 ao redor da célula), e o Von Neumann em 3D é
+6, não 8.
 
 Percebi também que mexer na quantidade de vizinhos considerados é algo bem
 sensível para o resultado final do autômato. Isso me fez pensar num dilema:
@@ -130,47 +138,43 @@ inicialmente eu queria uma função bem básica — determinística, sempre
 entregando o mesmo resultado pra mesma entrada — mas comecei a achar que,
 para fins científicos (o TCC compara algoritmos), faz mais sentido ter
 funções mais robustas e parametrizáveis, que aceitem variação controlada em
-vez de um comportamento fixo. Esse pensamento ainda ficou incompleto (ver
-pergunta aberta no Tipo B).
+vez de um comportamento fixo.
 
 ### Tipo B — Perguntas & Respostas
 
-**P1 (Felipe perguntou, corrigindo o entendimento):** Quais são os nomes
-corretos das duas vizinhanças clássicas de autômato celular, e quantos
-vizinhos cada uma enxerga em 2D e em 3D?
+**P1:** Conferindo o `count_neighbors` em
+`src/cavegen/generators/cellular_automata/generator.py:55`: hoje ele varre um
+cubo 3x3x3 inteiro ao redor de `(x, y, z)` — só implementa Moore 3D, sem
+opção de Von Neumann — e o próprio docstring diz que a soma inclui "a própria
+célula", ou seja, na prática são 27 células somadas (26 vizinhos + o
+centro), não 26. Isso foi uma escolha deliberada (uma variante
+"vizinhança + self", comum em geração de cavernas) ou passou batido e devia
+excluir a célula central?
 
-**R1:** Os nomes estão certos — **Von Neumann** (a "cruz") e **Moore** (o
-"quadrado"/"cubo cheio", o nome que faltava). As contagens:
+**R1:** Não dá pra considerar 100% um erro. A vizinhança em si tem 26
+vizinhos, mas se a célula se conta como entidade, isso cria um viés: uma
+célula que já é 1 ganha um "voto de desempate" a favor de continuar 1 (ela
+mesma conta como vizinho vivo), o que dá prioridade pra manter células já
+vivas e ajuda menos as células que são 0 a virarem 1. Ou seja, o autocount
+não é necessariamente errado, mas introduz um comportamento observável —
+talvez seja algo pra corrigir mais pra frente, mas por enquanto fica
+registrado como algo a observar na produção do código.
 
-| Vizinhança | 2D | 3D |
-|---|---|---|
-| Von Neumann (cruz — só faces ortogonais) | 4 vizinhos | 6 vizinhos |
-| Moore (cubo/quadrado completo, incluindo diagonais) | 8 vizinhos | 26 vizinhos |
+**P2:** Você começou a dizer que queria migrar de uma função determinística
+pra uma "mais robusta"/"mais volátil" para fins científicos, mas a frase
+ficou pela metade. Isso significa parametrizar o autômato (vizinhança,
+sensibilidade, seed, tratamento de borda etc. configuráveis) mantendo
+reprodutibilidade via seed, em vez de deixar tudo fixo no código? E isso já
+é o motivo por trás do `BorderTreatment` (zeros/ones/random) e do modificador
+de seed com coluna central que já existem no projeto, ou é uma ideia nova que
+ainda não foi implementada?
 
-Ou seja, em 3D não é "26 e 8" — é **26 (Moore) e 6 (Von Neumann)**. O 8 que
-você lembrou é o Moore *2D*; em 3D ele cresce pra 26 porque conta as 6 faces
-+ 12 arestas + 8 cantos do cubo 3x3x3 ao redor da célula.
-
-**P2 (verificação no código atual):** O `count_neighbors` em
-`src/cavegen/generators/cellular_automata/generator.py:55` varre um cubo
-3x3x3 inteiro ao redor de `(x, y, z)` — ou seja, hoje o gerador só implementa
-**Moore 3D**, não tem Von Neumann como opção. Só que o docstring da função diz
-"incluindo a própria célula": o laço soma as **27** células do cubo (26
-vizinhos + a célula central), não só os 26 vizinhos. Isso é intencional (uma
-variante "vizinhança + self" bem comum em geração de cavernas), ou era pra
-excluir a célula central e não excluiu?
-
-**R2:** *(em aberto — responder na próxima entrada)*
-
-**P3 (completando o raciocínio cortado):** Você começou a dizer que queria
-migrar de uma função determinística pra uma "mais robusta"/"mais volátil"
-para fins científicos, mas a frase ficou pela metade. Você quis dizer
-parametrizar o autômato (permitir variar vizinhança, sensibilidade, seed,
-tratamento de borda etc. por configuração, mantendo reprodutibilidade via
-seed) em vez de ter tudo fixo no código? Isso bate com o `BorderTreatment`
-(zeros/ones/random) e a seed com coluna central que já existem no projeto?
-
-**R3:** *(em aberto — responder na próxima entrada)*
+**R2:** É sobre poder receber parâmetros diferentes pra fazer experimentos
+mais rápidos. Em vez de deixar toda modificação do autômato hardcoded e ter
+que reescrever o código toda vez que eu quiser uma variação diferente, a
+ideia é poder configurar os parâmetros mais facilmente e rodar vários de uma
+vez — e, futuramente, talvez até usar um algoritmo genético pra descobrir os
+melhores hiperparâmetros.
 
 ---
 
