@@ -114,6 +114,7 @@ diário sem quebrar o padrão.
 | [Dia 0](#dia-0--abertura-do-diário) | Abertura do diário | Geral | Criação do arquivo e das regras de uso |
 | [Dia 1](#dia-1--primeiro-contato-com-o-cellular-automata-vizinhanças-e-sensibilidade) | Primeiro contato com o Cellular Automata: vizinhanças e sensibilidade | Cellular Automata 3D | Estudo das vizinhanças de Von Neumann e Moore, e a ideia de tornar o gerador mais parametrizável/não-determinístico |
 | [Dia 2](#dia-2--visualizando-resultados-padrões-de-decaimento-e-a-explosão-combinatória-de-parâmetros) | Visualizando resultados: padrões de decaimento e a explosão combinatória de parâmetros | Cellular Automata 3D | Plotagens 3D, padrões de crescimento/decaimento de células vivas ao longo das iterações, e o problema de escolher os melhores resultados entre milhares de combinações de parâmetros |
+| [Dia 3](#dia-3--dois-extremos-estruturais-vazio-contínuo-e-bolsões-de-ar-isolados) | Dois extremos estruturais: vazio contínuo e bolsões de ar isolados | Cellular Automata 3D | Padrões estruturais nos extremos de sensibilidade — grande vazio contínuo sem caminhos vs. bolsões de ar isolados dentro da rocha — e a constatação de que nenhum dos dois ainda é uma caverna. Também esclarece que a plotagem inverte rocha/vazio só pra visualização |
 
 ## Dúvidas em aberto
 
@@ -130,6 +131,7 @@ a resposta ficou registrada.
 | "Será que fazer testes com cálculos matemáticos mais sofisticados ajudaria a melhorar o resultado?" | [Dia 1](#dia-1--primeiro-contato-com-o-cellular-automata-vizinhanças-e-sensibilidade) |
 | "Como escolher os melhores resultados entre as ~1620 combinações de parâmetros sem visualizar todas manualmente?" | [Dia 2](#dia-2--visualizando-resultados-padrões-de-decaimento-e-a-explosão-combinatória-de-parâmetros) |
 | "Dá pra descobrir padrões de carregamento de seed dentro da parametrização do CA, agrupar esses padrões, e será que certos grupos dão resultados visuais melhores que outros?" | [Dia 2](#dia-2--visualizando-resultados-padrões-de-decaimento-e-a-explosão-combinatória-de-parâmetros) |
+| "Como transformar essas estruturas (o grande vazio contínuo ou os bolsões de ar isolados) em algo que realmente pareça uma caverna, com espaços conectados e navegáveis?" | [Dia 3](#dia-3--dois-extremos-estruturais-vazio-contínuo-e-bolsões-de-ar-isolados) |
 
 ### Respondidas
 
@@ -301,6 +303,59 @@ momento (não junto com essa fase) e vai virar sua própria entrada no Dia 3.
 > "Dá pra descobrir padrões de carregamento de seed dentro da parametrização
 > do CA, agrupar esses padrões, e será que certos grupos dão resultados
 > visuais melhores que outros?"
+
+---
+
+## Dia 3 — Dois extremos estruturais: vazio contínuo e bolsões de ar isolados
+
+**Algoritmo:** Cellular Automata 3D
+
+### Tipo A — Narrativa
+
+Nessa fase aprofundei um pouco mais nos resultados visuais do autômato,
+olhando o que diferentes combinações de parâmetros produzem
+estruturalmente.
+
+Uma clareza que vale registrar: metodologicamente, "célula viva" (o valor 1
+da matriz) é rocha — isso está até no texto do menu do projeto ("chance de
+cada célula nascer viva (rocha)"). Só que, **só pra facilitar a plotagem**,
+eu ando considerando 1 como se fosse o vazio na hora de desenhar (uma matriz
+invertida só pra visualização) — assim, o que aparece renderizado no plot é
+a forma do espaço vazio (os "buracos" entre as rochas) em vez da casca
+externa da rocha, que é bem menos informativa de se olhar. Ou seja: quanto
+mais voxels aparecem concentrados no plot, mais espaço vazio tem ali.
+
+Correção sobre o armazenamento: os dados **não** estão sendo salvos com
+1 = rocha — hoje eles são salvos exatamente do jeito que já ficam prontos
+pra plotagem (ou seja, na forma invertida). Pretendo, no futuro, adicionar
+uma conversão (inverter todo 0 em 1 e todo 1 em 0) pra alinhar o que fica
+salvo com a definição metodológica de 1 = rocha, mas isso ainda não foi
+implementado — é uma decisão em aberto, a ser tomada mais pra frente.
+
+Levando essa inversão em conta, encontrei dois padrões estruturais bem
+distintos nos extremos (já reinterpretando em termos do espaço vazio, não
+da rocha):
+- Com **sensibilidade alta** — o que no plot aparecia como "um grande
+  aglomerado" — o resultado real é um grande espaço vazio contínuo, sem
+  formar caminhos distintos — uma cavidade única grande, não uma rede de
+  túneis.
+- Com **sensibilidade baixa** — os "geodos" no plot — não é rocha, é o
+  oposto: bolsões de ar isolados dentro de uma massa de rocha — pequenas
+  câmaras vazias e densas, mas desconectadas entre si.
+
+Ainda não rodei a parametrização completa (as ~1620 combinações do Dia 2) —
+testei manualmente entre 30 e 50 combinações até agora — mas esse padrão de
+dois extremos já apareceu de forma consistente.
+
+Nenhum dos dois extremos é, de fato, uma caverna ainda — falta a estrutura
+de vazios conectados e navegáveis que se espera de uma caverna. Estamos
+pensando em formas de resolver isso (ver Tipo C).
+
+### Tipo C — Dúvidas em aberto
+
+> "Como transformar essas estruturas (o grande vazio contínuo ou os bolsões
+> de ar isolados) em algo que realmente pareça uma caverna, com espaços
+> conectados e navegáveis?"
 
 ---
 
