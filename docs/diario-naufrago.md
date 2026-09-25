@@ -120,7 +120,8 @@ a resposta ficou registrada.
 
 | Dúvida | Levantada em |
 |---|---|
-| *(nenhuma ainda)* | |
+| "Será que o algoritmo consegue alcançar a melhor eficiência?" | [Dia 1](#dia-1--primeiro-contato-com-o-cellular-automata-vizinhanças-e-sensibilidade) |
+| "Será que fazer testes com cálculos matemáticos mais sofisticados ajudaria a melhorar o resultado?" | [Dia 1](#dia-1--primeiro-contato-com-o-cellular-automata-vizinhanças-e-sensibilidade) |
 
 ### Respondidas
 
@@ -219,6 +220,13 @@ que reescrever o código toda vez que eu quiser uma variação diferente, a
 ideia é poder configurar os parâmetros mais facilmente e rodar vários de uma
 vez — e, futuramente, talvez até usar um algoritmo genético pra descobrir os
 melhores hiperparâmetros.
+
+### Tipo C — Dúvidas em aberto
+
+> "Será que o algoritmo consegue alcançar a melhor eficiência?"
+
+> "Será que fazer testes com cálculos matemáticos mais sofisticados ajudaria a
+> melhorar o resultado?"
 
 ---
 
