@@ -68,6 +68,7 @@ diário sem quebrar o padrão.
 | Dia | Título | Algoritmo | Resumo |
 |---|---|---|---|
 | [Dia 0](#dia-0--abertura-do-diário) | Abertura do diário | Geral | Criação do arquivo e das regras de uso |
+| [Dia 1](#dia-1--primeiro-contato-com-o-cellular-automata-vizinhanças-e-sensibilidade) | Primeiro contato com o Cellular Automata: vizinhanças e sensibilidade | Cellular Automata 3D | Estudo das vizinhanças de Von Neumann e Moore, e a ideia de tornar o gerador mais parametrizável/não-determinístico |
 
 ---
 
@@ -92,6 +93,70 @@ ciclo completo, e mais recentemente um refactor da medição de recursos
 (profiling). A partir da próxima entrada, o diário passa a registrar o
 raciocínio por trás dessas decisões e o que vier a seguir — incluindo o
 início do Random Walk 3D.
+
+---
+
+## Dia 1 — Primeiro contato com o Cellular Automata: vizinhanças e sensibilidade
+
+**Algoritmo:** Cellular Automata 3D
+
+### Tipo A — Narrativa
+
+Comecei estudando o que de fato é um autômato celular e percebi que o
+resultado final depende de várias variáveis — entre elas, a forma como o
+autômato "enxerga" os vizinhos de cada célula. Lembrei que existem (pelo
+menos) dois tipos clássicos de vizinhança: um em formato de cruz, e outro que
+enxerga tudo em volta, incluindo as diagonais, mas não tinha certeza dos
+nomes nem de quantos vizinhos cada um via em 3D — pedi correção sobre isso
+(ver Tipo B).
+
+Percebi também que mexer na quantidade de vizinhos considerados é algo bem
+sensível para o resultado final do autômato. Isso me fez pensar num dilema:
+inicialmente eu queria uma função bem básica — determinística, sempre
+entregando o mesmo resultado pra mesma entrada — mas comecei a achar que,
+para fins científicos (o TCC compara algoritmos), faz mais sentido ter
+funções mais robustas e parametrizáveis, que aceitem variação controlada em
+vez de um comportamento fixo. Esse pensamento ainda ficou incompleto (ver
+pergunta aberta no Tipo B).
+
+### Tipo B — Perguntas & Respostas
+
+**P1 (Felipe perguntou, corrigindo o entendimento):** Quais são os nomes
+corretos das duas vizinhanças clássicas de autômato celular, e quantos
+vizinhos cada uma enxerga em 2D e em 3D?
+
+**R1:** Os nomes estão certos — **Von Neumann** (a "cruz") e **Moore** (o
+"quadrado"/"cubo cheio", o nome que faltava). As contagens:
+
+| Vizinhança | 2D | 3D |
+|---|---|---|
+| Von Neumann (cruz — só faces ortogonais) | 4 vizinhos | 6 vizinhos |
+| Moore (cubo/quadrado completo, incluindo diagonais) | 8 vizinhos | 26 vizinhos |
+
+Ou seja, em 3D não é "26 e 8" — é **26 (Moore) e 6 (Von Neumann)**. O 8 que
+você lembrou é o Moore *2D*; em 3D ele cresce pra 26 porque conta as 6 faces
++ 12 arestas + 8 cantos do cubo 3x3x3 ao redor da célula.
+
+**P2 (verificação no código atual):** O `count_neighbors` em
+`src/cavegen/generators/cellular_automata/generator.py:55` varre um cubo
+3x3x3 inteiro ao redor de `(x, y, z)` — ou seja, hoje o gerador só implementa
+**Moore 3D**, não tem Von Neumann como opção. Só que o docstring da função diz
+"incluindo a própria célula": o laço soma as **27** células do cubo (26
+vizinhos + a célula central), não só os 26 vizinhos. Isso é intencional (uma
+variante "vizinhança + self" bem comum em geração de cavernas), ou era pra
+excluir a célula central e não excluiu?
+
+**R2:** *(em aberto — responder na próxima entrada)*
+
+**P3 (completando o raciocínio cortado):** Você começou a dizer que queria
+migrar de uma função determinística pra uma "mais robusta"/"mais volátil"
+para fins científicos, mas a frase ficou pela metade. Você quis dizer
+parametrizar o autômato (permitir variar vizinhança, sensibilidade, seed,
+tratamento de borda etc. por configuração, mantendo reprodutibilidade via
+seed) em vez de ter tudo fixo no código? Isso bate com o `BorderTreatment`
+(zeros/ones/random) e a seed com coluna central que já existem no projeto?
+
+**R3:** *(em aberto — responder na próxima entrada)*
 
 ---
 
