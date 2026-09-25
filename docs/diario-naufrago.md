@@ -113,6 +113,7 @@ diário sem quebrar o padrão.
 |---|---|---|---|
 | [Dia 0](#dia-0--abertura-do-diário) | Abertura do diário | Geral | Criação do arquivo e das regras de uso |
 | [Dia 1](#dia-1--primeiro-contato-com-o-cellular-automata-vizinhanças-e-sensibilidade) | Primeiro contato com o Cellular Automata: vizinhanças e sensibilidade | Cellular Automata 3D | Estudo das vizinhanças de Von Neumann e Moore, e a ideia de tornar o gerador mais parametrizável/não-determinístico |
+| [Dia 2](#dia-2--visualizando-resultados-padrões-de-decaimento-e-a-explosão-combinatória-de-parâmetros) | Visualizando resultados: padrões de decaimento e a explosão combinatória de parâmetros | Cellular Automata 3D | Plotagens 3D, padrões de crescimento/decaimento de células vivas ao longo das iterações, e o problema de escolher os melhores resultados entre milhares de combinações de parâmetros |
 
 ## Dúvidas em aberto
 
@@ -127,12 +128,14 @@ a resposta ficou registrada.
 |---|---|
 | "Será que o algoritmo consegue alcançar a melhor eficiência?" | [Dia 1](#dia-1--primeiro-contato-com-o-cellular-automata-vizinhanças-e-sensibilidade) |
 | "Será que fazer testes com cálculos matemáticos mais sofisticados ajudaria a melhorar o resultado?" | [Dia 1](#dia-1--primeiro-contato-com-o-cellular-automata-vizinhanças-e-sensibilidade) |
+| "Como escolher os melhores resultados entre as ~1620 combinações de parâmetros sem visualizar todas manualmente?" | [Dia 2](#dia-2--visualizando-resultados-padrões-de-decaimento-e-a-explosão-combinatória-de-parâmetros) |
+| "Dá pra descobrir padrões de carregamento de seed dentro da parametrização do CA, agrupar esses padrões, e será que certos grupos dão resultados visuais melhores que outros?" | [Dia 2](#dia-2--visualizando-resultados-padrões-de-decaimento-e-a-explosão-combinatória-de-parâmetros) |
 
 ### Respondidas
 
 | Dúvida | Levantada em | Respondida em |
 |---|---|---|
-| *(nenhuma ainda)* | | |
+| "Dá pra fazer outras plotagens auxiliares pra acompanhar o crescimento/decaimento das células vivas ao longo das iterações?" | Dia 2 | [Dia 2](#dia-2--visualizando-resultados-padrões-de-decaimento-e-a-explosão-combinatória-de-parâmetros) — sim, está planejado, ainda não feito |
 
 ---
 
@@ -232,6 +235,72 @@ melhores hiperparâmetros.
 
 > "Será que fazer testes com cálculos matemáticos mais sofisticados ajudaria a
 > melhorar o resultado?"
+
+---
+
+## Dia 2 — Visualizando resultados: padrões de decaimento e a explosão combinatória de parâmetros
+
+**Algoritmo:** Cellular Automata 3D
+
+### Tipo A — Narrativa
+
+Nessa fase foquei na visualização dos resultados. O gerador — já rodando com
+a contagem de 27 vizinhos que veio do Dia 1 — está produzindo resultados que
+eu consigo plotar em 3D e comparar entre execuções diferentes.
+
+Percebi que o resultado é extremamente sensível à sensibilidade (ao
+parâmetro que define quantos vizinhos uma célula precisa pra virar 1):
+quando esse limiar exige muitos vizinhos, o autômato praticamente apaga
+tudo — algumas execuções terminam sem nenhuma célula viva. Por causa disso,
+incluí nas plotagens uma forma de conferir a quantidade de células vivas no
+resultado final.
+
+Testando manualmente vários parâmetros e comparando diferentes quantidades
+de iterações, percebi pelo menos três padrões de comportamento diferentes,
+em cubos de 64x64x64:
+- **decaimento simples** — a quantidade de voxels vivos só cai;
+- **decaimento e depois crescimento** — cai e depois sobe de novo, como uma
+  parábola invertida;
+- **decaimento suave** — cai bem pouco, um comportamento mais logarítmico.
+
+Importante: esses padrões vieram de observar os resultados manualmente,
+comparando execuções — ainda não fiz uma plotagem dedicada que acompanhe a
+quantidade de células vivas ao longo do percurso (iteração por iteração)
+dentro de uma mesma execução. Isso ainda é TODO — é a próxima plotagem
+auxiliar que pretendo fazer.
+
+O outro ponto é o crescimento combinatório dos parâmetros: cada parâmetro
+novo multiplica a quantidade de combinações a testar (é uma análise
+combinatória — um parâmetro com 2 valores vezes outro com 3 valores já dá 6
+combinações, e por aí vai). Contando os parâmetros atuais do autômato — mas
+sem contar a seed, que fica de fora dessa conta por enquanto e vai ganhar
+sua própria história no Dia 3 — já estou em ~1620 combinações possíveis, o
+que torna inviável visualizar uma por uma manualmente. Por isso estou
+pensando em usar um arquivo **YAML** pra descrever vários parâmetros de uma
+vez e gerar um lote de autômatos automaticamente, em vez de testar um por
+um manualmente. Só que ainda não sei qual vai ser o método pra escolher os
+melhores resultados dentro desse volume — ter os dados é uma coisa, saber
+quais são os dados bons é outra, e visualizar as 1620 combinações uma por
+uma não é viável (ver Tipo C).
+
+### Tipo B — Perguntas & Respostas
+
+**P1:** Pra bater com as ~1620 combinações (sem contar seed): quais
+parâmetros estão entrando nessa conta hoje e quantos valores cada um está
+assumindo nos testes?
+
+**R1:** Todos os parâmetros atuais do autômato entram na conta, exceto a
+seed — essa fica de fora por enquanto, porque foi implementada em outro
+momento (não junto com essa fase) e vai virar sua própria entrada no Dia 3.
+
+### Tipo C — Dúvidas em aberto
+
+> "Como escolher os melhores resultados entre as ~1620 combinações de
+> parâmetros sem ter que visualizar todas manualmente?"
+
+> "Dá pra descobrir padrões de carregamento de seed dentro da parametrização
+> do CA, agrupar esses padrões, e será que certos grupos dão resultados
+> visuais melhores que outros?"
 
 ---
 
