@@ -6,24 +6,27 @@ O objetivo do projeto é comparar algoritmos clássicos e baseados em aprendizad
 
 ## Estratégia atual
 
-A arquitetura foi reorganizada para priorizar um pipeline científico **offline-first**:
+A arquitetura prioriza um pipeline científico **offline-first**:
 
-1. Python gera volumes 3D padronizados em voxels.
-2. As métricas quantitativas são calculadas em Python.
-3. Os volumes e meshes são exportados para arquivos (`.npz`, `.obj`, `.glb`) para inspeção e visualização.
-4. Unity é usada inicialmente como visualizador, não como fonte das métricas científicas.
-5. gRPC entra como fase posterior para integração interativa Python ↔ Unity.
-6. Google Colab/CUDA é o backend inicial para treinamento de GAN/PCGRL.
-7. AMD/ROCm fica como portabilidade opcional se houver tempo.
+1. Referências reais seguem point cloud → normais → Screened Poisson Surface
+   Reconstruction → malha validada → classificação interior/exterior → SDF/TSDF
+   → `VOID`, `SURFACE`, `SOLID` e `UNKNOWN`.
+2. Python gera volumes 3D, calcula métricas e registra benchmarks.
+3. Cellular Automata básico será comparado com versões guiadas por um SDF de
+   controle e, em etapa final, otimizadas por algoritmo genético.
+4. Arquivos `.npz` e malhas permitem inspeção na Unity; gRPC é posterior.
+5. Colab/CUDA é opção inicial de treino neural, e AMD/ROCm é portabilidade
+   opcional.
 
 Essa decisão reduz risco operacional e mantém o foco principal na comparação quantitativa dos algoritmos.
 
 ## Algoritmos previstos
 
 - Random Walk 3D
-- Cellular Automata 3D
-- GAN 3D, inicialmente com DCGAN/WGAN simplificada em volumes pequenos
-- PCGRL 3D, inicialmente com ambiente reduzido e recompensas simples
+- Cellular Automata 3D básico, guiado por SDF e depois ajustado por algoritmo
+  genético
+- GAN 3D, com arquitetura a escolher após auditar os volumes disponíveis
+- PCGRL 3D, após definir e validar o ambiente e a recompensa
 
 ## Convenção de volume
 
@@ -32,7 +35,9 @@ Neste repositório, um volume 3D é representado por um `numpy.ndarray` booleano
 - `True`: voxel aberto, isto é, espaço de caverna/túnel.
 - `False`: voxel fechado/sólido.
 
-Essa convenção permite calcular IoU, conectividade e morfologia diretamente sobre o espaço navegável da caverna.
+Essa convenção descreve os **volumes gerados**. A referência real incluirá
+também SDF/TSDF, rótulos e máscara de `UNKNOWN`; IoU só será aplicada às
+regiões `VOID` válidas e comparáveis.
 
 ## Estrutura
 
@@ -110,7 +115,7 @@ uv run python -m cavegen.benchmark.run_generation_benchmark \
 
 Os volumes gerados serão salvos em `results/volumes/` e a tabela de tempos em `results/csv/`.
 
-## Voxelização de referência PLY
+## Voxelização direta de superfície para diagnóstico
 
 Para inspecionar uma nuvem de pontos PLY como grade de voxels de superfície,
 execute uma primeira passagem em baixa resolução. O leitor processa o arquivo
@@ -131,14 +136,29 @@ O comando usa os limites XYZ previamente calculados, normaliza os pontos para
 índices ZYX, mostra o progresso a cada milhão de vértices e salva a grade como
 um `.npz` comprimido. O arquivo preserva os limites XYZ, a resolução, o caminho
 da fonte e a convenção de normalização. Nessa grade, `True` significa superfície
-observada, e não espaço aberto de caverna; por isso ela ainda não deve ser usada
-diretamente nas métricas dos volumes gerados.
+observada, e não espaço aberto de caverna. Ela serve ao diagnóstico do scan e
+não substitui a reconstrução de malha nem a classificação volumétrica.
 
 Execução registrada para o Elaphes em `32³`: 245 de 32.768 voxels (0,75%) foram
 marcados como superfície. O arquivo `elaphes_surface_32.npz` é um artefato local
 de dados processados e não faz parte do Git.
 
-## Exportação para mesh
+## Reconstrução da referência real
+
+A rota planejada parte novamente da point cloud em coordenadas contínuas.
+Screened Poisson é o método principal para reconstruir a malha; Ball Pivoting
+e Alpha Shapes são fallbacks a investigar. Entradas de caverna e faces de
+fechamento sintéticas devem ser registradas. Felipe implementará flood fill e
+SDF/TSDF inicialmente em casos sintéticos, enquanto Pablo prepara a malha.
+O campo terá sinal negativo em `VOID`, positivo em `SOLID/EXTERIOR`, uma banda
+`SURFACE` perto de zero e `UNKNOWN` onde a classificação for incerta.
+
+Para o CA, um SDF de **controle simplificado**, independente da caverna de
+teste, poderá enviesar a regra. Usar o SDF exato da referência de teste é um
+experimento distinto de reconstrução condicionada. O algoritmo genético será
+avaliado depois de estabilizar `CA+SDF`.
+
+## Exportação de volumes gerados para malha
 
 ```bash
 uv run python -m cavegen.meshing.export_mesh \
@@ -148,15 +168,21 @@ uv run python -m cavegen.meshing.export_mesh \
 
 ## Roadmap resumido
 
-1. Criar esqueleto técnico do repositório.
-2. Implementar Random Walk 3D e Cellular Automata 3D.
-3. Implementar métricas em Python: IoU, conectividade e estatísticas morfológicas.
-4. Exportar volumes e meshes para visualização offline.
-5. Criar visualizador simples em Unity por importação de arquivos.
-6. Treinar modelos GAN/PCGRL no Colab.
-7. Rodar benchmark principal com mesmas seeds, dimensões e métricas.
-8. Adicionar gRPC como integração interativa.
-9. Testar portabilidade AMD/ROCm se houver tempo.
+1. Preparar normais, reconstruir e validar a malha da referência real.
+2. Desenvolver em paralelo flood fill, SDF/TSDF e CA guiado por um campo
+   sintético; depois integrar a malha real.
+3. Validar rótulos, máscaras e métricas no mesmo domínio espacial.
+4. Comparar CA básico, CA+SDF e, ao final, CA+SDF+algoritmo genético.
+5. Auditar dados para GAN e formalizar o MDP antes do PCGRL; treinar modelos
+   pequenos e separar custo de treinamento de geração.
+6. Consolidar benchmarks em Python e visualizar os resultados na Unity.
+
+A lista detalhada, com decisões ainda abertas, está em
+[`Orientacao-codex.md`](Orientacao-codex.md). A justificativa das métricas e da
+reconstrução está em [`docs/methodology-adjustments.md`](docs/methodology-adjustments.md).
+As tarefas individuais estão em
+[`Pablo`](docs/tarefas-pablo-reconstrucao-modelos.md) e
+[`Felipe`](docs/tarefas-felipe-sdf-ca.md).
 
 ## Observação sobre benchmarks
 

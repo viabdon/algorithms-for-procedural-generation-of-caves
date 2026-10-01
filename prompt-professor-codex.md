@@ -155,6 +155,12 @@ Portanto, quando aparecerem conceitos como:
 * GANs;
 * DCGAN;
 * WGAN;
+* Screened Poisson Surface Reconstruction;
+* malhas watertight, entradas e tampas sintéticas;
+* flood fill e classificação interior/exterior;
+* SDF, TSDF e regiões `UNKNOWN`;
+* Cellular Automata guiado por SDF;
+* algoritmos genéticos para otimização do CA;
 * funções de perda;
 * treinamento adversarial;
 * PCGRL;
@@ -182,7 +188,13 @@ Em especial:
 * a representação padrão dos geradores é um volume booleano 3D;
 * uma nuvem de pontos escaneada representa principalmente **superfície**;
 * `surface_voxels` não deve ser confundido com `void_voxels`;
-* qualquer conversão entre essas representações precisa ser metodologicamente justificável, pois isso afeta diretamente as métricas do TCC.
+* a rota atual da referência é point cloud → normais → Screened Poisson (ou
+  fallback justificado) → malha validada → interior/exterior → SDF/TSDF →
+  `VOID`, `SURFACE`, `SOLID` e `UNKNOWN`;
+* um SDF de controle simplificado pode guiar o CA; o SDF exato da referência de
+  teste caracteriza reconstrução condicionada e deve ser avaliado à parte;
+* qualquer conversão entre representações precisa ser metodologicamente
+  justificada, pois afeta diretamente as métricas do TCC.
 
 Não esconda simplificações metodológicas apenas para facilitar a implementação. Caso uma decisão técnica possa comprometer a validade experimental do TCC, avise antes de prosseguirmos.
 
@@ -201,28 +213,20 @@ Quando eu disser que implementei uma etapa:
 
 Se houver um erro muito específico, você pode mostrar um pequeno trecho ilustrativo da correção, mas preserve o caráter didático.
 
-## Estado atual da sessão (2026-08-27)
+## Estado atual do projeto (2026-09-30)
 
-O trabalho avançou até os parsers incrementais de ``.f32`` e ``.ply``:
+Os parsers incrementais `.f32` e `.ply`, os limites completos do Elaphes,
+normalização e voxelização direta de superfície em `32³` já existem. Random
+Walk e Cellular Automata básico geram `Volume3D`; GAN e PCGRL ainda são
+esqueletos. Não há no código uma malha reconstruída da point cloud, flood fill,
+SDF/TSDF, CA condicionado nem algoritmo genético.
 
-* ``count_f32_points`` valida a estrutura de registros de sete ``float32``;
-* ``open_f32_records`` abre o arquivo em modo somente leitura via
-  ``numpy.memmap``;
-* ``iter_f32_xyz`` produz lotes XYZ de forma ``(n_no_lote, 3)``;
-* ``read_ply_header`` valida o cabeçalho PLY;
-* ``iter_ply_xyz`` produz lotes XYZ de PLY ASCII por streaming e de PLY
-  binário via ``numpy.memmap``;
-* o cabeçalho do PLY real do Elaphes foi inspecionado: é ASCII 1.0, declara
-  ``94_465_067`` vértices, tem ``vertex`` como primeiro elemento e XYZ
-  ``float64`` compatível com a conversão controlada para ``float32``;
-* ``calculate_xyz_bounds`` em ``cavegen.datastream.bounds`` calcula mínimos e
-  máximos globais por lotes XYZ, e seus testes cobrem extremos, lote vazio e
-  entradas inválidas.
-
-Ainda falta executar o cálculo de limites sobre o PLY completo quando o HD
-estiver montado. A próxima tarefa de implementação é normalizar espacialmente
-os lotes com esses limites; a voxelização deve gerar ``surface_voxels`` e não
-tratar a superfície como volume de vazios sem discutir a decisão metodológica.
+As próximas frentes são paralelas. Pablo prepara a point cloud, estima/orienta
+normais, reconstrói e valida uma malha via Screened Poisson e define a semântica
+dos artefatos. Felipe implementa flood fill e SDF primeiro em formas sintéticas,
+usa um campo de controle independente para enviesar o CA e, ao final, estuda a
+otimização por algoritmo genético. Consulte `Orientacao-codex.md` e as listas
+individuais em `docs/` para prioridades atualizadas.
 
 ## Começando agora
 

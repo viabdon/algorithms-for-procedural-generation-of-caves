@@ -8,14 +8,17 @@ __pycache__/
 # Notebooks
 .ipynb_checkpoints/
 
-# Data and generated artifacts
+# Dados brutos e derivados (amostras, normais, malhas reconstruídas, SDF/TSDF)
 /data/raw/*
 /data/processed/*
 /data/external/*
 /data/references/*
+
+# Resultados gerados e busca de parâmetros do CA
 /results/csv/*
 /results/figures/*
 /results/meshes/*
+/results/optimization/*
 /results/profiling/*
 /results/volumes/*
 /models/checkpoints/*

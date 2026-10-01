@@ -100,37 +100,63 @@ comando de voxelização exige o caminho de saída para não perder a inspeção
 arquivo e seus metadados de limites, origem e normalização foram validados após
 a escrita.
 
-**Próxima verificação:** inspecionar esse resultado e só então repetir em
-``64³`` e ``128³``. Depois, definir uma conversão metodologicamente justificável
-para ``void_voxels``.
+**Interpretação atual:** a grade `32³` é um artefato diagnóstico de superfície.
+Ela não é entrada suficiente para o Screened Poisson nem uma referência de
+`VOID`. A próxima rota parte novamente da point cloud contínua e inclui
+normais, reconstrução de malha, classificação e SDF/TSDF. Inspeções em
+resoluções distintas continuam úteis para sensibilidade, mas não substituem a
+validação da malha. As tarefas foram divididas entre
+[`Pablo`](tarefas-pablo-reconstrucao-modelos.md) e
+[`Felipe`](tarefas-felipe-sdf-ca.md).
 
-## Fase 1 — Baselines clássicos
+## Fase 1 — Baselines clássicos (implementação básica concluída)
 
-Implementar Random Walk 3D e Cellular Automata 3D. Esses algoritmos validam a representação volumétrica, o controle de seeds, a exportação e o cálculo de métricas antes de introduzir o custo dos modelos de IA.
+Random Walk 3D e Cellular Automata 3D já geram `Volume3D`. O CA básico será
+preservado como controle para `CA+SDF` e, depois, `CA+SDF+GA`. Reexecutar esses
+baselines após fixar o protocolo final.
 
-## Fase 2 — Métricas e exportação
+## Fase 2 — Reconstrução de malha real
 
-Implementar IoU, conectividade, volume ocupado, número de componentes, estatísticas morfológicas simples, exportação `.npz` e exportação `.obj` por Marching Cubes.
+Estimar/orientar normais da point cloud, reconstruir com Screened Poisson e
+validar malha, entradas, tampas sintéticas e regiões extrapoladas. Estudar Ball
+Pivoting/Alpha Shapes como fallbacks quando os critérios não forem cumpridos.
+A malha de Marching Cubes já existente é extraída de volumes gerados e não
+substitui esta fase.
 
-## Fase 3 — Visualização offline na Unity
+## Fase 3 — Interior/exterior, SDF e rótulos
 
-Criar um visualizador simples por importação de arquivos. A Unity não calcula a tabela principal do TCC nessa fase.
+Implementar flood fill e SDF/TSDF primeiro em geometria sintética, em paralelo
+à reconstrução do Elaphes. Integrar depois a malha validada. Tratar entradas,
+gaps e `UNKNOWN` explicitamente. Persistir campo físico, campo truncado,
+`VOID/SURFACE/SOLID/UNKNOWN`, máscara de validade, escala e parâmetros.
 
-## Fase 4 — IA no Colab
+## Fase 4 — CA condicionado e otimização genética
 
-Treinar modelos de IA em Colab, começando pequeno:
+Usar um SDF simplificado independente do scan de teste para enviesar o CA;
+comparar pesos e regras contra o CA básico. Quando `CA+SDF` estiver estável,
+testar um algoritmo genético para otimizar parâmetros sob orçamento controlado,
+com treino/validação/teste separados. Relatar custo de busca à parte.
 
-- GAN 3D simplificada em `32³` ou `64³`.
-- PCGRL 3D com ambiente reduzido e recompensas simples.
+## Fase 5 — Métricas e modelos neurais
 
-## Fase 5 — Benchmark principal
+Há implementações básicas de IoU, conectividade e morfologia. Adicionar
+alinhamento/máscara válida e métricas de superfície antes da avaliação real.
+Auditar dados para GAN/TSDF; especificar o MDP do PCGRL e validar ambiente
+pequeno antes de PPO. As interfaces neurais atuais ainda não geram volumes.
 
-Rodar todos os algoritmos com mesmas seeds, dimensões e métricas. Separar treinamento e inferência para modelos de IA.
+## Fase 6 — Benchmark principal
 
-## Fase 6 — Integração gRPC
+Comparar Random Walk, CA, CA+SDF, CA+SDF+GA e modelos neurais quando prontos,
+com geração repetida, domínio comum e dispersão. Separar custos de preparação
+da referência, otimização por GA, treinamento neural, geração e exportação.
+Controlar vazamento entre regiões vizinhas; limitar conclusões quando não
+houver cavernas independentes suficientes.
 
-Adicionar Python como servidor gRPC e Unity como cliente somente após o pipeline científico estar funcional.
+## Fase 7 — Visualização e integração
 
-## Fase 7 — Portabilidade AMD/ROCm
+Unity visualiza arquivos produzidos em Python. Adicionar gRPC somente após o
+pipeline científico estar funcional.
+
+## Fase 8 — Portabilidade AMD/ROCm
 
 Executar amostra menor no ambiente AMD/ROCm, se houver tempo, tratando-a como contribuição técnica complementar.

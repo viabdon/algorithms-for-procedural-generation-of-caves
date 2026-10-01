@@ -1,69 +1,96 @@
-# Lista de tarefas — dados reais, voxelização e IA
+# Próximos passos do TCC — reconstrução, campos de distância e geração
 
-## Parsers e inspeção de datasets
+**Estado em 30/09/2026.** Os leitores PLY/F32, limites XYZ do Elaphes,
+voxelização direta de superfície em `32³`, `Volume3D`, Random Walk, Cellular
+Automata básico e algumas métricas já existem. Ainda não há reconstrução de
+malha a partir da point cloud, classificação interior/exterior, SDF/TSDF,
+CA condicionado, GAN ou PCGRL funcional. A grade `elaphes_surface_32.npz`
+contém 245 células com pontos observados; ela é um diagnóstico, não a referência
+volumétrica final.
 
-- [x] Corrigir a configuração do Elaphes para o formato `.ply` em
-  `configs/datasets.yaml`.
-- [x] Implementar o parser incremental `.f32` em `src/cavegen/datastream/f32.py`:
-  validação do layout, `numpy.memmap` somente leitura e lotes XYZ `float32`.
-- [x] Implementar o parser incremental `.ply` em `src/cavegen/datastream/ply.py`:
-  validação de cabeçalho, PLY ASCII por streaming e PLY binário por
-  `numpy.memmap`.
-- [x] Criar testes sintéticos para PLY ASCII, binário little-endian e cabeçalho
-  inválido em `tests/test_ply.py`.
-- [ ] Inspecionar formalmente `data/raw/nasa/indian_tunnel.f32`: confirmar
-  endianness, layout de sete atributos e valores plausíveis de XYZ.
-- [x] Inspecionar o cabeçalho real de
-  `/run/media/midnavi/Pablo/TCC/DATA/RAW/elaphes_cave.ply`: PLY ASCII 1.0,
-  `94_465_067` vértices, `vertex` como primeiro elemento, XYZ `float64` e 16
-  atributos escalares adicionais. Um lote real de 2.048 pontos foi lido com
-  sucesso como XYZ `float32` finito.
-- [x] Adicionar `reservoir_sample_xyz` em `cavegen.datastream.sampling` para
-  amostragem reprodutível por `max_points`, sem carregar o dataset inteiro.
+## Caminho metodológico adotado
 
-## Pré-processamento e voxelização
+```text
+point cloud -> normais estimadas/orientadas -> Screened Poisson (principal)
+            -> malha validada e aproximadamente watertight
+            -> entradas tratadas e interior/exterior classificados
+            -> SDF em grade -> TSDF para aprendizagem/controle
+            -> VOID / SURFACE / SOLID / UNKNOWN
+```
 
-- [x] Implementar e testar `calculate_xyz_bounds` em
-  `src/cavegen/datastream/bounds.py`: mínimos e máximos incrementais,
-  `float32`, lotes vazios, validações e testes em `tests/test_bounds.py`.
-- [x] Executar `calculate_xyz_bounds` sobre todos os `94_465_067` vértices do
-  Elaphes e registrar os limites definitivos para a normalização em
-  `data/params/elaphes_xyz_bounds.json`.
-- [x] Definir e implementar a normalização espacial em
-  `src/cavegen/core/normalization.py`, preservando proporções com uma escala
-  compartilhada, padding simétrico e tratamento de eixos degenerados.
-- [x] Criar `src/cavegen/core/voxelization.py` para gerar
-  `surface_voxels: np.ndarray[bool]` a partir de pontos normalizados.
-- [x] Integrar leitura PLY, limites persistidos, normalização e voxelização em
-  `src/cavegen/datastream/reference_preprocessing.py`, com teste de integração
-  em `tests/test_reference_preprocessing.py`.
-- [x] Voxelizar o Elaphes em `32³`: o arquivo
-  `elaphes_surface_32.npz` contém 245 voxels de superfície em 32.768 (0,75%).
-- [ ] Avaliar o Elaphes em `64³` e `128³` somente após inspecionar o resultado
-  salvo em `32³`.
-- [x] Salvar referências de superfície em `.npz` com metadados de origem,
-  resolução e normalização, em formato separado de `Volume3D`.
-- [ ] Documentar em `docs/` a diferença metodológica entre `surface_voxels` e
-  `void_voxels`, incluindo as limitações de usar IoU diretamente entre ambos.
-- [ ] Definir e justificar qualquer conversão de superfície para volume vazio
-  antes de comparar dados reais com os geradores.
+Ball Pivoting e Alpha Shapes são candidatos de fallback da **reconstrução de
+malha**, caso o Poisson não produza uma geometria aceitável. Flood fill é uma
+implementação da **classificação**; consultas de ocupação ou winding numbers
+podem servir de comparação/fallback. O sinal do SDF depende da classificação:
+`SDF < 0` para `VOID`, `SDF > 0` para `SOLID/EXTERIOR`; uma banda `|SDF| ≤ ε`
+define `SURFACE`, e regiões sem evidência recebem `UNKNOWN`/máscara inválida.
+SDF e rótulos categóricos são artefatos distintos. Ver
+[`docs/architecture.md`](docs/architecture.md) e
+[`docs/methodology-adjustments.md`](docs/methodology-adjustments.md).
 
-## Dataset para GAN e Colab
+## Responsabilidades e dependências
 
-- [ ] Gerar um dataset sintético inicial com Random Walk e Cellular Automata.
-- [ ] Produzir inicialmente cerca de 1.000 volumes `32³` e manter dados e
-  checkpoints fora do Git.
-- [ ] Definir o formato para PyTorch: `(B, 1, D, H, W)`.
-- [ ] Criar notebook mínimo em `notebooks/colab/` com instalação, carregamento
-  de `.npz`, visualização de slices, `Dataset`, `DataLoader` e inspeção de um
-  batch.
-- [ ] Implementar um baseline neural simples (autoencoder ou DCGAN) antes de
-  iniciar WGAN ou PCGRL.
+| Frente | Responsável principal | Entrega que libera a outra frente |
+| --- | --- | --- |
+| Preparação da point cloud, normais, Screened Poisson, fallback e validação da malha | Pablo | Malha com coordenadas, orientação, entradas/tampas e proveniência documentadas |
+| Contrato semântico dos quatro rótulos, política de `UNKNOWN`, avaliação, GAN e PCGRL | Pablo | Especificação de sinal, grade, máscara de validade e protocolo de treino/teste |
+| Flood fill interior/exterior, SDF/TSDF em grade e testes geométricos | Felipe | Campo assinado e rótulos verificáveis, integráveis à malha validada |
+| CA com viés espacial por SDF de controle | Felipe | Baseline condicionado reproduzível, separado do CA original |
+| Algoritmo genético para otimizar o CA, após CA+SDF | Felipe | Comparação sob orçamento de busca e teste reservado |
 
-## Ordem recomendada
+As listas executáveis e metas indicativas estão em
+[`tarefas-pablo-reconstrucao-modelos.md`](docs/tarefas-pablo-reconstrucao-modelos.md)
+e [`tarefas-felipe-sdf-ca.md`](docs/tarefas-felipe-sdf-ca.md). As duas frentes
+podem avançar juntas: Felipe desenvolve flood fill e SDF com geometrias
+sintéticas e um campo tubular de controle, sem aguardar o PLY completo; Pablo
+entrega uma malha candidata para a integração posterior.
 
-1. Validar os dois datasets reais com seus parsers.
-2. Calcular limites e normalização incrementalmente.
-3. Voxelizar a superfície em baixa resolução e documentar a semântica.
-4. Gerar o dataset sintético e preparar o notebook Colab.
-5. Treinar GAN; deixar PCGRL para depois do baseline clássico e neural.
+## Marcos conjuntos
+
+- [ ] Acordar contrato XYZ↔ZYX, origem, espaçamento físico, sinal do SDF,
+  `ε`, `τ`, máscaras de `UNKNOWN`, limites da região de interesse e formato dos
+  artefatos. Uma mudança nesse contrato precisa ser refletida nas duas frentes.
+- [ ] Validar, em formas fechadas conhecidas, malha → classificação → SDF →
+  rótulos. Testar abertura legítima, gap acidental, orientação invertida e
+  superfície não watertight antes do Elaphes real.
+- [ ] Submeter a malha reconstruída a critérios de fechamento, orientação,
+  manifoldness, interseções, componentes, distância aos pontos, área de tampas
+  sintéticas e sensibilidade a parâmetros/resolução. `Watertight` isoladamente
+  não garante `VOID` correto.
+- [ ] Integrar a malha aceita ao flood fill/SDF. Se a incerteza impedir um
+  sinal defensável em alguma região, preservá-la como `UNKNOWN`; não converter
+  ausência de ponto em rocha ou ar por padrão.
+- [ ] Derivar `VOID`, `SURFACE` e `SOLID` do SDF apenas em células válidas;
+  persistir também SDF físico, TSDF normalizado, metadados e proveniência. Usar
+  IoU volumétrica contra dados reais só onde `VOID` de referência for válido.
+- [ ] Comparar CA clássico e CA condicionado sob seeds, forma, hardware e
+  orçamento equivalentes; medir aderência ao controle, conectividade,
+  diversidade, custo e sensibilidade ao peso do SDF.
+- [ ] Depois de estabilizar CA+SDF, avaliar se o algoritmo genético melhora
+  parâmetros da regra/controle contra uma busca simples de mesmo orçamento.
+  Reservar o teste e separar custo de otimização do tempo de geração.
+- [ ] Depois da referência validada, preparar divisões de dados sem vazamento
+  espacial e decidir modelos GAN/PCGRL. O SDF exato da caverna de teste só pode
+  alimentar um experimento separado de reconstrução condicionada, não o teste
+  principal de geração.
+
+## Ordem após a integração
+
+1. Medir similaridade de superfície, volume e topologia em Python, com domínio
+   e resolução comparáveis e `UNKNOWN` excluído ou explicitamente reportado.
+2. Auditar quantidade de cavernas independentes antes de treinar GAN; estudar
+   se TSDF/volume binário é a representação adequada. Um dataset sintético
+   testa infraestrutura, sem demonstrar fidelidade às cavernas reais.
+3. Especificar o MDP do PCGRL (`estado`, `ação`, `transição`, `recompensa`,
+   `término`) e usar estatísticas apenas do treino. Validar ambiente pequeno
+   antes de PPO/Conv3D; manter dados e métricas de teste fora da recompensa.
+4. Reexecutar baselines, registrar custos de preparação, treinamento e geração
+   separadamente, e atualizar o texto do TCC. Unity permanece visualizador e
+   gRPC segue posterior ao pipeline científico.
+5. Inspecionar o NASA Indian Tunnel `.f32`, seus atributos e limites completos
+   antes de aplicar nele a mesma reconstrução; não pressupor que seus dados
+   tenham cobertura ou normais equivalentes aos do Elaphes.
+
+Mudanças Python com contrato observável exigem testes em `tests/`; antes de
+concluí-las, executar a suíte disponível e uma importação ou exemplo pequeno,
+conforme `AGENTS.md`.
