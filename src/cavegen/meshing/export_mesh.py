@@ -5,7 +5,7 @@ from pathlib import Path
 
 import trimesh
 
-from cavegen.io.voxel_io import load_volume_npz
+from cavegen.datastream.voxel_io import load_volume_npz
 from cavegen.meshing.marching_cubes import volume_to_mesh
 
 

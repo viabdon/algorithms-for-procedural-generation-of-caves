@@ -3,7 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from cavegen.core.volume import Volume3D
-from cavegen.io.voxel_io import load_volume_npz
+from cavegen.datastream.voxel_io import load_volume_npz
 
 
 def load_reference_volume(path: str | Path) -> Volume3D:
