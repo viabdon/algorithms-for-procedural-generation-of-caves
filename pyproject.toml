@@ -28,6 +28,10 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+reconstruction = [
+  "open3d-cpu>=0.20,<0.21; sys_platform == 'linux'",
+  "open3d>=0.20,<0.21; sys_platform != 'linux'"
+]
 ml = [
   "torch>=2.2",
   "stable-baselines3>=2.3",
