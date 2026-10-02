@@ -114,8 +114,25 @@ extensões posteriores; custo de treinamento e inferência devem ser separados.
 
 ## 6. Integração
 
-As métricas e tabelas científicas ficam em Python. Unity usa malhas/volumes
-para inspeção, e gRPC permanece posterior. Comparações de tempo devem separar
+As métricas e tabelas científicas ficam em Python. Unity renderiza as malhas
+finais; arquivos OBJ intermediários podem ser inspecionados lá, e gRPC permanece
+posterior. Comparações de tempo devem separar
 CPU local, Colab/CUDA e eventual ROCm, com versões, backend e parâmetros
 identificados. Seeds iguais tornam cada método reproduzível, mas não
 emparelham geometrias equivalentes entre algoritmos.
+
+Registrar em cada execução: hash da entrada, algoritmo, versão da biblioteca,
+parâmetros, backend, número de threads e, quando houver sorteio, seed aleatória
+e gerador utilizado. A `interior_seed_xyz` do protótipo Poisson é uma coordenada
+sabidamente dentro da caverna para orientar normais, não uma seed de sorteio;
+persisti-la separadamente. As regras atuais `first` e `centroid` não usam RNG;
+`first` depende da ordem dos registros no PLY. Mesmo com parâmetros iguais, checar resultados
+numéricos quando backend ou paralelismo mudar.
+
+Na preparação para Poisson, os bins são células de uma grade XYZ regular e não
+a octree adaptativa interna do reconstrutor. Comparar `first` com `centroid`
+mantendo limites, número de bins, normais e profundidade iguais. Para o
+centróide, registrar contagem e dispersão XYZ por bin. Média pode amortecer
+ruído, mas mistura folhas de superfície diferentes quando dividem uma célula;
+dispersão alta pede inspeção ou bins menores. Aceitar a malha com métricas de
+suporte, bordas e topologia, não somente pela aparência de suavidade.

@@ -25,8 +25,8 @@ podem servir de comparação/fallback. O sinal do SDF depende da classificação
 `SDF < 0` para `VOID`, `SDF > 0` para `SOLID/EXTERIOR`; uma banda `|SDF| ≤ ε`
 define `SURFACE`, e regiões sem evidência recebem `UNKNOWN`/máscara inválida.
 SDF e rótulos categóricos são artefatos distintos. Ver
-[`docs/architecture.md`](docs/architecture.md) e
-[`docs/methodology-adjustments.md`](docs/methodology-adjustments.md).
+[`arquitetura`](docs/metodologia/architecture.md) e
+[`ajustes de metodologia`](docs/metodologia/methodology-adjustments.md).
 
 ## Responsabilidades e dependências
 
@@ -39,8 +39,8 @@ SDF e rótulos categóricos são artefatos distintos. Ver
 | Algoritmo genético para otimizar o CA, após CA+SDF | Felipe | Comparação sob orçamento de busca e teste reservado |
 
 As listas executáveis e metas indicativas estão em
-[`tarefas-pablo-reconstrucao-modelos.md`](docs/tarefas-pablo-reconstrucao-modelos.md)
-e [`tarefas-felipe-sdf-ca.md`](docs/tarefas-felipe-sdf-ca.md). As duas frentes
+[`tarefas-pablo-reconstrucao-modelos.md`](docs/tarefas/tarefas-pablo-reconstrucao-modelos.md)
+e [`tarefas-felipe-sdf-ca.md`](docs/tarefas/tarefas-felipe-sdf-ca.md). As duas frentes
 podem avançar juntas: Felipe desenvolve flood fill e SDF com geometrias
 sintéticas e um campo tubular de controle, sem aguardar o PLY completo; Pablo
 entrega uma malha candidata para a integração posterior.

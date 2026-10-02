@@ -2,12 +2,15 @@
 
 ## Estado do repositório e decisão
 
-Python permanece como ambiente de preparação, geração, métricas e benchmark;
-Unity visualiza os artefatos, e gRPC é posterior. O código atual lê XYZ em
+Python permanece como ambiente de preparação, reconstrução, métricas e benchmark;
+Unity renderiza as malhas finais, e gRPC é posterior. A etapa Poisson em Python
+produz um arquivo de malha e metadados; não depende de renderização em Python.
+O código atual lê XYZ em
 lotes, calcula limites, gera `surface_voxels` por ocupação de pontos, produz
 `Volume3D` para Random Walk/CA e extrai malhas desses volumes por Marching
 Cubes. **Marching Cubes não reconstrói a point cloud real**; a rota de
-referência descrita abaixo ainda precisa ser implementada.
+referência agora possui um primeiro protótipo de Screened Poisson em
+`cavegen.meshing.poisson`, ainda sem malha real aceita.
 
 A referência real passará pela sequência principal:
 
@@ -84,4 +87,6 @@ geração e exportação por hardware/backend.
 
 As decisões e riscos estão em
 [`methodology-adjustments.md`](methodology-adjustments.md), e as tarefas por
-responsável estão em [`Orientacao-codex.md`](../Orientacao-codex.md).
+responsável estão em [`Orientacao-codex.md`](../../Orientacao-codex.md).
+O processamento de bins, normais e octree está detalhado em
+[`amostragem-normais-screened-poisson.md`](amostragem-normais-screened-poisson.md).

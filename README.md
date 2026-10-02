@@ -45,7 +45,7 @@ regiões `VOID` válidas e comparáveis.
 cavegen-tcc/
 ├── configs/              # Configurações de algoritmos, experimentos e hardware
 ├── data/                 # Dados externos, brutos, processados e referências
-├── docs/                 # Arquitetura, roadmap e decisões metodológicas
+├── docs/                 # Tarefas, resumos teóricos e metodologia
 ├── models/               # Checkpoints de modelos treinados
 ├── notebooks/colab/      # Notebooks de treino e prototipação no Colab
 ├── proto/                # Arquivos .proto para a fase gRPC
@@ -145,13 +145,81 @@ de dados processados e não faz parte do Git.
 
 ## Reconstrução da referência real
 
-A rota planejada parte novamente da point cloud em coordenadas contínuas.
-Screened Poisson é o método principal para reconstruir a malha; Ball Pivoting
+A [explicação metodológica completa](docs/metodologia/amostragem-normais-screened-poisson.md)
+detalha bins, estatísticas, normais, octree, parâmetros e os primeiros ensaios.
+
+A rota parte novamente da point cloud em coordenadas contínuas. O protótipo
+`cavegen.meshing.poisson` reutiliza o leitor PLY e os limites do JSON do Elaphes,
+amostra um ponto por célula espacial sem carregar os 94 milhões de pontos e
+estima/orienta normais para o Screened Poisson. O PLY não contém normais.
+Os `batches` são blocos temporários de leitura; os `bins` são células 3D
+persistentes definidas pelos limites XYZ. A regra `first` guarda o primeiro
+ponto encontrado em cada bin ocupado. A regra `centroid` calcula a média dos
+pontos e persiste contagem e desvio padrão XYZ por bin. Não há sorteio; com
+mesmo PLY, ordem, limites, `--max-points` e regra, a amostra é reproduzível.
+Esses bins formam uma grade regular; a octree adaptativa pertence ao Poisson.
+`--max-points` limita o número de bins e o máximo de pontos retidos. Dispersão
+alta pode indicar ruído ou superfícies distintas na mesma célula; nesse caso,
+o centróide pode cair fora da superfície real.
+Instale a dependência opcional no ambiente do projeto antes da reconstrução:
+
+```bash
+uv pip install --python .venv/bin/python -e '.[reconstruction]'
+```
+
+Uma passagem pelo arquivo ASCII de 6,3 GB pode levar vários minutos. A amostra
+é persistida para ajustar os parâmetros da reconstrução sem reler o scan:
+
+```bash
+.venv/bin/python -m cavegen.meshing.poisson \
+  --ply /run/media/midnavi/Pablo/TCC/DATA/RAW/elaphes_cave.ply \
+  --bounds data/params/elaphes_xyz_bounds.json \
+  --sample-path data/processed/elaphes_poisson_sample.npz \
+  --sample-only
+
+.venv/bin/python -m cavegen.meshing.poisson \
+  --ply /run/media/midnavi/Pablo/TCC/DATA/RAW/elaphes_cave.ply \
+  --bounds data/params/elaphes_xyz_bounds.json \
+  --sample-path data/processed/elaphes_poisson_sample.npz \
+  --output results/meshes/elaphes_candidate.obj
+```
+
+Para comparar centróides, use `--sampling-rule centroid` com outro
+`--sample-path` e outro `--output`. O cache da amostra é específico da regra.
+
+O `.obj` é um artefato de malha para inspeção e posterior importação na Unity;
+Python não renderiza a malha. O JSON ao lado do OBJ registra parâmetros e
+diagnósticos. A orientação global das normais pode ser ajudada por
+`--interior-seed-xyz X Y Z` quando houver uma posição sabidamente navegável.
+Essa *seed* é uma coordenada semântica de orientação, não uma seed de sorteio.
+O protótipo usa uma thread no Poisson por padrão e grava a versão do Open3D,
+o número de threads, a seed de orientação, o critério de amostragem e o hash
+registrado da fonte. Se uma etapa futura introduzir sorteio, sua seed aleatória
+também deverá ser persistida.
+**O resultado é apenas uma malha candidata:** verificar entradas, extrapolações,
+densidade, orientação e fechamento antes de usá-la no flood fill. Ball Pivoting
 e Alpha Shapes são fallbacks a investigar. Entradas de caverna e faces de
 fechamento sintéticas devem ser registradas. Felipe implementará flood fill e
 SDF/TSDF inicialmente em casos sintéticos, enquanto Pablo prepara a malha.
 O campo terá sinal negativo em `VOID`, positivo em `SOLID/EXTERIOR`, uma banda
 `SURFACE` perto de zero e `UNKNOWN` onde a classificação for incerta.
+
+Primeiro ensaio local: a leitura completa reteve 1.864 pontos em bins
+`82×16×76` (529 s). Com `depth=7`, Open3D 0.20.0 e uma thread, o Poisson gerou
+6.173 vértices e 12.212 triângulos, mas a malha tem 186 arestas de borda,
+13 arestas não manifold e extrapola além do scan no eixo Y. **Essa candidata
+não está aprovada para classificação volumétrica.** A unidade física das
+coordenadas originais ainda precisa ser confirmada.
+
+Comparação preliminar da regra `centroid` sobre os mesmos bins: 1.864
+centróides, 215 arestas de borda, 3 arestas não manifold e 4 componentes de
+triângulos, contra 186, 13 e 3 com `first`. Nenhuma malha é watertight, e o
+centróide extrapola mais no eixo Y. A distância ponto–malha calculada sobre a
+união das duas amostras deu p95 de 0,678 unidade XYZ para `centroid` e 0,712
+para `first`; a diferença é pequena e essa amostra não substitui a comparação
+com o scan completo. O desvio espacial p95 por bin foi 0,490 unidade XYZ.
+Assim, o centróide isolado ainda não justifica aceitar a malha; investigar
+resolução dos bins, regiões dispersas, orientação das normais e suporte local.
 
 Para o CA, um SDF de **controle simplificado**, independente da caverna de
 teste, poderá enviesar a regra. Usar o SDF exato da referência de teste é um
@@ -179,10 +247,11 @@ uv run python -m cavegen.meshing.export_mesh \
 
 A lista detalhada, com decisões ainda abertas, está em
 [`Orientacao-codex.md`](Orientacao-codex.md). A justificativa das métricas e da
-reconstrução está em [`docs/methodology-adjustments.md`](docs/methodology-adjustments.md).
+reconstrução está em [`ajustes de metodologia`](docs/metodologia/methodology-adjustments.md).
 As tarefas individuais estão em
-[`Pablo`](docs/tarefas-pablo-reconstrucao-modelos.md) e
-[`Felipe`](docs/tarefas-felipe-sdf-ca.md).
+[`Pablo`](docs/tarefas/tarefas-pablo-reconstrucao-modelos.md) e
+[`Felipe`](docs/tarefas/tarefas-felipe-sdf-ca.md). O [índice de documentação](docs/README.md)
+reúne tarefas, teoria e as explicações da implementação.
 
 ## Observação sobre benchmarks
 

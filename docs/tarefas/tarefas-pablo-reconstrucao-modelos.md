@@ -4,24 +4,36 @@
 reconstruída, especifica a semântica dos artefatos e prepara a avaliação e os
 modelos neurais. Felipe implementa flood fill, SDF/TSDF e o CA condicionado em
 paralelo; ver [`tarefas-felipe-sdf-ca.md`](tarefas-felipe-sdf-ca.md).
+O estado da reconstrução e os parâmetros testados estão em
+[`amostragem-normais-screened-poisson.md`](../metodologia/amostragem-normais-screened-poisson.md).
 
 ## Até 02/10 — Contrato e amostra de trabalho
 
 - [ ] Definir com Felipe a região de interesse, transformação XYZ→ZYX,
   origem, espaçamento físico, shapes de teste, convenção `SDF < 0 = VOID`,
   banda `ε` de superfície, truncamento `τ` e máscara de validade/`UNKNOWN`.
-- [ ] Identificar no cabeçalho do PLY se há normais aproveitáveis; o leitor
-  atual usa apenas XYZ. Planejar leitura de atributos ou estimação/orientação
-  de normais, mantendo memória controlada para 94.465.067 pontos.
-- [ ] Preparar uma amostra espacial rastreável do Elaphes para prototipar a
-  reconstrução. Não usar os 245 voxels `32³` como entrada do Poisson; preservar
-  pontos em coordenadas contínuas e registrar origem e critério de amostragem.
+- [x] Identificar no cabeçalho do PLY se há normais aproveitáveis: o Elaphes
+  não as contém. O protótipo estima e orienta normais após amostragem espacial;
+  a orientação global ainda precisa de revisão com uma semente interior.
+- [x] Executar uma primeira amostragem espacial rastreável do Elaphes com o novo comando
+  `cavegen.meshing.poisson --sample-only`, revisando a densidade nas regiões
+  finas. Os 245 voxels `32³` não entram no Poisson; o arquivo guarda XYZ do scan.
+  Primeira passagem: 1.864 pontos retidos em bins `82×16×76`.
 
 ## Até 07/10 — Primeira malha candidata
 
 - [ ] Implementar ou prototipar Screened Poisson como rota principal a partir
   de pontos orientados. Registrar amostragem, orientação, profundidade da
   octree, escala, densidade, tempo e memória.
+- [ ] Refinar a amostra e a orientação das normais. A primeira candidata
+  (`depth=7`, 1.864 pontos) ainda possui 186 arestas de borda, 13 arestas não
+  manifold e extrapolação no eixo Y; não aceitá-la para flood fill.
+- [x] Comparar `first` e `centroid` nos mesmos bins do primeiro ensaio. A média
+  reduziu arestas não manifold (13→3), mas aumentou bordas abertas (186→215)
+  e a extrapolação em Y; nenhum resultado é watertight.
+- [ ] Inspecionar bins de alta dispersão, testar resolução maior e orientação
+  de normais com uma posição interior validada. Comparar suporte à nuvem e
+  topologia antes de qualquer fechamento artificial.
 - [ ] Inspecionar extrapolação em regiões pouco observadas, componentes,
   arestas de borda, manifoldness, self intersections, orientação e distância
   ponto–malha. Comparar a malha com o scan, não apenas com a grade `32³`.
