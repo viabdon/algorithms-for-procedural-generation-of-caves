@@ -28,6 +28,21 @@ deliberados, localizados e marcados como **faces sintéticas**. Sua área e
 efeito topológico precisam ser reportados. Faces sintéticas não equivalem a
 superfície medida nas métricas de correspondência com o scan.
 
+O ensaio denso atual reduziu o erro de aderência, mas a malha global ainda
+tem aberturas, faces não manifold e expansão para regiões sem pontos. O
+recorte X `[12,35]` acompanha melhor a nuvem, porém termina aberto no corte
+artificial. Portanto, não há ainda malha do Elaphes aprovada para flood fill.
+Priorizar inspeção de suporte local, segmentação com sobreposição e junções,
+orientação das normais e comparação dos fallbacks antes de escolher tampas.
+
+A [linha central inspirada em Racine](../resumos-teoricos/linha-central-racine.md)
+foi extraída em caráter exploratório com contração laplaciana e MST. A
+inspeção reconheceu o ramo curto real em X≈30 e a grande bifurcação em X≈42.
+A poda de quatro pontas menores que `1,3` perto de X≈42 é provisória e
+protegeu manualmente X≈30. Conferir os ramos nos pontos originais e a
+estabilidade dos nós antes de propor múltiplas sementes interiores para
+orientação local. Essa linha não substitui uma classificação assinada.
+
 ## 2. Classificação e campo de distância
 
 Depois da malha, classificar interior/exterior. Flood fill da borda sobre uma
@@ -45,6 +60,12 @@ sinal. A convenção do projeto será `SDF < 0` para `VOID` e `SDF > 0` para
 de sensibilidade. Não atribuir sinal a `UNKNOWN` como se houvesse evidência.
 Persistir separadamente `sdf_float32`, rótulos categóricos e máscara de
 validade, com origem, eixos XYZ/ZYX, escala, método e parâmetros.
+Usar `NaN` no SDF inválido pode ser útil para diagnóstico, mas a máscara
+booleana de validade deve ser a fonte explícita da semântica; operações
+numéricas e treinamento devem receber valores preenchidos junto da máscara.
+O valor `q = clip(SDF, -τ, τ) / τ` fica em `[-1,1]`; se for necessária entrada
+normalizada em `[0,1]` para a região navegável, definir a transformação
+separadamente e documentar sua direção, sem confundir esse canal com rótulos.
 
 Para aprendizagem e controle, derivar
 `TSDF = clip(SDF, -τ, τ) / τ`, com `τ > 0` fixado por configuração.

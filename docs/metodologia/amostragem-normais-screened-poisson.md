@@ -199,6 +199,101 @@ Ela não certifica fechamento nem forma navegável. A regra `centroid` reduziu
 arestas não manifold, mas aumentou bordas abertas e extrapolação. Não há base
 para aceitá-la como melhor por enquanto.
 
+### Diagnóstico após inspeção 3D (08/10/2026)
+
+A amostra global `first` tem um ponto em XYZ≈`(7,56, 4,64, 69,78)` cujo
+vizinho amostrado mais próximo está a `65,65` unidades. O segundo maior
+espaçamento entre vizinhos é `1,80`. Esse ponto isolado estende os limites Z
+usados para calcular os `82×16×76` bins, deixando poucos níveis Z para a
+superfície principal. A malha global tem um componente separado de 318
+triângulos entre Z≈47 e 75, sem suporte plausível na galeria principal. A
+inspeção visual também mostrou falhas no teto e extrapolação lateral.
+
+Um contrafactual com os mesmos 1.863 pontos, retirando apenas aquele ponto,
+**não resolveu** o problema: a nova malha ainda chegou a Z≈44,8, Y≈−41,2 e
+Y≈50,8, com 178 arestas de borda e 9 não manifold. Portanto, a anomalia
+explica a distorção do domínio e está associada à região espúria, mas a
+amostragem rala e/ou a orientação local das normais também precisam ser
+investigadas. Na malha global original, 31% dos vértices ficaram a mais de
+2 unidades do representante observado mais próximo; o p95 dessa distância
+foi `26,66` unidades. É uma medida unilateral sobre a amostra, não sobre
+todos os pontos brutos.
+
+Há também um efeito de proporção: o [Open3D reconstrói dentro de um cubo](https://www.open3d.org/docs/latest/python_api/open3d.geometry.TriangleMesh.html)
+com lado definido pelo maior eixo da nuvem (`scale=1.1` por padrão). O
+Elaphes inteiro mede cerca de 83,7 unidades em X e só 16,2 em Y; a caixa de
+reconstrução deixa muito espaço vazio nas direções curtas. Após retirar o
+ponto alto, os extremos Y≈−41,2/50,8 e Z≈44,8 da nova malha coincidem
+praticamente com os limites desse cubo. Essa coincidência indica que a
+superfície Poisson chegou à borda do domínio; o problema não é apenas o
+ponto anômalo. Reduzir `scale` sozinho não resolve a falta de suporte ou as
+passagens abertas.
+
+Para isolar o efeito da densidade, recortamos X `[12,35]`, Y `[-3,25,8]`,
+Z `[-6,5,2]` diretamente do PLY original e preservamos um ponto observado
+por bin: 22.273.631 pontos brutos geraram 10.949 representantes em
+`111×54×41` bins. Com `depth=8` e uma seed provisória visualmente interna
+`(20,1,−3,1)`, a malha local ficou muito mais próxima da amostra: distância
+mediana `0,081`, p95 `0,153` e nenhum vértice acima de 2 unidades. Ver
+[projeções sobrepostas](../../results/figures/elaphes_gallery_roi_x12_35_poisson_d8_projections.png)
+e [inspeção 3D](../../results/figures/elaphes_gallery_roi_x12_35_poisson_d8_interactive.html).
+A candidata local continua inadequada para SDF: tem 26 arestas de borda,
+28 não manifold e 37 componentes. As 26 arestas abertas estão todas no plano
+X≈36,15, o limite da caixa de reconstrução após o corte artificial da
+galeria em X=35. O maior componente contém 69.810 dos 70.138 triângulos.
+Usando os nós da linha central exploratória como referência aproximada de
+interior, apenas 1,0% das normais estimadas no recorte apontaram no sentido
+oposto ao vetor nó→ponto (3,3% em X `[32,35]`). Como a própria linha não foi
+validada, isso não certifica a orientação, mas não sugere uma inversão local
+generalizada nesse trecho.
+
+Esses resultados motivaram a reamostragem global descrita a seguir. Ainda é
+necessário inspecionar as normais, os componentes, o suporte dos triângulos
+e as entradas reais. Cortar por densidade, distância ou caixa pode retirar
+extrapolações para estudo, mas também cria bordas; não converte uma malha
+automaticamente em domínio watertight confiável para flood fill ou SDF.
+
+### Reamostragem global mais densa
+
+Uma nova passagem pelo PLY excluiu **somente para diagnóstico** os três
+pontos com Z>8; todos tinham Z entre `69,7792` e `69,7809`. Os outros
+94.465.064 pontos foram elegíveis. Com `first`, limite de 600.000 bins e
+limites XYZ `[-9,939101,-3,237271,-6,963341]` a
+`[73,724504,12,957701,8]`, a amostra ficou com 22.368 pontos em
+`258×50×46` bins. A nova candidata usou `depth=8`, 30 vizinhos para
+normais, 30 para orientação, uma thread e nenhuma seed interior, como a
+primeira candidata `depth=8`. As medidas de distância abaixo usam os
+**mesmos 22.368 pontos densos** para julgar ambas as malhas.
+
+| Medida | Primeira d8 | Densa d8 |
+| --- | ---: | ---: |
+| Representantes entregues ao Poisson | 1.864 | 22.368 |
+| Vértices / triângulos | 6.158 / 12.172 | 23.118 / 46.371 |
+| Distância p95 ponto→malha | 0,759 | 0,331 |
+| Distância p95 vértice→amostra densa | 25,164 | 10,901 |
+| Vértices a >2 unidades da amostra | 29,9% | 13,3% |
+| Arestas de borda / não manifold | 184 / 9 | 175 / 27 |
+| Componentes de triângulos | 4 | 5 |
+| Intervalo Y da malha | −31,37 a 27,48 | −41,11 a 50,86 |
+| Maior Z da malha | 71,97 | 31,79 |
+
+A densidade maior melhorou a cobertura dos pontos observados e reduziu a
+região sem suporte, mas **não tornou a malha fechada ou próxima do scan em
+todo o domínio**. Ela ainda atinge os limites Y do cubo do Poisson. Ver
+[projeções da candidata densa](../../results/figures/elaphes_global_dense_poisson_d8_projections.png)
+e [comparação 3D com filtros de densidade](../../results/figures/elaphes_global_dense_candidates_interactive.html).
+
+A densidade por vértice devolvida pelo Poisson se correlacionou com a
+distância à amostra: entre os vértices a mais de 5 unidades, a mediana da
+densidade foi `3,0`; dentro de 0,5 unidade foi `8,46`. Remover os 10% de
+menor densidade reduziu a fração de vértices a >2 unidades para 3,7%, mas
+aumentou as arestas de borda de 175 para 393. Remover 20% eliminou os
+vértices a >2 unidades, porém gerou 875 arestas de borda. Esses filtros
+ajudam a **identificar** interpolação espúria; nenhum dos resultados filtrados
+é watertight. A reconstrução da caverna inteira provavelmente exigirá
+segmentação/trechos com sobreposição e junções avaliadas, ou um fallback
+de reconstrução, além de um protocolo explícito para entradas e lacunas.
+
 ## 7. Parâmetros a estudar, em ordem
 
 1. Confirmar unidade e orientação dos eixos XYZ e localizar uma posição

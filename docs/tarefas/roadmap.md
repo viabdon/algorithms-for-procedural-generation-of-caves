@@ -1,5 +1,9 @@
 # Roadmap atualizado
 
+**Revisão de 09/10/2026.** As etapas abaixo descrevem dependências, não
+implicam que já existe referência volumétrica validada. Os marcos e
+responsáveis estão no [plano geral](../../Orientacao-codex.md).
+
 ## Fase 0 — Esqueleto do repositório (concluída)
 
 Criar pacote Python, diretórios, configurações, README, arquivos de dependência e convenções de volume.
@@ -123,6 +127,16 @@ Pivoting/Alpha Shapes como fallbacks quando os critérios não forem cumpridos.
 A malha de Marching Cubes já existente é extraída de volumes gerados e não
 substitui esta fase.
 
+**Estado Elaphes:** o Poisson global com 22.368 representantes melhorou a
+aderência mas mantém 175 bordas, 27 arestas não manifold e extrapolação. O
+recorte X `[12,35]` tem bom suporte local e abertura no corte artificial.
+A linha central LBC+MST inspirada em Racine foi inspecionada no recorte
+X `[12,45]`; reconhecemos ramo real curto em X≈30 e bifurcação em X≈42.
+A poda de quatro pontas é apenas diagnóstica. Conferir cortes dos pontos
+originais e revisar normais, segmentação/junções e fallbacks antes de aceitar
+qualquer malha. Ver [resumo teórico](../resumos-teoricos/linha-central-racine.md)
+e [ensaio](../metodologia/linha-central-elaphes-exploracao.md).
+
 ## Fase 3 — Interior/exterior, SDF e rótulos
 
 Implementar flood fill e SDF/TSDF primeiro em geometria sintética, em paralelo
@@ -154,8 +168,10 @@ houver cavernas independentes suficientes.
 
 ## Fase 7 — Visualização e integração
 
-Unity visualiza arquivos produzidos em Python. Adicionar gRPC somente após o
-pipeline científico estar funcional.
+O comando `plots/plot_elaphes.py` salva HTMLs interativos de diagnóstico com
+nuvem colorida por Z, linha e malhas selecionáveis. Unity visualiza os
+artefatos finais produzidos em Python. Adicionar gRPC somente após o pipeline
+científico estar funcional.
 
 ## Fase 8 — Portabilidade AMD/ROCm
 

@@ -1,6 +1,6 @@
 # Tarefas do Felipe — flood fill, SDF e Cellular Automata
 
-**Metas indicativas a partir de 30/09/2026.** Felipe é o responsável principal
+**Metas indicativas revistas em 09/10/2026.** Felipe é o responsável principal
 pela implementação e pelos testes de flood fill, SDF/TSDF e do CA enviesado
 por um campo de controle. O algoritmo genético é a etapa final da evolução do
 CA. Pablo prepara e valida a malha Screened Poisson e a semântica da referência;
@@ -10,11 +10,14 @@ O trabalho começa com geometrias sintéticas e um campo tubular simples.
 Assim, a urgência do SDF para o CA não fica bloqueada pelos 94.465.067 pontos
 do Elaphes nem pela reconstrução da malha real.
 
-## Até 02/10 — Contrato comum e casos conhecidos
+## Até 13/10 — Contrato comum e casos conhecidos
 
 - [ ] Acordar com Pablo shape ZYX, origem, espaçamento físico, sinal
   `SDF < 0 = VOID`, banda `ε` para `SURFACE`, truncamento `τ` para TSDF,
   rótulos `VOID/SURFACE/SOLID/UNKNOWN` e comportamento em células inválidas.
+  O domínio da referência real será baseado na malha **aceita**, com margem e
+  padding; para testes, usar grades sintéticas. `UNKNOWN` exige máscara
+  explícita, mesmo se o campo inválido for salvo como `NaN`.
 - [ ] Criar fixtures pequenas: cubo/esfera fechados, tubo com entrada, fenda
   acidental, duas componentes e superfície com orientação invertida. Registrar
   interior conhecido para testar sinal e distância.
@@ -22,7 +25,7 @@ do Elaphes nem pela reconstrução da malha real.
   sintéticas e máscaras de validade; não presumir que o `.npz` de superfície
   direta do Elaphes já delimita uma caverna.
 
-## Até 06/10 — Flood fill e SDF sintético
+## Até 16/10 — Flood fill e SDF sintético
 
 - [ ] Implementar flood fill exterior a partir das faces da grade sobre uma
   barreira voxelizada, com conectividade explícita. Derivar componentes
@@ -38,7 +41,7 @@ do Elaphes nem pela reconstrução da malha real.
   esqueleto procedural independente de cavernas reais. Este campo já pode
   alimentar o CA antes da malha Poisson.
 
-## Até 10/10 — CA condicionado por campo de controle
+## Até 20/10 — CA condicionado por campo de controle
 
 - [ ] Preservar `generate_cellular_automata` como baseline e especificar a
   nova regra com influência espacial do SDF/TSDF de controle. Comparar viés
@@ -51,12 +54,14 @@ do Elaphes nem pela reconstrução da malha real.
   **teste** não deve ser o controle do experimento principal; se usado, criar
   experimento separado de reconstrução condicionada.
 
-## Até 16/10 — Integrar o Elaphes e validar
+## Até 27/10, condicionado à malha aceita — Integrar o Elaphes e validar
 
 - [ ] Receber de Pablo uma malha candidata com orientação, coordenadas,
   entradas, tampas sintéticas e regiões incertas documentadas. Voxelizar a
   barreira no mesmo domínio do SDF e comparar flood fill com testes de
   ocupação da malha ou outro método de classificação quando necessário.
+  As malhas Poisson atuais ainda têm bordas e extrapolação; não atribuir
+  interior real a partir delas antes da revisão conjunta.
 - [ ] Inspecionar o artefato antigo `elaphes_surface_32.npz` apenas como
   diagnóstico; comparar a superfície original e a malha reconstruída em
   resoluções escolhidas após o teste inicial. Registrar extrapolações,
@@ -65,7 +70,7 @@ do Elaphes nem pela reconstrução da malha real.
   permanecer `UNKNOWN`; qualquer mudança de fechamento ou sinal deve ser
   discutida com Pablo antes de usar a referência em métricas ou aprendizagem.
 
-## Etapa final — Algoritmo genético para otimizar o CA (meta 30/10)
+## Etapa final — Algoritmo genético para otimizar o CA (meta indicativa 06/11)
 
 - [ ] Discutir e pesquisar qual será o cromossomo: probabilidade inicial,
   limiar de vizinhos, iterações, peso/escala do SDF, parâmetros do campo de

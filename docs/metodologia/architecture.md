@@ -10,13 +10,18 @@ lotes, calcula limites, gera `surface_voxels` por ocupação de pontos, produz
 `Volume3D` para Random Walk/CA e extrai malhas desses volumes por Marching
 Cubes. **Marching Cubes não reconstrói a point cloud real**; a rota de
 referência agora possui um primeiro protótipo de Screened Poisson em
-`cavegen.meshing.poisson`, ainda sem malha real aceita.
+`cavegen.meshing.poisson`, ainda sem malha real aceita. No Elaphes, o ensaio
+global mais denso (22.368 representantes, `depth=8`) melhorou a distância
+ponto→malha, mas manteve 175 arestas de borda, 27 não manifold e extrapolação
+até o limite cúbico do Poisson. Remover vértices de baixa densidade reduz
+extrapolação e aumenta aberturas; essas candidatas não alimentam ainda o SDF.
 
 A referência real passará pela sequência principal:
 
 ```text
 point cloud XYZ (+ atributos úteis)
   -> amostragem espacial/controle de memória e normais orientadas
+     ↳ linha central exploratória (LBC + MST) para inspecionar orientação por trecho
   -> Screened Poisson Surface Reconstruction
      (Ball Pivoting/Alpha Shapes como fallbacks de reconstrução)
   -> malha validada, aproximadamente watertight, com entradas/tampas marcadas
@@ -32,12 +37,19 @@ de tratamento explícito para não produzirem vazamento. Uma malha watertight
 pode conter tampas artificiais e, portanto, ainda requer validação geométrica
 e semântica. O artefato de `surface_voxels` atual permanece útil para inspeção
 e comparação com pontos observados, mas não é a entrada final do SDF.
+A [linha central exploratória](linha-central-elaphes-exploracao.md), adaptada de
+[Racine et al.](../resumos-teoricos/linha-central-racine.md), também não define
+o interior: ela pode sugerir várias posições interiores e trechos de
+orientação das normais **depois** de conferir os nós com cortes do scan. A
+poda precisa preservar o ramo real curto perto de X≈30 e revisar a bifurcação
+maior perto de X≈42; um limiar global de comprimento apagaria geometria real.
 
 ## Contratos entre as etapas
 
 | Artefato | Convenção | Uso |
 | --- | --- | --- |
 | Point cloud | XYZ contínuo, fonte e atributos registrados | Estimar normais e reconstruir malha |
+| Linha central candidata | Nós XYZ, arestas, recorte, parâmetros e trechos validados | Inspeção e possível apoio à orientação local; não fornece sinal por si |
 | Malha real candidata | Vértices XYZ, faces orientadas, faces sintéticas marcadas | Inspeção, classificação e distância |
 | Grade de classificação | ZYX, shape, origem, espaçamento, região válida | Sinal e incerteza do SDF |
 | SDF físico | `float32[D,H,W]`, distância à malha, negativo em `VOID` | Geometria e avaliação |
@@ -51,6 +63,10 @@ não é um valor de distância positivo nem negativo. Nas células válidas,
 `SOLID/EXTERIOR`. Fixar `ε` em unidade física e estudar sensibilidade à
 resolução. Preservar campo contínuo e rótulos separadamente. A mesma
 transformação XYZ↔ZYX deve valer para malha, SDF, CA e saídas neurais.
+O domínio da grade deverá derivar da **malha aceita**, com margem física e
+padding documentados, em vez de exigir uma região de interesse fixa para cada
+scan. A conversão para o eixo vertical da Unity pertence à exportação e deve
+ser testada com pontos de referência, preservando o contrato ZYX interno.
 
 ## Campos diferentes para referência e controle
 
@@ -90,3 +106,6 @@ As decisões e riscos estão em
 responsável estão em [`Orientacao-codex.md`](../../Orientacao-codex.md).
 O processamento de bins, normais e octree está detalhado em
 [`amostragem-normais-screened-poisson.md`](amostragem-normais-screened-poisson.md).
+Os HTMLs de inspeção da linha e das malhas podem ser regenerados pelo
+[`plot_elaphes.py`](../../plots/plot_elaphes.py); eles são diagnósticos em
+Python, enquanto Unity permanece o visualizador das malhas finais.
