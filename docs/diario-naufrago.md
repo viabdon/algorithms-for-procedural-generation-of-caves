@@ -116,6 +116,7 @@ diário sem quebrar o padrão.
 | [Dia 2](#dia-2--visualizando-resultados-padrões-de-decaimento-e-a-explosão-combinatória-de-parâmetros) | Visualizando resultados: padrões de decaimento e a explosão combinatória de parâmetros | Cellular Automata 3D | Plotagens 3D, padrões de crescimento/decaimento de células vivas ao longo das iterações, e o problema de escolher os melhores resultados entre milhares de combinações de parâmetros |
 | [Dia 3](#dia-3--dois-extremos-estruturais-vazio-contínuo-e-bolsões-de-ar-isolados) | Dois extremos estruturais: vazio contínuo e bolsões de ar isolados | Cellular Automata 3D | Padrões estruturais nos extremos de sensibilidade — grande vazio contínuo sem caminhos vs. bolsões de ar isolados dentro da rocha — e a constatação de que nenhum dos dois ainda é uma caverna. Também esclarece que a plotagem inverte rocha/vazio só pra visualização |
 | [Dia 4](#dia-4--hipótese-usar-random-walk-ou-l-system-como-conector-dos-bolsões-de-ar-do-ca) | Hipótese: usar Random Walk ou L-System como conector dos bolsões de ar do CA | Cellular Automata 3D, Random Walk 3D | Ideia (ainda sem conclusão) de usar o CA como esqueleto/"cérebro" e um algoritmo auxiliar pra conectar os bolsões de ar em nós, formando caminhos — e o problema de identificar esses bolsões como nós numa matriz 3D |
+| [Dia 5](#dia-5--convolução-acelera-o-autômato-e-o-plot-de-trajetória-não-revela-um-padrão-claro) | Convolução acelera o autômato e o plot de trajetória não revela um padrão claro | Cellular Automata 3D | Troca do laço de contagem de vizinhos por convolução (400-580x mais rápido, equivalência testada bit a bit) com justificativa metodológica pro TCC, e implementação do gráfico de células vivas por iteração — que mostra os comportamentos já notados no Dia 2, mas sem revelar um padrão claro ligado aos parâmetros |
 
 ## Dúvidas em aberto
 
@@ -135,12 +136,13 @@ a resposta ficou registrada.
 | "Como transformar essas estruturas (o grande vazio contínuo ou os bolsões de ar isolados) em algo que realmente pareça uma caverna, com espaços conectados e navegáveis?" | [Dia 3](#dia-3--dois-extremos-estruturais-vazio-contínuo-e-bolsões-de-ar-isolados) |
 | "Usar Random Walk (ou L-System) como conector dos bolsões de ar do CA entrega resultados melhores do que rodar o Random Walk sozinho?" | [Dia 4](#dia-4--hipótese-usar-random-walk-ou-l-system-como-conector-dos-bolsões-de-ar-do-ca) |
 | "Que técnica dá pra usar pra identificar os bolsões de ar como nós dentro de uma matriz 3D?" | [Dia 4](#dia-4--hipótese-usar-random-walk-ou-l-system-como-conector-dos-bolsões-de-ar-do-ca) |
+| "Dá pra classificar os comportamentos de crescimento/decaimento de células vivas a partir de parâmetros específicos do autômato?" | [Dia 5](#dia-5--convolução-acelera-o-autômato-e-o-plot-de-trajetória-não-revela-um-padrão-claro) |
 
 ### Respondidas
 
 | Dúvida | Levantada em | Respondida em |
 |---|---|---|
-| "Dá pra fazer outras plotagens auxiliares pra acompanhar o crescimento/decaimento das células vivas ao longo das iterações?" | Dia 2 | [Dia 2](#dia-2--visualizando-resultados-padrões-de-decaimento-e-a-explosão-combinatória-de-parâmetros) — sim, está planejado, ainda não feito |
+| "Dá pra fazer outras plotagens auxiliares pra acompanhar o crescimento/decaimento das células vivas ao longo das iterações?" | Dia 2 | [Dia 5](#dia-5--convolução-acelera-o-autômato-e-o-plot-de-trajetória-não-revela-um-padrão-claro) — sim, implementado: gráfico de linha ao lado do 3D |
 
 ---
 
@@ -401,6 +403,62 @@ caverna.
 
 > "Que técnica dá pra usar pra identificar os bolsões de ar como nós dentro
 > de uma matriz 3D?"
+
+---
+
+## Dia 5 — Convolução acelera o autômato e o plot de trajetória não revela um padrão claro
+
+**Algoritmo:** Cellular Automata 3D
+**Commits relacionados:** `8c3f90b`, `18a4b93`, `d79adb8`
+
+### Tipo A — Narrativa
+
+Troquei a contagem de vizinhos, que antes era um laço triplo em Python
+percorrendo célula por célula, por uma convolução (`scipy.ndimage.convolve`
+com um kernel 3x3x3). O tratamento de borda também mudou de abordagem: em vez
+de ser um caso especial dentro da contagem, agora é uma moldura de 1 célula
+aplicada à matriz antes da convolução, e descartada depois no recorte — isso
+faz os três tratamentos (zeros, ones, random) passarem pelo mesmo caminho de
+código. Validei que o resultado é idêntico ao laço antigo bit a bit, usando o
+laço como oráculo de teste numa faixa de sensibilidades, formatos de volume e
+quantidades de iteração diferentes; 24 dos 26 resultados que eu já tinha
+salvo bateram exatamente igual depois do refactor — os 2 que não bateram usam
+tratamento de borda aleatório, que não é reprodutível de qualquer jeito, com
+ou sem convolução.
+
+O ganho de performance foi bem relevante: de 2,67s pra 0,0064s por passo num
+cubo 64³, uma aceleração de 400 a 580x. Isso é o tipo de coisa que ataca
+diretamente o problema da explosão combinatória que registrei no Dia 2 (as
+~1620 combinações de parâmetros) — testar lotes grandes de combinações passa
+a ser muito mais viável em termos de tempo.
+
+Essa otimização também ganhou uma justificativa metodológica própria, que
+registrei em `docs/methodology-adjustments.md`: se o Cellular Automata vai
+ser comparado contra métodos de IA — que rodam sobre bibliotecas compiladas —
+deixá-lo rodando num laço Python puro seria uma comparação de desempenho
+injusta. E, do lado da métrica de complexidade de implementação, a simetria
+se mantém: continuo contando a definição da regra do autômato do mesmo jeito
+que contaria a definição de um modelo de IA, sem entrar no código interno da
+biblioteca de convolução.
+
+Separado disso, implementei o plot que tinha ficado como TODO desde o Dia 2:
+agora o autômato guarda a quantidade de células vivas em cada iteração (do
+passo 0, a semente, até o último passo), e o HTML de visualização ganhou um
+gráfico de linha ao lado da nuvem de pontos 3D. Resultados antigos continuam
+só com o 3D, porque não tinham esse histórico salvo.
+
+Com esse gráfico, consegui enfim visualizar os diferentes comportamentos de
+quantidade de células vivas que já tinha notado manualmente no Dia 2
+(decaimento simples, decaimento seguido de crescimento, decaimento suave) —
+mas não consegui achar um padrão que explique quando cada comportamento
+aparece. Talvez seja possível classificar esses comportamentos a partir de
+parâmetros específicos do autômato, mas não tenho certeza de que isso
+realmente seria vantajoso (ver Tipo C).
+
+### Tipo C — Dúvidas em aberto
+
+> "Dá pra classificar os comportamentos de crescimento/decaimento de células
+> vivas a partir de parâmetros específicos do autômato?"
 
 ---
 
