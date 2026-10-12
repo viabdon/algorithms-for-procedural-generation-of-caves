@@ -1,11 +1,15 @@
 # Próximos passos do TCC — reconstrução, SDF e geração
 
-**Estado em 09/10/2026.** Leitura PLY/F32, limites XYZ, grade diagnóstica de
+**Estado em 12/10/2026.** Leitura PLY/F32, limites XYZ, grade diagnóstica de
 superfície em `32³`, `Volume3D`, Random Walk, CA básico e métricas iniciais
 existem. O protótipo de Screened Poisson já produziu malhas candidatas do
 Elaphes, mas nenhuma foi aceita como referência: a amostra global densa ainda
 gera aberturas e extrapolação. A linha central exploratória inspirada em
 Racine foi extraída e inspecionada; ela **ainda não prova interior/exterior**.
+Há um protótipo de orientação por trechos que registra exatamente os pontos
+com sentido incerto, permite destacá-los no HTML e aplicar decisões manuais
+`keep`/`flip`. Como faltam posições interiores validadas em cortes, o
+diagnóstico inicial marcou os 20.274 pontos do recorte como incertos.
 Não há no repositório flood fill/SDF de referência, CA condicionado, algoritmo
 genético, GAN ou PCGRL funcional.
 
@@ -47,12 +51,18 @@ nos pontos brutos. A regra provisória de poda `<1,3` não é critério geral.
 
 | Responsável | Até 13/10 | Até 20/10 |
 | --- | --- | --- |
-| **Pablo** | Auditar poses do scanner e pontos altos; conferir ramos da linha central e normais; comparar Poisson denso, segmentação e fallbacks contra suporte/topologia | Escolher e documentar candidata com entradas/tampas e regiões incertas; definir máscaras e protocolo de métricas/dados |
+| **Pablo** | Conferir os três pontos altos com a versão sanitizada oficial; testar em cortes as posições sugeridas pela linha e a orientação das normais; comparar Poisson denso, segmentação e fallbacks contra suporte/topologia | Escolher e documentar candidata com entradas/tampas e regiões incertas; definir máscaras e protocolo de métricas/dados |
 | **Felipe** | Implementar flood fill, sinal/SDF/TSDF e testes em geometrias sintéticas; gerar SDF tubular de controle independente | Integrar candidata aceita, verificar vazamentos/`UNKNOWN`, condicionar CA e comparar peso zero ao baseline |
 
 Pablo pode entregar recortes e metadados para testes enquanto a malha global é
 revista. Felipe não precisa esperar a referência real para construir o SDF de
 controle. A malha atual **não deve** ser usada como verdade interior do Elaphes.
+O [inventário do scanner](docs/metodologia/metadados-elaphes-scanner.md)
+concluiu a busca nos materiais disponíveis: não há poses utilizáveis; cabeçalho
+e `pointsourceid` foram revisados. O [fluxo de revisão de
+normais](docs/metodologia/orientacao-normais-linha-central.md) está
+implementado; faltam nós interiores verificados em cortes e uma comparação
+controlada das malhas.
 Listas detalhadas: [Pablo](docs/tarefas/tarefas-pablo-reconstrucao-modelos.md),
 [Felipe](docs/tarefas/tarefas-felipe-sdf-ca.md) e
 [roadmap](docs/tarefas/roadmap.md).

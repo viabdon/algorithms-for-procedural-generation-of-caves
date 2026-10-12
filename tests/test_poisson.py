@@ -10,7 +10,8 @@ import unittest
 
 import numpy as np
 
-from cavegen.meshing.poisson import run, sample_spatial_bins, spatial_bin_shape
+from cavegen.meshing.normal_orientation import save_orientation
+from cavegen.meshing.poisson import run, run_oriented_sample, sample_spatial_bins, spatial_bin_shape
 
 
 class PoissonPreparationTests(unittest.TestCase):
@@ -143,6 +144,26 @@ class PoissonPreparationTests(unittest.TestCase):
             self.assertFalse(result["uses_random_sampling"])
             self.assertTrue(mesh_path.is_file())
             self.assertTrue(mesh_path.with_suffix(".obj.json").is_file())
+
+            normals = points / np.linalg.norm(points, axis=1, keepdims=True)
+            orientation = root / "orientation.npz"
+            review = {
+                "points_xyz": points, "baseline_normals_xyz": normals,
+                "oriented_normals_xyz": normals.copy(),
+                "uncertain_mask": np.ones(n, dtype=bool),
+                "manual_mask": np.zeros(n, dtype=bool),
+                "reason_bits": np.full(n, 64, dtype=np.uint16),
+                "candidate_branches": np.full((n, 2), -1, dtype=np.int32),
+            }
+            save_orientation(orientation, review, {})
+            with self.assertRaisesRegex(ValueError, "normal signs remain uncertain"):
+                run_oriented_sample(orientation, root / "rejected.obj", depth=5,
+                                    require_resolved=True)
+            reviewed_mesh = root / "reviewed.obj"
+            reviewed = run_oriented_sample(orientation, reviewed_mesh, depth=5)
+            self.assertEqual(reviewed["normal_sign_uncertain_count"], n)
+            self.assertGreater(reviewed["mesh_triangles"], 0)
+            self.assertTrue(reviewed_mesh.is_file())
 
 
 if __name__ == "__main__":

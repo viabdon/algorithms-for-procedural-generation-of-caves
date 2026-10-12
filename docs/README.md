@@ -17,6 +17,8 @@
 - [Arquitetura do pipeline](metodologia/architecture.md)
 - [Ajustes de metodologia](metodologia/methodology-adjustments.md)
 - [Extração exploratória de linha central no Elaphes](metodologia/linha-central-elaphes-exploracao.md)
+- [Orientação experimental das normais por trechos e revisão dos índices incertos](metodologia/orientacao-normais-linha-central.md)
+- [Inventário de metadados e posições do scanner do Elaphes](metodologia/metadados-elaphes-scanner.md)
 
 O [plano geral](../Orientacao-codex.md) reúne as dependências entre as frentes.
 Os resumos explicam conceitos e fontes; os documentos metodológicos descrevem
@@ -26,3 +28,5 @@ Para regenerar os HTMLs 3D da nuvem, linha central e malhas candidatas, usar
 `uv run python plots/plot_elaphes.py line` ou `uv run python plots/plot_elaphes.py mesh`
 na raiz do repositório. O comando aceita `--cloud`, `--graph`, `--mesh NOME=OBJ`,
 `--output`, `--max-points`, `--seed` e `--show`; ver `--help` em cada subcomando.
+`--orientation`, `--highlight-uncertain` e `--show-normals` acrescentam os
+índices incertos e as setas da revisão ao HTML.

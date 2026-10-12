@@ -1,6 +1,6 @@
 # Roadmap atualizado
 
-**Revisão de 09/10/2026.** As etapas abaixo descrevem dependências, não
+**Revisão de 12/10/2026.** As etapas abaixo descrevem dependências, não
 implicam que já existe referência volumétrica validada. Os marcos e
 responsáveis estão no [plano geral](../../Orientacao-codex.md).
 
@@ -136,6 +136,11 @@ A poda de quatro pontas é apenas diagnóstica. Conferir cortes dos pontos
 originais e revisar normais, segmentação/junções e fallbacks antes de aceitar
 qualquer malha. Ver [resumo teórico](../resumos-teoricos/linha-central-racine.md)
 e [ensaio](../metodologia/linha-central-elaphes-exploracao.md).
+O [protótipo de orientação por trechos](../metodologia/orientacao-normais-linha-central.md)
+já produz IDs exatos de sentidos incertos e plot de revisão; a execução sem
+referências interiores validadas marcou os 20.274 pontos como incertos.
+Conferir referências em cortes e comparar malhas sob a mesma amostra e
+parâmetros antes de escolher uma reconstrução.
 
 ## Fase 3 — Interior/exterior, SDF e rótulos
 

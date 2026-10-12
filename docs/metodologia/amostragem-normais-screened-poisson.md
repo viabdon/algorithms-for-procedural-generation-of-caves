@@ -123,6 +123,20 @@ violar essa hipótese. A seed é uma **posição geométrica**, não uma seed de
 aleatoriedade. Nos dois ensaios do Elaphes ela foi `null`; a orientação
 semântica ainda não foi validada.
 
+Há agora uma [rota experimental por trechos](orientacao-normais-linha-central.md)
+para **amostras já fixadas**: `cavegen.meshing.normal_orientation prepare`
+estima as mesmas normais base do Open3D, associa pontos a ramos da linha
+central, requer nós interiores validados para votar, guarda os índices
+incertos e permite revisão manual do sentido. A opção
+`cavegen.meshing.poisson --oriented-sample ARQUIVO.npz` entrega essas normais
+diretamente ao Poisson, sem recalculá-las nem aplicar a seed global. O modo
+`--require-resolved` bloqueia a reconstrução enquanto houver sentidos
+incertos. Sem referências validadas, a primeira execução no recorte X
+`[12,45]` manteve **20.274/20.274** sentidos incertos; não foi interpretada
+como melhoria de malha. A comparação precisa manter amostra e profundidade
+iguais e medir suporte, bordas, componentes e extrapolação. O CSV de revisão
+registra **quais** pontos ainda carecem de decisão.
+
 ## 5. Octree adaptativa e chamada do Screened Poisson
 
 Depois das normais, o código executa

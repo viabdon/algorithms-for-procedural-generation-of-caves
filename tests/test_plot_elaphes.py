@@ -9,10 +9,42 @@ import unittest
 import numpy as np
 import trimesh
 
-from plots.plot_elaphes import amostrar_pontos, carregar_grafo, main, montar_linha
+from cavegen.meshing.normal_orientation import save_orientation
+from plots.plot_elaphes import (
+    adicionar_revisao_normais, amostrar_pontos, carregar_grafo, main, montar_linha,
+)
 
 
 class PlotElaphesTests(unittest.TestCase):
+    def test_review_overlay_identifies_exact_points_and_arrows(self) -> None:
+        points = np.array([[0, 0, 0], [1, 0, 0], [2, 0, 0], [3, 0, 0]], dtype=float)
+        normals = np.tile([0., 1., 0.], (len(points), 1))
+        result = {
+            "points_xyz": points, "baseline_normals_xyz": normals,
+            "oriented_normals_xyz": normals.copy(),
+            "uncertain_mask": np.array([False, True, False, True]),
+            "manual_mask": np.array([False, False, True, False]),
+            "reason_bits": np.array([0, 64, 512, 64], dtype=np.uint16),
+            "candidate_branches": np.zeros((len(points), 2), dtype=np.int32),
+        }
+        with TemporaryDirectory() as directory:
+            archive = Path(directory) / "review.npz"
+            save_orientation(archive, result, {})
+            figure = montar_linha(points[:1], points[[0, 3]], np.array([[0, 1]]))
+            adicionar_revisao_normais(
+                figure, points, archive, destacar_incertos=True,
+                mostrar_manuais=True, mostrar_normais=True, max_setas=2,
+            )
+            uncertain = next(trace for trace in figure.data if trace.name.startswith("Sentido incerto"))
+            self.assertEqual(len(uncertain.x), 2)
+            self.assertIn("Índice=1", uncertain.text[0])
+            self.assertIn("Índice=3", uncertain.text[1])
+            self.assertEqual(sum(trace.type == "cone" for trace in figure.data), 1)
+            cone = next(trace for trace in figure.data if trace.type == "cone")
+            self.assertLessEqual(len(cone.x), 2)
+            with self.assertRaisesRegex(ValueError, "não pertence à nuvem"):
+                adicionar_revisao_normais(figure, points[::-1], archive, destacar_incertos=True)
+
     def test_cloud_uses_visible_depth_colors_on_light_background(self) -> None:
         pontos = np.array([[0, 0, 0], [1, 1, 2], [2, 1, 1]], dtype=float)
         nos = np.array([[0.5, 0.5, 0.5], [1.5, 0.8, 1.5]], dtype=float)
@@ -69,6 +101,24 @@ class PlotElaphesTests(unittest.TestCase):
             self.assertIn("Caixa", html)
             self.assertIn("Esfera", html)
             self.assertIn("Viridis", html)
+
+            points = np.array([[0., 0., 0.], [1., 1., 1.]])
+            normals = np.tile([0., 0., 1.], (2, 1))
+            orientation = root / "review.npz"
+            save_orientation(orientation, {
+                "points_xyz": points, "baseline_normals_xyz": normals,
+                "oriented_normals_xyz": normals.copy(),
+                "uncertain_mask": np.array([True, False]),
+                "manual_mask": np.zeros(2, dtype=bool),
+                "reason_bits": np.array([64, 0], dtype=np.uint16),
+                "candidate_branches": np.full((2, 2), -1, dtype=np.int32),
+            }, {})
+            main(["mesh", "--cloud", str(cloud), "--mesh", f"Caixa={mesh_a}",
+                  "--mesh", f"Esfera={mesh_b}", "--orientation", str(orientation),
+                  "--highlight-uncertain", "--show-normals", "--output", str(output)])
+            html = output.read_text()
+            self.assertIn("Sentido incerto (1)", html)
+            self.assertIn("Normais atuais (1 setas)", html)
 
 
 if __name__ == "__main__":

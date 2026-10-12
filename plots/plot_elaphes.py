@@ -18,6 +18,8 @@ import numpy as np
 import plotly.graph_objects as go
 import trimesh
 
+from cavegen.meshing.normal_orientation import load_orientation, points_sha256, reason_names
+
 RAIZ_PROJETO = Path(__file__).resolve().parents[1]
 NUVEM_LINHA_PADRAO = "data/processed/elaphes_gallery_roi_x12_45.npz"
 GRAFO_PADRAO = "data/processed/elaphes_centreline_roi_x12_45_pruned_exploratory.npz"
@@ -119,8 +121,75 @@ def montar_linha(pontos: np.ndarray, nos: np.ndarray, arestas: np.ndarray) -> go
     figura.add_trace(go.Scatter3d(
         x=nos[:, 0], y=nos[:, 1], z=nos[:, 2],
         mode="markers", name="Nós", marker=dict(size=3.5, color="#d62828"),
+        customdata=np.arange(len(nos)),
+        hovertemplate="Nó=%{customdata}<br>X=%{x:.3f}<br>Y=%{y:.3f}<br>Z=%{z:.3f}<extra></extra>",
     ))
     return _layout(figura, "Elaphes: nuvem observada e linha central exploratória")
+
+
+def adicionar_revisao_normais(
+    figura: go.Figure, pontos_completos: np.ndarray, orientacao: str | Path,
+    *, destacar_incertos: bool = False, mostrar_manuais: bool = False,
+    mostrar_normais: bool = False, max_setas: int = 200, comprimento_seta: float = 0.4,
+) -> go.Figure:
+    """Highlight exact sample indices and show the arrows reviewed by keep/flip."""
+    if max_setas < 1 or not np.isfinite(comprimento_seta) or comprimento_seta <= 0:
+        raise ValueError("max_setas e comprimento_seta devem ser positivos")
+    resultado = load_orientation(resolver_caminho(orientacao))
+    if points_sha256(pontos_completos) != str(resultado["point_sha256"]):
+        raise ValueError("a orientação não pertence à nuvem passada em --cloud")
+    grupos = []
+    if destacar_incertos or mostrar_normais:
+        grupos.append(("Sentido incerto", resultado["uncertain_indices"], "#f72585"))
+    if mostrar_manuais:
+        grupos.append(("Corrigidos manualmente", np.flatnonzero(resultado["manual_mask"]), "#008b58"))
+    for nome, indices, cor in grupos:
+        if not len(indices):
+            continue
+        pontos = resultado["points_xyz"][indices]
+        normais = resultado["oriented_normals_xyz"][indices]
+        detalhes = [
+            f"Índice={int(i)}<br>Normal atual=({n[0]:.3f}, {n[1]:.3f}, {n[2]:.3f})"
+            f"<br>Ramos={int(resultado['candidate_branches'][i, 0])},"
+            f"{int(resultado['candidate_branches'][i, 1])}"
+            f"<br>Motivos={reason_names(int(resultado['reason_bits'][i]))}"
+            for i, n in zip(indices, normais)
+        ]
+        figura.add_trace(go.Scatter3d(
+            x=pontos[:, 0], y=pontos[:, 1], z=pontos[:, 2],
+            mode="markers", name=f"{nome} ({len(indices)})",
+            marker=dict(size=3.5, color=cor, opacity=0.7, symbol="diamond"),
+            text=detalhes, hovertemplate="%{text}<br>X=%{x:.3f}<br>Y=%{y:.3f}<br>Z=%{z:.3f}<extra></extra>",
+        ))
+    if mostrar_normais:
+        incertos = resultado["uncertain_indices"]
+        manuais = np.flatnonzero(resultado["manual_mask"]) if mostrar_manuais else np.empty(0, dtype=int)
+        manuais = manuais[np.linspace(0, len(manuais) - 1, min(len(manuais), max_setas), dtype=int)]
+        restantes = max_setas - len(manuais)
+        incertos = incertos[np.linspace(0, len(incertos) - 1, min(len(incertos), restantes), dtype=int)]
+        indices = np.r_[manuais, incertos]
+    else:
+        indices = np.empty(0, dtype=int)
+    if len(indices):
+        origens = resultado["points_xyz"][indices]
+        direcoes = resultado["oriented_normals_xyz"][indices]
+        pontas = origens + comprimento_seta * direcoes
+        linhas = np.full((len(indices) * 3, 3), np.nan)
+        linhas[0::3] = origens
+        linhas[1::3] = pontas
+        figura.add_trace(go.Scatter3d(
+            x=linhas[:, 0], y=linhas[:, 1], z=linhas[:, 2],
+            mode="lines", name=f"Normais atuais ({len(indices)} setas)",
+            line=dict(color="#4b185d", width=4), hoverinfo="skip",
+        ))
+        figura.add_trace(go.Cone(
+            x=pontas[:, 0], y=pontas[:, 1], z=pontas[:, 2],
+            u=direcoes[:, 0], v=direcoes[:, 1], w=direcoes[:, 2],
+            anchor="tip", sizemode="absolute", sizeref=comprimento_seta * 0.35,
+            colorscale=[[0, "#4b185d"], [1, "#4b185d"]], showscale=False,
+            name="Sentido das normais", hoverinfo="skip",
+        ))
+    return figura
 
 
 def carregar_malha(caminho: str | Path) -> tuple[np.ndarray, np.ndarray]:
@@ -172,6 +241,13 @@ def _argumentos(argv: Sequence[str] | None = None) -> argparse.Namespace:
         comando.add_argument("--max-points", type=int, default=120_000)
         comando.add_argument("--seed", type=int, default=0, help="seed só para limite de pontos do gráfico")
         comando.add_argument("--show", action="store_true", help="abre também no navegador")
+        comando.add_argument("--orientation", help="NPZ de revisão gerado por normal_orientation prepare/apply")
+        comando.add_argument("--highlight-uncertain", action="store_true",
+                             help="destaca todos os índices com sentido incerto, mesmo fora de --max-points")
+        comando.add_argument("--show-manual", action="store_true", help="destaca pontos corrigidos manualmente")
+        comando.add_argument("--show-normals", action="store_true", help="desenha setas de normais selecionadas")
+        comando.add_argument("--max-normal-arrows", type=int, default=200)
+        comando.add_argument("--normal-arrow-length", type=float, default=0.4)
         if tipo == "line":
             comando.add_argument("--graph", default=GRAFO_PADRAO, help="NPZ com nodes_xyz e edges")
         else:
@@ -182,9 +258,8 @@ def _argumentos(argv: Sequence[str] | None = None) -> argparse.Namespace:
 
 def main(argv: Sequence[str] | None = None) -> Path:
     argumentos = _argumentos(argv)
-    pontos = amostrar_pontos(
-        carregar_xyz(argumentos.cloud, "points_xyz"), argumentos.max_points, argumentos.seed
-    )
+    pontos_completos = carregar_xyz(argumentos.cloud, "points_xyz")
+    pontos = amostrar_pontos(pontos_completos, argumentos.max_points, argumentos.seed)
     if argumentos.tipo == "line":
         nos, arestas = carregar_grafo(argumentos.graph)
         figura = montar_linha(pontos, nos, arestas)
@@ -201,6 +276,24 @@ def main(argv: Sequence[str] | None = None) -> Path:
         malhas = [(nome, *carregar_malha(caminho)) for nome, caminho in escolhas]
         figura = montar_malhas(pontos, malhas)
         nome_padrao = "elaphes_global_dense_candidates_interactive.html"
+    if argumentos.highlight_uncertain or argumentos.show_manual or argumentos.show_normals:
+        if not argumentos.orientation:
+            raise ValueError("--orientation é obrigatório para destacar ou mostrar normais")
+        adicionar_revisao_normais(
+            figura, pontos_completos, argumentos.orientation,
+            destacar_incertos=argumentos.highlight_uncertain,
+            mostrar_manuais=argumentos.show_manual,
+            mostrar_normais=argumentos.show_normals,
+            max_setas=argumentos.max_normal_arrows,
+            comprimento_seta=argumentos.normal_arrow_length,
+        )
+        if argumentos.tipo == "mesh" and figura.layout.updatemenus:
+            # The mesh selector must keep every review overlay visible.
+            menus = list(figura.layout.updatemenus)
+            for button in menus[0].buttons:
+                visibility = list(button.args[0]["visible"])
+                visibility.extend([True] * (len(figura.data) - len(visibility)))
+                button.args = ({"visible": visibility},)
     destino = resolver_caminho(argumentos.output or f"results/figures/{nome_padrao}")
     destino.parent.mkdir(parents=True, exist_ok=True)
     figura.write_html(destino, include_plotlyjs=True)

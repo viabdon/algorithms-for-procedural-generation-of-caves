@@ -84,6 +84,13 @@ deve aceitar ramos protegidos por evidência geométrica/manual e comparar
 cada ponta removida com os pontos originais. Caso contrário, ela apagaria
 justamente a ramificação real em X≈30.
 
+Em 12/10/2026, Pablo abriu a última plotagem 3D no navegador e confirmou
+visualmente que todos os nós da linha podada aparentam estar dentro do volume
+da nuvem e que as ramificações estão representadas corretamente. A inspeção
+visual do **grafo exibido** está concluída. Ainda faltam cortes locais para
+avaliar posições interiores candidatas, confirmação geométrica das pontas
+podadas nos pontos originais e classificação assinada para o SDF.
+
 Arquivos de inspeção: [comparação de pesos](../../results/figures/elaphes_lbc_roi_weight_comparison.png), [grafo com peso 0,5](../../results/figures/elaphes_centreline_roi_x12_35_exploratory.png) e [vista 3D interativa com peso 0,05](../../results/figures/elaphes_centreline_roi_x12_35_interactive.html). Para sobreposição no CloudCompare, abrir `results/figures/elaphes_gallery_roi_x12_35.ply` junto de `results/figures/elaphes_centreline_roi_x12_35_weight_0.05_nodes.ply` (nós vermelhos; as arestas não foram exportadas para esse PLY). Os dados intermediários em `data/processed/` e as figuras em `results/figures/` são ignorados pelo Git; quem reproduzir o teste precisa gerar os seus próprios artefatos a partir do PLY original.
 
 Ambiente deste ensaio: Python 3.14.7, NumPy 2.5.0, Open3D 0.20.0, `pc-skeletor` 1.0.0, `robust-laplacian` 1.1.0 e `mistree` 2.0.0. As dependências adicionais foram instaladas apenas em `/tmp/tcc-centreline-deps`, fora do ambiente do projeto. Não houve amostragem aleatória neste recorte (`first` por bin), portanto nenhuma seed foi sorteada; a ordem dos pontos no PLY determina qual deles representa cada bin. Uma futura implementação oficial deve registrar versões, parâmetros e qualquer seed usada.
@@ -111,9 +118,18 @@ pelo Git.
 
 ### Próximo experimento
 
-Conferir a poda e os três braços de X≈42 em cortes do CloudCompare com os
-pontos originais e as malhas candidatas, e registrar quais trechos foram
-confirmados manualmente. Testar preservação de extremidades e seleção de
-componentes antes de usar o grafo para orientação local de normais ou
-geração de sementes interiores. A classificação interior/exterior deve ser
-validada separadamente antes de entregar a linha ao SDF.
+Em 12/10 foi executado o [protótipo de orientação por
+trechos](orientacao-normais-linha-central.md) sobre os 20.274 representantes
+do recorte X `[12,45]` e o grafo podado de 120 nós. O NPZ, o CSV com índices
+exatos e o HTML de revisão foram gerados em `data/processed/` e
+`results/figures/` (ignorados pelo Git). Sem referências interiores
+verificadas em cortes, **20.274/20.274** sentidos ficaram incertos; essa
+execução verifica os contratos de arquivos e visualização, não a eficácia da
+orientação.
+
+Conferir em cortes do CloudCompare as pontas podadas e os três braços de
+X≈42 contra pontos originais e malhas candidatas. Testar preservação de
+extremidades, seleção de componentes e associação de pontos da superfície
+a trechos da linha, inclusive nas bifurcações, antes de orientar normais ou
+usar nós como sementes interiores. A classificação interior/exterior deve
+ser validada separadamente antes de entregar a linha ao SDF.

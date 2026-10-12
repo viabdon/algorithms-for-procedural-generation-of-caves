@@ -43,6 +43,20 @@ protegeu manualmente X≈30. Conferir os ramos nos pontos originais e a
 estabilidade dos nós antes de propor múltiplas sementes interiores para
 orientação local. Essa linha não substitui uma classificação assinada.
 
+Foi implementada uma [hipótese de orientação local](orientacao-normais-linha-central.md):
+dividir o grafo em ramos, comparar até dois ramos por ponto com distância
+normalizada por escala local, usar apenas nós **verificados em cortes** para
+votar no sentido e conferir esses votos por consenso em trechos coerentes de
+superfície. Um trecho não decide pontos distantes sem voto local válido.
+Discordâncias e falta de evidência mantêm índices específicos incertos para
+inspeção e eventual `keep`/`flip` manual. Os limiares e a própria associação
+entre parede e ramo são experimentais; paredes próximas podem confundir a
+proximidade euclidiana. O diagnóstico inicial do recorte X `[12,45]` não
+recebeu referências validadas e preservou todos os 20.274 sentidos como
+incertos. A revisão de normais é independente da máscara `UNKNOWN` do SDF:
+uma normal com sentido decidido não prova que a célula correspondente é
+interior ou exterior.
+
 ## 2. Classificação e campo de distância
 
 Depois da malha, classificar interior/exterior. Flood fill da borda sobre uma

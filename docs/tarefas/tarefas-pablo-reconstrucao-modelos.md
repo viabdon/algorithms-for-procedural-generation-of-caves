@@ -1,6 +1,6 @@
 # Tarefas do Pablo — malha, semântica e modelos neurais
 
-**Metas indicativas revistas em 09/10/2026.** Esta frente produz a malha
+**Metas indicativas revistas em 12/10/2026.** Esta frente produz a malha
 reconstruída, especifica a semântica dos artefatos e prepara a avaliação e os
 modelos neurais. Felipe implementa flood fill, SDF/TSDF e o CA condicionado em
 paralelo; ver [`tarefas-felipe-sdf-ca.md`](tarefas-felipe-sdf-ca.md).
@@ -15,23 +15,41 @@ O estado da reconstrução e os parâmetros testados estão em
 - [x] Identificar no cabeçalho do PLY se há normais aproveitáveis: o Elaphes
   não as contém. O protótipo estima e orienta normais após amostragem espacial;
   a orientação global ainda precisa de revisão com uma semente interior.
-- [ ] Inventariar os arquivos brutos e metadados do Elaphes em busca de
-  posições/poses do scanner, estações, trajetórias ou projeto de aquisição.
-  Conferir também a documentação e a fonte original do dataset: a exportação
-  para PLY pode não preservar esses dados.
-- [ ] Revisar o cabeçalho e os atributos do PLY, em especial `pointsourceid`,
-  para verificar se permitem associar pontos a tomadas/estações. Não tratar
-  identificadores de origem como coordenadas do scanner sem uma tabela ou
-  arquivo de poses correspondente.
-- [ ] Registrar em uma tabela curta os arquivos encontrados, o que cada um
-  contém, unidade, eixos e transformação para o XYZ do PLY. Concluir até
-  **13/10** se há posições de scanner utilizáveis para orientar normais e
-  testar algumas em trechos conhecidos de piso, teto e paredes.
-- [ ] Caso não haja poses compatíveis, discutir um esqueleto preliminar de
-  baixa resolução ou múltiplas posições interiores validadas em cortes da
-  nuvem. Avaliar como associar cada ponto a um trecho e lidar com bifurcações
-  antes de propor orientação local das normais; documentar a decisão até
-  **13/10**, sem assumir que a linha central estimada seja verdade de campo.
+- [x] Inventariar os arquivos brutos e metadados locais e conferir a
+  [fonte oficial](https://dataset-dl.liris.cnrs.fr/elaphes-cave/) em busca de
+  poses, estações e trajetórias. O HD contém apenas o PLY; os arquivos
+  publicados não listam poses. Ver
+  [inventário e limites da inspeção](../metodologia/metadados-elaphes-scanner.md).
+- [x] Revisar cabeçalho e atributos do PLY, inclusive `pointsourceid`.
+  Não há campos de posição do scanner; nas amostras verificadas o ID é `0`.
+  Mesmo outros IDs não seriam coordenadas sem tabela de correspondência.
+- [x] Registrar os arquivos e metadados examinados e concluir que **não há
+  poses utilizáveis nos materiais disponíveis**. A unidade física e a
+  transformação geográfica do PLY ainda não foram confirmadas; testar poses
+  em piso/teto/paredes só será possível se surgir fonte adicional.
+- [x] Inspecionar no navegador a última plotagem 3D da linha central podada:
+  Pablo confirmou que todos os nós aparentam estar dentro do volume da nuvem
+  e que as ramificações estão representadas corretamente. Essa é uma
+  validação visual do grafo, registrada em
+  [extração exploratória](../metodologia/linha-central-elaphes-exploracao.md).
+- [ ] Conferir posições candidatas em cortes locais da nuvem e em trechos
+  conhecidos de piso, teto e paredes, antes de usá-las como sementes
+  interiores para orientar normais. A sobreposição 3D não prova o interior
+  nem fornece o sinal do SDF.
+- [x] Prototipar a associação de cada ponto a até dois ramos da linha central,
+  com margem para custos próximos e região de bifurcação. Orientar por votos
+  de nós interiores **explicitamente verificados**, sem fundir vetores de
+  ramos discordantes. Ver [método e limites](../metodologia/orientacao-normais-linha-central.md).
+- [x] Registrar **quais** pontos têm sentido incerto no NPZ/CSV e destacá-los
+  no HTML com índice, normal e motivo. Implementar revisão pontual `keep`/`flip`
+  com hash da amostra ordenada e um novo artefato; permitir que Poisson consuma
+  diretamente as normais revisadas.
+- [ ] Validar nós interiores em cortes de piso, teto, paredes, pontas e
+  bifurcações; registrar evidência de cada escolha. Até essa conferência,
+  manter as 20.274 normais do primeiro diagnóstico como incertas.
+- [ ] Avaliar associações, patches, votos discordantes e índices incertos
+  contra trechos conhecidos. Testar sensibilidade a densidade, vizinhos e
+  limiares, inclusive paredes próximas e ramos de X≈30/X≈42.
 - [x] Executar uma primeira amostragem espacial rastreável do Elaphes com o novo comando
   `cavegen.meshing.poisson --sample-only`, revisando a densidade nas regiões
   finas. Os 245 voxels `32³` não entram no Poisson; o arquivo guarda XYZ do scan.
@@ -50,7 +68,9 @@ O estado da reconstrução e os parâmetros testados estão em
   e 22.368 representantes entraram no Poisson. Remover só o representante
   anômalo da amostra antiga não eliminou a extrapolação.
 - [ ] Inspecionar a origem dos três pontos altos no PLY bruto antes de fixar
-  uma regra de exclusão definitiva; guardar o critério e as contagens.
+  uma regra de exclusão definitiva; guardar o critério e as contagens. A
+  fonte oficial oferece versão sanitizada com três pontos isolados removidos;
+  comparar coordenadas antes de afirmar que são os mesmos três registros.
 - [ ] Avaliar segmentação com sobreposição, junções e componentes da malha
   global; a candidata densa melhorou a aderência mas ainda extrapola ao
   limite cúbico, tem 175 arestas abertas e 27 não manifold.
@@ -87,6 +107,10 @@ O estado da reconstrução e os parâmetros testados estão em
 
 ## Até 20/10 — Decidir a reconstrução e integrar
 
+- [ ] Comparar Poisson com normais base e normais por trechos usando **a mesma
+  amostra e profundidade**; medir suporte à nuvem, teto, bordas, componentes,
+  não manifold e extrapolação. `--require-resolved` impede promover uma
+  reconstrução com sentidos ainda incertos.
 - [ ] Testar sensibilidade do Poisson a normais, amostragem e profundidade.
   Caso falhe nos critérios, estudar Ball Pivoting e Alpha Shapes como fallbacks
   de **malha**, registrando por que cada candidato foi aceito ou rejeitado.

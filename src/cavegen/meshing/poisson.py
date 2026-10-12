@@ -132,6 +132,7 @@ def reconstruct_poisson(
     normal_neighbors: int = 30,
     orientation_neighbors: int = 30,
     interior_seed_xyz: tuple[float, float, float] | None = None,
+    oriented_normals_xyz: np.ndarray | None = None,
     threads: int = 1,
 ):
     """Return Open3D's Screened Poisson mesh and vertex density estimates.
@@ -147,6 +148,15 @@ def reconstruct_poisson(
         raise ValueError("depth and normal-neighbor counts are too small")
     if threads < 1:
         raise ValueError("threads must be positive")
+    if oriented_normals_xyz is not None:
+        if interior_seed_xyz is not None:
+            raise ValueError("oriented normals and interior_seed_xyz cannot be combined")
+        oriented_normals_xyz = np.asarray(oriented_normals_xyz, dtype=np.float64)
+        if oriented_normals_xyz.shape != points_xyz.shape or not np.isfinite(oriented_normals_xyz).all():
+            raise ValueError("oriented normals must be finite and match points_xyz")
+        lengths = np.linalg.norm(oriented_normals_xyz, axis=1)
+        if np.any(lengths < 1e-8):
+            raise ValueError("oriented normals cannot contain zero vectors")
     try:
         import open3d as o3d
     except ImportError as error:
@@ -154,8 +164,11 @@ def reconstruct_poisson(
 
     pcd = o3d.geometry.PointCloud()
     pcd.points = o3d.utility.Vector3dVector(points_xyz.astype(np.float64))
-    pcd.estimate_normals(o3d.geometry.KDTreeSearchParamKNN(knn=normal_neighbors))
-    pcd.orient_normals_consistent_tangent_plane(orientation_neighbors)
+    if oriented_normals_xyz is not None:
+        pcd.normals = o3d.utility.Vector3dVector(oriented_normals_xyz / lengths[:, None])
+    else:
+        pcd.estimate_normals(o3d.geometry.KDTreeSearchParamKNN(knn=normal_neighbors))
+        pcd.orient_normals_consistent_tangent_plane(orientation_neighbors)
     if interior_seed_xyz is not None:
         seed = np.asarray(interior_seed_xyz, dtype=np.float64)
         if seed.shape != (3,) or not np.isfinite(seed).all():
@@ -167,6 +180,67 @@ def reconstruct_poisson(
     return o3d.geometry.TriangleMesh.create_from_point_cloud_poisson(
         pcd, depth=depth, n_threads=threads
     )
+
+
+def run_oriented_sample(
+    orientation_path: str | Path, output_path: str | Path, *, depth: int = 8,
+    threads: int = 1, require_resolved: bool = False,
+) -> dict[str, object]:
+    """Reconstruct a diagnostic mesh from a fixed, reviewable normal archive."""
+    from cavegen.meshing.normal_orientation import load_orientation
+
+    if depth < 2 or threads < 1:
+        raise ValueError("invalid Poisson depth or thread count")
+    data = load_orientation(orientation_path)
+    uncertain_count = int(np.count_nonzero(data["uncertain_mask"]))
+    if require_resolved and uncertain_count:
+        raise ValueError(f"{uncertain_count} normal signs remain uncertain")
+    start = perf_counter()
+    points = data["points_xyz"]
+    mesh, densities = reconstruct_poisson(
+        points, depth=depth, threads=threads,
+        oriented_normals_xyz=data["oriented_normals_xyz"],
+    )
+    if len(mesh.vertices) == 0 or len(mesh.triangles) == 0:
+        raise ValueError("Poisson returned an empty mesh")
+    output = Path(output_path)
+    output.parent.mkdir(parents=True, exist_ok=True)
+    o3d = _require_open3d()
+    if not o3d.io.write_triangle_mesh(str(output), mesh):
+        raise OSError(f"could not write mesh: {output}")
+    triangles = np.asarray(mesh.triangles)
+    edges = np.sort(np.concatenate((triangles[:, [0, 1]], triangles[:, [1, 2]],
+                                    triangles[:, [2, 0]])), axis=1)
+    _, edge_counts = np.unique(edges, axis=0, return_counts=True)
+    clusters, _, _ = mesh.cluster_connected_triangles()
+    density = np.asarray(densities)
+    metadata: dict[str, object] = {
+        "status": "candidate_requires_validation",
+        "method": "Open3D Screened Poisson with reviewed normal archive",
+        "orientation_path": str(orientation_path),
+        "point_sha256": str(data["point_sha256"]),
+        "review_sha256": str(data["review_sha256"]),
+        "sampled_vertices": int(len(points)),
+        "normal_sign_uncertain_count": uncertain_count,
+        "normal_sign_manual_count": int(np.count_nonzero(data["manual_mask"])),
+        "mesh_vertices": len(mesh.vertices),
+        "mesh_triangles": len(mesh.triangles),
+        "mesh_watertight": bool(mesh.is_watertight()),
+        "mesh_boundary_edges": int(np.count_nonzero(edge_counts == 1)),
+        "mesh_nonmanifold_edges": int(np.count_nonzero(edge_counts > 2)),
+        "mesh_components": int(np.max(clusters)) + 1,
+        "mesh_bounds_xyz": [mesh.get_min_bound().tolist(), mesh.get_max_bound().tolist()],
+        "density_min": float(density.min()),
+        "density_max": float(density.max()),
+        "depth": depth,
+        "poisson_threads": threads,
+        "open3d_version": o3d.__version__,
+        "elapsed_seconds": perf_counter() - start,
+    }
+    output.with_suffix(output.suffix + ".json").write_text(
+        json.dumps(metadata, indent=2), encoding="utf-8"
+    )
+    return metadata
 
 
 def run(
@@ -364,7 +438,10 @@ def _require_open3d():
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Build a Screened Poisson mesh candidate from a PLY.")
-    parser.add_argument("--ply", required=True)
+    parser.add_argument("--ply", help="source PLY for the existing sampling route")
+    parser.add_argument("--oriented-sample", help="NPZ from normal_orientation prepare/apply")
+    parser.add_argument("--require-resolved", action="store_true",
+                        help="with --oriented-sample, reject remaining uncertain signs")
     parser.add_argument("--bounds", default="data/params/elaphes_xyz_bounds.json")
     parser.add_argument("--output", help="Candidate mesh path, e.g. results/meshes/elaphes.obj")
     parser.add_argument("--sample-path", help="Reusable sampled XYZ archive (.npz).")
@@ -378,6 +455,17 @@ def main() -> None:
     parser.add_argument("--threads", type=int, default=1, help="Poisson CPU threads; defaults to 1.")
     parser.add_argument("--interior-seed-xyz", type=float, nargs=3, metavar=("X", "Y", "Z"))
     args = parser.parse_args()
+    if args.oriented_sample:
+        if args.ply or args.sample_path or args.sample_only or args.interior_seed_xyz:
+            parser.error("--oriented-sample cannot be combined with PLY sampling or interior seed")
+        if not args.output:
+            parser.error("--output is required with --oriented-sample")
+        metadata = run_oriented_sample(args.oriented_sample, args.output, depth=args.depth,
+                                       threads=args.threads, require_resolved=args.require_resolved)
+        print(json.dumps(metadata, indent=2))
+        return
+    if not args.ply:
+        parser.error("--ply or --oriented-sample is required")
     metadata = run(
         args.ply, args.bounds, args.output,
         max_points=args.max_points,

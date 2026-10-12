@@ -20,8 +20,10 @@ A referência real passará pela sequência principal:
 
 ```text
 point cloud XYZ (+ atributos úteis)
-  -> amostragem espacial/controle de memória e normais orientadas
-     ↳ linha central exploratória (LBC + MST) para inspecionar orientação por trecho
+  -> amostragem espacial/controle de memória e estimação de normais
+     ↳ linha central exploratória (LBC + MST)
+     ↳ associação a ramos + referências interiores verificadas em cortes
+     ↳ orientação por trechos, lista de índices incertos e revisão manual
   -> Screened Poisson Surface Reconstruction
      (Ball Pivoting/Alpha Shapes como fallbacks de reconstrução)
   -> malha validada, aproximadamente watertight, com entradas/tampas marcadas
@@ -43,6 +45,14 @@ o interior: ela pode sugerir várias posições interiores e trechos de
 orientação das normais **depois** de conferir os nós com cortes do scan. A
 poda precisa preservar o ramo real curto perto de X≈30 e revisar a bifurcação
 maior perto de X≈42; um limiar global de comprimento apagaria geometria real.
+O [módulo experimental de orientação](orientacao-normais-linha-central.md)
+agora associa cada ponto amostrado a até dois ramos, reúne votos de referências
+**explicitamente validadas** e salva a lista exata dos pontos com sentido
+incerto. As correções `keep`/`flip` ficam vinculadas ao hash dos XYZ ordenados
+e às setas revisadas. O Poisson pode consumir essas normais diretamente para
+uma comparação; isso não valida a linha, a malha ou o interior. Na primeira
+execução do Elaphes, sem referências conferidas em cortes, os 20.274 sentidos
+permaneceram incertos.
 
 ## Contratos entre as etapas
 
@@ -50,6 +60,7 @@ maior perto de X≈42; um limiar global de comprimento apagaria geometria real.
 | --- | --- | --- |
 | Point cloud | XYZ contínuo, fonte e atributos registrados | Estimar normais e reconstruir malha |
 | Linha central candidata | Nós XYZ, arestas, recorte, parâmetros e trechos validados | Inspeção e possível apoio à orientação local; não fornece sinal por si |
+| Revisão de normais | XYZ amostrados ordenados, hash, normais, índices incertos, motivos, ramos e decisões manuais | Diagnóstico e comparação Poisson; não é máscara `UNKNOWN` do SDF |
 | Malha real candidata | Vértices XYZ, faces orientadas, faces sintéticas marcadas | Inspeção, classificação e distância |
 | Grade de classificação | ZYX, shape, origem, espaçamento, região válida | Sinal e incerteza do SDF |
 | SDF físico | `float32[D,H,W]`, distância à malha, negativo em `VOID` | Geometria e avaliação |
