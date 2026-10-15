@@ -184,22 +184,27 @@ def reconstruct_poisson(
 
 def run_oriented_sample(
     orientation_path: str | Path, output_path: str | Path, *, depth: int = 8,
-    threads: int = 1, require_resolved: bool = False,
+    threads: int = 1, require_resolved: bool = False, normal_source: str = "reviewed",
 ) -> dict[str, object]:
-    """Reconstruct a diagnostic mesh from a fixed, reviewable normal archive."""
+    """Reconstruct from baseline or reviewed normals of the same ordered sample."""
     from cavegen.meshing.normal_orientation import load_orientation
 
     if depth < 2 or threads < 1:
         raise ValueError("invalid Poisson depth or thread count")
+    if normal_source not in {"baseline", "reviewed"}:
+        raise ValueError("normal_source must be baseline or reviewed")
+    if normal_source == "baseline" and require_resolved:
+        raise ValueError("require_resolved applies only to reviewed normals")
     data = load_orientation(orientation_path)
     uncertain_count = int(np.count_nonzero(data["uncertain_mask"]))
     if require_resolved and uncertain_count:
         raise ValueError(f"{uncertain_count} normal signs remain uncertain")
     start = perf_counter()
     points = data["points_xyz"]
+    normals = data["baseline_normals_xyz" if normal_source == "baseline" else "oriented_normals_xyz"]
     mesh, densities = reconstruct_poisson(
         points, depth=depth, threads=threads,
-        oriented_normals_xyz=data["oriented_normals_xyz"],
+        oriented_normals_xyz=normals,
     )
     if len(mesh.vertices) == 0 or len(mesh.triangles) == 0:
         raise ValueError("Poisson returned an empty mesh")
@@ -216,13 +221,15 @@ def run_oriented_sample(
     density = np.asarray(densities)
     metadata: dict[str, object] = {
         "status": "candidate_requires_validation",
-        "method": "Open3D Screened Poisson with reviewed normal archive",
+        "method": "Open3D Screened Poisson with fixed normal archive",
+        "normal_source": normal_source,
         "orientation_path": str(orientation_path),
         "point_sha256": str(data["point_sha256"]),
         "review_sha256": str(data["review_sha256"]),
         "sampled_vertices": int(len(points)),
         "normal_sign_uncertain_count": uncertain_count,
-        "normal_sign_manual_count": int(np.count_nonzero(data["manual_mask"])),
+        "normal_sign_manual_count": (int(np.count_nonzero(data["manual_mask"]))
+                                     if normal_source == "reviewed" else 0),
         "mesh_vertices": len(mesh.vertices),
         "mesh_triangles": len(mesh.triangles),
         "mesh_watertight": bool(mesh.is_watertight()),
@@ -442,6 +449,8 @@ def main() -> None:
     parser.add_argument("--oriented-sample", help="NPZ from normal_orientation prepare/apply")
     parser.add_argument("--require-resolved", action="store_true",
                         help="with --oriented-sample, reject remaining uncertain signs")
+    parser.add_argument("--baseline-normals", action="store_true",
+                        help="with --oriented-sample, use its original Open3D normals as control")
     parser.add_argument("--bounds", default="data/params/elaphes_xyz_bounds.json")
     parser.add_argument("--output", help="Candidate mesh path, e.g. results/meshes/elaphes.obj")
     parser.add_argument("--sample-path", help="Reusable sampled XYZ archive (.npz).")
@@ -458,12 +467,17 @@ def main() -> None:
     if args.oriented_sample:
         if args.ply or args.sample_path or args.sample_only or args.interior_seed_xyz:
             parser.error("--oriented-sample cannot be combined with PLY sampling or interior seed")
+        if args.baseline_normals and args.require_resolved:
+            parser.error("--baseline-normals cannot be combined with --require-resolved")
         if not args.output:
             parser.error("--output is required with --oriented-sample")
         metadata = run_oriented_sample(args.oriented_sample, args.output, depth=args.depth,
-                                       threads=args.threads, require_resolved=args.require_resolved)
+                                       threads=args.threads, require_resolved=args.require_resolved,
+                                       normal_source="baseline" if args.baseline_normals else "reviewed")
         print(json.dumps(metadata, indent=2))
         return
+    if args.baseline_normals:
+        parser.error("--baseline-normals requires --oriented-sample")
     if not args.ply:
         parser.error("--ply or --oriented-sample is required")
     metadata = run(

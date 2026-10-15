@@ -249,8 +249,8 @@ por bin: 22.273.631 pontos brutos geraram 10.949 representantes em
 `111×54×41` bins. Com `depth=8` e uma seed provisória visualmente interna
 `(20,1,−3,1)`, a malha local ficou muito mais próxima da amostra: distância
 mediana `0,081`, p95 `0,153` e nenhum vértice acima de 2 unidades. Ver
-[projeções sobrepostas](../../results/figures/elaphes_gallery_roi_x12_35_poisson_d8_projections.png)
-e [inspeção 3D](../../results/figures/elaphes_gallery_roi_x12_35_poisson_d8_interactive.html).
+[projeções sobrepostas](../../results/figures/02_reconstrucao_poisson/elaphes_gallery_roi_x12_35_poisson_d8_projections.png)
+e [inspeção 3D](../../results/figures/02_reconstrucao_poisson/elaphes_gallery_roi_x12_35_poisson_d8_interactive.html).
 A candidata local continua inadequada para SDF: tem 26 arestas de borda,
 28 não manifold e 37 componentes. As 26 arestas abertas estão todas no plano
 X≈36,15, o limite da caixa de reconstrução após o corte artificial da
@@ -294,8 +294,8 @@ primeira candidata `depth=8`. As medidas de distância abaixo usam os
 A densidade maior melhorou a cobertura dos pontos observados e reduziu a
 região sem suporte, mas **não tornou a malha fechada ou próxima do scan em
 todo o domínio**. Ela ainda atinge os limites Y do cubo do Poisson. Ver
-[projeções da candidata densa](../../results/figures/elaphes_global_dense_poisson_d8_projections.png)
-e [comparação 3D com filtros de densidade](../../results/figures/elaphes_global_dense_candidates_interactive.html).
+[projeções da candidata densa](../../results/figures/02_reconstrucao_poisson/elaphes_global_dense_poisson_d8_projections.png)
+e [comparação 3D com filtros de densidade](../../results/figures/05_comparacao_malhas/elaphes_global_dense_candidates_interactive.html).
 
 A densidade por vértice devolvida pelo Poisson se correlacionou com a
 distância à amostra: entre os vértices a mais de 5 unidades, a mediana da

@@ -221,6 +221,44 @@ com o scan completo. O desvio espacial p95 por bin foi 0,490 unidade XYZ.
 Assim, o centróide isolado ainda não justifica aceitar a malha; investigar
 resolução dos bins, regiões dispersas, orientação das normais e suporte local.
 
+### Menu de revisão e malhas
+
+As visualizações locais são separadas por etapa em
+[results/figures](results/figures/README.md), incluindo recortes, Poisson,
+linha central, orientação de normais, comparação de malhas e geração procedural.
+
+O menu de texto reúne testes, inspeção de NPZ/CSV/JSON/OBJ, preparação de
+normais, HTML de revisão, aplicação de `keep`/`flip` e Poisson diagnóstico:
+
+```bash
+.venv/bin/python menu_malhas.py
+```
+
+Também aceita comandos diretos curtos, com caminhos relativos à raiz do projeto:
+
+```bash
+.venv/bin/python menu_malhas.py testar
+.venv/bin/python menu_malhas.py listar
+.venv/bin/python menu_malhas.py inspecionar data/processed/elaphes_centreline_normals_review.npz --indice 42
+.venv/bin/python menu_malhas.py --help
+```
+
+`preparar` usa por padrão a amostra e o grafo do recorte X `[12,45]`; sem
+`--referencias`, todos os sentidos continuam incertos. Só marque um nó como
+interior validado após conferi-lo nos cortes locais. `plotar --orientacao NPZ`
+salva o HTML com pontos incertos e setas. `aplicar` lê o CSV do NPZ por padrão
+e exige um novo nome de saída. O menu recusa sobrescrever revisões e malhas.
+Sem `--saida`, `preparar` e `plotar` sugerem o próximo nome livre.
+
+`malha --modo baseline` e `malha --modo reviewed` usam exatamente os mesmos
+pontos do NPZ de revisão, `depth` e número de threads configuráveis. O modo
+`baseline` usa as normais originais estimadas pelo Open3D; `reviewed` usa as
+normais revisadas e exige que todos os sentidos estejam decididos, salvo com
+`--permitir-incertos`. O JSON da malha registra a origem das normais. Se a
+revisão ainda não mudou nenhuma normal, essa comparação não testa o efeito da
+orientação. Ambas as saídas continuam candidatas diagnósticas, sem comprovar
+interior/exterior ou aptidão para o SDF.
+
 Para o CA, um SDF de **controle simplificado**, independente da caverna de
 teste, poderá enviesar a regra. Usar o SDF exato da referência de teste é um
 experimento distinto de reconstrução condicionada. O algoritmo genético será

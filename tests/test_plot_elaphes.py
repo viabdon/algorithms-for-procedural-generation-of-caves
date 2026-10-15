@@ -5,6 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 from tempfile import TemporaryDirectory
 import unittest
+from unittest.mock import patch
 
 import numpy as np
 import trimesh
@@ -16,6 +17,35 @@ from plots.plot_elaphes import (
 
 
 class PlotElaphesTests(unittest.TestCase):
+    def test_default_html_paths_follow_experiment_stages(self) -> None:
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            cloud, graph, mesh, review = [root / name for name in
+                                          ("cloud.npz", "graph.npz", "mesh.obj", "review.npz")]
+            points = np.array([[0., 0., 0.], [1., 1., 1.]])
+            normals = np.tile([0., 0., 1.], (2, 1))
+            np.savez(cloud, points_xyz=points)
+            np.savez(graph, nodes_xyz=points, edges=np.array([[0, 1]]))
+            trimesh.creation.box().export(mesh)
+            save_orientation(review, {
+                "points_xyz": points, "baseline_normals_xyz": normals,
+                "oriented_normals_xyz": normals.copy(),
+                "uncertain_mask": np.array([True, False]),
+                "manual_mask": np.zeros(2, dtype=bool),
+                "reason_bits": np.array([64, 0], dtype=np.uint16),
+                "candidate_branches": np.full((2, 2), -1, dtype=np.int32),
+            }, {})
+            with patch("plots.plot_elaphes.RAIZ_PROJETO", root), \
+                 patch("plotly.graph_objects.Figure.write_html"):
+                line = main(["line", "--cloud", str(cloud), "--graph", str(graph)])
+                self.assertEqual(line.parent.name, "03_linha_central")
+                oriented = main(["line", "--cloud", str(cloud), "--graph", str(graph),
+                                 "--orientation", str(review), "--highlight-uncertain"])
+                self.assertEqual(oriented.parent.name, "04_orientacao_normais")
+                comparison = main(["mesh", "--cloud", str(cloud),
+                                   "--mesh", f"Caixa={mesh}"])
+                self.assertEqual(comparison.parent.name, "05_comparacao_malhas")
+
     def test_review_overlay_identifies_exact_points_and_arrows(self) -> None:
         points = np.array([[0, 0, 0], [1, 0, 0], [2, 0, 0], [3, 0, 0]], dtype=float)
         normals = np.tile([0., 1., 0.], (len(points), 1))

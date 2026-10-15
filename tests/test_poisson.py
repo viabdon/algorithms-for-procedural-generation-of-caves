@@ -162,8 +162,17 @@ class PoissonPreparationTests(unittest.TestCase):
             reviewed_mesh = root / "reviewed.obj"
             reviewed = run_oriented_sample(orientation, reviewed_mesh, depth=5)
             self.assertEqual(reviewed["normal_sign_uncertain_count"], n)
+            self.assertEqual(reviewed["normal_source"], "reviewed")
             self.assertGreater(reviewed["mesh_triangles"], 0)
             self.assertTrue(reviewed_mesh.is_file())
+            baseline = run_oriented_sample(orientation, root / "baseline.obj", depth=5,
+                                           normal_source="baseline")
+            self.assertEqual(baseline["normal_source"], "baseline")
+            self.assertEqual(baseline["point_sha256"], reviewed["point_sha256"])
+            self.assertTrue((root / "baseline.obj").is_file())
+            with self.assertRaisesRegex(ValueError, "only to reviewed"):
+                run_oriented_sample(orientation, root / "invalid.obj", depth=5,
+                                    normal_source="baseline", require_resolved=True)
 
 
 if __name__ == "__main__":

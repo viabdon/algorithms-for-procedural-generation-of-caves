@@ -571,18 +571,18 @@ def apply_manual_corrections(
         if reader.fieldnames is None or not required_columns.issubset(reader.fieldnames):
             raise ValueError("correction CSV is missing review columns")
         decisions: dict[int, str] = {}
+        seen_indices: set[int] = set()
         for row in reader:
             action = (row["action"] or "").strip().lower()
-            if not action:
-                continue
-            if action not in {"keep", "flip"}:
+            if action and action not in {"keep", "flip"}:
                 raise ValueError("action must be keep or flip")
             try:
                 index = int(row["point_index"])
             except (TypeError, ValueError) as error:
                 raise ValueError("point_index must be an integer") from error
-            if index in decisions or index < 0 or index >= len(result["points_xyz"]):
+            if index in seen_indices or index < 0 or index >= len(result["points_xyz"]):
                 raise ValueError("duplicate or out-of-range point_index")
+            seen_indices.add(index)
             if not result["uncertain_mask"][index]:
                 raise ValueError("manual correction targets a point that is not uncertain")
             try:
@@ -601,7 +601,10 @@ def apply_manual_corrections(
             if (branches != tuple(result["candidate_branches"][index]) or
                     row["reasons"] != reason_names(int(result["reason_bits"][index]))):
                 raise ValueError("review row branches or reasons differ from point_index")
-            decisions[index] = action
+            if action:
+                decisions[index] = action
+    if seen_indices != set(map(int, result["uncertain_indices"])):
+        raise ValueError("correction CSV must contain every uncertain point exactly once")
     if not decisions:
         raise ValueError("correction CSV has no keep/flip decisions")
     for index, action in decisions.items():
@@ -639,10 +642,10 @@ def _load_validated_references(path: Path | None, nodes: np.ndarray, edges: np.n
     for item in references:
         if not isinstance(item, dict) or type(item.get("validated_interior")) is not bool:
             raise ValueError("each reference needs node_index and validated_interior boolean")
+        index = item.get("node_index")
+        if isinstance(index, bool) or not isinstance(index, int) or not 0 <= index < len(nodes):
+            raise ValueError("node_index must be a valid node index")
         if item["validated_interior"]:
-            index = item.get("node_index")
-            if isinstance(index, bool) or not isinstance(index, int):
-                raise ValueError("node_index must be an integer")
             accepted.append(index)
     return accepted
 

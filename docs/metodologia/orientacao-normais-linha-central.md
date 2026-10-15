@@ -109,7 +109,7 @@ Na raiz do projeto, com o ambiente `.venv`:
   --graph data/processed/elaphes_centreline_roi_x12_45_pruned_exploratory.npz \
   --orientation data/processed/elaphes_centreline_normals_review.npz \
   --highlight-uncertain --show-normals --max-normal-arrows 120 \
-  --output results/figures/elaphes_centreline_normals_review.html
+  --output results/figures/04_orientacao_normais/elaphes_centreline_normals_review.html
 ```
 
 O fundo da nuvem é colorido por Z. Pontos rosa são incertos; pontos verdes
@@ -178,3 +178,19 @@ Esse módulo implementa uma **adaptação metodológica do projeto** posterior
 à extração da linha. A extração LBC+MST foi inspirada em Racine et al.; a
 associação de pontos, os votos de referências, a revisão de sentidos e o
 CSV não são apresentados aqui como procedimentos publicados por eles.
+
+## Próximo experimento acordado: similaridade de cossenos
+
+**Ainda não implementado.** Manter a convenção atual: o vetor de referência
+vai da linha central ao ponto da parede, no sentido do sólido. Cosseno
+positivo sugere `keep` para uma normal que acompanha esse vetor; cosseno
+negativo sugere `flip`. Comparar limiares simétricos de valor absoluto
+`0,5`, `0,75` e `0,94`, registrando decisões, conflitos entre ramos e pontos
+que continuarem incertos. A faixa `|cosseno| ≥ 0,5` é exploratória, pois
+admite até 60° de diferença; não equivale a uma orientação validada.
+
+A aparência da linha dentro da nuvem não comprova que cada trecho esteja
+no interior da passagem. O experimento deverá preservar a cautela nas
+bifurcações, verificar qualidade local das normais e comparar as malhas com
+a mesma amostra e parâmetros, antes de considerar a orientação adequada à
+referência SDF.

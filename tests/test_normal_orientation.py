@@ -54,6 +54,11 @@ class NormalOrientationTests(unittest.TestCase):
                 first = prepare(sample, graph, root / "first.npz", reference_path=reference)
             self.assertEqual(first["uncertain_count"], len(points))
             self.assertEqual(first["validated_reference_node_indices"], [])
+            record["references"][0]["node_index"] = len(nodes)
+            reference.write_text(json.dumps(record))
+            with self.assertRaisesRegex(ValueError, "valid node index"):
+                prepare(sample, graph, root / "invalid-node.npz", reference_path=reference)
+            record["references"][0]["node_index"] = 0
             record["graph_sha256"] = "wrong"
             reference.write_text(json.dumps(record))
             with self.assertRaisesRegex(ValueError, "different centreline graph"):
@@ -141,6 +146,22 @@ class NormalOrientationTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "coordinates or normal differ"):
                 apply_manual_corrections(source, csv_path, corrected)
             rows[0]["point_index"] = "0"
+            rows[2]["normal_x"] = "999"
+            with csv_path.open("w", encoding="utf-8", newline="") as stream:
+                stream.write(lines[0] + "\n")
+                writer = csv.DictWriter(stream, fieldnames=rows[0].keys())
+                writer.writeheader()
+                writer.writerows(rows)
+            with self.assertRaisesRegex(ValueError, "coordinates or normal differ"):
+                apply_manual_corrections(source, csv_path, corrected)
+            rows[2]["normal_x"] = str(result["oriented_normals_xyz"][2, 0])
+            with csv_path.open("w", encoding="utf-8", newline="") as stream:
+                stream.write(lines[0] + "\n")
+                writer = csv.DictWriter(stream, fieldnames=rows[0].keys())
+                writer.writeheader()
+                writer.writerows(rows[:-1])
+            with self.assertRaisesRegex(ValueError, "every uncertain point"):
+                apply_manual_corrections(source, csv_path, corrected)
             with csv_path.open("w", encoding="utf-8", newline="") as stream:
                 stream.write(lines[0] + "\n")
                 writer = csv.DictWriter(stream, fieldnames=rows[0].keys())

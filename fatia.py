@@ -1,7 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from pathlib import Path
 
-from cavegen.io.voxel_io import load_volume_npz
+from cavegen.datastream.voxel_io import load_volume_npz
 
 # 1) Carrega o volume booleano gerado pelo algoritmo.
 volume = load_volume_npz("results/volumes/random_walk_seed_0.npz")
@@ -40,6 +41,8 @@ eixos_3d.set_box_aspect(volume.shape[::-1])  # (x, y, z) = (width, height, depth
 plt.tight_layout()
 
 # Salva uma imagem em disco (útil para inspecionar/colocar no TCC)...
-figura.savefig("results/figures/random_walk_seed_0_3d.png", dpi=130)
+destino = Path("results/figures/06_geracao_procedural/random_walk_seed_0_3d.png")
+destino.parent.mkdir(parents=True, exist_ok=True)
+figura.savefig(destino, dpi=130)
 # ...e também abre a janela interativa, onde dá para girar a caverna com o mouse.
 plt.show()

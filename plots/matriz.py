@@ -21,7 +21,7 @@ from pathlib import Path
 import numpy as np
 
 from cavegen.core.volume import Volume3D
-from cavegen.io.voxel_io import load_volume_npz
+from cavegen.datastream.voxel_io import load_volume_npz
 
 # Raiz do projeto (a pasta que contém src/, results/, ...). Usar isso deixa os
 # scripts funcionando independente de onde o terminal está aberto.
@@ -31,7 +31,7 @@ RAIZ_PROJETO = Path(__file__).resolve().parents[1]
 VOLUME_PADRAO = "results/volumes/random_walk_seed_0.npz"
 
 # Onde as figuras geradas são salvas.
-PASTA_FIGURAS = RAIZ_PROJETO / "results" / "figures"
+PASTA_FIGURAS = RAIZ_PROJETO / "results" / "figures" / "06_geracao_procedural"
 
 
 @dataclass(slots=True)
@@ -163,7 +163,7 @@ def preparar_matriz(
 
 
 def caminho_da_figura(matriz: MatrizVoxels, sufixo: str, extensao: str) -> Path:
-    """Monta results/figures/<nome>_<sufixo>.<extensao> e garante a pasta."""
+    """Monta o caminho na etapa de geração procedural e garante a pasta."""
     PASTA_FIGURAS.mkdir(parents=True, exist_ok=True)
     return PASTA_FIGURAS / f"{matriz.nome}_{sufixo}.{extensao}"
 

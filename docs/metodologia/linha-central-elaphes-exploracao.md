@@ -24,7 +24,7 @@ O artigo de [Feng e Crane](https://nzfeng.github.io/research/SignedHeatMethod/Si
 
 ## Resultados do ensaio no PLY original (08/10/2026)
 
-A leitura integral levou cerca de 524 s. O recorte reteve 22.273.631 pontos originais e produziu 10.949 pontos amostrados nos 111 × 54 × 41 bins possíveis. A amostra observada abrangeu aproximadamente X `12,00–35,00`, Y `-2,00–4,26`, Z `-5,23–0,18`. Ela foi salva em `data/processed/elaphes_gallery_roi_x12_35.npz` e exportada para CloudCompare como `results/figures/elaphes_gallery_roi_x12_35.ply`.
+A leitura integral levou cerca de 524 s. O recorte reteve 22.273.631 pontos originais e produziu 10.949 pontos amostrados nos 111 × 54 × 41 bins possíveis. A amostra observada abrangeu aproximadamente X `12,00–35,00`, Y `-2,00–4,26`, Z `-5,23–0,18`. Ela foi salva em `data/processed/elaphes_gallery_roi_x12_35.npz` e exportada para CloudCompare como `results/figures/01_nuvem_e_recortes/elaphes_gallery_roi_x12_35.ply`.
 
 Para a contração, o Open3D reduziu essa amostra com voxels de `0,4` unidade XYZ e o filtro estatístico padrão do `pc-skeletor`, deixando 2.250 pontos. Usamos `init_attraction=0.5`, `down_sample=0.4`, no máximo 5 iterações e pesos iniciais de contração `0.5`, `0.1`, `0.05`, `0.01` e `0.005`. Depois, agrupamos pontos contraídos em voxels Open3D de `0,5` unidade XYZ. Para os pesos `0.5` e `0.05`, construímos uma árvore geradora mínima com `mistree.GetMST`, `k_neighbours=12`. O agrupamento por voxels **não é idêntico** à regra de distância mínima do CloudCompare usada por Racine et al.; também não aplicamos a seleção de maior componente por octree dos autores.
 
@@ -38,7 +38,7 @@ Para a contração, o Open3D reduziu essa amostra com voxels de `0,4` unidade XY
 
 Para `0.05`, a árvore tem 54 arestas, quatro folhas e dois nós de grau 3 próximos de X≈29,78 e X≈32,90. A maior aresta tem aproximadamente `0,58` unidade XYZ. A distância mediana dos nós à amostra da superfície é `0,79` unidade XYZ. Essas medidas descrevem a geometria do candidato; **não demonstram que os nós estejam no interior**. As bifurcações podem decorrer de forma real, amostragem ou conexões da árvore.
 
-Em [três cortes de espessura 1 unidade XYZ](../../results/figures/elaphes_centreline_roi_x12_35_sections.png), centrados em X=20, 29,8 e 32,9, os nós `0.05` aparecem dentro do contorno projetado da nuvem. O corte agrega pontos de profundidades X diferentes; ele é uma verificação visual preliminar, sem classificar interior/exterior nem confirmar as bifurcações.
+Em [três cortes de espessura 1 unidade XYZ](../../results/figures/03_linha_central/elaphes_centreline_roi_x12_35_sections.png), centrados em X=20, 29,8 e 32,9, os nós `0.05` aparecem dentro do contorno projetado da nuvem. O corte agrega pontos de profundidades X diferentes; ele é uma verificação visual preliminar, sem classificar interior/exterior nem confirmar as bifurcações.
 
 ### Repetição com o trecho seguinte incluído
 
@@ -48,8 +48,8 @@ de 400.000 bins. A passagem pelo PLY reteve 35.560.683 pontos brutos e
 20.274 representantes em `156×53×48` bins. Com LBC `0.05/0.5`,
 `down_sample=0.4`, máximo de cinco iterações, redução Open3D `0.5` e MST
 `k_neighbours=12`, surgiram 129 nós entre X≈13,42 e 43,84, nove folhas e
-seis nós de grau ≥3. Ver [vista 3D ampliada](../../results/figures/elaphes_centreline_roi_x12_45_interactive.html)
-e [projeções](../../results/figures/elaphes_centreline_roi_x12_45_weight_0.05.png).
+seis nós de grau ≥3. Ver [vista 3D ampliada](../../results/figures/03_linha_central/elaphes_centreline_roi_x12_45_interactive.html)
+e [projeções](../../results/figures/03_linha_central/elaphes_centreline_roi_x12_45_weight_0.05.png).
 
 O nó de grau 3 em X≈32,9 do recorte curto **não reapareceu** com a extensão
 até X=45. Na inspeção visual 3D posterior, o pesquisador confirmou que a
@@ -62,8 +62,8 @@ Essa confirmação visual dá apoio geométrico à linha, mas não substitui uma
 classificação assinada interior/exterior para SDF.
 
 Para abrir a nuvem e os nós no CloudCompare, usar
-`results/figures/elaphes_gallery_roi_x12_45.ply` e
-`results/figures/elaphes_centreline_roi_x12_45_weight_0.05_nodes.ply`.
+`results/figures/01_nuvem_e_recortes/elaphes_gallery_roi_x12_45.ply` e
+`results/figures/03_linha_central/elaphes_centreline_roi_x12_45_weight_0.05_nodes.ply`.
 
 ### Poda exploratória com ramo confirmado protegido
 
@@ -74,8 +74,8 @@ e `6,879`. Fizemos uma poda exploratória dos terminais com comprimento
 `<1,3`, **exceto** o ramo confirmado em X≈30 (`0,382`). O grafo passou de
 129 nós/128 arestas para 120 nós/119 arestas, com cinco folhas: o início
 do recorte, o ramo curto real e os três braços maiores em X≈42. Ver
-[linha 3D com poda](../../results/figures/elaphes_centreline_roi_x12_45_pruned_interactive.html).
-Os 120 nós também estão em `results/figures/elaphes_centreline_roi_x12_45_pruned_nodes.ply`
+[linha 3D com poda](../../results/figures/03_linha_central/elaphes_centreline_roi_x12_45_pruned_interactive.html).
+Os 120 nós também estão em `results/figures/03_linha_central/elaphes_centreline_roi_x12_45_pruned_nodes.ply`
 para sobreposição com a nuvem no CloudCompare; esse PLY não contém as arestas.
 
 O limiar `1,3` foi escolhido para **este diagnóstico** após a inspeção dos
@@ -91,7 +91,7 @@ visual do **grafo exibido** está concluída. Ainda faltam cortes locais para
 avaliar posições interiores candidatas, confirmação geométrica das pontas
 podadas nos pontos originais e classificação assinada para o SDF.
 
-Arquivos de inspeção: [comparação de pesos](../../results/figures/elaphes_lbc_roi_weight_comparison.png), [grafo com peso 0,5](../../results/figures/elaphes_centreline_roi_x12_35_exploratory.png) e [vista 3D interativa com peso 0,05](../../results/figures/elaphes_centreline_roi_x12_35_interactive.html). Para sobreposição no CloudCompare, abrir `results/figures/elaphes_gallery_roi_x12_35.ply` junto de `results/figures/elaphes_centreline_roi_x12_35_weight_0.05_nodes.ply` (nós vermelhos; as arestas não foram exportadas para esse PLY). Os dados intermediários em `data/processed/` e as figuras em `results/figures/` são ignorados pelo Git; quem reproduzir o teste precisa gerar os seus próprios artefatos a partir do PLY original.
+Arquivos de inspeção: [comparação de pesos](../../results/figures/03_linha_central/elaphes_lbc_roi_weight_comparison.png), [grafo com peso 0,5](../../results/figures/03_linha_central/elaphes_centreline_roi_x12_35_exploratory.png) e [vista 3D interativa com peso 0,05](../../results/figures/03_linha_central/elaphes_centreline_roi_x12_35_interactive.html). Para sobreposição no CloudCompare, abrir `results/figures/01_nuvem_e_recortes/elaphes_gallery_roi_x12_35.ply` junto de `results/figures/03_linha_central/elaphes_centreline_roi_x12_35_weight_0.05_nodes.ply` (nós vermelhos; as arestas não foram exportadas para esse PLY). Os dados intermediários em `data/processed/` e as figuras em `results/figures/` são ignorados pelo Git; quem reproduzir o teste precisa gerar os seus próprios artefatos a partir do PLY original.
 
 Ambiente deste ensaio: Python 3.14.7, NumPy 2.5.0, Open3D 0.20.0, `pc-skeletor` 1.0.0, `robust-laplacian` 1.1.0 e `mistree` 2.0.0. As dependências adicionais foram instaladas apenas em `/tmp/tcc-centreline-deps`, fora do ambiente do projeto. Não houve amostragem aleatória neste recorte (`first` por bin), portanto nenhuma seed foi sorteada; a ordem dos pontos no PLY determina qual deles representa cada bin. Uma futura implementação oficial deve registrar versões, parâmetros e qualquer seed usada.
 
@@ -105,7 +105,7 @@ a contração nem a reconstrução. Na raiz do projeto:
 ```bash
 uv run python plots/plot_elaphes.py line
 uv run python plots/plot_elaphes.py mesh
-uv run python plots/plot_elaphes.py line --cloud data/processed/elaphes_gallery_roi_x12_45.npz --graph data/processed/elaphes_centreline_roi_x12_45_weight_0.05_exploratory.npz --output results/figures/elaphes_centreline_roi_x12_45_interactive.html
+uv run python plots/plot_elaphes.py line --cloud data/processed/elaphes_gallery_roi_x12_45.npz --graph data/processed/elaphes_centreline_roi_x12_45_weight_0.05_exploratory.npz --output results/figures/03_linha_central/elaphes_centreline_roi_x12_45_interactive.html
 ```
 
 `line` usa por padrão a versão podada X `[12,45]`; `mesh` alterna entre a
