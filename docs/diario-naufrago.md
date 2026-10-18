@@ -117,6 +117,7 @@ diário sem quebrar o padrão.
 | [Dia 3](#dia-3--dois-extremos-estruturais-vazio-contínuo-e-bolsões-de-ar-isolados) | Dois extremos estruturais: vazio contínuo e bolsões de ar isolados | Cellular Automata 3D | Padrões estruturais nos extremos de sensibilidade — grande vazio contínuo sem caminhos vs. bolsões de ar isolados dentro da rocha — e a constatação de que nenhum dos dois ainda é uma caverna. Também esclarece que a plotagem inverte rocha/vazio só pra visualização |
 | [Dia 4](#dia-4--hipótese-usar-random-walk-ou-l-system-como-conector-dos-bolsões-de-ar-do-ca) | Hipótese: usar Random Walk ou L-System como conector dos bolsões de ar do CA | Cellular Automata 3D, Random Walk 3D | Ideia (ainda sem conclusão) de usar o CA como esqueleto/"cérebro" e um algoritmo auxiliar pra conectar os bolsões de ar em nós, formando caminhos — e o problema de identificar esses bolsões como nós numa matriz 3D |
 | [Dia 5](#dia-5--convolução-acelera-o-autômato-e-o-plot-de-trajetória-não-revela-um-padrão-claro) | Convolução acelera o autômato e o plot de trajetória não revela um padrão claro | Cellular Automata 3D | Troca do laço de contagem de vizinhos por convolução (400-580x mais rápido, equivalência testada bit a bit) com justificativa metodológica pro TCC, e implementação do gráfico de células vivas por iteração — que mostra os comportamentos já notados no Dia 2, mas sem revelar um padrão claro ligado aos parâmetros |
+| [Dia 6](#dia-6--pesquisando-sdf-da-superfície-para-a-matriz-voxelizada) | Pesquisando SDF: da superfície para a matriz voxelizada | Cellular Automata 3D, Random Walk 3D | Ideia de usar o SDF de uma caverna de Random Walk como matriz de peso pro CA (reforçar voxels perto dela, apagar bolsões distantes); estudo da base do Signed Distance Field, a falta (até agora) de literatura aplicando SDF direto em matriz voxelizada em vez de malha, e o custo inviável da busca ingênua por distâncias em 2D e, pior, em 3D |
 
 ## Dúvidas em aberto
 
@@ -137,6 +138,8 @@ a resposta ficou registrada.
 | "Usar Random Walk (ou L-System) como conector dos bolsões de ar do CA entrega resultados melhores do que rodar o Random Walk sozinho?" | [Dia 4](#dia-4--hipótese-usar-random-walk-ou-l-system-como-conector-dos-bolsões-de-ar-do-ca) |
 | "Que técnica dá pra usar pra identificar os bolsões de ar como nós dentro de uma matriz 3D?" | [Dia 4](#dia-4--hipótese-usar-random-walk-ou-l-system-como-conector-dos-bolsões-de-ar-do-ca) |
 | "Dá pra classificar os comportamentos de crescimento/decaimento de células vivas a partir de parâmetros específicos do autômato?" | [Dia 5](#dia-5--convolução-acelera-o-autômato-e-o-plot-de-trajetória-não-revela-um-padrão-claro) |
+| "Dá pra aplicar SDF direto numa matriz voxelizada em vez de numa malha?" | [Dia 6](#dia-6--pesquisando-sdf-da-superfície-para-a-matriz-voxelizada) |
+| "Qual algoritmo otimiza o cálculo de distâncias em 3D?" | [Dia 6](#dia-6--pesquisando-sdf-da-superfície-para-a-matriz-voxelizada) |
 
 ### Respondidas
 
@@ -459,6 +462,62 @@ realmente seria vantajoso (ver Tipo C).
 
 > "Dá pra classificar os comportamentos de crescimento/decaimento de células
 > vivas a partir de parâmetros específicos do autômato?"
+
+---
+
+## Dia 6 — Pesquisando SDF: da superfície para a matriz voxelizada
+
+**Algoritmo:** Cellular Automata 3D, Random Walk 3D (SDF como campo de controle)
+**Commits relacionados:** `2290df4` (divisão de tarefas SDF/CA, em
+`docs/tarefas-felipe-sdf-ca.md`)
+
+### Tipo A — Narrativa
+
+Nessa fase saí um pouco do código e fui pesquisar **SDF — Signed Distance
+Field** (campo de distância com sinal). A ideia básica é calcular, pra cada
+ponto, a distância até a superfície mais próxima, com o sinal indicando de
+que lado ele está (dentro ou fora). Com isso dá pra saber, dentro da matriz,
+quais regiões estão mais perto e quais estão mais longe das paredes.
+
+O motivo de eu querer o SDF vem direto dos resultados do autômato: ele gera
+vários bolsões de ar grandes, mas separados entre si (Dia 3). Em vez de
+sobrepor uma caverna pronta por cima do resultado, a ideia é gerar uma
+caverna com o Random Walk, que sozinho não gera uma caverna tão perfeita, e
+calcular o SDF dela. Assim eu tenho, pra cada voxel, a distância mínima até
+essa caverna, e esse SDF vira uma **matriz 3D de suporte** à matriz gerada a
+partir da seed.
+
+Como o próprio CA já decide cada voxel pela quantidade de vizinhos, essa
+matriz auxiliar entraria como um **peso**: voxels mais próximos da caverna do
+Random Walk ganham peso maior, e os muito distantes ganham peso menor. Na
+prática, o autômato tenderia a seguir o formato do Random Walk. Os bolsões
+muito afastados, que antes apareciam soltos em várias das imagens geradas,
+tenderiam a sumir, e os que estão perto da caverna se reforçariam. O
+objetivo é deixar o resultado do CA com mais cara de caverna. Isso é uma
+evolução da hipótese do Dia 4: lá o Random Walk seria um conector entre os
+bolsões, e aqui ele vira um guia para o próprio autômato.
+
+O problema é que, no que encontrei até agora, o SDF aparece quase sempre
+aplicado a **malhas**, ou seja, superfícies. Mesmo quando o objeto é 3D, o
+que se mede é a distância até uma superfície descrita por uma malha. Ainda
+não achei literatura que sustente aplicar o SDF diretamente numa **matriz
+voxelizada**, que é o formato em que o autômato trabalha. Por isso voltei pra
+base do assunto: quero entender bem a matemática, que não é muito complexa,
+e procurar alguma solução já aplicada em 2D que dê pra levar pro 3D.
+
+A outra preocupação é desempenho. A abordagem ingênua, que testa todos os
+pontos pra achar a distância euclidiana até o mais próximo, já é inviável
+numa matriz 2D, e em 3D fica muito pior. Então não basta entender o SDF: vou
+precisar de algum algoritmo que otimize esse cálculo.
+
+Vou continuar a pesquisa pra ver se dá pra implementar o SDF numa matriz 3D
+voxelizada em vez de numa superfície, e qual é a melhor forma de otimizar.
+
+### Tipo C — Dúvidas em aberto
+
+> "Dá pra aplicar SDF direto numa matriz voxelizada em vez de numa malha?"
+
+> "Qual algoritmo otimiza o cálculo de distâncias em 3D?"
 
 ---
 
