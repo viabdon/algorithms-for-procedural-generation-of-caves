@@ -1,10 +1,12 @@
 # Orientação experimental de normais com a linha central
 
-**Estado em 12/10/2026.** Há código e um artefato diagnóstico para o recorte
+**Estado em 15/10/2026.** Há código e artefatos diagnósticos para o recorte
 X `[12,45]` do Elaphes. Ainda **não há posições interiores validadas em
 cortes**. Por isso, o primeiro processamento marcou os **20.274 pontos como
 incertos**. A linha central visualmente plausível não fornece, sozinha, o
-interior, o sinal do SDF ou uma malha aceita.
+interior, o sinal do SDF ou uma malha aceita. A comparação posterior de
+limiares de cosseno também não demonstrou uma reconstrução utilizável. A
+decisão de escopo está registrada ao final deste documento.
 
 ## O que esta etapa tenta resolver
 
@@ -141,7 +143,7 @@ para outra rodada de revisão. Uma decisão manual de sentido não corrige a
 posição do ponto, a normal geométrica mal estimada nem uma associação errada
 à superfície.
 
-## Reconstrução comparativa e validações pendentes
+## Uso diagnóstico e requisitos para eventual retomada
 
 O Poisson pode ler um NPZ de revisão por `--oriented-sample` para produzir
 uma malha OBJ **diagnóstica** com as normais salvas. `--require-resolved`
@@ -160,7 +162,8 @@ métricas topológicas.
 O comando acima só poderá passar por `--require-resolved` quando **todos** os
 índices da amostra usada estiverem decididos. Ainda não é o caso do Elaphes.
 
-Antes de promover o resultado a uma candidata séria para SDF:
+Se uma pesquisa futura retomar esta abordagem, antes de promover o resultado
+a uma candidata séria para SDF será necessário:
 
 - Conferir nós interiores em cortes locais de piso, teto e paredes, incluindo
   extremidades e bifurcações; anotar evidência para cada nó escolhido.
@@ -179,18 +182,125 @@ Esse módulo implementa uma **adaptação metodológica do projeto** posterior
 associação de pontos, os votos de referências, a revisão de sentidos e o
 CSV não são apresentados aqui como procedimentos publicados por eles.
 
-## Próximo experimento acordado: similaridade de cossenos
+## Experimento de cossenos com a linha central (15/10/2026)
 
-**Ainda não implementado.** Manter a convenção atual: o vetor de referência
-vai da linha central ao ponto da parede, no sentido do sólido. Cosseno
-positivo sugere `keep` para uma normal que acompanha esse vetor; cosseno
-negativo sugere `flip`. Comparar limiares simétricos de valor absoluto
-`0,5`, `0,75` e `0,94`, registrando decisões, conflitos entre ramos e pontos
-que continuarem incertos. A faixa `|cosseno| ≥ 0,5` é exploratória, pois
-admite até 60° de diferença; não equivale a uma orientação validada.
+### Por que e como foi feito
 
-A aparência da linha dentro da nuvem não comprova que cada trecho esteja
-no interior da passagem. O experimento deverá preservar a cautela nas
-bifurcações, verificar qualidade local das normais e comparar as malhas com
-a mesma amostra e parâmetros, antes de considerar a orientação adequada à
-referência SDF.
+A revisão visual individual de 20.274 normais não é viável. Testamos se a
+direção local linha central → ponto da parede pode propor automaticamente o
+sentido de parte delas. Para cada ponto da amostra, projetamos sobre a aresta
+mais próxima de cada ramo candidato e calculamos
+`c = dot(normal_base, ponto - projeção) / |ponto - projeção|`. Portanto,
+`c ≥ limiar` propõe `keep` e `c ≤ -limiar` propõe `flip`. Entre os dois
+limites, a normal continua incerta. Comparamos `|c| ≥ 0,50`, `0,75` e `0,94`
+(desvios máximos aproximados de 60°, 41,4° e 20°). **Essas são propostas
+geométricas, não referências interiores validadas.**
+
+A associação já existente limita a distância à linha a `2,5` raios locais e
+retém um segundo ramo quando os custos são próximos ou há bifurcação. Se
+existirem dois candidatos, ambos precisam ultrapassar o limiar com o mesmo
+sinal. Pontos perto de bifurcações, com normal local instável, sem ramo
+plausível ou com vetor radial nulo permanecem incertos. Os valores dos dois
+cossenos, projeções, arestas, ramos, qualidade local e motivos são gravados
+por índice da amostra nos NPZ; o CSV contém todos os índices ainda incertos.
+O `automatic_sign` vale `+1` (`keep`), `-1` (`flip`) ou `0` (incerto). O
+`review_sha256` protege também esses diagnósticos. A revisão manual e a
+plotagem existentes aceitam esses arquivos.
+
+O comando curto é:
+
+```bash
+.venv/bin/python menu_malhas.py cossenos \
+  --orientacao data/processed/elaphes_centreline_normals_review.npz \
+  --grafo data/processed/elaphes_centreline_roi_x12_45_pruned_exploratory.npz \
+  --prefixo data/processed/elaphes_centreline_cosine_experiment_01
+```
+
+O prefixo deve ser novo: o comando não sobrescreve resultados. Ele produz
+`_cos050.npz`, `_cos075.npz`, `_cos094.npz`, seus JSON/CSV e `_summary.json`.
+O mesmo comando está na opção 8 do menu. `inspecionar ARQUIVO --indice N`
+mostra o cosseno e a aresta para um ponto; `plotar --orientacao ARQUIVO`
+gera o HTML correspondente. Para malhas, `malha --permitir-incertos` permite
+uma comparação diagnóstica e conserva as normais base nos pontos incertos.
+Um HTML do limiar `0,50` foi gerado em
+`results/figures/04_orientacao_normais/elaphes_centreline_cosine_experiment_01_cos050.html`.
+
+### O que foi observado no recorte Elaphes
+
+Foram usados a amostra fixa de **20.274 pontos** (hash XYZ ordenado
+`9b269cea…ec193`), o grafo podado de **120 nós e 119 arestas** (hash
+`26e6c57f…c76da`) e as normais base do diagnóstico anterior. Não houve nova
+amostragem nem sorteio. Os três arquivos preservam a mesma ordem dos pontos;
+as normais base diferem do arquivo original no máximo por `2,22 × 10⁻¹⁶`
+devido à renormalização. As decisões do limiar mais alto são subconjuntos
+das decisões dos limiares menores.
+
+| Cosseno mínimo em módulo | `keep` propostos | `flip` propostos | Incertos | Fração proposta |
+| ---: | ---: | ---: | ---: | ---: |
+| 0,50 | 3.786 | 8.149 | 8.339 | 58,9% |
+| 0,75 | 2.469 | 6.222 | 11.583 | 42,9% |
+| 0,94 | 709 | 2.238 | 17.327 | 14,5% |
+
+Em **todos** os limiares, 4.758 pontos ficaram sem ramo plausível, 3.083
+tinham custos de ramos próximos, 12 estavam perto de bifurcação e 2.285
+tinham qualidade local de normal baixa. As contagens **se sobrepõem**. O
+filtro de cosseno foi insuficiente em 2.583, 6.226 e 12.406 pontos,
+respectivamente. Não apareceu conflito de sinais fortes entre dois ramos
+nos candidatos desta amostra; o caso foi coberto em teste sintético, mas
+esse zero não confirma a associação nas bifurcações reais. A diferença grande
+entre 3.786 `keep` e 8.149 `flip` no limiar 0,50 sugere que a orientação
+global inicial do Open3D diverge da direção radial proposta em muitas áreas;
+sem cortes interiores, não sabemos se a proposta está certa.
+
+### Malhas comparáveis, ainda diagnósticas
+
+Reconstruímos o baseline e as três propostas com os mesmos 20.274 pontos,
+Screened Poisson do Open3D, profundidade 8 e uma thread. Nos índices incertos,
+as propostas usam a normal base. O baseline usa as normais base do arquivo
+`_cos050.npz`; elas são numericamente equivalentes às do diagnóstico inicial.
+As saídas estão em `results/meshes/elaphes_cosine_experiment_01_*.obj` com
+JSON de métricas associado.
+
+| Normais | Vértices | Faces | Arestas de borda | Arestas não manifold | Componentes | Distância vértice→amostra, P95 / P99 |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Base | 49.303 | 98.617 | 207 | 29 | 14 | 1,122 / 9,795 |
+| 0,50 | 50.216 | 100.608 | 128 | 57 | 22 | 0,911 / 6,572 |
+| 0,75 | 54.117 | 108.416 | 200 | 82 | 35 | 1,108 / 13,245 |
+| 0,94 | 55.512 | 111.400 | 202 | 105 | 19 | 0,955 / 8,591 |
+
+A distância foi medida da posição de cada vértice da malha ao ponto mais
+próximo da amostra fixa, nas unidades XYZ do scanner; não mede cobertura da
+nuvem pela superfície nem compara topologia correta. Nenhuma malha foi
+watertight. `0,50` reduziu bordas e P99, mas aumentou arestas não manifold e
+componentes; portanto **nenhum limiar demonstrou melhora global ou uma
+malha adequada ao SDF**. O limiar `0,75` teve P99 maior que o baseline.
+
+Para aceitar um resultado em eventual retomada, seria necessário verificar
+referências interiores em cortes locais, conferir as associações de paredes e
+ramos nas bifurcações e revisar visualmente entradas, teto, extrapolação e
+suporte da malha. A aparência da linha dentro da nuvem continua insuficiente
+para determinar o sinal interior/exterior. Esta orientação por cossenos é uma
+adaptação experimental nossa, não parte do método de Racine et al.
+
+## Decisão de escopo e pesquisas futuras (15/10/2026)
+
+**Resultado do ensaio:** a linha central permitiu registrar associações,
+incertezas e propostas reproduzíveis de orientação, mas não validou o sentido
+físico das normais nem produziu uma malha adequada à classificação
+interior/exterior. As três reconstruções por cosseno tiveram resultados
+mistos frente ao baseline; nenhuma ficou watertight. Isso não demonstra que
+a abordagem seja impossível em geral, apenas que ela não resolveu a
+reconstrução do Elaphes nas condições testadas.
+
+**Decisão para o TCC atual:** em razão do tempo, do recorte e do foco da
+pesquisa, não prosseguir com a reconstrução da malha por orientação baseada
+na linha central. Os arquivos e comandos acima permanecem como registro
+reproduzível do experimento, não como etapas pendentes da pipeline atual.
+Esta decisão não equivale a aceitar outra malha do Elaphes como referência.
+
+**Questões abertas para trabalhos futuros:** conferir nós interiores em
+cortes locais, testar se cada ponto está associado à parede e ao ramo
+corretos nas bifurcações, avaliar a orientação com referências verificadas
+e medir seu efeito em malhas reconstruídas sob a mesma amostra e os mesmos
+parâmetros. Qualquer conclusão sobre interior/exterior ainda dependeria de
+validação geométrica e topológica independente.

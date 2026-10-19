@@ -117,11 +117,15 @@ visual, sozinha, não diz de qual lado da parede está o vazio.
 O [procedimento, os comandos e os formatos](../metodologia/orientacao-normais-linha-central.md)
 estão no documento metodológico. No primeiro diagnóstico do Elaphes, **nenhum
 nó foi promovido a interior verificado**: todos os 20.274 pontos ficaram
-incertos, como deveria ocorrer sem a evidência necessária. Uma nova malha
-Poisson poderá usar as normais revisadas para uma comparação controlada, mas
-isso ainda não constitui validação do interior para flood fill ou SDF.
+incertos, como deveria ocorrer sem a evidência necessária. Uma comparação
+posterior usou a mesma amostra e os mesmos parâmetros do Poisson para o
+baseline e três limiares de cosseno. Houve ganhos em algumas medidas e perdas
+em outras; nenhuma malha ficou fechada ou adequada a validar o interior para
+flood fill ou SDF. **O TCC não dará continuidade à reconstrução da malha por
+essa orientação da linha central** no recorte e no prazo atuais. O resultado
+e a decisão estão detalhados no documento metodológico.
 
-## Adaptações e decisões ainda necessárias
+## Questões abertas para pesquisas futuras
 
 - Verificar as quatro pontas removidas e os três braços conservados em X≈42
   contra cortes dos pontos originais. Definir uma poda que preserve ramos

@@ -32,10 +32,6 @@ O estado da reconstrução e os parâmetros testados estão em
   e que as ramificações estão representadas corretamente. Essa é uma
   validação visual do grafo, registrada em
   [extração exploratória](../metodologia/linha-central-elaphes-exploracao.md).
-- [ ] Conferir posições candidatas em cortes locais da nuvem e em trechos
-  conhecidos de piso, teto e paredes, antes de usá-las como sementes
-  interiores para orientar normais. A sobreposição 3D não prova o interior
-  nem fornece o sinal do SDF.
 - [x] Prototipar a associação de cada ponto a até dois ramos da linha central,
   com margem para custos próximos e região de bifurcação. Orientar por votos
   de nós interiores **explicitamente verificados**, sem fundir vetores de
@@ -44,12 +40,6 @@ O estado da reconstrução e os parâmetros testados estão em
   no HTML com índice, normal e motivo. Implementar revisão pontual `keep`/`flip`
   com hash da amostra ordenada e um novo artefato; permitir que Poisson consuma
   diretamente as normais revisadas.
-- [ ] Validar nós interiores em cortes de piso, teto, paredes, pontas e
-  bifurcações; registrar evidência de cada escolha. Até essa conferência,
-  manter as 20.274 normais do primeiro diagnóstico como incertas.
-- [ ] Avaliar associações, patches, votos discordantes e índices incertos
-  contra trechos conhecidos. Testar sensibilidade a densidade, vizinhos e
-  limiares, inclusive paredes próximas e ramos de X≈30/X≈42.
 - [x] Executar uma primeira amostragem espacial rastreável do Elaphes com o novo comando
   `cavegen.meshing.poisson --sample-only`, revisando a densidade nas regiões
   finas. Os 245 voxels `32³` não entram no Poisson; o arquivo guarda XYZ do scan.
@@ -71,9 +61,6 @@ O estado da reconstrução e os parâmetros testados estão em
   uma regra de exclusão definitiva; guardar o critério e as contagens. A
   fonte oficial oferece versão sanitizada com três pontos isolados removidos;
   comparar coordenadas antes de afirmar que são os mesmos três registros.
-- [ ] Avaliar segmentação com sobreposição, junções e componentes da malha
-  global; a candidata densa melhorou a aderência mas ainda extrapola ao
-  limite cúbico, tem 175 arestas abertas e 27 não manifold.
 - [ ] Comparar a nova malha global com o recorte denso X `[12,35]`, que tem
   bom suporte geométrico mas termina aberto no limite artificial X≈36,15 e
   ainda possui arestas não manifold. Não promover a malha do recorte a
@@ -100,17 +87,26 @@ O estado da reconstrução e os parâmetros testados estão em
 - [x] Medir pontas terminais e produzir poda exploratória em X≈42,
   preservando explicitamente o ramo real de X≈30 apesar de medir só 0,382
   unidade. A versão de inspeção tem 120 nós e cinco folhas.
-- [ ] Conferir nos pontos originais cada ponta removida e os três braços
-  mantidos em X≈42; formalizar uma poda que aceite ramos protegidos e não
-  use apenas comprimento como critério. Só depois testar a linha como
-  referência para normais ou sementes interiores.
+
+**Decisão de escopo em 15/10/2026:** a orientação pela linha central foi
+comparada com o baseline em três limiares de cosseno, mantendo amostra e
+parâmetros do Poisson. Os resultados foram mistos e nenhuma malha ficou
+fechada. A reconstrução por esse método não prosseguirá no TCC atual.
+Conferir referências interiores em cortes, revisar a poda em X≈42 e validar
+associações de parede, ramo e normal ficam como [pesquisa
+futura](../metodologia/orientacao-normais-linha-central.md), fora das tarefas
+com prazo desta frente.
+
+**Hipótese de pesquisa futura, sem prazo neste TCC:** dividir a nuvem em
+trechos sobrepostos, buscar parâmetros locais do Poisson e unir as malhas.
+Uma bifurcação deve caber inteira em um trecho; a avaliação deve ocorrer
+também após a união, sem confundir tampas artificiais dos recortes com uma
+superfície real watertight. A candidata global densa ainda extrapola ao
+limite cúbico e tem 175 arestas abertas e 27 não manifold; não há evidência
+experimental de que a abordagem por trechos resolva esses defeitos.
 
 ## Até 20/10 — Decidir a reconstrução e integrar
 
-- [ ] Comparar Poisson com normais base e normais por trechos usando **a mesma
-  amostra e profundidade**; medir suporte à nuvem, teto, bordas, componentes,
-  não manifold e extrapolação. `--require-resolved` impede promover uma
-  reconstrução com sentidos ainda incertos.
 - [ ] Testar sensibilidade do Poisson a normais, amostragem e profundidade.
   Caso falhe nos critérios, estudar Ball Pivoting e Alpha Shapes como fallbacks
   de **malha**, registrando por que cada candidato foi aceito ou rejeitado.

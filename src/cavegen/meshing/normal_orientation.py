@@ -1,8 +1,9 @@
 """Experimental centreline-assisted normal orientation with point-level review.
 
-Only references explicitly marked as validated interior positions can vote on
-the normal sign. The centreline graph and its branches remain hypotheses, not
-an interior/exterior classification or a source of SDF signs.
+Validated interior references support the original patch-voting path. A separate
+cosine path makes provisional proposals directly from the centreline geometry.
+The graph remains a hypothesis, not an interior/exterior classification or a
+source of SDF signs.
 """
 
 from __future__ import annotations
@@ -31,6 +32,10 @@ REASON_PATCH_UNDECIDED = 64
 REASON_PATCH_CONFLICT = 128
 REASON_LOW_NORMAL_QUALITY = 256
 REASON_MANUAL = 512
+REASON_COSINE_BELOW_THRESHOLD = 1024
+REASON_COSINE_CONFLICT = 2048
+REASON_CENTRELINE_PROVISIONAL = 4096
+REASON_ZERO_RADIAL = 8192
 REASONS = {
     REASON_NO_BRANCH: "sem_ramo_plausivel",
     REASON_BRANCH_AMBIGUOUS: "ramos_proximos",
@@ -42,6 +47,10 @@ REASONS = {
     REASON_PATCH_CONFLICT: "voto_local_contraria_trecho",
     REASON_LOW_NORMAL_QUALITY: "normal_local_instavel",
     REASON_MANUAL: "sentido_revisado_manualmente",
+    REASON_COSINE_BELOW_THRESHOLD: "cosseno_abaixo_do_limiar",
+    REASON_COSINE_CONFLICT: "cossenos_de_ramos_discordam",
+    REASON_CENTRELINE_PROVISIONAL: "linha_central_sem_interior_validado",
+    REASON_ZERO_RADIAL: "vetor_linha_parede_nulo",
 }
 
 
@@ -196,6 +205,7 @@ def associate_points(
     chosen_edges = np.full((count, branch_count), -1, dtype=np.int32)
     arc_positions = np.full((count, branch_count), np.nan)
     projected_radii = np.full((count, branch_count), np.nan)
+    projected_xyz = np.full((count, branch_count, 3), np.nan)
     for branch_id, branch in enumerate(branches):
         branch_edges = links[branch.edges]
         starts = nodes[branch_edges[:, 0]]
@@ -222,6 +232,7 @@ def associate_points(
                 branch.arc[local_index] + path_fraction * np.diff(branch.arc)[local_index]
             )
             projected_radii[begin:end, branch_id] = local_radii[row, local_index]
+            projected_xyz[begin:end, branch_id] = projections[row, local_index]
     ranked = np.argsort(costs, axis=1)
     row = np.arange(count)
     first = ranked[:, 0]
@@ -251,10 +262,14 @@ def associate_points(
     candidates = np.column_stack((np.where(valid_first, first, -1), np.where(second_valid, second, -1)))
     candidate_arc = np.full((count, 2), np.nan)
     candidate_radius = np.full((count, 2), np.nan)
+    candidate_xyz = np.full((count, 2, 3), np.nan)
+    candidate_edges = np.full((count, 2), -1, dtype=np.int32)
     for slot in range(2):
         valid = candidates[:, slot] >= 0
         candidate_arc[valid, slot] = arc_positions[row[valid], candidates[valid, slot]]
         candidate_radius[valid, slot] = projected_radii[row[valid], candidates[valid, slot]]
+        candidate_xyz[valid, slot] = projected_xyz[row[valid], candidates[valid, slot]]
+        candidate_edges[valid, slot] = chosen_edges[row[valid], candidates[valid, slot]]
     return {
         "branches": branches,
         "junction_nodes": junction_nodes,
@@ -262,6 +277,8 @@ def associate_points(
         "candidate_branches": candidates.astype(np.int32),
         "candidate_arc": candidate_arc,
         "candidate_radius": candidate_radius,
+        "candidate_projection_xyz": candidate_xyz,
+        "candidate_edges": candidate_edges,
         "best_cost": first_cost,
         "second_cost": second_cost,
         "cost_margin": margin,
@@ -462,6 +479,81 @@ def orient_from_references(
     }
 
 
+def orient_by_centreline_cosine(
+    points_xyz: np.ndarray, baseline_normals_xyz: np.ndarray,
+    nodes_xyz: np.ndarray, edges: np.ndarray, threshold: float,
+    *, params: Parameters = Parameters(),
+) -> dict[str, np.ndarray]:
+    """Propose signs from local centreline-to-wall vectors, without claiming interior validation.
+
+    Each candidate uses the closest point on its branch edge, not an arbitrarily
+    distant node. Near junctions remain uncertain; two plausible branches must
+    each pass the threshold with the same sign.
+    """
+    params.validate()
+    if not np.isfinite(threshold) or not 0 < threshold <= 1:
+        raise ValueError("cosine threshold must be finite and in (0, 1]")
+    points = _xyz(points_xyz, "points_xyz")
+    normals = _xyz(baseline_normals_xyz, "baseline_normals_xyz")
+    if len(normals) != len(points):
+        raise ValueError("baseline normals must align with ordered sample points")
+    lengths = np.linalg.norm(normals, axis=1)
+    if np.any(lengths < 1e-8):
+        raise ValueError("baseline normals cannot contain zero vectors")
+    normals = normals / lengths[:, None]
+    association = associate_points(points, nodes_xyz, edges, params=params)
+    candidates = association["candidate_branches"]
+    projection_xyz = association["candidate_projection_xyz"]
+    radial = points[:, None, :] - projection_xyz
+    radial_length = np.linalg.norm(radial, axis=2)
+    valid_vector = (candidates >= 0) & np.isfinite(radial_length) & (radial_length > 1e-8)
+    cosines = np.full((len(points), 2), np.nan)
+    cosines[valid_vector] = (
+        np.einsum("nij,nj->ni", radial, normals)[valid_vector] / radial_length[valid_vector]
+    )
+    variation, second_axis = _normal_quality(points, params.normal_neighbors)
+    low_quality = (variation > params.max_surface_variation) | (second_axis < 0.05)
+    strong = valid_vector & (np.abs(cosines) >= threshold)
+    both = candidates[:, 1] >= 0
+    conflict = both & strong[:, 0] & strong[:, 1] & (np.sign(cosines[:, 0]) != np.sign(cosines[:, 1]))
+    complete = strong[:, 0] & (~both | strong[:, 1]) & ~conflict
+    decided = complete & ~association["near_junction"] & ~low_quality
+    sign = np.zeros(len(points), dtype=np.int8)
+    sign[decided] = np.sign(cosines[decided, 0]).astype(np.int8)
+    oriented = normals * np.where(sign == 0, 1, sign)[:, None]
+    reasons = np.full(len(points), REASON_CENTRELINE_PROVISIONAL, dtype=np.uint16)
+    reasons[candidates[:, 0] < 0] |= REASON_NO_BRANCH
+    reasons[association["branch_ambiguous"]] |= REASON_BRANCH_AMBIGUOUS
+    reasons[association["near_junction"]] |= REASON_JUNCTION
+    zero_radial = ((candidates >= 0) & ~valid_vector).any(axis=1)
+    reasons[zero_radial] |= REASON_ZERO_RADIAL
+    reasons[~complete & (candidates[:, 0] >= 0) & ~conflict & ~zero_radial] |= REASON_COSINE_BELOW_THRESHOLD
+    reasons[conflict] |= REASON_COSINE_CONFLICT
+    reasons[low_quality] |= REASON_LOW_NORMAL_QUALITY
+    uncertain = ~decided
+    return {
+        "points_xyz": points,
+        "baseline_normals_xyz": normals,
+        "oriented_normals_xyz": oriented,
+        "uncertain_mask": uncertain,
+        "uncertain_indices": np.flatnonzero(uncertain).astype(np.int64),
+        "manual_mask": np.zeros(len(points), dtype=bool),
+        "reason_bits": reasons,
+        "candidate_branches": candidates,
+        "best_edge": association["best_edge"].astype(np.int32),
+        "best_cost": association["best_cost"],
+        "second_cost": association["second_cost"],
+        "cost_margin": association["cost_margin"],
+        "candidate_edges": association["candidate_edges"],
+        "candidate_projection_xyz": projection_xyz,
+        "candidate_cosines": cosines,
+        "cosine_threshold": np.asarray(threshold, dtype=np.float64),
+        "automatic_sign": sign,
+        "surface_variation": variation,
+        "second_tangent_axis_ratio": second_axis,
+    }
+
+
 def _review_sha256(result: dict[str, np.ndarray]) -> str:
     digest = hashlib.sha256()
     digest.update(points_sha256(result["points_xyz"]).encode("ascii"))
@@ -470,6 +562,13 @@ def _review_sha256(result: dict[str, np.ndarray]) -> str:
     digest.update(np.ascontiguousarray(result["candidate_branches"], dtype="<i4").tobytes())
     digest.update(np.ascontiguousarray(result["reason_bits"], dtype="<u2").tobytes())
     digest.update(np.ascontiguousarray(result["manual_mask"], dtype=np.uint8).tobytes())
+    # Optional fields preserve compatibility with reviews made before the cosine experiment.
+    for name, dtype in (("candidate_edges", "<i4"), ("candidate_projection_xyz", "<f8"),
+                        ("candidate_cosines", "<f8"), ("cosine_threshold", "<f8"),
+                        ("automatic_sign", np.int8)):
+        if name in result:
+            digest.update(name.encode("ascii"))
+            digest.update(np.ascontiguousarray(result[name], dtype=dtype).tobytes())
     return digest.hexdigest()
 
 
@@ -516,6 +615,12 @@ def save_orientation(
         manual_corrections=int(np.count_nonzero(result["manual_mask"])),
         reason_legend=REASONS,
     )
+    if "automatic_sign" in result:
+        report.update(
+            automatic_keep_count=int(np.count_nonzero(result["automatic_sign"] == 1)),
+            automatic_flip_count=int(np.count_nonzero(result["automatic_sign"] == -1)),
+            cosine_threshold=float(result["cosine_threshold"]),
+        )
     output.with_suffix(".json").write_text(json.dumps(report, indent=2, ensure_ascii=False), encoding="utf-8")
     return report
 
@@ -547,6 +652,23 @@ def load_orientation(path: str | Path) -> dict[str, np.ndarray]:
         raise ValueError("manual decisions cannot remain uncertain")
     if not np.array_equal(result["uncertain_indices"], np.flatnonzero(result["uncertain_mask"])):
         raise ValueError("orientation archive uncertain indices differ from its mask")
+    optional = {"candidate_edges", "candidate_projection_xyz", "candidate_cosines",
+                "cosine_threshold", "automatic_sign"}
+    if optional & result.keys():
+        if not optional <= result.keys():
+            raise ValueError("orientation archive has incomplete cosine diagnostics")
+        if (result["candidate_edges"].shape != (len(points), 2)
+                or result["candidate_projection_xyz"].shape != (len(points), 2, 3)
+                or result["candidate_cosines"].shape != (len(points), 2)
+                or result["cosine_threshold"].shape != ()
+                or result["automatic_sign"].shape != (len(points),)):
+            raise ValueError("orientation archive cosine diagnostics have invalid shapes")
+        if not np.isin(result["automatic_sign"], [-1, 0, 1]).all():
+            raise ValueError("orientation archive automatic signs are invalid")
+        if np.any((result["automatic_sign"] != 0) & result["uncertain_mask"]):
+            raise ValueError("automatic decisions cannot remain uncertain")
+        if not np.isfinite(result["cosine_threshold"]) or not 0 < float(result["cosine_threshold"]) <= 1:
+            raise ValueError("orientation archive cosine threshold is invalid")
     if str(result["review_sha256"]) != _review_sha256(result):
         raise ValueError("orientation archive review hash differs from normals or mask")
     return result
@@ -695,6 +817,73 @@ def prepare(
     return report
 
 
+def compare_cosine_thresholds(
+    baseline_path: str | Path, graph_path: str | Path, output_prefix: str | Path,
+    *, thresholds: tuple[float, ...] = (0.5, 0.75, 0.94),
+    params: Parameters = Parameters(),
+) -> dict[str, object]:
+    """Write comparable provisional reviews from one fixed point/normal sample."""
+    params.validate()
+    if not thresholds or len(set(thresholds)) != len(thresholds):
+        raise ValueError("thresholds must be a nonempty set of distinct values")
+    for threshold in thresholds:
+        if not np.isfinite(threshold) or not 0 < threshold <= 1:
+            raise ValueError("cosine thresholds must be finite and in (0, 1]")
+    baseline = load_orientation(baseline_path)
+    nodes, edges = _load_graph(Path(graph_path))
+    prefix = Path(output_prefix)
+    outputs = [prefix.with_name(f"{prefix.name}_cos{int(round(t * 100)):03d}.npz") for t in thresholds]
+    summary_path = prefix.with_name(f"{prefix.name}_summary.json")
+    if len(set(outputs)) != len(outputs):
+        raise ValueError("thresholds produce duplicate output names")
+    for output in outputs + [summary_path]:
+        if output.exists() or (output.suffix == ".npz" and (
+                output.with_suffix(".json").exists() or output.with_suffix(".uncertain.csv").exists())):
+            raise ValueError(f"output already exists: {output}")
+    import open3d as o3d
+    reports: list[dict[str, object]] = []
+    for threshold, output in zip(thresholds, outputs):
+        start = perf_counter()
+        result = orient_by_centreline_cosine(
+            baseline["points_xyz"], baseline["baseline_normals_xyz"],
+            nodes, edges, threshold, params=params,
+        )
+        report = save_orientation(output, result, {
+            "status": "provisional_centreline_cosine_requires_interior_validation",
+            "method": "local edge projection, cosine, branch agreement, junction and normal-quality filters",
+            "baseline_path": str(baseline_path),
+            "baseline_review_sha256": str(baseline["review_sha256"]),
+            "graph_path": str(graph_path),
+            "graph_sha256": graph_sha256(nodes, edges),
+            "open3d_version": o3d.__version__,
+            "parameters": vars(params),
+            "random_seed": None,
+            "elapsed_seconds": perf_counter() - start,
+            "no_branch_count": int(np.count_nonzero(result["reason_bits"] & REASON_NO_BRANCH)),
+            "branch_ambiguous_count": int(np.count_nonzero(result["reason_bits"] & REASON_BRANCH_AMBIGUOUS)),
+            "near_junction_count": int(np.count_nonzero(result["reason_bits"] & REASON_JUNCTION)),
+            "low_normal_quality_count": int(np.count_nonzero(result["reason_bits"] & REASON_LOW_NORMAL_QUALITY)),
+            "cosine_below_threshold_count": int(np.count_nonzero(result["reason_bits"] & REASON_COSINE_BELOW_THRESHOLD)),
+            "cosine_conflict_count": int(np.count_nonzero(result["reason_bits"] & REASON_COSINE_CONFLICT)),
+            "zero_radial_count": int(np.count_nonzero(result["reason_bits"] & REASON_ZERO_RADIAL)),
+        })
+        report["orientation_path"] = str(output)
+        reports.append(report)
+    summary: dict[str, object] = {
+        "status": "provisional_centreline_cosine_requires_interior_validation",
+        "baseline_path": str(baseline_path),
+        "baseline_review_sha256": str(baseline["review_sha256"]),
+        "point_sha256": str(baseline["point_sha256"]),
+        "graph_path": str(graph_path),
+        "graph_sha256": graph_sha256(nodes, edges),
+        "parameters": vars(params),
+        "thresholds": reports,
+    }
+    summary_path.parent.mkdir(parents=True, exist_ok=True)
+    summary_path.write_text(json.dumps(summary, indent=2, ensure_ascii=False), encoding="utf-8")
+    return summary
+
+
 def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     commands = parser.add_subparsers(dest="command", required=True)
@@ -710,6 +899,10 @@ def main(argv: list[str] | None = None) -> None:
     apply_parser.add_argument("--input", required=True, help="orientation NPZ reviewed in the plot")
     apply_parser.add_argument("--corrections", required=True, help="edited .uncertain.csv")
     apply_parser.add_argument("--output", required=True, help="new corrected orientation NPZ")
+    cosine_parser = commands.add_parser("cosine", help="compare provisional centreline cosine thresholds")
+    cosine_parser.add_argument("--baseline", required=True, help="fixed orientation NPZ with baseline normals")
+    cosine_parser.add_argument("--graph", required=True, help="NPZ with nodes_xyz and edges")
+    cosine_parser.add_argument("--output-prefix", required=True, help="prefix for three reviews and summary")
     args = parser.parse_args(argv)
     if args.command == "prepare":
         params = Parameters(normal_neighbors=args.normal_neighbors,
@@ -717,6 +910,8 @@ def main(argv: list[str] | None = None) -> None:
                             ambiguity_margin=args.ambiguity_margin)
         report = prepare(args.sample, args.graph, args.output,
                          reference_path=args.references, params=params)
+    elif args.command == "cosine":
+        report = compare_cosine_thresholds(args.baseline, args.graph, args.output_prefix)
     else:
         report = apply_manual_corrections(args.input, args.corrections, args.output)
     print(json.dumps(report, indent=2, ensure_ascii=False))

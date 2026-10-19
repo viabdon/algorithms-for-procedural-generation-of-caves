@@ -304,9 +304,10 @@ menor densidade reduziu a fração de vértices a >2 unidades para 3,7%, mas
 aumentou as arestas de borda de 175 para 393. Remover 20% eliminou os
 vértices a >2 unidades, porém gerou 875 arestas de borda. Esses filtros
 ajudam a **identificar** interpolação espúria; nenhum dos resultados filtrados
-é watertight. A reconstrução da caverna inteira provavelmente exigirá
-segmentação/trechos com sobreposição e junções avaliadas, ou um fallback
-de reconstrução, além de um protocolo explícito para entradas e lacunas.
+é watertight. Reconstruir trechos com sobreposição e avaliar suas junções é
+uma hipótese de pesquisa futura, não uma etapa da reconstrução atual. Um
+eventual fechamento ainda exigiria protocolo explícito para entradas e
+lacunas, além de validação da malha unida.
 
 ## 7. Parâmetros a estudar, em ordem
 

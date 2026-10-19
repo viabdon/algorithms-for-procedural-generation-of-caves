@@ -259,6 +259,14 @@ revisão ainda não mudou nenhuma normal, essa comparação não testa o efeito 
 orientação. Ambas as saídas continuam candidatas diagnósticas, sem comprovar
 interior/exterior ou aptidão para o SDF.
 
+O [ensaio de dilatação morfológica](docs/metodologia/espessamento-morfologico-elaphes.md)
+usa as opções `9`/`10` para uma amostra densa e `11`/`12` para a ocupação
+voxelizada a partir de todos os pontos brutos do recorte X `[12,35]`.
+`voxelizar-roi` lê o PLY uma vez; `espessar-bruto` compara raios 0, 1 e 2
+voxels e salva métricas de suporte, topologia e conectividade do espaço
+livre. Essas saídas são diagnósticas para decidir se existe um volume apto
+ao SDF, não rótulos `VOID`/`SOLID` validados.
+
 Para o CA, um SDF de **controle simplificado**, independente da caverna de
 teste, poderá enviesar a regra. Usar o SDF exato da referência de teste é um
 experimento distinto de reconstrução condicionada. O algoritmo genético será

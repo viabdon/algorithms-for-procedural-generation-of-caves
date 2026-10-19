@@ -18,6 +18,8 @@
 - [Ajustes de metodologia](metodologia/methodology-adjustments.md)
 - [Extração exploratória de linha central no Elaphes](metodologia/linha-central-elaphes-exploracao.md)
 - [Orientação experimental das normais por trechos e revisão dos índices incertos](metodologia/orientacao-normais-linha-central.md)
+- [Dilatação morfológica da nuvem densa do Elaphes e avaliação para SDF](metodologia/espessamento-morfologico-elaphes.md)
+- [Poisson e espessamento leve na extensão completa do Elaphes](metodologia/poisson-elaphes-extensao-completa.md)
 - [Inventário de metadados e posições do scanner do Elaphes](metodologia/metadados-elaphes-scanner.md)
 
 O [plano geral](../Orientacao-codex.md) reúne as dependências entre as frentes.

@@ -1,6 +1,6 @@
 # Roadmap atualizado
 
-**Revisão de 12/10/2026.** As etapas abaixo descrevem dependências, não
+**Revisão de 18/10/2026.** As etapas abaixo descrevem dependências, não
 implicam que já existe referência volumétrica validada. Os marcos e
 responsáveis estão no [plano geral](../../Orientacao-codex.md).
 
@@ -133,14 +133,25 @@ recorte X `[12,35]` tem bom suporte local e abertura no corte artificial.
 A linha central LBC+MST inspirada em Racine foi inspecionada no recorte
 X `[12,45]`; reconhecemos ramo real curto em X≈30 e bifurcação em X≈42.
 A poda de quatro pontas é apenas diagnóstica. Conferir cortes dos pontos
-originais e revisar normais, segmentação/junções e fallbacks antes de aceitar
+originais e revisar normais e fallbacks antes de aceitar
 qualquer malha. Ver [resumo teórico](../resumos-teoricos/linha-central-racine.md)
 e [ensaio](../metodologia/linha-central-elaphes-exploracao.md).
-O [protótipo de orientação por trechos](../metodologia/orientacao-normais-linha-central.md)
-já produz IDs exatos de sentidos incertos e plot de revisão; a execução sem
-referências interiores validadas marcou os 20.274 pontos como incertos.
-Conferir referências em cortes e comparar malhas sob a mesma amostra e
-parâmetros antes de escolher uma reconstrução.
+O [protótipo de orientação pela linha central](../metodologia/orientacao-normais-linha-central.md)
+produziu IDs exatos de sentidos incertos e plot de revisão; a execução sem
+referências interiores validadas marcou os 20.274 pontos como incertos. O
+ensaio posterior de cossenos comparou três limiares e um baseline com a mesma
+amostra e parâmetros: nenhuma malha ficou fechada e não houve melhora global
+comprovada. **Decisão de 15/10/2026:** encerrar essa rota de reconstrução no
+escopo atual do TCC. A validação de referências e associações por ramos fica
+registrada como pesquisa futura, não como tarefa desta fase. Nenhuma malha do
+Elaphes foi aceita como referência por essa decisão.
+
+**Outra hipótese de pesquisa futura:** reconstruir trechos sobrepostos com
+parâmetros locais e unir as superfícies, tratando a bifurcação em X≈42 como
+uma região única. A união teria de ser validada quanto a continuidade,
+auto-interseções, componentes, suporte nos pontos e entradas reais antes de
+produzir um SDF. A estratégia ainda não foi testada e fica fora do escopo
+atual por limite de tempo e foco da pesquisa.
 
 ## Fase 3 — Interior/exterior, SDF e rótulos
 

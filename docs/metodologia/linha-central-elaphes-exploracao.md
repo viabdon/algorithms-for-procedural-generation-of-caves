@@ -87,9 +87,10 @@ justamente a ramificação real em X≈30.
 Em 12/10/2026, Pablo abriu a última plotagem 3D no navegador e confirmou
 visualmente que todos os nós da linha podada aparentam estar dentro do volume
 da nuvem e que as ramificações estão representadas corretamente. A inspeção
-visual do **grafo exibido** está concluída. Ainda faltam cortes locais para
-avaliar posições interiores candidatas, confirmação geométrica das pontas
-podadas nos pontos originais e classificação assinada para o SDF.
+visual do **grafo exibido** está concluída. Cortes locais para avaliar
+posições interiores candidatas e a confirmação geométrica das pontas podadas
+nos pontos originais permanecem sem execução; são questões para eventual
+retomada, não evidência de classificação assinada para o SDF.
 
 Arquivos de inspeção: [comparação de pesos](../../results/figures/03_linha_central/elaphes_lbc_roi_weight_comparison.png), [grafo com peso 0,5](../../results/figures/03_linha_central/elaphes_centreline_roi_x12_35_exploratory.png) e [vista 3D interativa com peso 0,05](../../results/figures/03_linha_central/elaphes_centreline_roi_x12_35_interactive.html). Para sobreposição no CloudCompare, abrir `results/figures/01_nuvem_e_recortes/elaphes_gallery_roi_x12_35.ply` junto de `results/figures/03_linha_central/elaphes_centreline_roi_x12_35_weight_0.05_nodes.ply` (nós vermelhos; as arestas não foram exportadas para esse PLY). Os dados intermediários em `data/processed/` e as figuras em `results/figures/` são ignorados pelo Git; quem reproduzir o teste precisa gerar os seus próprios artefatos a partir do PLY original.
 
@@ -116,7 +117,7 @@ visualização**, sem alterar a nuvem de análise. Os seis HTMLs de inspeção
 existentes foram regenerados com esse padrão em 09/10/2026 e seguem ignorados
 pelo Git.
 
-### Próximo experimento
+### Desfecho da orientação pela linha central
 
 Em 12/10 foi executado o [protótipo de orientação por
 trechos](orientacao-normais-linha-central.md) sobre os 20.274 representantes
@@ -127,9 +128,16 @@ verificadas em cortes, **20.274/20.274** sentidos ficaram incertos; essa
 execução verifica os contratos de arquivos e visualização, não a eficácia da
 orientação.
 
-Conferir em cortes do CloudCompare as pontas podadas e os três braços de
-X≈42 contra pontos originais e malhas candidatas. Testar preservação de
-extremidades, seleção de componentes e associação de pontos da superfície
-a trechos da linha, inclusive nas bifurcações, antes de orientar normais ou
-usar nós como sementes interiores. A classificação interior/exterior deve
-ser validada separadamente antes de entregar a linha ao SDF.
+Em 15/10, um [ensaio de cossenos](orientacao-normais-linha-central.md)
+propôs sentidos com três limiares e comparou as reconstruções Poisson com o
+baseline, preservando amostra e parâmetros. Algumas métricas melhoraram e
+outras pioraram; nenhuma malha ficou fechada ou adequada a validar o sinal
+interior/exterior. Pelo tempo, recorte e foco do TCC, a reconstrução baseada
+nessa linha central foi encerrada no escopo atual.
+
+Em uma pesquisa futura, seria necessário conferir em cortes do CloudCompare
+as pontas podadas e os três braços de X≈42 contra pontos originais e malhas
+candidatas; testar preservação de extremidades, seleção de componentes e
+associação de pontos da superfície a trechos da linha nas bifurcações; e
+validar a classificação interior/exterior separadamente antes de usar a
+linha como referência de orientação ou de SDF.

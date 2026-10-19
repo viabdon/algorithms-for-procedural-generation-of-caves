@@ -74,6 +74,18 @@ class MenuMalhasTests(unittest.TestCase):
                                        "--saida", str(output)]), 1)
                 self.assertEqual(run.call_count, 2)
 
+    def test_cosine_menu_command_summarizes_three_thresholds(self) -> None:
+        rows = [{"cosine_threshold": threshold, "automatic_keep_count": 2,
+                 "automatic_flip_count": 3, "uncertain_count": 4,
+                 "orientation_path": f"cos{threshold}.npz"}
+                for threshold in (0.5, 0.75, 0.94)]
+        with patch("menu_malhas.compare_cosine_thresholds", return_value={"thresholds": rows}) as compare:
+            with redirect_stdout(StringIO()) as output:
+                self.assertEqual(main(["cossenos", "--prefixo", "data/processed/teste"]), 0)
+            self.assertEqual(compare.call_count, 1)
+            self.assertIn("|cos| ≥ 0.94", output.getvalue())
+            self.assertIn("incertos=4", output.getvalue())
+
     def test_test_command_uses_current_interpreter_without_shell(self) -> None:
         with patch("menu_malhas.subprocess.run") as run:
             run.return_value.returncode = 0
@@ -82,6 +94,36 @@ class MenuMalhasTests(unittest.TestCase):
             self.assertEqual(command, [sys.executable, "-m", "unittest", "discover",
                                        "-s", "tests", "-p", "test_normal_orientation.py", "-v"])
             self.assertFalse(run.call_args.kwargs["check"])
+
+    def test_thickening_command_uses_requested_sample_and_radii(self) -> None:
+        report = {"measured_points": 40_000}
+        with patch("cavegen.meshing.morphological_thickening.run_experiment",
+                   return_value=report) as run:
+            with redirect_stdout(StringIO()) as output:
+                self.assertEqual(main(["espessar", "--amostra", "sample.npz",
+                                       "--prefixo", "results/meshes/teste",
+                                       "--voxel", "0.2", "--raios", "1", "2"]), 0)
+            self.assertEqual(run.call_args.kwargs["voxel_size"], 0.2)
+            self.assertEqual(run.call_args.kwargs["radii_voxels"], (1, 2))
+            self.assertIn("40,000", output.getvalue())
+
+    def test_raw_thickening_commands_keep_occupancy_and_sample_explicit(self) -> None:
+        with patch("cavegen.meshing.morphological_thickening.voxelize_raw_roi",
+                   return_value={"occupancy_path": "raw.npz", "roi_source_count": 100,
+                                 "occupied_voxels": 25}) as voxelize:
+            with redirect_stdout(StringIO()):
+                self.assertEqual(main(["voxelizar-roi", "--ply", "raw.ply",
+                                       "--saida", "raw.npz", "--voxel", "0.1"]), 0)
+            self.assertEqual(voxelize.call_args.kwargs["voxel_size"], 0.1)
+        with patch("cavegen.meshing.morphological_thickening.run_raw_occupancy_experiment",
+                   return_value={"raw_roi_points": 100}) as run:
+            with redirect_stdout(StringIO()):
+                self.assertEqual(main(["espessar-bruto", "--ocupacao", "raw.npz",
+                                       "--amostra", "sample.npz", "--prefixo", "compare",
+                                       "--raios", "0", "1", "2"]), 0)
+            self.assertEqual(run.call_args.kwargs["radii_voxels"], (0, 1, 2))
+            self.assertTrue(str(run.call_args.args[0]).endswith("raw.npz"))
+            self.assertTrue(str(run.call_args.args[1]).endswith("sample.npz"))
 
 
 if __name__ == "__main__":

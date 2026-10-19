@@ -39,9 +39,10 @@ A [linha central inspirada em Racine](../resumos-teoricos/linha-central-racine.m
 foi extraída em caráter exploratório com contração laplaciana e MST. A
 inspeção reconheceu o ramo curto real em X≈30 e a grande bifurcação em X≈42.
 A poda de quatro pontas menores que `1,3` perto de X≈42 é provisória e
-protegeu manualmente X≈30. Conferir os ramos nos pontos originais e a
-estabilidade dos nós antes de propor múltiplas sementes interiores para
-orientação local. Essa linha não substitui uma classificação assinada.
+protegeu manualmente X≈30. A conferência dos ramos nos pontos originais e
+da estabilidade dos nós seria necessária antes de propor múltiplas sementes
+interiores para orientação local. Essa linha não substitui uma classificação
+assinada.
 
 Foi implementada uma [hipótese de orientação local](orientacao-normais-linha-central.md):
 dividir o grafo em ramos, comparar até dois ramos por ponto com distância
@@ -56,6 +57,26 @@ recebeu referências validadas e preservou todos os 20.274 sentidos como
 incertos. A revisão de normais é independente da máscara `UNKNOWN` do SDF:
 uma normal com sentido decidido não prova que a célula correspondente é
 interior ou exterior.
+
+Um ensaio posterior propôs orientações por cosseno nos limiares `0,50`,
+`0,75` e `0,94` e comparou as malhas com o baseline na mesma amostra e com
+os mesmos parâmetros. Nenhuma malha ficou fechada e não houve melhora global
+comprovada. **Decisão de 15/10/2026:** não prosseguir com a reconstrução da
+malha por orientação baseada na linha central no escopo atual do TCC. A
+validação de nós interiores, das associações nas bifurcações e das normais
+propostas permanece aberta para pesquisas futuras, conforme o [registro do
+experimento](orientacao-normais-linha-central.md).
+
+Também foi testada a [dilatação morfológica da nuvem densa](espessamento-morfologico-elaphes.md)
+no recorte X `[12,35]`, incluindo uma grade de 0,10 unidade XYZ preenchida
+com os 22.273.631 pontos brutos do PLY. Os raios 0, 1 e 2 voxels reduziram
+arestas não manifold de 42 para 5 e 0, mas todas as malhas Poisson se
+auto-intersectaram; a aderência p95 dos pontos medidos piorou de 0,099 para
+0,197 e 0,303. A borda da ocupação forma uma casca em torno da parede
+medida, e os 56 nós sondados permaneceram em espaço livre conectado à borda
+do recorte. Assim, **não há volume do Elaphes validado para SDF por essa
+rota**; SDFs sintéticos de controle continuam viáveis para desenvolver e
+comparar os geradores sem alegar uma referência real assinada.
 
 ## 2. Classificação e campo de distância
 

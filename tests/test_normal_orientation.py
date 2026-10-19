@@ -16,11 +16,14 @@ from cavegen.meshing.normal_orientation import (
     Parameters,
     apply_manual_corrections,
     associate_points,
+    compare_cosine_thresholds,
     graph_sha256,
     load_orientation,
     orient_from_references,
+    orient_by_centreline_cosine,
     points_sha256,
     prepare,
+    reason_names,
     save_orientation,
     split_branches,
 )
@@ -37,6 +40,85 @@ def tube_sample() -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
 
 
 class NormalOrientationTests(unittest.TestCase):
+    def test_cosine_thresholds_keep_flip_and_retain_weak_votes(self) -> None:
+        points, inward, nodes, edges = tube_sample()
+        normals = -inward
+        normals[0] *= -1  # clear inward vote
+        normals[1] = [1, 0, 0]  # tangent to the radial vector
+        with patch("cavegen.meshing.normal_orientation._normal_quality",
+                   return_value=(np.zeros(len(points)), np.ones(len(points)))):
+            low = orient_by_centreline_cosine(points, normals, nodes, edges, 0.5)
+            high = orient_by_centreline_cosine(points, normals, nodes, edges, 0.94)
+        self.assertEqual(int(low["automatic_sign"][0]), -1)
+        self.assertEqual(int(low["automatic_sign"][2]), 1)
+        self.assertEqual(int(low["automatic_sign"][1]), 0)
+        np.testing.assert_allclose(low["oriented_normals_xyz"][0], -low["baseline_normals_xyz"][0])
+        np.testing.assert_allclose(low["oriented_normals_xyz"][1], low["baseline_normals_xyz"][1])
+        self.assertTrue(np.all(~high["uncertain_mask"] <= ~low["uncertain_mask"]))
+        self.assertAlmostEqual(float(low["candidate_cosines"][0, 0]), -1)
+        with self.assertRaisesRegex(ValueError, "threshold"):
+            orient_by_centreline_cosine(points, normals, nodes, edges, 0)
+
+    def test_cosine_candidates_must_agree_and_junction_remains_uncertain(self) -> None:
+        points = np.asarray([[1, 1, 1], [1.01, 1, 1], [1, 1.01, 1],
+                             [1, 1, 1.01], [1.02, 1.02, 1]], dtype=float)
+        normals = np.tile([1., -1., 0.], (len(points), 1))
+        nodes = np.asarray([[0, 0, 0], [2, 0, 0], [0, 2, 0], [-2, 0, 0]], dtype=float)
+        edges = np.asarray([[0, 1], [0, 2], [0, 3]])
+        params = Parameters(max_branch_cost=10, ambiguity_margin=1, junction_radius_factor=0.01)
+        with patch("cavegen.meshing.normal_orientation._normal_quality",
+                   return_value=(np.zeros(len(points)), np.ones(len(points)))):
+            result = orient_by_centreline_cosine(points, normals, nodes, edges, 0.4, params=params)
+        self.assertTrue(result["uncertain_mask"][0])
+        self.assertEqual(int(result["automatic_sign"][0]), 0)
+        self.assertGreater(float(result["candidate_cosines"][0, 0]) *
+                           float(result["candidate_cosines"][0, 1]) * -1, 0)
+        self.assertIn("cossenos_de_ramos_discordam", reason_names(int(result["reason_bits"][0])))
+
+    def test_cosine_does_not_decide_near_a_junction(self) -> None:
+        points, inward, nodes, edges = tube_sample()
+        nodes = np.vstack((nodes, [0, 2, 0], [-2, 0, 0]))
+        edges = np.vstack((edges, [0, 4], [0, 5]))
+        with patch("cavegen.meshing.normal_orientation._normal_quality",
+                   return_value=(np.zeros(len(points)), np.ones(len(points)))):
+            result = orient_by_centreline_cosine(points, -inward, nodes, edges, 0.5)
+        self.assertTrue(result["uncertain_mask"][0])
+        self.assertEqual(int(result["automatic_sign"][0]), 0)
+        self.assertIn("perto_de_bifurcacao", reason_names(int(result["reason_bits"][0])))
+
+    def test_cosine_does_not_decide_when_point_lies_on_centreline(self) -> None:
+        points, inward, nodes, edges = tube_sample()
+        points = np.vstack((points, [1, 0, 0]))
+        normals = np.vstack((inward, [0, 1, 0]))
+        with patch("cavegen.meshing.normal_orientation._normal_quality",
+                   return_value=(np.zeros(len(points)), np.ones(len(points)))):
+            result = orient_by_centreline_cosine(points, normals, nodes, edges, 0.5)
+        self.assertTrue(result["uncertain_mask"][-1])
+        self.assertTrue(np.isnan(result["candidate_cosines"][-1, 0]))
+        self.assertIn("vetor_linha_parede_nulo", reason_names(int(result["reason_bits"][-1])))
+
+    @unittest.skipUnless(importlib.util.find_spec("open3d"), "Open3D extra is optional")
+    def test_cosine_comparison_writes_distinct_reviewable_artifacts(self) -> None:
+        points, inward, nodes, edges = tube_sample()
+        initial = orient_from_references(points, inward, nodes, edges, [])
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            baseline = root / "baseline.npz"
+            graph = root / "graph.npz"
+            np.savez(graph, nodes_xyz=nodes, edges=edges)
+            save_orientation(baseline, initial, {})
+            prefix = root / "cosine"
+            report = compare_cosine_thresholds(baseline, graph, prefix)
+            self.assertEqual([row["cosine_threshold"] for row in report["thresholds"]],
+                             [0.5, 0.75, 0.94])
+            for row in report["thresholds"]:
+                loaded = load_orientation(row["orientation_path"])
+                self.assertEqual(len(loaded["points_xyz"]), len(points))
+                self.assertEqual(str(loaded["point_sha256"]), report["point_sha256"])
+                self.assertTrue(Path(row["uncertain_csv"]).exists())
+            with self.assertRaisesRegex(ValueError, "already exists"):
+                compare_cosine_thresholds(baseline, graph, prefix)
+
     @unittest.skipUnless(importlib.util.find_spec("open3d"), "Open3D extra is optional")
     def test_prepare_requires_explicitly_validated_references(self) -> None:
         points, inward, nodes, edges = tube_sample()

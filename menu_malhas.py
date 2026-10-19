@@ -17,6 +17,7 @@ import numpy as np
 
 from cavegen.meshing.normal_orientation import (
     apply_manual_corrections,
+    compare_cosine_thresholds,
     load_orientation,
     prepare,
     reason_names,
@@ -30,6 +31,9 @@ GRAPH = "data/processed/elaphes_centreline_roi_x12_45_pruned_exploratory.npz"
 ORIENTATION = "data/processed/elaphes_centreline_normals_review.npz"
 LINE_FIGURE = "results/figures/03_linha_central/elaphes_centreline_roi_x12_45_pruned_interactive.html"
 NORMAL_FIGURE = "results/figures/04_orientacao_normais/elaphes_centreline_normals_review.html"
+THICK_SAMPLE = "data/processed/elaphes_gallery_roi_x12_35_dense2m_bins.npz"
+RAW_OCCUPANCY = "data/processed/elaphes_gallery_roi_x12_35_raw_occupancy_010.npz"
+RAW_PLY = "/run/media/midnavi/Pablo/TCC/DATA/RAW/elaphes_cave.ply"
 
 
 def path(value: str | Path) -> Path:
@@ -78,6 +82,11 @@ def inspect_file(source: Path, index: int | None = None) -> None:
                 print(f"Pontos: {len(reviewed['points_xyz'])}; incertos: "
                       f"{len(reviewed['uncertain_indices'])}; decisões manuais: "
                       f"{np.count_nonzero(reviewed['manual_mask'])}")
+                if "automatic_sign" in reviewed:
+                    signs = reviewed["automatic_sign"]
+                    print(f"Limiar |cos|: {float(reviewed['cosine_threshold']):.2f}; "
+                          f"keep propostos: {np.count_nonzero(signs == 1)}; "
+                          f"flip propostos: {np.count_nonzero(signs == -1)}")
                 print(f"Hash da amostra: {reviewed['point_sha256']}")
                 if index is not None:
                     if not 0 <= index < len(reviewed["points_xyz"]):
@@ -87,6 +96,10 @@ def inspect_file(source: Path, index: int | None = None) -> None:
                           f"ramos={reviewed['candidate_branches'][index].tolist()}; "
                           f"incerto={bool(reviewed['uncertain_mask'][index])}; "
                           f"motivos={reason_names(int(reviewed['reason_bits'][index]))}")
+                    if "candidate_cosines" in reviewed:
+                        print(f"  cossenos={reviewed['candidate_cosines'][index].tolist()}; "
+                              f"arestas={reviewed['candidate_edges'][index].tolist()}; "
+                              f"proposta={int(reviewed['automatic_sign'][index])}")
             elif index is not None:
                 key = "nodes_xyz" if "nodes_xyz" in keys else "points_xyz"
                 if key not in keys or not 0 <= index < len(archive[key]):
@@ -176,6 +189,14 @@ def execute(args: argparse.Namespace) -> int:
         correction = path(args.csv) if args.csv else source.with_suffix(".uncertain.csv")
         result = apply_manual_corrections(source, correction, output)
         print(f"Revisão corrigida: {output}\nIncertos restantes: {result['uncertain_count']}")
+    elif args.command == "cossenos":
+        prefix = path(args.prefixo or "data/processed/elaphes_centreline_cosine")
+        result = compare_cosine_thresholds(path(args.orientacao), path(args.grafo), prefix)
+        for report in result["thresholds"]:
+            print(f"|cos| ≥ {report['cosine_threshold']:.2f}: "
+                  f"keep={report['automatic_keep_count']}, flip={report['automatic_flip_count']}, "
+                  f"incertos={report['uncertain_count']} -> {report['orientation_path']}")
+        print(f"Resumo: {prefix.with_name(prefix.name + '_summary.json')}")
     elif args.command == "malha":
         output = path(args.saida)
         new_output(output)
@@ -188,6 +209,44 @@ def execute(args: argparse.Namespace) -> int:
               f"Pontos: {result['sampled_vertices']}; sentidos incertos: "
               f"{result['normal_sign_uncertain_count']}\n"
               f"Faces: {result['mesh_triangles']}; bordas: {result['mesh_boundary_edges']}")
+    elif args.command == "amostrar-roi":
+        from cavegen.meshing.morphological_thickening import sample_measured_roi
+
+        result = sample_measured_roi(
+            path(args.ply), path(args.saida), max_bins=args.max_bins,
+        )
+        print(f"Amostra medida: {result['sample_path']}\n"
+              f"Pontos no recorte: {result['roi_source_count']:,}; "
+              f"representantes: {result['sampled_points']:,}")
+    elif args.command == "espessar":
+        from cavegen.meshing.morphological_thickening import run_experiment
+
+        result = run_experiment(
+            path(args.amostra), path(args.prefixo), voxel_size=args.voxel,
+            radii_voxels=tuple(args.raios), depth=args.profundidade,
+            threads=args.threads, probe_graph_path=path(args.grafo) if args.grafo else None,
+        )
+        print(f"Comparação diagnóstica: {path(args.prefixo).with_name(path(args.prefixo).name + '_summary.json')}\n"
+              f"Pontos medidos: {result['measured_points']:,}")
+    elif args.command == "voxelizar-roi":
+        from cavegen.meshing.morphological_thickening import voxelize_raw_roi
+
+        result = voxelize_raw_roi(
+            path(args.ply), path(args.saida), voxel_size=args.voxel,
+        )
+        print(f"Ocupação bruta: {result['occupancy_path']}\n"
+              f"Pontos no recorte: {result['roi_source_count']:,}; "
+              f"voxels ocupados: {result['occupied_voxels']:,}")
+    elif args.command == "espessar-bruto":
+        from cavegen.meshing.morphological_thickening import run_raw_occupancy_experiment
+
+        result = run_raw_occupancy_experiment(
+            path(args.ocupacao), path(args.amostra), path(args.prefixo),
+            radii_voxels=tuple(args.raios), depth=args.profundidade,
+            threads=args.threads, probe_graph_path=path(args.grafo) if args.grafo else None,
+        )
+        print(f"Comparação diagnóstica: {path(args.prefixo).with_name(path(args.prefixo).name + '_summary.json')}\n"
+              f"Pontos brutos no recorte: {result['raw_roi_points']:,}")
     return 0
 
 
@@ -216,6 +275,10 @@ def parser_for_menu() -> argparse.ArgumentParser:
     correction.add_argument("--orientacao", required=True)
     correction.add_argument("--csv", help="padrão: CSV associado ao NPZ")
     correction.add_argument("--saida", required=True)
+    cosine = commands.add_parser("cossenos", help="comparar limiares 0,50/0,75/0,94 na mesma amostra")
+    cosine.add_argument("--orientacao", default=ORIENTATION, help="NPZ com normais base fixas")
+    cosine.add_argument("--grafo", default=GRAPH)
+    cosine.add_argument("--prefixo", help="prefixo dos NPZ e JSON; não sobrescreve saídas")
     meshing = commands.add_parser("malha", help="gerar Poisson de uma revisão fixa")
     meshing.add_argument("--orientacao", required=True)
     meshing.add_argument("--saida", required=True)
@@ -225,6 +288,32 @@ def parser_for_menu() -> argparse.ArgumentParser:
     meshing.add_argument("--threads", type=int, default=1)
     meshing.add_argument("--permitir-incertos", action="store_true",
                          help="permitir malha revisada diagnóstica ainda com sentidos incertos")
+    roi = commands.add_parser("amostrar-roi", help="amostrar pontos medidos do PLY no recorte X [12,35]")
+    roi.add_argument("--ply", default=RAW_PLY)
+    roi.add_argument("--saida", default=THICK_SAMPLE)
+    roi.add_argument("--max-bins", type=int, default=2_000_000)
+    thickening = commands.add_parser("espessar", help="comparar Poisson direto e dilatação morfológica")
+    thickening.add_argument("--amostra", default=THICK_SAMPLE)
+    thickening.add_argument("--prefixo", default="results/meshes/elaphes_thickening_dense2m")
+    thickening.add_argument("--voxel", type=float, default=0.25)
+    thickening.add_argument("--raios", type=int, nargs="+", default=[1, 2])
+    thickening.add_argument("--grafo",
+                            help="nós visuais como sonda diagnóstica, não referência interior validada")
+    thickening.add_argument("--profundidade", type=int, default=8)
+    thickening.add_argument("--threads", type=int, default=1)
+    raw_roi = commands.add_parser("voxelizar-roi", help="voxelizar todos os pontos brutos do recorte")
+    raw_roi.add_argument("--ply", default=RAW_PLY)
+    raw_roi.add_argument("--saida", default=RAW_OCCUPANCY)
+    raw_roi.add_argument("--voxel", type=float, default=0.1)
+    raw_thickening = commands.add_parser("espessar-bruto", help="comparar Poisson com dilatação da ocupação bruta")
+    raw_thickening.add_argument("--ocupacao", default=RAW_OCCUPANCY)
+    raw_thickening.add_argument("--amostra", default=THICK_SAMPLE,
+                               help="amostra medida para checagem de distância (não é holdout)")
+    raw_thickening.add_argument("--prefixo", default="results/meshes/elaphes_thickening_raw_010")
+    raw_thickening.add_argument("--raios", type=int, nargs="+", default=[0, 1, 2])
+    raw_thickening.add_argument("--grafo", help="nós ainda não validados para sonda diagnóstica")
+    raw_thickening.add_argument("--profundidade", type=int, default=8)
+    raw_thickening.add_argument("--threads", type=int, default=1)
     return parser
 
 
@@ -235,7 +324,9 @@ def _ask(label: str, default: str = "") -> str:
 
 def interactive() -> int:
     menu = ("\n1 Testar  2 Listar  3 Inspecionar  4 Preparar revisão\n"
-            "5 Plotar  6 Aplicar CSV  7 Gerar malha Poisson  0 Sair")
+            "5 Plotar  6 Aplicar CSV  7 Gerar malha Poisson  8 Comparar cossenos\n"
+            "9 Amostrar PLY no recorte  10 Comparar espessamento\n"
+            "11 Voxelizar PLY bruto  12 Comparar espessamento bruto  0 Sair")
     while True:
         try:
             print(menu)
@@ -259,6 +350,25 @@ def interactive() -> int:
                               "--saida", _ask("Novo OBJ", suggest_output(
                                   "results/meshes/elaphes_normals_diagnostic.obj")), "--profundidade",
                               _ask("Profundidade Poisson", "8")],
+                "8": lambda: ["cossenos", "--orientacao", _ask("NPZ base", ORIENTATION),
+                              "--grafo", _ask("Grafo", GRAPH), "--prefixo",
+                              _ask("Prefixo dos resultados", "data/processed/elaphes_centreline_cosine")],
+                "9": lambda: ["amostrar-roi", "--ply", _ask("PLY bruto", RAW_PLY),
+                              "--saida", _ask("Novo NPZ", THICK_SAMPLE),
+                              "--max-bins", _ask("Limite de bins", "2000000")],
+                "10": lambda: ["espessar", "--amostra", _ask("Amostra densa", THICK_SAMPLE),
+                               "--prefixo", _ask("Prefixo novo das malhas",
+                                                "results/meshes/elaphes_thickening_dense2m"),
+                               "--voxel", _ask("Tamanho do voxel", "0.25"),
+                               "--raios", *_ask("Raios em voxels, separados por espaço", "1 2").split()],
+                "11": lambda: ["voxelizar-roi", "--ply", _ask("PLY bruto", RAW_PLY),
+                               "--saida", _ask("Novo NPZ de ocupação", RAW_OCCUPANCY),
+                               "--voxel", _ask("Tamanho do voxel", "0.1")],
+                "12": lambda: ["espessar-bruto", "--ocupacao", _ask("Ocupação bruta", RAW_OCCUPANCY),
+                               "--amostra", _ask("Amostra medida para checagem", THICK_SAMPLE),
+                               "--prefixo", _ask("Prefixo novo das malhas",
+                                                "results/meshes/elaphes_thickening_raw_010"),
+                               "--raios", *_ask("Raios em voxels, separados por espaço", "0 1 2").split()],
             }
             if choice not in commands:
                 print("Escolha inválida.")
@@ -279,6 +389,11 @@ def interactive() -> int:
             if choice == "7" and argv[argv.index("--modo") + 1] == "reviewed":
                 if _ask("Permitir sentidos incertos? (s/N)", "N").lower() == "s":
                     argv.append("--permitir-incertos")
+            if choice in {"10", "12"}:
+                graph = _ask("Grafo opcional para sonda visual (- = nenhum)",
+                             GRAPH if path(GRAPH).exists() else "")
+                if graph and graph != "-":
+                    argv += ["--grafo", graph]
             try:
                 main(argv)
             except SystemExit:
