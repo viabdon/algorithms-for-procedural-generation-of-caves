@@ -123,6 +123,15 @@ Pivoting/Alpha Shapes como fallbacks quando os critérios não forem cumpridos.
 A malha de Marching Cubes já existente é extraída de volumes gerados e não
 substitui esta fase.
 
+Os ensaios Poisson do Elaphes ainda não produziram uma malha real validada
+para interior/exterior e SDF; as candidatas têm aberturas, problemas de
+topologia ou extrapolação. Os diagnósticos e HTMLs estão preservados na branch
+`experiment/elaphes-meshing` (commit `21cff18`). A reconstrução por trechos
+sobrepostos, com busca local de parâmetros e união das malhas, permanece
+hipótese de pesquisa futura, fora do escopo atual. O SDF de controle
+sintético permite prosseguir com CA+SDF sem atribuir aos dados reais um
+sinal ainda não verificado.
+
 ## Fase 3 — Interior/exterior, SDF e rótulos
 
 Implementar flood fill e SDF/TSDF primeiro em geometria sintética, em paralelo

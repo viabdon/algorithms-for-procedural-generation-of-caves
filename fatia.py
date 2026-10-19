@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-from cavegen.io.voxel_io import load_volume_npz
+from cavegen.datastream.voxel_io import load_volume_npz
 
 # 1) Carrega o volume booleano gerado pelo algoritmo.
 volume = load_volume_npz("results/volumes/random_walk_seed_0.npz")

@@ -21,7 +21,7 @@ from pathlib import Path
 import numpy as np
 
 from cavegen.core.volume import Volume3D
-from cavegen.io.voxel_io import load_volume_npz
+from cavegen.datastream.voxel_io import load_volume_npz
 
 # Raiz do projeto (a pasta que contém src/, results/, ...). Usar isso deixa os
 # scripts funcionando independente de onde o terminal está aberto.
