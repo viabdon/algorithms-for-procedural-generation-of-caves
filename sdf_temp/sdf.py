@@ -22,8 +22,8 @@
     docs/architecture.md usa o inverso (SDF < 0 no VOID), por isso o sinal
     fica em SINAL_INTERNO, para inverter fácil.
 
-    Plot: paleta divergente com azul no externo, cinza claro na borda (zero) e
-    vermelho no interno. A opacidade sobe em linha reta do CORTE_NEGATIVO
+    Plot: paleta Emrld do plotly, do verde claro (mais negativo) ao
+    verde-azulado escuro (mais positivo). A opacidade sobe em linha reta do CORTE_NEGATIVO
     (transparente) até o valor mais positivo (opaco). Abaixo do corte o voxel
     nem entra no plot.
 
@@ -55,10 +55,7 @@ CONVENCAO = "interno positivo, externo negativo, borda 0; distância em voxels"
 # Onde a opacidade chega a 0: o que está abaixo disso não é plotado.
 CORTE_NEGATIVO = -5.0
 
-# O zero fica em cinza claro, e não escuro, para a borda aparecer no fundo preto.
-COR_EXTERNO = "#3987e5"
-COR_BORDA = "#f0efec"
-COR_INTERNO = "#e66767"
+PALETA = "Emrld"
 
 def binarizar_borda(classificacao: np.ndarray) -> np.ndarray:
     """
@@ -96,16 +93,6 @@ def opacidade(valor: float, maximo: float) -> float:
         maximo: maior valor do SDF.
     """
     return (valor - CORTE_NEGATIVO) / (maximo - CORTE_NEGATIVO)
-
-def escala_divergente(maximo: float) -> list:
-    """
-        Azul, cinza e vermelho, com o cinza preso no zero (a borda). O braço
-        negativo vai até o corte e o positivo até o máximo, então os dois
-        braços podem ter tamanhos diferentes.
-        maximo: maior valor do SDF.
-    """
-    zero = -CORTE_NEGATIVO / (maximo - CORTE_NEGATIVO)
-    return [[0, COR_EXTERNO], [zero, COR_BORDA], [1, COR_INTERNO]]
 
 def regiao(valor: float) -> str:
     """
@@ -146,7 +133,7 @@ def trace_do_nivel(sdf: np.ndarray, valor: float, maximo: float,
         marker=dict(
             size=4,
             color=np.full(x.size, valor),
-            colorscale=escala_divergente(maximo),
+            colorscale=PALETA,
             cmin=CORTE_NEGATIVO,
             cmax=maximo,
             opacity=opacidade(valor, maximo),

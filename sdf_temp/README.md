@@ -70,9 +70,8 @@ máximo positivo é só 2.
 O npz traz `sdf` (`float32`), `borda` e `interno` (máscaras `uint8`),
 `convencao` e `metadata`.
 
-**Plot:** paleta divergente, com azul no externo, cinza claro na borda (zero)
-e vermelho no interno. O cinza é claro para a borda aparecer no fundo preto.
-A opacidade sobe em linha reta de `CORTE_NEGATIVO = -5` (100% transparente)
+**Plot:** paleta Emrld do plotly, do verde claro (mais negativo) ao
+verde-azulado escuro (mais positivo). A opacidade sobe em linha reta de `CORTE_NEGATIVO = -5` (100% transparente)
 até o valor mais positivo (opaco). Abaixo do corte o voxel nem entra no plot:
 dos 262.144 voxels, ficam 10.711. Cada nível distinto do SDF vira um trace
 (o plotly só aceita uma opacidade por trace); no Elaphes são 26 níveis.
