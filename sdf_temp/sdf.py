@@ -22,10 +22,10 @@
     docs/architecture.md usa o inverso (SDF < 0 no VOID), por isso o sinal
     fica em SINAL_INTERNO, para inverter fácil.
 
-    Plot: paleta Emrld do plotly, do verde claro (mais negativo) ao
-    verde-azulado escuro (mais positivo). A opacidade sobe em linha reta do CORTE_NEGATIVO
-    (transparente) até o valor mais positivo (opaco). Abaixo do corte o voxel
-    nem entra no plot.
+    Plot: paleta Tropic do plotly, do verde-azulado (mais negativo) ao rosa
+    (mais positivo), esticada de CORTE_NEGATIVO até o máximo. A opacidade sobe
+    em linha reta do CORTE_NEGATIVO (transparente) até o valor mais positivo
+    (opaco). Abaixo do corte o voxel nem entra no plot.
 
     uv run python sdf_temp/sdf.py
 """
@@ -53,9 +53,9 @@ SINAL_INTERNO = 1
 CONVENCAO = "interno positivo, externo negativo, borda 0; distância em voxels"
 
 # Onde a opacidade chega a 0: o que está abaixo disso não é plotado.
-CORTE_NEGATIVO = -5.0
+CORTE_NEGATIVO = -10.0
 
-PALETA = "Emrld"
+PALETA = "Tropic"
 
 def binarizar_borda(classificacao: np.ndarray) -> np.ndarray:
     """
