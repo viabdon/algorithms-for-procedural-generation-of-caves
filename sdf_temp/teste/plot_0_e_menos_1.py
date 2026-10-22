@@ -3,7 +3,8 @@
 
     Teste visual da inundação: o -1 é a água encostada na borda por uma face,
     então essa camada deve envolver a borda por fora. A borda sai mais
-    transparente para não esconder a camada -1.
+    transparente e com o triplo do tamanho, para a camada -1 aparecer através
+    dela em vez de cobri-la.
 
     Lê o npz da etapa sdf.py e grava a figura nesta mesma pasta.
 
@@ -25,22 +26,23 @@ PASTA = Path(__file__).resolve().parent
 ENTRADA = PASTA.parent / "npz" / "elaphes_surface_64_sdf.npz"
 SAIDA_PLOT = PASTA / "elaphes_surface_64_sdf_0_e_menos_1.html"
 
-# Nível do SDF: (nome, cor, opacidade). As cores são as pontas da Tropic, a
-# paleta do sdf.py. A borda vem primeiro: a translúcida é desenhada antes da opaca.
+# Nível do SDF: (nome, cor, opacidade, tamanho do marcador). As cores são as
+# pontas da Tropic, a paleta do sdf.py. A borda vem primeiro: a translúcida é
+# desenhada antes da opaca.
 NIVEIS = {
-    0.0: ("borda (0)", diverging.Tropic[-1], 0.25),
-    -1.0: ("externo (-1)", diverging.Tropic[0], 1.0),
+    0.0: ("borda (0)", diverging.Tropic[-1], 0.25, 6),
+    -1.0: ("externo (-1)", diverging.Tropic[0], 1.0, 2),
 }
 
 def trace_do_nivel(sdf: np.ndarray, valor: float) -> go.Scatter3d:
     """
-        Um Scatter3d por nível, com a cor e a opacidade de NIVEIS.
+        Um Scatter3d por nível, com a cor, a opacidade e o tamanho de NIVEIS.
         Mesma troca de eixos dos outros plots: x é a largura, y é a
         profundidade e z é a altura da grade (depth, height, width).
         sdf: campo com sinal.
         valor: nível plotado nesse trace (uma chave de NIVEIS).
     """
-    nome, cor, opacidade = NIVEIS[valor]
+    nome, cor, opacidade, tamanho = NIVEIS[valor]
     indices = np.argwhere(sdf == valor)
     x, y, z = indices[:, 2], indices[:, 0], indices[:, 1]
 
@@ -48,7 +50,7 @@ def trace_do_nivel(sdf: np.ndarray, valor: float) -> go.Scatter3d:
         x=x, y=y, z=z,
         mode="markers",
         name=f"{nome}: {x.size} voxels",
-        marker=dict(size=4, color=cor, opacity=opacidade),
+        marker=dict(size=tamanho, color=cor, opacity=opacidade),
         hovertemplate=f"(%{{x}}, %{{y}}, %{{z}})<br>{nome}<extra></extra>",
     )
 
@@ -97,8 +99,9 @@ def main():
     titulo = f"Elaphes {largura}^3 - SDF só nos níveis 0 (borda) e -1 (externo colado nela)"
     figura(sdf, titulo).write_html(SAIDA_PLOT, include_plotlyjs="cdn")
 
-    for valor, (nome, _, opacidade) in NIVEIS.items():
-        print(f"{nome}: {int((sdf == valor).sum())} voxels, opacidade {opacidade}")
+    for valor, (nome, _, opacidade, tamanho) in NIVEIS.items():
+        print(f"{nome}: {int((sdf == valor).sum())} voxels, opacidade {opacidade}, "
+              f"tamanho {tamanho}")
     print(f"figura salva em {SAIDA_PLOT}")
 
 if __name__ == "__main__":

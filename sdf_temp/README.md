@@ -88,9 +88,11 @@ mesmo resultado, então o npz do scipy serve de referência para testar.
 
 ## Testes visuais
 
-`teste/plot_0_e_menos_1.py` plota só a borda (0, opacidade 0,25) e a camada
-de água colada nela por uma face (−1, opaca), para conferir que o externo
-envolve a borda por fora. Lê o npz do `sdf.py` e grava a figura em `teste/`.
+`teste/plot_0_e_menos_1.py` plota só a borda (0, opacidade 0,25, marcador
+tamanho 6) e a camada de água colada nela por uma face (−1, opaca, tamanho 2),
+para conferir que o externo envolve a borda por fora. A borda tem o triplo do
+tamanho e é translúcida, então a camada −1 aparece através dela em vez de
+cobri-la. Lê o npz do `sdf.py` e grava a figura em `teste/`.
 No Elaphes 64³ são 783 voxels de borda e 1.095 na camada −1.
 
 - [elaphes_surface_64_sdf_0_e_menos_1.html](file:///C:/Users/Felipe%20Cruz/Desktop/CESUPA/TCC/code/algorithms-for-procedural-generation-of-caves/sdf_temp/teste/elaphes_surface_64_sdf_0_e_menos_1.html)
