@@ -70,6 +70,15 @@ máximo positivo é só 2.
 O npz traz `sdf` (`float32`), `borda` e `interno` (máscaras `uint8`),
 `convencao` e `metadata`.
 
+**Plot:** paleta divergente, com azul no externo, cinza claro na borda (zero)
+e vermelho no interno. O cinza é claro para a borda aparecer no fundo preto.
+A opacidade sobe em linha reta de `CORTE_NEGATIVO = -5` (100% transparente)
+até o valor mais positivo (opaco). Abaixo do corte o voxel nem entra no plot:
+dos 262.144 voxels, ficam 10.711. Cada nível distinto do SDF vira um trace
+(o plotly só aceita uma opacidade por trace); no Elaphes são 26 níveis.
+
+- [elaphes_surface_64_sdf.html](file:///C:/Users/Felipe%20Cruz/Desktop/CESUPA/TCC/code/algorithms-for-procedural-generation-of-caves/sdf_temp/plots/elaphes_surface_64_sdf.html)
+
 A EDT do scipy entra por enquanto. A implementação do artigo do Fuseiller
 (`articles/`) pode substituir `distancia_ate_borda()`: qualquer EDT exata dá o
 mesmo resultado, então o npz do scipy serve de referência para testar.
