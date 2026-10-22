@@ -118,6 +118,7 @@ diário sem quebrar o padrão.
 | [Dia 4](#dia-4--hipótese-usar-random-walk-ou-l-system-como-conector-dos-bolsões-de-ar-do-ca) | Hipótese: usar Random Walk ou L-System como conector dos bolsões de ar do CA | Cellular Automata 3D, Random Walk 3D | Ideia (ainda sem conclusão) de usar o CA como esqueleto/"cérebro" e um algoritmo auxiliar pra conectar os bolsões de ar em nós, formando caminhos — e o problema de identificar esses bolsões como nós numa matriz 3D |
 | [Dia 5](#dia-5--convolução-acelera-o-autômato-e-o-plot-de-trajetória-não-revela-um-padrão-claro) | Convolução acelera o autômato e o plot de trajetória não revela um padrão claro | Cellular Automata 3D | Troca do laço de contagem de vizinhos por convolução (400-580x mais rápido, equivalência testada bit a bit) com justificativa metodológica pro TCC, e implementação do gráfico de células vivas por iteração — que mostra os comportamentos já notados no Dia 2, mas sem revelar um padrão claro ligado aos parâmetros |
 | [Dia 6](#dia-6--pesquisando-sdf-da-superfície-para-a-matriz-voxelizada) | Pesquisando SDF: da superfície para a matriz voxelizada | Cellular Automata 3D, Random Walk 3D | Ideia de usar o SDF de uma caverna de Random Walk como matriz de peso pro CA (reforçar voxels perto dela, apagar bolsões distantes); estudo da base do Signed Distance Field, a falta (até agora) de literatura aplicando SDF direto em matriz voxelizada em vez de malha, e o custo inviável da busca ingênua por distâncias em 2D e, pior, em 3D |
+| [Dia 7](#dia-7--flood-fill-pra-separar-dentro-e-fora-e-a-mediatriz-como-atalho-pra-distância-euclidiana) | Flood fill pra separar dentro e fora, e a mediatriz como atalho pra distância euclidiana | Geral (SDF) | Flood fill escolhido pra classificar interior/exterior no Elaphes depois de comparar com vizinhos de face e CA de preenchimento (trata os 26 voxels de buraco fechado sem mexer no lado de fora e sem parâmetros, mas depende da parede externa estar fechada) e a mediatriz como ideia pra cortar comparações no cálculo da distância euclidiana |
 
 ## Dúvidas em aberto
 
@@ -140,6 +141,9 @@ a resposta ficou registrada.
 | "Dá pra classificar os comportamentos de crescimento/decaimento de células vivas a partir de parâmetros específicos do autômato?" | [Dia 5](#dia-5--convolução-acelera-o-autômato-e-o-plot-de-trajetória-não-revela-um-padrão-claro) |
 | "Dá pra aplicar SDF direto numa matriz voxelizada em vez de numa malha?" | [Dia 6](#dia-6--pesquisando-sdf-da-superfície-para-a-matriz-voxelizada) |
 | "Qual algoritmo otimiza o cálculo de distâncias em 3D?" | [Dia 6](#dia-6--pesquisando-sdf-da-superfície-para-a-matriz-voxelizada) |
+| "Em que casos o flood fill não funciona, e como corrigir quando ele vazar?" | [Dia 7](#dia-7--flood-fill-pra-separar-dentro-e-fora-e-a-mediatriz-como-atalho-pra-distância-euclidiana) |
+| "Quanto do vazio 'quase fechado' (26 → 48 → 64) é falha real e quanto é dobra da parede?" | [Dia 7](#dia-7--flood-fill-pra-separar-dentro-e-fora-e-a-mediatriz-como-atalho-pra-distância-euclidiana) |
+| "A mediatriz entra de fato como otimização no cálculo do SDF?" | [Dia 7](#dia-7--flood-fill-pra-separar-dentro-e-fora-e-a-mediatriz-como-atalho-pra-distância-euclidiana) |
 
 ### Respondidas
 
@@ -518,6 +522,106 @@ voxelizada em vez de numa superfície, e qual é a melhor forma de otimizar.
 > "Dá pra aplicar SDF direto numa matriz voxelizada em vez de numa malha?"
 
 > "Qual algoritmo otimiza o cálculo de distâncias em 3D?"
+
+---
+
+## Dia 7 — Flood fill pra separar dentro e fora, e a mediatriz como atalho pra distância euclidiana
+
+**Algoritmo:** Geral (SDF)
+**Commits relacionados:** nenhum — experimento local em `elaphes_test/inundacao/`
+(pasta fora do git, com README próprio)
+
+### Tipo A — Narrativa
+
+Uma das etapas do SDF é definir o que é borda e o que é parte interna, já
+que o sinal do campo depende de saber de que lado da parede cada voxel
+está. Pesquisando sobre isso, cheguei à conclusão de que a melhor forma
+provavelmente é usar **flood fill**: partir de fora e "inundar" tudo que dá
+pra alcançar sem atravessar a parede. O que não foi alcançado é interior.
+
+Testei isso no Elaphes normalizado e voxelizado (grade 64³, 1049 voxels de
+superfície depois de remover um outlier). O ponto de partida foi a
+classificação mais simples, **por vizinhos de face**: é borda todo voxel
+cheio que tenha pelo menos uma face vazia. Ela erra no Elaphes porque o
+modelo tem **falhas internas**, ou seja, vazios fechados no meio da caverna.
+Os voxels que encostam nesses vazios saem como borda, mesmo cercados de
+parede.
+
+Primeiro tentei tapar essas falhas com um CA de preenchimento antes de
+classificar. A regra é `cheio | (vizinhos >= s)`, que só acende voxels e
+nunca apaga, então a caverna nunca ficou mais fina. Depois comparei com o
+flood fill:
+
+| abordagem | parâmetros | buracos fechados tratados (de 26) | voxels alterados por fora | borda (1) | interno (2) |
+|---|---|---|---|---|---|
+| Vizinhos de face, sem preenchimento | 6 vizinhos de face | 0 | 0 | 853 | 196 |
+| CA von Neumann | s = 5 de 6; 2 iterações (4 dá igual) | 11 | **2** | 817 | 245 |
+| CA Moore | s = 20 de 26; 2 iterações | 15 | 0 | 812 | 252 |
+| CA Moore | s = 20 de 26; 4 iterações | 18 | 0 | 806 | 261 |
+| **Flood fill** | conectividade 6 (sem ajuste) | **26** | **0** | **783** | **292** |
+
+"Por fora" é um vazio ligado ao lado de fora da grade que o método
+preencheu, engordando a caverna. Nas linhas do CA, borda e interno vêm da
+classificação por vizinhos de face, aplicada depois do preenchimento.
+
+O CA ajudou, mas esbarrou em três limites. Primeiro, a regra é local: ela
+não diferencia um vazio interno de uma dobra côncava da parede externa, e
+por isso o von Neumann preencheu 2 voxels por fora. Segundo, ele para cedo:
+o von Neumann estabiliza na 2ª iteração e o Moore na 3ª, e o melhor caso
+pegou só 18 dos 26 voxels de buraco. Terceiro, ele tem três parâmetros pra
+calibrar (vizinhança, sensibilidade e iterações). Testei sensibilidades de 4
+a 6 no von Neumann e de 14 a 22 no Moore, e baixar a sensibilidade preenche
+mais, mas aumenta o risco de engordar por fora.
+
+O flood fill troca o critério local por um global. Em vez de perguntar
+"esse vazio tem muitos vizinhos cheios?", ele pergunta "existe um caminho
+desse vazio até o lado de fora sem atravessar parede?". Com isso ele
+encontrou os 26 voxels de buraco fechado (6 grupos, o maior com 17). Ele não
+mexe no lado de fora, porque tudo o que a água alcança é externo por
+definição, e não tem parâmetro pra calibrar. Também passou pra interno 70
+voxels que a classificação por vizinhos de face marcava como borda só porque
+encostavam num buraco fechado. Os dois métodos concordam: tudo o que o CA
+Moore preencheu estava dentro dos 26 voxels do flood fill.
+
+Um detalhe que liga isso ao resto do meu trabalho: o flood fill também é um
+autômato celular. O `scipy.ndimage.binary_fill_holes` funciona como um CA
+com vizinhança de von Neumann, sensibilidade 1, borda `ONES` (fora da grade
+é água) e máscara (só vazio vira água), iterado até estabilizar. Só mudou a
+regra. A vizinhança de 6 é proposital: com Moore, a água passaria na
+diagonal por frestas de canto, e paredes quase fechadas vazariam.
+
+A limitação é que o flood fill exige que a **parede externa** esteja
+fechada. O meio da caverna pode ter falhas, e é isso que ele resolve. Mas
+basta uma fresta contínua de vazios até o lado de fora pra água entrar e o
+buraco inteiro virar externo. Pra estimar quanto vazio está "quase fechado",
+tapei frestas pequenas com um *closing* morfológico antes de inundar. O
+vazio interno subiu de 26 pra 48 voxels com frestas de até 1 voxel, e pra 64
+com frestas de até 2. É uma estimativa por cima, porque o *closing* também
+pode tapar dobras reais da parede. Ainda preciso entender bem esses casos e
+como corrigir quando der problema. Algumas opções são o *closing*, um CA de
+preenchimento antes de inundar ou uma grade mais grossa. Mas, pro arquivo
+que temos hoje pra comparação, o flood fill foi o melhor dos métodos
+testados.
+
+O ponto principal agora é otimizar o cálculo da distância euclidiana do
+SDF. Uma das ideias que encontrei é usar a **mediatriz** (o *perpendicular
+bisector* da literatura em inglês; em 3D, o plano mediador): pega dois
+pontos e traça a reta, ou o plano, que corta o segmento entre eles ao meio.
+Todo ponto de um lado desse plano está mais perto de um dos dois pontos do
+que do outro. Com isso, dá pra descartar comparações inteiras de uma vez em
+vez de testar ponto contra ponto, o que cortaria bastante operações.
+
+Ainda preciso estudar mais antes de colocar isso de fato no projeto. Fica
+registrado como opção de otimização pra quando o SDF estiver implementado.
+
+### Tipo C — Dúvidas em aberto
+
+> "Em que casos o flood fill não funciona, e como corrigir quando ele vazar?"
+
+> "Quanto do vazio 'quase fechado' (26 → 48 → 64) é falha real e quanto é
+> dobra da parede?"
+
+> "A mediatriz entra de fato como otimização no cálculo do SDF?"
 
 ---
 
