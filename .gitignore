@@ -29,7 +29,6 @@ __pycache__/
 /sdf_temp/entrada/
 /sdf_temp/npz/
 /sdf_temp/plots/
-/sdf_temp/teste/*.html
 
 # Keep directory placeholders
 !.gitkeep
