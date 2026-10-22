@@ -23,6 +23,13 @@ __pycache__/
 /results/volumes/*
 /models/checkpoints/*
 
+# Experimento do SDF: só o código e a documentação são versionados. A entrada
+# vem do PLY em data/, as saídas são regeneradas e os artigos são das editoras.
+/sdf_temp/articles/
+/sdf_temp/entrada/
+/sdf_temp/npz/
+/sdf_temp/plots/
+
 # Keep directory placeholders
 !.gitkeep
 
