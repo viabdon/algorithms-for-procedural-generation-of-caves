@@ -8,7 +8,9 @@ zero o resultado tem de ser o mesmo do autômato básico, bit a bit.
 
 from __future__ import annotations
 
+import tempfile
 import unittest
+from pathlib import Path
 
 import numpy as np
 
@@ -18,6 +20,12 @@ from cavegen.generators.cellular_automata.generator import (
     cellular_automata,
     iterate,
     neighbor_counts,
+)
+from cavegen.generators.cellular_automata.pesos import (
+    importar_sdf,
+    load_peso_info,
+    load_peso_matrix,
+    used_peso_ids,
 )
 
 
@@ -70,6 +78,28 @@ class PesoTests(unittest.TestCase):
 
         with self.assertRaises(ValueError):
             aplicar_peso(vizinhos, np.zeros((4, 4, 5), dtype=np.float32))
+
+
+class ArmazenamentoDePesoTests(unittest.TestCase):
+    def test_importar_sdf_copia_a_matriz_e_anota_a_origem(self) -> None:
+        sdf = np.random.default_rng(4).uniform(-10, 2, size=(4, 5, 6)).astype(np.float32)
+
+        with tempfile.TemporaryDirectory() as pasta:
+            origem = Path(pasta) / "campo_sdf.npz"
+            np.savez_compressed(origem, sdf=sdf, convencao="interno positivo")
+            destino_pesos = Path(pasta) / "pesos"
+
+            primeiro = importar_sdf(origem, destino_pesos)
+            segundo = importar_sdf(origem, destino_pesos)
+
+            self.assertEqual((primeiro.name, segundo.name), ("peso_001.npz", "peso_002.npz"))
+            self.assertEqual(used_peso_ids(destino_pesos), {1, 2})
+            np.testing.assert_array_equal(load_peso_matrix(1, destino_pesos), sdf)
+
+            info = load_peso_info(1, destino_pesos)
+            self.assertEqual(info["shape"], (4, 5, 6))
+            self.assertEqual(info["convencao"], "interno positivo")
+            self.assertTrue(info["origem"].endswith("campo_sdf.npz"))
 
 
 if __name__ == "__main__":

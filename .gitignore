@@ -51,6 +51,7 @@ __pycache__/
 /src/cavegen/generators/cellular_automata/results
 /src/cavegen/generators/cellular_automata/plots
 /src/cavegen/generators/cellular_automata/seeds
+/src/cavegen/generators/cellular_automata/pesos
 
 # Instruções locais para agentes
 prompt-professor-codex.md
