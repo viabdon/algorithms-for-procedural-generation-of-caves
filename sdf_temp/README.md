@@ -6,7 +6,6 @@ seu npz e o seu plot.
 
 ```
 entrada/elaphes_surface_64.npz          grade 64³ (depth, height, width), 1 = superfície observada
-  -> remover_outlier.py                 zera voxels soltos (no próprio npz de entrada)
   -> inundacao.py                       flood fill: 0 vazio, 1 borda, 2 interno
        npz/elaphes_surface_64_inundacao.npz
   -> sdf.py                             tira o 2, binariza a borda, mede a distância
@@ -27,12 +26,12 @@ carregam o Plotly pela internet, então precisa estar online.
 
 ## Etapas
 
-### 0. Entrada e outlier
+### 0. Entrada
 
-`remover_outlier.py` zera o voxel (13, 60, 31) do plot, o único da grade sem
-nenhum dos 26 vizinhos cheios. Sobrescreve o npz de entrada e é idempotente.
-
-- [elaphes_surface_64.html](file:///C:/Users/Felipe%20Cruz/Desktop/CESUPA/TCC/code/algorithms-for-procedural-generation-of-caves/sdf_temp/plots/elaphes_surface_64.html)
+O npz de entrada já está sem o outlier: o voxel (13, 60, 31) do plot, o único
+da grade sem nenhum dos 26 vizinhos cheios, foi zerado uma vez por um script
+avulso. O script saiu do projeto por ser um caso específico e fica no
+histórico do git (commit `d20feaf`, `sdf_temp/remover_outlier.py`).
 
 ### 1. Inundação (flood fill)
 
@@ -94,10 +93,12 @@ raiz do projeto:
 uv run python -m cavegen.datastream.run_reference_voxelization --ply data/raw/elaphes/elaphes_cave.ply --output sdf_temp/entrada/elaphes_surface_64.npz --shape 64 64 64
 ```
 
+A voxelização devolve o outlier: zere o índice (60, 31, 13) da grade
+`surface_voxels` (o (13, 60, 31) do plot) antes de seguir.
+
 Depois, as etapas na ordem:
 
 ```
-uv run python sdf_temp/remover_outlier.py
 uv run python sdf_temp/inundacao.py
 uv run python sdf_temp/sdf.py
 ```
