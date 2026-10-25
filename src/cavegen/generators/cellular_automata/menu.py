@@ -41,8 +41,8 @@ SEGUNDOS_POR_CELULA = 11.5e-6
 
 BORDAS = list(BorderTreatment)
 EXPLICACAO_BORDAS = {
-    BorderTreatment.ZEROS: "fora da matriz conta como vazio, a caverna fecha nas paredes",
-    BorderTreatment.ONES: "fora da matriz conta como cheio, a caverna abre nas paredes",
+    BorderTreatment.ZEROS: "fora da matriz conta como rocha (0), a caverna fecha nas paredes",
+    BorderTreatment.ONES: "fora da matriz conta como vazio (1), a caverna abre nas paredes",
     BorderTreatment.RANDOM: "fora da matriz sorteia 0 ou 1 a cada consulta, paredes irregulares",
 }
 
@@ -212,8 +212,8 @@ def criar_seed():
 
     explicar(
         "Probabilidade de 1",
-        ("Chance de cada celula nascer viva (rocha).",
-        "Perto de 0.5 o ruido sai equilibrado; mais baixo nasce mais vazio."),
+        ("Chance de cada celula nascer viva (vazio).",
+        "Perto de 0.5 o ruido sai equilibrado; mais baixo nasce mais rocha."),
         faixa="0.0 a 1.0", tipico="0.45 a 0.50",
     )
     probabilidade = perguntar("probabilidade", PROBABILIDADE_PADRAO, float, minimo=0.0, maximo=1.0)
@@ -239,8 +239,8 @@ def rodar_ca():
         "Sensibilidade",
         ("Minimo de vizinhos vivos, no cubo 3x3x3 em volta (a propria celula conta),",
         "para a celula virar 1 no passo seguinte.",
-        "MENOR deixa mais celulas vivas: abaixo de 10 o volume vira um bloco solido.",
-        "MAIOR mata mais celulas: acima de 18 nao sobra quase nada.",
+        "MENOR deixa mais celulas vivas: abaixo de 10 quase tudo vira vazio.",
+        "MAIOR mata mais celulas: acima de 18 quase tudo vira rocha.",
         "Com probabilidade 0.5 a media de vizinhos vivos e ~13.5, entao 14 e o equilibrio."),
         faixa=f"0 a {MAX_VIZINHOS}", tipico="13 a 15",
     )
@@ -282,9 +282,9 @@ def resumir_resultado(destino):
     print(f"  celulas vivas: {vivas}/{total} ({100 * vivas / total:.1f}%)")
 
     if vivas == total:
-        print("  volume 100% cheio: a sensibilidade esta baixa demais, tente um valor maior.")
+        print("  volume 100% vazio (tudo 1): a sensibilidade esta baixa demais, tente um valor maior.")
     elif vivas == 0:
-        print("  volume 100% vazio: a sensibilidade esta alta demais, tente um valor menor.")
+        print("  volume 100% rocha (tudo 0): a sensibilidade esta alta demais, tente um valor menor.")
 
 def plotar():
     """
