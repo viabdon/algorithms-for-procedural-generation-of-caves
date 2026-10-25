@@ -3,6 +3,7 @@ from pathlib import Path
 import numpy as np
 
 from cavegen.generators.cellular_automata.generator import BorderTreatment, cellular_automata
+from cavegen.generators.cellular_automata.pesos import load_peso_matrix
 from cavegen.generators.cellular_automata.seeds import load_seed_matrix
 from cavegen.generators.cellular_automata.storage import build_path, next_id, storage_dir, used_ids
 from cavegen.profiling.resource_tracker import track_resources
@@ -19,8 +20,10 @@ def config_do_run(argumentos: dict) -> str:
         argumentos: argumentos da chamada de run_and_save, por nome.
     """
     borda = BorderTreatment(argumentos["border_treatment"]).value
+    peso_id = argumentos.get("peso_id")
+    peso = f" peso{peso_id:03d}" if peso_id is not None else ""
     return (f"seed{argumentos['seed_id']:03d} s{argumentos['sensitivity']} "
-            f"{borda} it{argumentos['iterations']}")
+            f"{borda} it{argumentos['iterations']}{peso}")
 
 def used_result_ids(directory: Path = RESULTS_DIR) -> set:
     """
@@ -46,7 +49,8 @@ def result_path(result_id: int, directory: Path = RESULTS_DIR) -> Path:
 
 @track_resources(label=config_do_run)
 def run_and_save(seed_id: int, sensitivity: int, border_treatment: BorderTreatment,
-                iterations: int, directory: Path = RESULTS_DIR, progress=None) -> Path:
+                iterations: int, directory: Path = RESULTS_DIR, progress=None,
+                peso_id: int | None = None) -> Path:
     """
         Roda o CA sobre uma seed gravada e guarda o volume final em um npz novo.
         seed_id: número da seed usada como matriz inicial.
@@ -55,13 +59,19 @@ def run_and_save(seed_id: int, sensitivity: int, border_treatment: BorderTreatme
         iterations: quantas vezes o passo é repetido.
         directory: pasta onde os resultados são gravados.
         progress: função opcional chamada ao fim de cada passo com (passo, iterations).
+        peso_id: número do peso somado à contagem de vizinhos; None roda o CA básico.
     """
     border_treatment = BorderTreatment(border_treatment)
     directory = Path(directory)
     directory.mkdir(parents=True, exist_ok=True)
 
     inicial = load_seed_matrix(seed_id)
-    final, historico = cellular_automata(inicial, sensitivity, border_treatment, iterations, progress)
+    peso = load_peso_matrix(peso_id) if peso_id is not None else None
+    final, historico = cellular_automata(inicial, sensitivity, border_treatment, iterations,
+                                         progress, peso)
+
+    # Resultados do CA básico não levam peso_id, como as seeds sorteadas não levam origem.
+    extras = {"peso_id": peso_id} if peso_id is not None else {}
 
     result_id = next_result_id(directory)
     np.savez_compressed(
@@ -74,6 +84,7 @@ def run_and_save(seed_id: int, sensitivity: int, border_treatment: BorderTreatme
         sensitivity=sensitivity,
         border_treatment=border_treatment.value,
         iterations=iterations,
+        **extras,
     )
 
     return result_path(result_id, directory)
@@ -85,7 +96,7 @@ def load_result_info(result_id: int, directory: Path = RESULTS_DIR) -> dict:
         directory: pasta onde os resultados são gravados.
     """
     with np.load(result_path(result_id, directory)) as arquivo:
-        return {
+        info = {
             "result_id": int(arquivo["result_id"]),
             "seed_id": int(arquivo["seed_id"]),
             "size": int(arquivo["size"]),
@@ -93,6 +104,12 @@ def load_result_info(result_id: int, directory: Path = RESULTS_DIR) -> dict:
             "border_treatment": str(arquivo["border_treatment"]),
             "iterations": int(arquivo["iterations"]),
         }
+
+        # Só resultados rodados com peso trazem o peso_id.
+        if "peso_id" in arquivo.files:
+            info["peso_id"] = int(arquivo["peso_id"])
+
+        return info
 
 def load_result(result_id: int, directory: Path = RESULTS_DIR) -> dict:
     """

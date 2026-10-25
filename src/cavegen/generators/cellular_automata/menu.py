@@ -14,6 +14,7 @@ from cavegen.generators.cellular_automata.modifiers import (
     add_center_column,
     celulas_da_coluna,
 )
+from cavegen.generators.cellular_automata.pesos import load_peso_info, used_peso_ids
 from cavegen.generators.cellular_automata.plot import figura_ja_existe, plotar_resultado
 from cavegen.generators.cellular_automata.results import (
     load_result,
@@ -136,12 +137,46 @@ def escolher_resultado():
     print("\n  Resultados gravados:")
     for numero in sorted(disponiveis):
         info = load_result_info(numero)
+        peso = f"  peso {info['peso_id']:03d}" if "peso_id" in info else ""
         print(f"    {numero:03d}  {info['size']}^3  seed {info['seed_id']:03d}  "
-            f"s={info['sensitivity']}  b={info['border_treatment']}  it={info['iterations']}")
+            f"s={info['sensitivity']}  b={info['border_treatment']}  it={info['iterations']}{peso}")
 
     while True:
         escolha = perguntar("resultado", max(disponiveis), int)
         if escolha in disponiveis:
+            return escolha
+
+        print("    numero fora da lista acima.")
+
+def escolher_peso(lado: int):
+    """
+        Lista os pesos do mesmo tamanho da seed e devolve o escolhido, ou None
+        para rodar o CA básico. O peso é somado posição por posição, então só
+        serve um peso com o formato da seed.
+        lado: lado do cubo da seed escolhida.
+    """
+    compativeis = {numero for numero in used_peso_ids()
+                   if load_peso_info(numero)["shape"] == (lado, lado, lado)}
+    if not compativeis:
+        print(f"\n  nenhum peso {lado}^3 gravado, rodando o CA basico (sem peso).")
+        return None
+
+    explicar(
+        "Peso (SDF)",
+        ("Matriz somada a contagem de vizinhos de cada celula antes da sensibilidade.",
+        "Negativo tira vizinhos (fora da caverna o vazio custa a nascer),",
+        "positivo da vizinhos (dentro da caverna o vazio nasce mais facil).",
+        "0 roda o CA basico, sem peso."),
+    )
+    for numero in sorted(compativeis):
+        info = load_peso_info(numero)
+        print(f"    {numero:03d}  {lado}^3  <- {info['origem']}")
+
+    while True:
+        escolha = perguntar("peso", 0, int)
+        if escolha == 0:
+            return None
+        if escolha in compativeis:
             return escolha
 
         print("    numero fora da lista acima.")
@@ -198,6 +233,7 @@ def rodar_ca():
         return
 
     lado = load_seed_info(seed_id)["size"]
+    peso_id = escolher_peso(lado)
 
     explicar(
         "Sensibilidade",
@@ -229,7 +265,8 @@ def rodar_ca():
     def mostrar_passo(passo, total):
         print(f"    passo {passo}/{total} concluido")
 
-    destino = run_and_save(seed_id, sensibilidade, borda, iteracoes, progress=mostrar_passo)
+    destino = run_and_save(seed_id, sensibilidade, borda, iteracoes, progress=mostrar_passo,
+                           peso_id=peso_id)
     resumir_resultado(destino)
 
 def resumir_resultado(destino):
