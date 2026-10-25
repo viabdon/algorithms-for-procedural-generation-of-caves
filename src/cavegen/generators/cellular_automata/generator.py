@@ -21,7 +21,7 @@ class BorderTreatment(Enum):
     ONES = "ones"
     RANDOM = "random"
 
-def cellular_automata(matrix: np.ndarray, sensitivity: int, border_treatment: BorderTreatment, iterations: int, progress=None) -> tuple[np.ndarray, np.ndarray]:
+def cellular_automata(matrix: np.ndarray, sensitivity: int, border_treatment: BorderTreatment, iterations: int, progress=None, peso=None) -> tuple[np.ndarray, np.ndarray]:
     """
         Aplica o autômato celular sobre a matriz, repetindo o passo N vezes.
         Devolve a matriz final e a quantidade de células vivas em cada passo,
@@ -31,28 +31,47 @@ def cellular_automata(matrix: np.ndarray, sensitivity: int, border_treatment: Bo
         border_treatment: membro de BorderTreatment, ou a string equivalente.
         iterations: quantas vezes o passo é repetido.
         progress: função opcional chamada ao fim de cada passo com (passo, iterations).
+        peso: matriz opcional do mesmo formato, somada à contagem de vizinhos em
+              todo passo (ver aplicar_peso). Sem peso, é o autômato básico.
     """
     border_treatment = BorderTreatment(border_treatment)
     historico = [int(matrix.sum())]
 
     for i in range(iterations):
-        matrix = iterate(matrix, sensitivity, border_treatment)
+        matrix = iterate(matrix, sensitivity, border_treatment, peso)
         historico.append(int(matrix.sum()))
         if progress is not None:
             progress(i + 1, iterations)
 
     return matrix, np.array(historico, dtype=np.int64)
 
-def iterate(matrix: np.ndarray, sensitivity: int, border_treatment: BorderTreatment) -> np.ndarray:
+def iterate(matrix: np.ndarray, sensitivity: int, border_treatment: BorderTreatment, peso=None) -> np.ndarray:
     """
         Executa um único passo do autômato, gerando a matriz seguinte.
         matrix: matriz binária do passo anterior.
         sensitivity: mínimo de vizinhos para a célula virar 1.
         border_treatment: membro de BorderTreatment, ou a string equivalente.
+        peso: matriz opcional somada à contagem de vizinhos (ver aplicar_peso).
     """
     vizinhos = neighbor_counts(matrix, border_treatment)
+    if peso is not None:
+        vizinhos = aplicar_peso(vizinhos, peso)
 
     return (vizinhos >= sensitivity).astype(int)
+
+def aplicar_peso(vizinhos: np.ndarray, peso: np.ndarray) -> np.ndarray:
+    """
+        Soma o peso de cada célula à contagem de vizinhos dela, posição por posição,
+        antes da comparação com a sensibilidade. Peso negativo tira vizinhos: a
+        célula precisa de mais vizinhos vivos para virar 1, e longe o bastante
+        nem os 27 alcançam. Peso positivo dá vizinhos à célula.
+        vizinhos: contagem de vizinhos de cada célula, de neighbor_counts.
+        peso: matriz do mesmo formato, como o SDF (interno +, externo -).
+    """
+    if peso.shape != vizinhos.shape:
+        raise ValueError(f"O peso tem formato {peso.shape}, mas a matriz tem {vizinhos.shape}.")
+
+    return vizinhos + peso
 
 def neighbor_counts(matrix: np.ndarray, border_treatment: BorderTreatment) -> np.ndarray:
     """
