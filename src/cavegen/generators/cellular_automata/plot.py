@@ -269,10 +269,14 @@ def figura_volumetrica(x, y, z, valores, titulo, minimos=None, maximos=None,
 def dados_da_matriz(matrix):
     """
         Converte a matriz binária nas coordenadas das células vivas.
+        A matriz é (depth, height, width), então a altura vai para o z do plot:
+        x é a largura, y é a profundidade e z é a altura, a mesma troca dos plots
+        do Elaphes e do SDF. Sem isso um CA guiado pelo SDF sai girado em relação
+        à caverna que o guiou.
         matrix: matriz binária de um resultado do CA.
     """
     vivas = np.argwhere(matrix)
-    return vivas[:, 0], vivas[:, 1], vivas[:, 2]
+    return vivas[:, 2], vivas[:, 0], vivas[:, 1]
 
 def titulo_do_resultado(dados, celulas_vivas):
     """
@@ -280,9 +284,10 @@ def titulo_do_resultado(dados, celulas_vivas):
         dados: dicionário devolvido por load_result.
         celulas_vivas: quantidade de células vivas no volume.
     """
+    peso = f" peso {dados['peso_id']:03d}" if "peso_id" in dados else ""
     return (f"CA {dados['size']}^3 - seed {dados['seed_id']:03d} "
             f"s={dados['sensitivity']} b={dados['border_treatment']} "
-            f"it={dados['iterations']} - {celulas_vivas} celulas vivas")
+            f"it={dados['iterations']}{peso} - {celulas_vivas} celulas vivas")
 
 def caminho_da_figura(result_id, directory=PASTA_FIGURAS):
     """
