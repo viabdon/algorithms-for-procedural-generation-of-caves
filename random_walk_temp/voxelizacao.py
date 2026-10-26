@@ -11,9 +11,13 @@
     da Unity. A caverna inteira é encaixada na grade com a mesma escala nos
     três eixos e centralizada, com MARGEM voxels de folga em volta.
 
-    Raio: o radius da cena convertido pela escala. Se ele ficar menor que
-    RAIO_MINIMO, vale o mínimo: com raio de meia diagonal do voxel (√3/2), todo
-    ponto do caminho tem um centro de voxel ao alcance e o caminho não se parte.
+    Raio: RAIO_PADRAO voxels, escolhido para o 64³. Encaixando a caverna
+    inteira no cubo, o radius da cena (7) vira 0,2 a 0,3 voxel e o túnel some
+    abaixo do tamanho do voxel; com 1,5 a caverna fica com a ordem de grandeza
+    de vazios do Elaphes e com um pouco de interno para o SDF positivo.
+    Com "proporcional" no lugar do raio, vale o radius convertido pela escala,
+    com o mínimo de meia diagonal do voxel (√3/2): com ele todo ponto do
+    caminho tem um centro de voxel ao alcance e o caminho não se parte.
 
     Classificação, nos mesmos códigos da inundação do sdf_temp, para o SDF
     seguir igual:
@@ -22,7 +26,7 @@
     2: interno, vazio que não encosta em rocha.
     Fora da grade conta como rocha.
 
-    uv run python random_walk_temp/voxelizacao.py [seed] [lado] [raio_em_voxels]
+    uv run python random_walk_temp/voxelizacao.py [seed] [lado] [raio_em_voxels|proporcional]
 """
 import sys
 from itertools import pairwise
@@ -41,6 +45,7 @@ INTERNO = 2
 
 LADO_PADRAO = 64
 MARGEM = 2
+RAIO_PADRAO = 1.5
 RAIO_MINIMO = np.sqrt(3) / 2
 
 # Cruz 3D: borda é o vazio com algum vizinho de face fora da caverna.
@@ -140,7 +145,9 @@ def caminho_classificacao(caminhos: Path, lado: int) -> Path:
 def main():
     seed = int(sys.argv[1]) if len(sys.argv) > 1 else SEED_PADRAO
     lado = int(sys.argv[2]) if len(sys.argv) > 2 else LADO_PADRAO
-    raio_forcado = float(sys.argv[3]) if len(sys.argv) > 3 else None
+    raio_pedido = sys.argv[3] if len(sys.argv) > 3 else str(RAIO_PADRAO)
+    # None faz voxelizar() usar o radius da cena convertido pela escala.
+    raio_forcado = None if raio_pedido == "proporcional" else float(raio_pedido)
 
     for caminhos in sorted(PASTA_NPZ.glob(f"*_seed{seed:03d}_caminhos.npz")):
         dados = np.load(caminhos)

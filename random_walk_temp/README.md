@@ -84,14 +84,17 @@ A classificação usa os códigos da inundação (0 fora, 1 borda, 2 interno), m
 não precisa de flood fill: o tubo já é o vazio da caverna, então borda é o
 vazio que encosta em rocha e interno é o resto.
 
-**Escala (ponto em aberto).** As cavernas reais têm até ~1.900 unidades e o
-tubo tem raio 7. No cubo 64³, o raio proporcional fica entre 0,2 e 0,3 voxel,
-abaixo do tamanho do voxel. Por padrão vale o mínimo de √3/2 ≈ 0,87 voxel
-(o menor raio que não parte o caminho), o que dá um túnel de 1 voxel de
-largura, quase sem interno. Medido com a seed 1 (todas as opções deixam a
-caverna num pedaço só):
+**Escala: 64³ com raio 1,5 voxel.** As cavernas reais têm até ~1.900
+unidades e o tubo tem raio 7. No cubo 64³, o raio proporcional fica entre
+0,2 e 0,3 voxel, abaixo do tamanho do voxel; com o mínimo que não parte o
+caminho (√3/2 ≈ 0,87) o túnel tem 1 voxel de largura e quase nenhum interno.
+O raio padrão ficou em 1,5 voxel: mesmo tamanho de grade das seeds e do
+Elaphes, ordem de grandeza de vazios do Elaphes e um pouco de interno para o
+SDF positivo. O custo é o túnel ficar ~5x mais grosso, em proporção, que o
+do original. Medido com a seed 1 (todas as opções deixam a caverna num
+pedaço só; cada célula é vazios, interno):
 
-| caverna | 64³, r 0,87 (padrão) | 64³, r 1,5 | 64³, r 2 | 128³, r 2 |
+| caverna | 64³, r 0,87 | 64³, r 1,5 (padrão) | 64³, r 2 | 128³, r 2 |
 |---|---|---|---|---|
 | Knotlow Cavern | 245 vazios, 1 interno | 857, 172 | 1.400, 455 | 3.166, 1.030 |
 | Odins Mine | 463, 1 | 1.268, 248 | 2.192, 781 | 4.948, 1.685 |
@@ -101,8 +104,8 @@ Para comparar: o Elaphes em 64³ tem 1.075 voxels de casca (783 borda, 292
 interno). Para o túnel ter a proporção do original sem forçar o raio, a grade
 precisaria de ~256³ (raio proporcional 0,9 a 1,4).
 
-O raio pode ser forçado pelo terceiro argumento:
-`uv run python random_walk_temp/voxelizacao.py 1 64 1.5`.
+O raio muda pelo terceiro argumento, em voxels ou `proporcional`:
+`uv run python random_walk_temp/voxelizacao.py 1 64 2`.
 
 ### 4. SDF (`sdf_caminhada.py`)
 
@@ -119,6 +122,28 @@ O npz sai no formato que o `pesos.py` do CA importa:
 ```
 uv run python -m cavegen.generators.cellular_automata.pesos random_walk_temp/npz/knotlow_cavern_seed001_64_sdf.npz
 ```
+
+Assim entrou o **peso 002**: Knotlow Cavern, seed 1, 64³, raio 1,5 (857
+vazios, 172 internos, SDF de −48,76 a +1,41).
+
+### 5. Teste rápido do CA com o peso 002
+
+Mesma configuração do Dia 8 com o Elaphes (seed 1 do CA, borda zeros, 3
+iterações), rodado em memória, sem gravar resultado. IoU contra os 857
+vazios da Knotlow:
+
+| s | vazios | IoU | cobre da Knotlow | vazios fora dela |
+|---|---|---|---|---|
+| 9 | 10.301 | 0,08 | 100% | 9.444 |
+| 11 | 4.391 | 0,19 | 99% | 3.546 |
+| 12 | 2.409 | 0,31 | 90% | 1.637 |
+| 13 | 1.072 | 0,41 | 66% | 509 |
+| 14 | 292 | 0,24 | 26% | 66 |
+| 15 | 22 | 0,03 | 3% | 0 |
+
+O peso guia o CA do mesmo jeito que o do Elaphes: a sensibilidade controla a
+espessura em volta do guia, e o melhor IoU também cai em s = 13 (0,41, contra
+0,49 com o Elaphes).
 
 ## Como regenerar
 
