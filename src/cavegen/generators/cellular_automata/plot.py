@@ -1,13 +1,17 @@
 """Visualizacao volumetrica 3D no estilo radar/sonar/GPR.
 
 Le um volume ja processado pelo CA (pasta results/) e monta a figura interativa
-do plotly: fundo preto, colormap jet, caixa wireframe (arestas de tras
-pontilhadas) e um gizmo de eixos no canto.
+do plotly: fundo preto, caixa wireframe (arestas de tras pontilhadas) e um
+gizmo de eixos no canto.
+
+A cor vem da altura da celula ou da quantidade de vizinhos vivos dela, em uma
+das PALETAS. Por vizinhos, a opacidade tambem acompanha a contagem: a celula
+com menos vizinhos fica meio transparente e a mais cercada, opaca.
 
 O HTML vai para plots/, ao lado do codigo, e o caminho e impresso para copiar
 no navegador. A pasta results/ guarda apenas os npz.
 
-    uv run python -m cavegen.generators.cellular_automata.plot 1
+    uv run python -m cavegen.generators.cellular_automata.plot 1 [altura|vizinhos] [paleta]
 """
 
 import sys
@@ -18,6 +22,7 @@ import numpy as np
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
+from cavegen.generators.cellular_automata.generator import neighbor_counts
 from cavegen.generators.cellular_automata.results import RESULTS_DIR, load_result
 from cavegen.generators.cellular_automata.storage import storage_dir
 
@@ -33,6 +38,18 @@ CORES_GIZMO = {"X": "#00e676", "Y": "#2196f3", "Z": "#b388ff"}  # verde, azul, r
 
 # Faixa da altura da figura (0 = base, 1 = topo) ocupada pelo grafico de linha.
 FAIXA_VERTICAL_HISTORICO = (0.2, 0.8)
+
+MODOS_COR = ("altura", "vizinhos")
+
+# A Jet e a paleta de sempre; as outras vao do claro ao escuro, entao a celula
+# com menos vizinhos (ou mais baixa) fica mais clara.
+PALETAS = ("Jet", "Mint", "Purp", "Teal", "Sunsetdark", "Emrld", "Burg")
+
+# A celula viva entra na propria contagem, entao ela tem de 1 a 27 vizinhos.
+MIN_VIZINHOS, MAX_VIZINHOS = 1, 27
+
+# Opacidade da celula com menos vizinhos; a mais cercada fica opaca (1.0).
+OPACIDADE_MINIMA = 0.5
 
 
 def camera_isometrica(elevacao=ELEVACAO, azimute=AZIMUTE, raio=RAIO):
@@ -181,18 +198,50 @@ def adicionar_historico(figura, historico, total_celulas):
     )
 
 
+def trace_da_nuvem(x, y, z, valores, tamanho, paleta, limites_cor, opacidade,
+                   rotulo_escala, com_escala):
+    """
+        Um Scatter3d da nuvem com uma única opacidade (o plotly só aceita uma por trace).
+        com_escala: desenha a barra de cores (só um dos traces precisa).
+    """
+    cor_minima, cor_maxima = limites_cor
+    return go.Scatter3d(
+        x=x, y=y, z=z,
+        mode="markers",
+        marker=dict(
+            size=tamanho,
+            color=valores,
+            colorscale=paleta,
+            cmin=cor_minima,
+            cmax=cor_maxima,
+            opacity=opacidade,
+            showscale=com_escala,
+            colorbar=dict(
+                title=dict(text=rotulo_escala, font=dict(color="white", size=12)),
+                x=-0.06, xanchor="left", len=0.75, thickness=14,
+                bgcolor="black", outlinecolor="white", outlinewidth=1,
+                tickfont=dict(color="white", size=11),
+            ) if com_escala else None,
+        ),
+        hovertemplate="(%{x}, %{y}, %{z})<br>" + rotulo_escala + "=%{marker.color}<extra></extra>",
+        showlegend=False,
+    )
+
+
 def figura_volumetrica(x, y, z, valores, titulo, minimos=None, maximos=None,
                     rotulo_escala="intensidade", limites_cor=None,
-                    historico=None, total_celulas=None):
+                    historico=None, total_celulas=None, paleta="Jet", opacidades=None):
     """
         Nuvem 3D; com historico, ganha ao lado a linha de células vivas por iteração.
         historico: células vivas em cada passo, do 0 (seed) ao último.
         total_celulas: tamanho do volume, para mostrar a porcentagem no hover.
+        paleta: nome de uma escala de cor do plotly, como as de PALETAS.
+        opacidades: opacidade de cada ponto; sem ela, a nuvem toda fica com 0.7.
     """
     x, y, z, valores = (np.asarray(v) for v in (x, y, z, valores))
     # Sem limites explicitos o plotly normaliza pelo min/max dos proprios dados,
     # o que muda a leitura da cor de um resultado para outro.
-    cor_minima, cor_maxima = limites_cor if limites_cor is not None else (None, None)
+    limites_cor = limites_cor if limites_cor is not None else (None, None)
     minimos = np.asarray(minimos if minimos is not None
                         else [x.min() - 0.5, y.min() - 0.5, z.min() - 0.5], float)
     maximos = np.asarray(maximos if maximos is not None
@@ -215,30 +264,25 @@ def figura_volumetrica(x, y, z, valores, titulo, minimos=None, maximos=None,
         figura = go.Figure()
         celula_3d = {}
 
-    figura.add_trace(
-        go.Scatter3d(
-            x=x, y=y, z=z,
-            mode="markers",
-            marker=dict(
-                size=tamanho,
-                color=valores,
-                colorscale="Jet",
-                cmin=cor_minima,
-                cmax=cor_maxima,
-                opacity=0.7,
-                showscale=True,
-                colorbar=dict(
-                    title=dict(text=rotulo_escala, font=dict(color="white", size=12)),
-                    x=-0.06, xanchor="left", len=0.75, thickness=14,
-                    bgcolor="black", outlinecolor="white", outlinewidth=1,
-                    tickfont=dict(color="white", size=11),
-                ),
-            ),
-            hovertemplate="(%{x}, %{y}, %{z})<br>" + rotulo_escala + "=%{marker.color}<extra></extra>",
-            showlegend=False,
-        ),
-        **celula_3d,
-    )
+    if opacidades is None:
+        figura.add_trace(
+            trace_da_nuvem(x, y, z, valores, tamanho, paleta, limites_cor, 0.7,
+                           rotulo_escala, com_escala=True),
+            **celula_3d,
+        )
+    else:
+        # Um trace por opacidade, do mais transparente ao opaco: o opaco é
+        # desenhado por último e não fica escondido atrás do translúcido.
+        opacidades = np.asarray(opacidades)
+        niveis = np.unique(opacidades)
+        for nivel in niveis:
+            dentro = opacidades == nivel
+            figura.add_trace(
+                trace_da_nuvem(x[dentro], y[dentro], z[dentro], valores[dentro], tamanho,
+                               paleta, limites_cor, float(nivel), rotulo_escala,
+                               com_escala=bool(nivel == niveis[-1])),
+                **celula_3d,
+            )
 
     for trace in caixa_wireframe(minimos, maximos, olho) + gizmo_eixos(minimos, maximos):
         figura.add_trace(trace, **celula_3d)
@@ -289,25 +333,53 @@ def titulo_do_resultado(dados, celulas_vivas):
             f"s={dados['sensitivity']} b={dados['border_treatment']} "
             f"it={dados['iterations']}{peso} - {celulas_vivas} celulas vivas")
 
-def caminho_da_figura(result_id, directory=PASTA_FIGURAS):
+def vizinhos_das_vivas(matrix, border_treatment):
     """
-        Caminho do HTML da figura, na pasta plots/ do pacote.
+        Contagem de vizinhos vivos de cada célula viva, na mesma ordem de
+        dados_da_matriz. É a mesma contagem do passo do CA (cubo 3x3x3 com a
+        própria célula), então vai de MIN_VIZINHOS a MAX_VIZINHOS.
+        matrix: matriz binária de um resultado do CA.
+        border_treatment: a borda que o CA usou, para a contagem na beira bater com a dele.
+    """
+    vivas = np.asarray(matrix, dtype=bool)
+    # A máscara booleana percorre a matriz na mesma ordem do argwhere.
+    return neighbor_counts(vivas.astype(np.int16), border_treatment)[vivas]
+
+def opacidade_por_vizinhos(vizinhos):
+    """
+        Rampa linear: MIN_VIZINHOS fica com OPACIDADE_MINIMA e MAX_VIZINHOS, opaco.
+        Os limites são fixos, então a mesma contagem tem a mesma opacidade em
+        qualquer resultado.
+        vizinhos: contagem de vizinhos de cada célula viva.
+    """
+    fracao = (np.asarray(vizinhos) - MIN_VIZINHOS) / (MAX_VIZINHOS - MIN_VIZINHOS)
+    return OPACIDADE_MINIMA + (1 - OPACIDADE_MINIMA) * fracao
+
+def caminho_da_figura(result_id, modo="altura", paleta="Jet", directory=PASTA_FIGURAS):
+    """
+        Caminho do HTML da figura, na pasta plots/ do pacote. O modo e a paleta
+        entram no nome, então cada combinação tem o seu arquivo.
         result_id: número de identificação do resultado.
+        modo: um dos MODOS_COR.
+        paleta: uma das PALETAS.
         directory: pasta onde os HTML são gravados.
     """
     directory = Path(directory)
     directory.mkdir(parents=True, exist_ok=True)
-    return directory / f"result_{result_id:03d}.html"
+    return directory / f"result_{result_id:03d}_{modo}_{paleta.lower()}.html"
 
-def figura_ja_existe(result_id, directory=PASTA_FIGURAS) -> bool:
+def figura_ja_existe(result_id, modo="altura", paleta="Jet", directory=PASTA_FIGURAS) -> bool:
     """
-        Diz se a figura desse resultado já está gravada em plots/.
+        Diz se a figura desse resultado, nesse modo e paleta, já está gravada em plots/.
         result_id: número de identificação do resultado.
+        modo: um dos MODOS_COR.
+        paleta: uma das PALETAS.
         directory: pasta onde os HTML são gravados.
     """
-    return caminho_da_figura(result_id, directory).exists()
+    return caminho_da_figura(result_id, modo, paleta, directory).exists()
 
-def plotar_resultado(result_id, directory=RESULTS_DIR, mostrar=False, refazer=False):
+def plotar_resultado(result_id, directory=RESULTS_DIR, mostrar=False, refazer=False,
+                     modo="altura", paleta="Jet"):
     """
         Grava o HTML da figura e devolve o caminho do arquivo.
         Se a figura já existir, devolve o caminho sem remontar.
@@ -315,8 +387,14 @@ def plotar_resultado(result_id, directory=RESULTS_DIR, mostrar=False, refazer=Fa
         directory: pasta onde os resultados são gravados.
         mostrar: abre a figura no navegador além de gravar o HTML.
         refazer: remonta a figura mesmo que o HTML já exista.
+        modo: "altura" colore pela altura; "vizinhos" colore pela contagem de
+              vizinhos vivos e deixa mais transparente quem tem menos.
+        paleta: uma das PALETAS.
     """
-    destino = caminho_da_figura(result_id)
+    if modo not in MODOS_COR:
+        raise ValueError(f"modo precisa ser um de {MODOS_COR}, recebeu {modo!r}.")
+
+    destino = caminho_da_figura(result_id, modo, paleta)
     if destino.exists() and not refazer and not mostrar:
         return destino
 
@@ -328,18 +406,26 @@ def plotar_resultado(result_id, directory=RESULTS_DIR, mostrar=False, refazer=Fa
     # escala comparavel entre resultados e sobrevive a um volume sem nenhuma viva.
     lado = dados["size"]
 
-    # A celula viva nao tem intensidade: o volume e binario. Colorir pela altura
-    # e o que da leitura de profundidade a nuvem, no lugar de um bloco de uma cor
-    # so. Os limites sao o volume inteiro, entao a mesma cor significa a mesma
-    # altura em qualquer resultado.
+    # A celula viva nao tem intensidade: o volume e binario. A cor vem da altura
+    # ou dos vizinhos, com limites fixos (o volume inteiro, ou 1 a 27), entao a
+    # mesma cor significa o mesmo valor em qualquer resultado.
+    if modo == "altura":
+        valores, rotulo, limites, opacidades = z, "altura (z)", (0, lado - 1), None
+    else:
+        valores = vizinhos_das_vivas(dados["matrix"], dados["border_treatment"])
+        rotulo, limites = "vizinhos", (MIN_VIZINHOS, MAX_VIZINHOS)
+        opacidades = opacidade_por_vizinhos(valores)
+
     figura = figura_volumetrica(
-        x, y, z, z, titulo,
+        x, y, z, valores, titulo,
         minimos=[-0.5, -0.5, -0.5],
         maximos=[lado - 0.5, lado - 0.5, lado - 0.5],
-        rotulo_escala="altura (z)",
-        limites_cor=(0, lado - 1),
+        rotulo_escala=rotulo,
+        limites_cor=limites,
         historico=dados["live_cells_history"],
         total_celulas=lado ** 3,
+        paleta=paleta,
+        opacidades=opacidades,
     )
 
     figura.write_html(destino, include_plotlyjs="cdn")
@@ -352,9 +438,11 @@ def plotar_resultado(result_id, directory=RESULTS_DIR, mostrar=False, refazer=Fa
 def main(argumentos=None):
     argumentos = argumentos if argumentos is not None else sys.argv[1:]
     if not argumentos:
-        raise SystemExit("informe o numero do resultado, ex: ... plot 1")
+        raise SystemExit("informe o numero do resultado, ex: ... plot 1 vizinhos Mint")
 
-    destino = plotar_resultado(int(argumentos[0]), refazer=True)
+    modo = argumentos[1] if len(argumentos) > 1 else "altura"
+    paleta = argumentos[2] if len(argumentos) > 2 else "Jet"
+    destino = plotar_resultado(int(argumentos[0]), refazer=True, modo=modo, paleta=paleta)
     print("figura salva em:", destino)
 
 if __name__ == "__main__":

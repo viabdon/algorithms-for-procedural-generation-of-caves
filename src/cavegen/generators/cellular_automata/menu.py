@@ -10,7 +10,13 @@ aceita o valor X.
 
 from cavegen.generators.cellular_automata.generator import BorderTreatment
 from cavegen.generators.cellular_automata.pesos import load_peso_info, used_peso_ids
-from cavegen.generators.cellular_automata.plot import figura_ja_existe, plotar_resultado
+from cavegen.generators.cellular_automata.plot import (
+    MODOS_COR,
+    OPACIDADE_MINIMA,
+    PALETAS,
+    figura_ja_existe,
+    plotar_resultado,
+)
 from cavegen.generators.cellular_automata.results import (
     load_result,
     load_result_info,
@@ -173,6 +179,38 @@ def escolher_peso(lado: int):
 
         print("    numero fora da lista acima.")
 
+EXPLICACAO_MODOS = {
+    "altura": "cor pela altura da celula, como sempre foi",
+    "vizinhos": (f"cor pelos vizinhos vivos (1 a 27); quem tem menos fica "
+                 f"{100 * (1 - OPACIDADE_MINIMA):.0f}% transparente, quem tem mais, opaco"),
+}
+
+def escolher_modo_cor() -> str:
+    """
+        Explica cada forma de colorir a nuvem e devolve a escolhida.
+    """
+    explicar("Cor da nuvem", ("Define o que a cor de cada celula viva mostra.",))
+    for numero, modo in enumerate(MODOS_COR, start=1):
+        print(f"    {numero}) {modo:8s} - {EXPLICACAO_MODOS[modo]}")
+
+    escolha = perguntar("cor", 1, int, minimo=1, maximo=len(MODOS_COR))
+    return MODOS_COR[escolha - 1]
+
+def escolher_paleta() -> str:
+    """
+        Lista as paletas disponíveis e devolve a escolhida.
+    """
+    explicar(
+        "Paleta",
+        ("Jet e a de sempre, do azul ao vermelho.",
+        "As outras vao do claro (pouco) ao escuro (muito)."),
+    )
+    for numero, paleta in enumerate(PALETAS, start=1):
+        print(f"    {numero}) {paleta}")
+
+    escolha = perguntar("paleta", 1, int, minimo=1, maximo=len(PALETAS))
+    return PALETAS[escolha - 1]
+
 def escolher_borda() -> BorderTreatment:
     """
         Explica cada tratamento de borda e devolve o membro de BorderTreatment escolhido.
@@ -289,12 +327,15 @@ def plotar():
         print("  Nenhum resultado gravado ainda. Use a opcao 2 primeiro.")
         return
 
-    if figura_ja_existe(result_id):
+    modo = escolher_modo_cor()
+    paleta = escolher_paleta()
+
+    if figura_ja_existe(result_id, modo, paleta):
         print("\n  esta figura ja estava plotada, reaproveitando o arquivo.")
     else:
         print("\n  montando a figura...")
 
-    destino = plotar_resultado(result_id)
+    destino = plotar_resultado(result_id, modo=modo, paleta=paleta)
     print("  copie este caminho no navegador:")
     print(f"    {destino}")
 
