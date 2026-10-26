@@ -30,6 +30,11 @@ __pycache__/
 /sdf_temp/npz/
 /sdf_temp/plots/
 
+# Projeto base do Random Walk (Unity, de outro TCC) e o que sai dele
+/external/
+/random_walk_temp/npz/
+/random_walk_temp/plots/
+
 # Keep directory placeholders
 !.gitkeep
 
