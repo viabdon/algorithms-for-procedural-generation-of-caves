@@ -49,7 +49,7 @@ PALETAS = ("Jet", "Mint", "Purp", "Teal", "Sunsetdark", "Emrld", "Burg")
 MIN_VIZINHOS, MAX_VIZINHOS = 1, 27
 
 # Opacidade da celula com menos vizinhos; a mais cercada fica opaca (1.0).
-OPACIDADE_MINIMA = 0.5
+OPACIDADE_MINIMA = 0.25
 
 
 def camera_isometrica(elevacao=ELEVACAO, azimute=AZIMUTE, raio=RAIO):

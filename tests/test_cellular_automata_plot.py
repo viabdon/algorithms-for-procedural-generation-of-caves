@@ -60,7 +60,8 @@ class CorPorVizinhosTests(unittest.TestCase):
         opacidades = opacidade_por_vizinhos(np.array([MIN_VIZINHOS, 14, MAX_VIZINHOS]))
 
         self.assertAlmostEqual(float(opacidades[0]), OPACIDADE_MINIMA)
-        self.assertAlmostEqual(float(opacidades[1]), 0.75)
+        # 14 é o meio da faixa de 1 a 27, então fica no meio da rampa.
+        self.assertAlmostEqual(float(opacidades[1]), (OPACIDADE_MINIMA + 1) / 2)
         self.assertAlmostEqual(float(opacidades[2]), 1.0)
 
     def test_cada_opacidade_vira_um_trace_com_uma_so_barra_de_cor(self) -> None:
