@@ -119,6 +119,7 @@ diário sem quebrar o padrão.
 | [Dia 5](#dia-5--convolução-acelera-o-autômato-e-o-plot-de-trajetória-não-revela-um-padrão-claro) | Convolução acelera o autômato e o plot de trajetória não revela um padrão claro | Cellular Automata 3D | Troca do laço de contagem de vizinhos por convolução (400-580x mais rápido, equivalência testada bit a bit) com justificativa metodológica pro TCC, e implementação do gráfico de células vivas por iteração — que mostra os comportamentos já notados no Dia 2, mas sem revelar um padrão claro ligado aos parâmetros |
 | [Dia 6](#dia-6--pesquisando-sdf-da-superfície-para-a-matriz-voxelizada) | Pesquisando SDF: da superfície para a matriz voxelizada | Cellular Automata 3D, Random Walk 3D | Ideia de usar o SDF de uma caverna de Random Walk como matriz de peso pro CA (reforçar voxels perto dela, apagar bolsões distantes); estudo da base do Signed Distance Field, a falta (até agora) de literatura aplicando SDF direto em matriz voxelizada em vez de malha, e o custo inviável da busca ingênua por distâncias em 2D e, pior, em 3D |
 | [Dia 7](#dia-7--flood-fill-pra-separar-dentro-e-fora-e-a-mediatriz-como-atalho-pra-distância-euclidiana) | Flood fill pra separar dentro e fora, e a mediatriz como atalho pra distância euclidiana | Geral (SDF) | Flood fill escolhido pra classificar interior/exterior no Elaphes depois de comparar com vizinhos de face e CA de preenchimento (trata os 26 voxels de buraco fechado sem mexer no lado de fora e sem parâmetros, mas depende da parede externa estar fechada) e a mediatriz como ideia pra cortar comparações no cálculo da distância euclidiana |
+| [Dia 8](#dia-8--ca-guiado-pelo-sdf-do-elaphes-segue-o-contorno-sem-copiar-a-caverna) | CA guiado pelo SDF do Elaphes: segue o contorno sem copiar a caverna | Cellular Automata 3D | SDF do Elaphes calculado (inundação + EDT exata do scipy) e somado como peso à contagem de vizinhos do CA: o vazio fica confinado ao entorno da caverna e a sensibilidade controla a espessura (IoU máximo 0,49 em s = 13), seguindo o contorno sem copiar. Próximo passo: trocar o Elaphes pelo SDF de uma caverna de Random Walk |
 
 ## Dúvidas em aberto
 
@@ -139,17 +140,19 @@ a resposta ficou registrada.
 | "Usar Random Walk (ou L-System) como conector dos bolsões de ar do CA entrega resultados melhores do que rodar o Random Walk sozinho?" | [Dia 4](#dia-4--hipótese-usar-random-walk-ou-l-system-como-conector-dos-bolsões-de-ar-do-ca) |
 | "Que técnica dá pra usar pra identificar os bolsões de ar como nós dentro de uma matriz 3D?" | [Dia 4](#dia-4--hipótese-usar-random-walk-ou-l-system-como-conector-dos-bolsões-de-ar-do-ca) |
 | "Dá pra classificar os comportamentos de crescimento/decaimento de células vivas a partir de parâmetros específicos do autômato?" | [Dia 5](#dia-5--convolução-acelera-o-autômato-e-o-plot-de-trajetória-não-revela-um-padrão-claro) |
-| "Dá pra aplicar SDF direto numa matriz voxelizada em vez de numa malha?" | [Dia 6](#dia-6--pesquisando-sdf-da-superfície-para-a-matriz-voxelizada) |
 | "Qual algoritmo otimiza o cálculo de distâncias em 3D?" | [Dia 6](#dia-6--pesquisando-sdf-da-superfície-para-a-matriz-voxelizada) |
 | "Em que casos o flood fill não funciona, e como corrigir quando ele vazar?" | [Dia 7](#dia-7--flood-fill-pra-separar-dentro-e-fora-e-a-mediatriz-como-atalho-pra-distância-euclidiana) |
 | "Quanto do vazio 'quase fechado' (26 → 48 → 64) é falha real e quanto é dobra da parede?" | [Dia 7](#dia-7--flood-fill-pra-separar-dentro-e-fora-e-a-mediatriz-como-atalho-pra-distância-euclidiana) |
 | "A mediatriz entra de fato como otimização no cálculo do SDF?" | [Dia 7](#dia-7--flood-fill-pra-separar-dentro-e-fora-e-a-mediatriz-como-atalho-pra-distância-euclidiana) |
+| "Um CA guiado pelo SDF de uma caverna de Random Walk chega tão perto de uma caverna real quanto o guiado pelo Elaphes?" | [Dia 8](#dia-8--ca-guiado-pelo-sdf-do-elaphes-segue-o-contorno-sem-copiar-a-caverna) |
+| "Que sensibilidade (ou escala do peso) equilibra seguir o guia sem copiá-lo?" | [Dia 8](#dia-8--ca-guiado-pelo-sdf-do-elaphes-segue-o-contorno-sem-copiar-a-caverna) |
 
 ### Respondidas
 
 | Dúvida | Levantada em | Respondida em |
 |---|---|---|
 | "Dá pra fazer outras plotagens auxiliares pra acompanhar o crescimento/decaimento das células vivas ao longo das iterações?" | Dia 2 | [Dia 5](#dia-5--convolução-acelera-o-autômato-e-o-plot-de-trajetória-não-revela-um-padrão-claro) — sim, implementado: gráfico de linha ao lado do 3D |
+| "Dá pra aplicar SDF direto numa matriz voxelizada em vez de numa malha?" | Dia 6 | [Dia 8](#dia-8--ca-guiado-pelo-sdf-do-elaphes-segue-o-contorno-sem-copiar-a-caverna) — sim: inundação separa borda e interno, e a EDT exata do scipy dá a distância até a borda voxelizada |
 
 ---
 
@@ -622,6 +625,88 @@ registrado como opção de otimização pra quando o SDF estiver implementado.
 > dobra da parede?"
 
 > "A mediatriz entra de fato como otimização no cálculo do SDF?"
+
+---
+
+## Dia 8 — CA guiado pelo SDF do Elaphes: segue o contorno sem copiar a caverna
+
+**Algoritmo:** Cellular Automata 3D (SDF como peso)
+**Commits relacionados:** `d20feaf`, `429a4b5` (pipeline do SDF); `286414f`,
+`d016569`, `47331a3` (peso no CA); `3fe3ede` (plot)
+
+### Tipo A — Narrativa
+
+Depois de estudar a base do SDF, implementei ele e usei como peso no
+Cellular Automata. A pasta `sdf_temp/` continua no projeto porque o SDF
+ainda vai servir pra uma métrica futura, a de proximidade com uma caverna
+real, mas por enquanto não vou mexer muito nela. O foco aqui foi outro:
+usar o SDF pra enviesar o CA.
+
+A pipeline do SDF ficou em duas etapas. A primeira é a inundação do Dia 7,
+que saiu do experimento local e entrou no git, reproduzindo o resultado
+anterior bit a bit (783 voxels de borda, 292 internos, 26 de buraco
+fechado). A segunda calcula a distância euclidiana de cada voxel até a
+borda mais próxima com a EDT exata do scipy (`distance_transform_edt`), e o
+sinal vem da classificação da inundação: positivo dentro, negativo fora,
+zero na borda. No Elaphes 64³ o campo vai de +2 no interno até −63,16 no
+ponto mais distante do lado de fora. Esse sinal é o inverso do
+`docs/architecture.md` (lá `SDF < 0` é vazio), então o arquivo gerado grava
+a convenção usada, até alinhar isso com o Pablo.
+
+Plotando o SDF, apareceu uma suspeita de água dentro da caverna, ou seja,
+um voxel externo preso entre paredes. Não se confirmou: na grade inteira só
+existe uma componente de água, ligada à borda da grade. O ponto suspeito
+estava na frente da parede, projetado por cima do interno, e a paleta
+pintava o externo próximo com uma cor parecida com a do interno.
+
+No CA, o peso entra de um jeito simples: a matriz de peso é somada à
+contagem de vizinhos de cada célula antes da comparação com a
+sensibilidade, em todo passo. Dentro da caverna o peso é positivo e dá
+vizinhos extras, então a célula vira vazio mais fácil. Fora ele é negativo
+e tira vizinhos, e a partir de certa distância nem os 27 vizinhos vivos
+alcançam a sensibilidade. É o mecanismo que eu imaginava no Dia 6 pra fazer
+os bolsões distantes sumirem. Sem peso (ou com peso zero) o CA é o básico,
+testado bit a bit, e fica como baseline da comparação CA × CA+SDF. Os pesos
+ficam guardados ao lado das seeds, com a origem e a convenção de sinal
+anotadas, e o menu deixa escolher o peso na hora de rodar.
+
+E funcionou: consegui de fato enviesar o CA. Na seed 001 (64³, p = 0,5,
+borda zeros, 3 iterações), o peso confina o vazio ao entorno do Elaphes, e
+a sensibilidade passa a controlar a espessura da caverna. De 6 a 11, o CA
+cobre todo o Elaphes mais um halo em volta. Em 13 a sobreposição com o
+Elaphes é a maior (IoU 0,49). De 14 em diante ele corrói a caverna: em
+s = 14 sobram 678 vazios, contra 108.128 do mesmo CA sem peso.
+
+O que mais me interessa é que ele segue a trajetória do Elaphes, mas não
+imita o Elaphes. Mesmo no melhor caso a sobreposição fica perto da metade,
+então o CA não reproduz a caverna voxel a voxel, só acompanha o contorno
+dela. Pra mim esse é o melhor comportamento possível. Em vez dos vários
+bolsões separados que eu tinha antes (Dia 3), agora tenho uma aproximação
+de estrutura de caverna real, com caminhos bem estruturados como os do
+Elaphes, mas com o grau de naturalidade que vem do próprio CA.
+
+Um detalhe de visualização: o plot do CA desenhava a largura na vertical, e
+o CA guiado pelo Elaphes saía em pé, com a caverna deitada virando uma
+coluna. O cálculo sempre esteve alinhado, só o desenho girava. Corrigi pra
+altura ficar na vertical, como nos plots do Elaphes e do SDF, e o plot
+ganhou a opção de colorir cada célula pela quantidade de vizinhos, o que
+separa a superfície do miolo.
+
+Ainda falta a parte mais importante. Até aqui eu usei uma caverna real pra
+enviesar o CA, então é óbvio que o resultado se parece com uma caverna. E
+se o guia for uma caverna feita pelo Random Walk? Cavernas reais mapeadas
+são dados limitados. O ideal é que tudo seja procedural: gerar a caverna
+com o Random Walk, calcular o SDF dela e rodar o CA em cima desse SDF, pra
+chegar no melhor nível de caverna possível sem depender de um dado real.
+Ainda não sei se os resultados vão ser tão bons quanto com o Elaphes.
+
+### Tipo C — Dúvidas em aberto
+
+> "Um CA guiado pelo SDF de uma caverna de Random Walk chega tão perto de
+> uma caverna real quanto o guiado pelo Elaphes?"
+
+> "Que sensibilidade (ou escala do peso) equilibra seguir o guia sem
+> copiá-lo?"
 
 ---
 
