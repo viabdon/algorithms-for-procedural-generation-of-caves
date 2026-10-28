@@ -1,121 +1,41 @@
-# Ajustes metodológicos da reconstrução e da geração
+# Ajustes metodológicos da comparação de geradores
 
-Este documento reflete a decisão descrita em
-`Conclusao_Pipeline_Reconstrucao_Malha_SDF.docx` e preserva, para PCGRL, a
-distinção entre dataset e recompensa de
-`resumo_deep_rl_pcg_cavernas_tcc_formatado.docx`. Ambos são documentos locais
-de apoio do TCC. A sequência abaixo é a **rota experimental adotada**, não
-uma alegação de que a referência volumétrica já foi validada.
+## Decisão e alcance
 
-## 1. Da nuvem de pontos à malha
+O [resumo quinzenal de 18/10/2026](relatorios/resumo-quinzenal-tcc-2026-10-18.docx) registra o retorno à geração de volumes voxelizados como núcleo do TCC. A reconstrução do Elaphes, um SDF real e a IoU volumétrica contra esse scan deixam de ser pré-requisitos ou métricas do escopo atual. O benchmark deve comparar algoritmos por custo, estrutura, controle e diversidade, sem alegar recuperação do volume interno real do Elaphes.
 
-Os pontos do PLY representam superfície observada. A grade atual
-`elaphes_surface_32.npz` (245 de 32.768 voxels) registra onde pontos caíram e
-serve ao diagnóstico; converter seu complemento em vazio continuaria errado.
-A nova rota reconstrói uma malha a partir de pontos contínuos e normais
-estimadas/orientadas. Screened Poisson é o método principal; Ball Pivoting e
-Alpha Shapes são fallbacks se a reconstrução principal falhar nos critérios
-de aceitação, não alternativas independentes ao SDF. Amostragem, orientação de
-normais, profundidade da octree, densidade, tempo e memória precisam constar
-do relatório, sobretudo com 94.465.067 vértices do Elaphes.
+## 1. Limites da referência real
 
-Uma malha aproximadamente watertight deve ser avaliada quanto a arestas de
-borda, manifoldness, auto-interseções, componentes, orientação, fidelidade aos
-pontos e estabilidade paramétrica. O Screened Poisson pode extrapolar em
-regiões pouco observadas. Entradas legítimas não são automaticamente falhas:
-fechamentos necessários para uma classificação volumétrica devem ser
-deliberados, localizados e marcados como **faces sintéticas**. Sua área e
-efeito topológico precisam ser reportados. Faces sintéticas não equivalem a
-superfície medida nas métricas de correspondência com o scan.
+Os 94.465.067 pontos do PLY amostram parede observada. A voxelização direta `32³` marcou 245 células de superfície entre 32.768. `True` nessa grade tem semântica diferente do `True` dos volumes gerados, que significa ar. Inverter a grade não produz referência de vazio: o complemento mistura ar interno, exterior e partes não observadas.
 
-## 2. Classificação e campo de distância
+Os ensaios com Screened Poisson melhoraram a aderência com amostragem mais densa, mas mantiveram bordas, defeitos topológicos ou extrapolação. A linha central exploratória identificou ramos; a orientação por cossenos alterou bordas e componentes sem produzir malha validada. O espessamento da ocupação bruta levou a malhas sem arestas de borda, porém com auto-interseções e falha na checagem de watertightness. A unidade física XYZ ainda não foi confirmada. Esses resultados delimitam as condições examinadas no Elaphes, sem invalidar os métodos em geral. Os registros estão na branch `experiment/elaphes-meshing` e em artefatos locais.
 
-Depois da malha, classificar interior/exterior. Flood fill da borda sobre uma
-barreira voxelizada é a implementação inicial; cavidades abertas vazam por
-entradas e gaps, então testar tampas controladas e registrar sensibilidade à
-conectividade e resolução. Consultas de ocupação em malha válida e generalized
-winding numbers em malhas imperfeitas são comparações/fallbacks possíveis.
-Nenhum método torna automática a interpretação física do interior da caverna.
-Regiões sem suporte confiável devem permanecer `UNKNOWN`.
+O Elaphes continua útil para inspeção qualitativa e propriedades observáveis. Métricas de superfície com tolerância podem ser estudadas em regiões alinhadas e comparáveis, distinguindo observação de extrapolação. IoU de superfície não entra automaticamente como substituta da volumétrica. Ball Pivoting, Alpha Shapes, winding numbers e fechos controlados são hipóteses futuras, sem comparação concluída demonstrada pelo resumo.
 
-A distância à malha fornece a magnitude do SDF; a classificação fornece o
-sinal. A convenção do projeto será `SDF < 0` para `VOID` e `SDF > 0` para
-`SOLID/EXTERIOR`. Em células válidas, uma banda `|SDF| ≤ ε` define
-`SURFACE`; `ε` deve ser ligado ao espaçamento físico e submetido a análise
-de sensibilidade. Não atribuir sinal a `UNKNOWN` como se houvesse evidência.
-Persistir separadamente `sdf_float32`, rótulos categóricos e máscara de
-validade, com origem, eixos XYZ/ZYX, escala, método e parâmetros.
+Na branch `CA` (`a58155e`), um flood fill de seis vizinhos e uma EDT calculam um campo experimental da grade de parede `64³`. Encontraram 26 vazios fechados e classificaram 783 voxels como borda e 292 como internos. O campo usa interno positivo, externo negativo e distância em voxels. A classe interna pode conter espessura de parede e buracos fechados; o ar do túnel aberto se conecta ao exterior. Portanto, nem o campo nem a IoU 0,49 relatada para o CA guiado por ele validam uma referência volumétrica de ar do Elaphes. Esse número é apenas diagnóstico de sobreposição com a grade derivada do scan.
 
-Para aprendizagem e controle, derivar
-`TSDF = clip(SDF, -τ, τ) / τ`, com `τ > 0` fixado por configuração.
-TSDF concentra a faixa numérica perto das paredes; não é uma etapa que cria
-interior/exterior nem dados independentes adicionais. O sinal e os rótulos
-precisam ser validados em formas sintéticas conhecidas antes de usar o scan.
+## 2. Protocolo do benchmark principal
 
-## 3. Cellular Automata guiado por SDF e algoritmo genético
+Comparar Random Walk e CA básico primeiro em `64³`, com eixos ZYX. Fixar sementes, repetições, parâmetros e orçamento de ajuste antes da coleta; registrar código, configuração e hardware e relatar dispersão. A grade não recebe unidade física sem conversão conhecida. As medidas já disponíveis no `main` são tempo de geração, pico de RSS, proporção de vazio, fração de vazio na maior componente e estatísticas da transformada de distância. CPU/GPU/VRAM e descritores adicionais precisam de instrumentação e protocolo. Custos de treinamento, otimização, geração e visualização devem ser separados quando essas etapas existirem.
 
-O CA básico existente aplica uma regra local por vizinhança. O experimento
-`CA+SDF` deve acrescentar um campo espacial de controle à inicialização,
-limiar ou transição, mantendo a regra local reconhecível e um peso zero que
-reproduza o baseline. A forma exata será escolhida e testada por Felipe; uma
-possibilidade teórica é ponderar a informação de vizinhança com o TSDF de
-controle, mais favorável à abertura onde o campo é negativo. Reportar peso,
-seeds, ocupação, conectividade, aderência à forma e diversidade.
+A branch `CA` acrescenta rastreamento de tempo, CPU e RSS do processo, além de GPU/VRAM quando houver leitura. Há testes do amostrador, mas o protocolo de comparação ainda precisa definir hardware, intervalo de amostragem e tratamento de execuções curtas e leituras ausentes. O benchmark dessa branch não importa por causa da antiga API do CA; seus resultados não devem ser tratados como benchmark integrado antes da correção e de uma execução de ponta a ponta.
 
-O controle principal deve vir de um SDF **simplificado e independente do scan
-de teste** — por exemplo, tubo ou esqueleto procedural, pontos de entrada e
-saída, ou grade de baixa resolução. Dar ao CA o SDF exato da referência que
-será usada como resposta de teste transforma a tarefa em reconstrução
-condicionada; isso pode ser estudado, mas em tabela separada. Para comparar
-algoritmos condicionados, oferecer informação de controle equivalente.
+Não é requisito portar o CA otimizado à GPU apenas porque os modelos neurais treinam no Colab. A comparação estrutural usa saídas `64³` e as mesmas métricas, independentemente do dispositivo. Para custo, identificar máquina e backend em cada linha, separar treino de geração e evitar uma classificação única de velocidade baseada em CPU local versus GPU do Colab. Se a pergunta experimental incluir aceleração por GPU, implementar e medir uma variante do CA como estudo próprio; isso exigiria verificar equivalência de resultados e medir também transferências e sincronização.
 
-Após estabilizar `CA+SDF`, testar se um algoritmo genético melhora parâmetros
-da regra e do viés espacial. Definir cromossomo, limites, função de aptidão,
-orçamento e população antes de rodar a busca. A aptidão pode equilibrar
-conectividade, aderência ao **controle permitido**, diversidade e custo, com
-escalas explícitas. Ajustar em treino/validação; reservar o teste. Comparar
-`CA`, `CA+SDF` e `CA+SDF+GA` sob orçamento de geração comparável e relatar
-também o custo adicional de otimização do GA. Incluir uma busca simples de
-mesmo orçamento como controle metodológico para atribuir ganhos ao GA.
+Conectividade, componentes e ocupação têm prioridade na avaliação estrutural. A transformada de distância ao sólido descreve o espaço livre; seus valores dependem de resolução, espaçamento e bordas, e não validam a largura de todos os túneis. Ramificação, tortuosidade e diversidade exigem definições e validação próprias. Volumes gerados usam `True = ar`, `False = sólido`, com eixos ZYX.
 
-## 4. Avaliação das referências e dos geradores
+**Contrato do SDF sintético:** para um volume gerado com vazio conhecido, `SDF > 0` no interior do vazio, `SDF < 0` no exterior sólido e `SDF = 0` nos voxels de borda. A magnitude é a distância euclidiana ao voxel de borda mais próximo, em unidades de voxel, na grade ZYX. O protótipo da branch `CA` usa borda de seis vizinhos de face e coloca o zero no centro do voxel de borda. Registrar sinal, unidade, regra de borda e origem do volume com o campo. Não equiparar esse SDF às estatísticas já existentes de distância do vazio ao sólido: elas são outro descritor, sem sinal.
 
-IoU e Dice volumétricos voltam a ser apropriados quando `real_void` for
-validado, no mesmo domínio do volume gerado e apenas nas células válidas.
-Métricas de superfície (ASSD, Hausdorff95, Surface Dice com tolerância)
-comparam fronteiras alinhadas, declaram unidade física/resolução e distinguem
-superfície observada de tampas. Medir também componentes, maior componente,
-ocupação, largura e, após definição, ramificação/tortuosidade. Uma única IoU
-contra uma caverna específica não avalia sozinha a plausibilidade de um
-gerador não condicionado.
+## 3. Extensões condicionadas e neurais
 
-Dividir treino/validação/teste por caverna ou região com separação espacial
-entre patches. Quando houver poucos scans, relatar a limitação de
-generalização. Volumes sintéticos de Random Walk/CA servem ao teste de
-infraestrutura, mas não comprovam fidelidade à distribuição de cavernas
-reais. Registrar versões da malha/SDF, `ε`, `τ`, máscaras, divisão dos dados,
-hardware e custos separados de preparação, otimização/treinamento e geração.
+Na branch `CA`, um peso espacial já é somado à contagem de vizinhos em cada iteração. Testes mostram que peso zero reproduz o CA básico e rejeitam shape incompatível. O porte experimental de Random Walk ponderado por waypoints gera tubos voxelizados e um SDF conforme o contrato de sinal e unidade acima, mas seus waypoints foram posicionados sobre cavernas reais no projeto base; tratá-lo como controle totalmente independente de referência real seria impreciso. Para um experimento de CA guiado, definir guia procedural independente do scan de teste e condicionamento permitido explícito.
 
-## 5. Redes neurais após a referência válida
+Está planejado ajustar geneticamente parâmetros de **CA e Random Walk**. Antes de executar a busca, definir limites e codificação de cada método, aptidão estrutural, orçamento comparável, sementes de ajuste e sementes reservadas de avaliação. Comparar o GA com busca simples de mesmo orçamento. Atribuir o custo da busca à otimização, não ao tempo de uma geração já parametrizada.
 
-Auditar primeiro número e independência dos exemplos. Uma rede pode usar
-`VOID` binário, TSDF ou ambos; a escolha de autoencoder, DCGAN ou WGAN exige
-objetivo e critérios explícitos. Um autoencoder valida reconstrução, mas não
-demonstra geração de novas cavernas. O SDF é representação, não substituto de
-diversidade do dataset.
+GAN e PCGRL ainda são interfaces sem geração funcional. Uma GAN requer volumes de treino semanticamente válidos; volumes sintéticos verificam a infraestrutura, sem comprovar aprendizado de cavernas reais. Para PCGRL, definir o MDP e iniciar com ambiente pequeno, conectividade e ocupação na recompensa, sem IoU contra o scan. Modelos prontos devem obedecer ao contrato de volume e separar treino de inferência.
 
-Para PCGRL, o dataset pode fornecer distribuições de ocupação, largura e
-topologia ao problema/recompensa. Isso difere de treinar a política com pares
-supervisionados. Formalizar estado, ações, transição, recompensa, desconto e
-término antes de PPO; começar com grade pequena, representação Narrow 3D e
-recompensa simples de conectividade/ocupação. Evitar IoU contra o conjunto de
-teste na recompensa. Conv3D, controle condicional e Generator–Solver são
-extensões posteriores; custo de treinamento e inferência devem ser separados.
+## 4. Condição para revisitar o SDF real
 
-## 6. Integração
+Uma retomada futura exigiria superfície geometricamente aceita, tratamento documentado de entradas e regiões não observadas, classificação interior/exterior validada e unidade espacial conhecida. Distâncias à parede fornecem magnitude, mas não o sinal de um SDF. Sem isso, não se inferem `VOID/SOLID` reais nem IoU volumétrica da nuvem. Esta frente não bloqueia a comparação atual.
 
-As métricas e tabelas científicas ficam em Python. Unity usa malhas/volumes
-para inspeção, e gRPC permanece posterior. Comparações de tempo devem separar
-CPU local, Colab/CUDA e eventual ROCm, com versões, backend e parâmetros
-identificados. Seeds iguais tornam cada método reproduzível, mas não
-emparelham geometrias equivalentes entre algoritmos.
+Ver [Orientação](../Orientacao-codex.md), tarefas de [Pablo](tarefas-pablo-reconstrucao-modelos.md) e de [Felipe](tarefas-felipe-sdf-ca.md).

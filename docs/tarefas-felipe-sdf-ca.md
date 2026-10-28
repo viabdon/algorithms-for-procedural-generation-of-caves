@@ -1,86 +1,55 @@
-# Tarefas do Felipe — flood fill, SDF e Cellular Automata
+# Tarefas do Felipe — CA e extensões de controle
 
-**Metas indicativas a partir de 30/09/2026.** Felipe é o responsável principal
-pela implementação e pelos testes de flood fill, SDF/TSDF e do CA enviesado
-por um campo de controle. O algoritmo genético é a etapa final da evolução do
-CA. Pablo prepara e valida a malha Screened Poisson e a semântica da referência;
-ver [`tarefas-pablo-reconstrucao-modelos.md`](tarefas-pablo-reconstrucao-modelos.md).
+**Estado verificado na branch `CA` em 28/10/2026 (`a58155e`).** O CA básico e o benchmark clássico continuam prioritários. A branch avançou no CA com pesos, instrumentação e protótipos de SDF, ainda sem integração validada ao benchmark principal. Flood fill e SDF real do Elaphes não são dependências do benchmark. Ver o [resumo quinzenal](relatorios/resumo-quinzenal-tcc-2026-10-18.docx), o [roadmap](roadmap.md) e as [tarefas de Pablo](tarefas-pablo-reconstrucao-modelos.md).
 
-O trabalho começa com geometrias sintéticas e um campo tubular simples.
-Assim, a urgência do SDF para o CA não fica bloqueada pelos 94.465.067 pontos
-do Elaphes nem pela reconstrução da malha real.
+## Divisão de trabalho deste plano
 
-## Até 02/10 — Contrato comum e casos conhecidos
+Felipe conduz a **integração e os experimentos do CA**, seu peso espacial, a instrumentação da branch `CA` e o ajuste genético dos parâmetros do CA. Pablo conduz o **Random Walk** no benchmark, o ajuste de seus parâmetros, as métricas, a análise e a frente neural. Os dois fecham juntos sementes, orçamento e hardware para que os resultados tenham o mesmo critério de leitura. Isso define entregas pendentes, não resultados já obtidos.
 
-- [ ] Acordar com Pablo shape ZYX, origem, espaçamento físico, sinal
-  `SDF < 0 = VOID`, banda `ε` para `SURFACE`, truncamento `τ` para TSDF,
-  rótulos `VOID/SURFACE/SOLID/UNKNOWN` e comportamento em células inválidas.
-- [ ] Criar fixtures pequenas: cubo/esfera fechados, tubo com entrada, fenda
-  acidental, duas componentes e superfície com orientação invertida. Registrar
-  interior conhecido para testar sinal e distância.
-- [ ] Definir interfaces para receber malha ou barreira voxelizada, tampas
-  sintéticas e máscaras de validade; não presumir que o `.npz` de superfície
-  direta do Elaphes já delimita uma caverna.
+## Base disponível
 
-## Até 06/10 — Flood fill e SDF sintético
+- [x] CA básico gera `Volume3D` booleano em ZYX, com `True = ar` e `False = sólido`.
+- [x] O benchmark inicial mede tempo de geração, pico de RSS, proporção de vazio, fração da maior componente e estatísticas da transformada de distância.
+- [x] Na branch `CA`, a contagem de vizinhos foi vetorizada por convolução 3D; testes comparam o resultado à versão em laço para bordas determinísticas. O modo de borda aleatório não é reproduzível bit a bit.
+- [x] Na branch `CA`, há seeds e resultados NPZ, menu de execução/visualização, pesos espaciais opcionais e teste de equivalência do CA sem peso com peso zero. O peso é somado à contagem de vizinhos antes do limiar em cada iteração.
+- [x] A branch inclui um amostrador de recursos do processo com tempo, CPU e RSS, além de GPU/VRAM quando disponíveis. A interpretação e a comparabilidade dessas medidas ainda dependem de protocolo.
+- [ ] Os resultados comparáveis e a dispersão entre sementes ainda precisam ser coletados no protocolo comum.
 
-- [ ] Implementar flood fill exterior a partir das faces da grade sobre uma
-  barreira voxelizada, com conectividade explícita. Derivar componentes
-  internas candidatas e detectar vazamento por entradas/gaps; exigir ou
-  registrar tampas quando necessárias.
-- [ ] Calcular distâncias à **malha ou à superfície de referência definida** e
-  atribuir o sinal pela classificação interior/exterior. Para malha aberta ou
-  região ambígua, marcar `UNKNOWN` em vez de inventar um sinal.
-- [ ] Persistir SDF físico `float32`, TSDF truncado/normalizado e rótulos
-  derivados com `|SDF| ≤ ε` para `SURFACE`. Testar centro, parede, exterior,
-  anisotropia, bordas, fenda e inversão de sinal.
-- [ ] Criar um gerador de SDF de controle simples, por exemplo tubo ou
-  esqueleto procedural independente de cavernas reais. Este campo já pode
-  alimentar o CA antes da malha Poisson.
+## Prioridade imediata — reproduzir o CA
 
-## Até 10/10 — CA condicionado por campo de controle
+- [ ] Reparar a integração da branch com o benchmark: `run_generation_benchmark.py` importa `generate_cellular_automata`, ausente no pacote reorganizado. O import falha em `a58155e`, embora os 53 testes da branch passem.
+- [ ] Depois da correção, executar um caso pequeno de ponta a ponta e conferir contrato `Volume3D`, formato NPZ, linha CSV e tempo medido antes de iniciar a coleta final.
+- [x] Registrar a configuração inicial `baseline_32.yaml`: volume ZYX `32³`, sementes `0` a `4` e parâmetros dos dois geradores clássicos.
+- [x] Acordar `64³` em ZYX como grade das medições finais. `baseline_32.yaml` é configuração inicial, não o protocolo final.
+- [ ] Fixar com Pablo sementes, repetições de medição, orçamento de ajuste, hardware e versões. A escala física do voxel só será declarada se houver conversão conhecida.
+- [ ] Criar a configuração final do CA em `64³` ZYX, separada de `baseline_32.yaml`, com probabilidade inicial, sensibilidade, iterações e regra de borda registradas. Evitar a borda aleatória na comparação que exige reprodução bit a bit, ou controlar explicitamente seus sorteios.
+- [ ] Reexecutar o CA básico e, depois do ajuste, o CA com parâmetros escolhidos; conferir arquivos NPZ e linhas CSV, registrar configuração e variação entre sementes.
+- [ ] Inspecionar conectividade, componentes e ocupação, inclusive volume sem ar e volume quase todo aberto. Conferir a semântica das bordas no relatório.
+- [ ] Registrar que a transformada de distância ao sólido depende da resolução e do espaçamento; seus resumos não são automaticamente a largura de todos os túneis.
 
-- [ ] Preservar `generate_cellular_automata` como baseline e especificar a
-  nova regra com influência espacial do SDF/TSDF de controle. Comparar viés
-  na probabilidade inicial, no limiar local ou na transição; escolher uma
-  formulação mensurável e registrar o peso do campo.
-- [ ] Garantir que peso zero reproduz o CA básico sob a mesma seed. Definir
-  tratamento de bordas, `UNKNOWN`, shape divergente e `τ`/escala incompatível.
-- [ ] Gerar volumes com pesos distintos e medir aderência ao controle,
-  conectividade, ocupação, diversidade e tempo. O SDF exato da caverna de
-  **teste** não deve ser o controle do experimento principal; se usado, criar
-  experimento separado de reconstrução condicionada.
+## Extensão em protótipo — CA com campo de controle
 
-## Até 16/10 — Integrar o Elaphes e validar
+- [x] Implementar a soma de um peso espacial à contagem de vizinhos do CA. Testes cobrem peso positivo/negativo, shape incompatível e equivalência entre ausência de peso e peso zero.
+- [x] Criar um pipeline experimental em `random_walk_temp/`: portar a caminhada ponderada por waypoints de um projeto base, voxelizar os caminhos em tubos e calcular a distância à borda. O raio padrão de 1,5 voxel em `64³` foi escolhido para manter o túnel representável, mas engrossa a geometria em relação ao original; o código ainda não integra o gerador público nem o benchmark.
+- [x] Adotar como contrato de SDF sintético o sinal positivo no interior do vazio, negativo no exterior sólido, zero na borda e distância euclidiana em voxels, na grade ZYX. O protótipo de Random Walk segue esse sinal e unidade.
+- [ ] Consolidar um campo de controle independente do scan de teste, com origem, regra de borda e parâmetros registrados, preservando o contrato acima. Os waypoints do protótipo atual vêm de cavernas reais do projeto base.
+- [ ] Comparar CA básico e condicionado com sementes e orçamento equivalentes, medindo ocupação, conectividade, aderência ao controle permitido, diversidade e custo. Separar o efeito do controle da geração sem condicionamento.
 
-- [ ] Receber de Pablo uma malha candidata com orientação, coordenadas,
-  entradas, tampas sintéticas e regiões incertas documentadas. Voxelizar a
-  barreira no mesmo domínio do SDF e comparar flood fill com testes de
-  ocupação da malha ou outro método de classificação quando necessário.
-- [ ] Inspecionar o artefato antigo `elaphes_surface_32.npz` apenas como
-  diagnóstico; comparar a superfície original e a malha reconstruída em
-  resoluções escolhidas após o teste inicial. Registrar extrapolações,
-  vazamentos, componentes e sensibilidade a `ε`, `τ` e resolução.
-- [ ] Entregar artefatos e relatório reproduzíveis. Células ambíguas devem
-  permanecer `UNKNOWN`; qualquer mudança de fechamento ou sinal deve ser
-  discutida com Pablo antes de usar a referência em métricas ou aprendizagem.
+## Ajuste planejado — otimização genética
 
-## Etapa final — Algoritmo genético para otimizar o CA (meta 30/10)
+- [ ] Definir cromossomo e limites dos parâmetros do **CA**: probabilidade inicial, sensibilidade, iterações e tratamento de borda; incluir peso de controle apenas se o experimento condicionado for aprovado. Combinar com Pablo a mesma função de aptidão estrutural usada no Random Walk, com parâmetros próprios para cada gerador.
+- [ ] Fixar sementes de ajuste e sementes reservadas de avaliação, número de sementes por candidato, total de avaliações, parada e tratamento de candidatos inválidos. Não selecionar parâmetros usando os resultados reservados.
+- [ ] Comparar o GA do CA com busca simples de igual orçamento. Registrar número de avaliações e tempo total de busca; medir separadamente o tempo de gerar um volume com a configuração escolhida. Pablo faz a avaliação correspondente do Random Walk.
 
-- [ ] Discutir e pesquisar qual será o cromossomo: probabilidade inicial,
-  limiar de vizinhos, iterações, peso/escala do SDF, parâmetros do campo de
-  controle e, se justificável, regras locais. Fixar limites válidos e custo de
-  cada avaliação antes de implementar.
-- [ ] Definir aptidão com conectividade, coerência da forma, aderência ao
-  **controle independente**, diversidade e custo, evitando que uma métrica
-  domine as demais ou que o GA aprenda a resposta da caverna de teste.
-- [ ] Comparar estratégia simples de busca e algoritmo genético com orçamento
-  equivalente; especificar população, seleção, cruzamento, mutação, elitismo,
-  parada e seeds. Se custo ou ganho não justificar GA, registrar a conclusão.
-- [ ] Implementar e testar GA só após estabilizar CA+SDF. Comparar CA básico,
-  CA+SDF e CA+SDF+GA em dados de validação; reservar teste para avaliação
-  final. Reportar separadamente custo de otimização e tempo de geração.
+## Orçamento, repetições e hardware a fechar com Pablo
 
-Para cada mudança Python com contrato observável, adicionar testes em
-`tests/`; antes de concluir, executar a suíte e uma checagem de importação ou
-exemplo pequeno, conforme `AGENTS.md`.
+- [ ] Separar sementes diferentes para medir diversidade geométrica de repetições da mesma configuração para estimar variação de tempo. Definir quantidades antes da coleta e registrar cada execução.
+- [ ] Usar o rastreador de CPU/RSS e de GPU/VRAM quando disponível, anotando máquina, threads, backend e versões. Verificar o intervalo de amostragem e execuções curtas; célula vazia de GPU significa leitura ausente.
+- [ ] Manter o CA otimizado na CPU para o protocolo inicial. Não é necessário portá-lo para GPU porque GAN/PCGRL treinam no Colab. Uma porta para GPU seria experimento separado de aceleração, com teste de equivalência, transferências e sincronização medidos.
+- [ ] Entregar a Pablo os resultados de CA básico, CA ajustado e, se houver, CA condicionado com configuração, sementes, métricas e ambiente. Custos de CPU local e GPU do Colab devem ser apresentados por ambiente, sem uma classificação direta de velocidade entre máquinas diferentes.
+
+## Limite da frente real
+
+O PLY do Elaphes observa parede, não o interior. Na branch `CA`, `sdf_temp/` usa flood fill de seis vizinhos e EDT para produzir um campo experimental da grade de **parede** `64³`: 783 voxels de borda, 292 classificados como internos e 26 vazios fechados encontrados. O sinal é positivo no interno e negativo no externo, em voxels. Como entradas e frestas permitem comunicação com o exterior, esse "interno" não valida o ar transitável da caverna. O valor de IoU 0,49 relatado no diário da branch é uma sobreposição diagnóstica com a grade derivada do scan, não IoU volumétrica contra `VOID` real. As malhas avaliadas também não forneceram classificação interior/exterior confiável. Assim, esse campo não deve ser apresentado como SDF real validado nem como referência de avaliação.
+
+Para cada mudança Python com contrato observável, adicionar teste em `tests/`; antes de concluir, executar a suíte e uma importação ou exemplo pertinente, conforme `AGENTS.md`.

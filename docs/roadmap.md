@@ -1,171 +1,56 @@
-# Roadmap atualizado
+# Roadmap do TCC
 
-## Fase 0 — Esqueleto do repositório (concluída)
+**Replanejamento de 18/10/2026; branch `CA` verificada em 28/10/2026 (`a58155e`).** O [resumo quinzenal](relatorios/resumo-quinzenal-tcc-2026-10-18.docx) retira a reconstrução do Elaphes, o SDF real e a IoU volumétrica do caminho crítico. Este roadmap separa o que está no checkout `main` dos avanços ainda isolados nas branches `CA` e `experiment/elaphes-meshing`.
 
-Criar pacote Python, diretórios, configurações, README, arquivos de dependência e convenções de volume.
+## Base disponível
 
-## Pré-processamento de referências reais
+- [x] Leitura incremental de PLY/F32, limites XYZ, normalização XYZ→ZYX e voxelização diagnóstica de superfície. O PLY do Elaphes declara 94.465.067 pontos; em `32³`, 245 de 32.768 células foram marcadas como parede observada. Essa grade não representa vazio.
+- [x] `Volume3D` booleano, Random Walk e CA básico, com `True = ar` e `False = sólido`.
+- [x] Persistência NPZ, exportação de malha de volumes gerados por Marching Cubes e benchmark inicial em Python.
+- [x] Métricas iniciais de tempo, pico de RSS, proporção de vazio, fração na maior componente e estatísticas da transformada de distância.
+- [x] Ensaios exploratórios de Poisson, linha central, orientação de normais e espessamento registrados na branch experimental e em artefatos locais. Nenhum produziu uma referência volumétrica validada.
 
-### Concluído — Implementar limites espaciais incrementais de nuvens de pontos
+### Avanços na branch `CA` ainda não integrados ao `main`
 
-**Estado:** ``calculate_xyz_bounds`` foi implementada em
-``cavegen.datastream.bounds`` e testada em ``tests/test_bounds.py``. Os parsers
-``.f32`` e ``.ply`` fornecem os lotes XYZ ``float32`` de forma
-``(n_no_lote, 3)`` que ela consome. O leitor PLY suporta payload ASCII por
-streaming e payload binário por ``numpy.memmap``.
+- [x] CA com contagem 3D vetorizada, bordas configuráveis, sementes/resultados NPZ, menu e peso espacial opcional. Testes verificam equivalência com o laço para bordas determinísticas e CA sem peso igual ao de peso zero.
+- [x] Amostrador de tempo, CPU e RSS do processo, com GPU/VRAM quando disponíveis. A branch contém testes do rastreador, sem protocolo final de hardware.
+- [x] Protótipos `sdf_temp/` de flood fill e EDT da **parede** voxelizada do Elaphes e `random_walk_temp/` de caminhada ponderada por waypoints, voxelização tubular e campo de distância. São experimentos, não a referência real validada nem geradores integrados ao benchmark.
+- [x] Fixar o contrato do SDF sintético: positivo no interior do vazio, negativo no exterior sólido, zero na borda e distância euclidiana em voxels, na mesma grade ZYX. O protótipo de Random Walk segue sinal e unidade; a API pública ainda não está integrada.
+- [ ] Corrigir a integração: o benchmark da branch importa `generate_cellular_automata`, que não é exportado pelo pacote reorganizado. A suíte da branch passou com 53 testes, mas a checagem de importação do benchmark falhou.
 
-**Objetivo:** calcular a caixa delimitadora alinhada aos eixos da nuvem sem
-carregar todos os pontos na memória:
+## Prioridade 1 — Fechar o benchmark clássico
 
-```text
-min_xyz = [menor_x, menor_y, menor_z]
-max_xyz = [maior_x, maior_y, maior_z]
-```
+- [x] Registrar a configuração inicial `baseline_32.yaml`: volume ZYX `32³`, sementes `0` a `4` e parâmetros de Random Walk e CA básico.
+- [x] Fixar `64³` em ZYX como grade das medições finais. A configuração `baseline_32.yaml` permanece como teste inicial e precisa de uma configuração final distinta.
+- [ ] Fixar sementes e repetições de medição; documentar hardware, versões e orçamento de ajuste. Não atribuir escala física aos voxels sem conversão conhecida.
+- [ ] Integrar a API do CA da branch ao benchmark e testar importação e uma execução pequena antes de coletar resultados.
+- [ ] Reexecutar ambos, registrar resultados e dispersão por semente. Conferir NPZ, CSV e casos degenerados antes de interpretar diferenças.
+- [ ] Interpretar tempo, pico de RAM, proporção de vazio e fração da maior componente. Completar a contagem de componentes quando necessária ao relatório.
+- [ ] Documentar resolução e unidade da transformada de distância. Não chamar seus resumos de largura validada de todos os túneis.
 
-**Estratégia:** para cada lote, calcular mínimo e máximo locais por coluna e
-combiná-los com acumuladores globais por ``numpy.minimum`` e
-``numpy.maximum``. A implementação deve manter memória adicional constante,
-além do lote atual.
+## Prioridade 2 — Avaliação estrutural e relato
 
-**Cobertura dos dados:** para produzir limites usados na normalização e na
-voxelização, a função deve consumir todos os vértices do iterador. Uma amostra
-não garante conter os extremos reais e pode reduzir indevidamente a caixa,
-causando distorção ou recorte de pontos. Amostras servem apenas para
-visualização, estimativas exploratórias ou escolha preliminar de parâmetros;
-nunca como limites definitivos da referência.
+- [ ] Definir e validar conectividade, componentes e ocupação como medidas estruturais centrais. Especificar ramificação, tortuosidade e diversidade antes de usá-las.
+- [ ] Integrar e validar a instrumentação de CPU/RSS e GPU/VRAM da branch `CA` no protocolo comum; GPU/VRAM podem ficar ausentes quando não houver leitura. Definir como amostragem e execuções curtas entram no relato.
+- [ ] Definir a apresentação de custos por ambiente: CA e Random Walk podem permanecer na CPU; modelos neurais podem usar GPU no Colab. Separar treino, inferência/geração e transferências. Portar CA para GPU somente se surgir uma pergunta experimental específica sobre esse backend.
+- [ ] Separar custo de geração, treino, otimização e visualização; identificar cada ambiente de execução.
+- [ ] Atualizar o texto do TCC para explicitar a retirada da IoU volumétrica e a impossibilidade atual de afirmar recuperação do volume interno real do Elaphes.
 
-**Contrato proposto:** uma função genérica, fora dos parsers de formato, deve
-receber um iterável de lotes XYZ e retornar ``(min_xyz, max_xyz)`` como dois
-arrays ``float32`` de forma ``(3,)``.
+## Prioridade 3 — Frente neural
 
-**Validações:** rejeitar iterável sem pontos, lotes fora da forma ``(N, 3)`` e
-coordenadas ``NaN`` ou infinitas. Eixos degenerados (``min == max``) devem ser
-preservados nesta etapa e tratados explicitamente apenas durante a
-normalização.
+- [ ] Auditar volume, independência e semântica dos dados de treino antes de escolher uma GAN. Dados sintéticos servem a testes de infraestrutura, não à alegação de aprendizagem de cavernas reais.
+- [ ] Especificar um MDP pequeno para PCGRL, com recompensa inicial de conectividade e ocupação, sem IoU com o scan.
+- [ ] Implementar geração funcional e comparar com os baselines sob o mesmo contrato `Volume3D`; reportar treino e geração separadamente. As interfaces atuais lançam `NotImplementedError`.
 
-**Verificação:** testar ao menos dois lotes, com número total de pontos que
-não seja múltiplo do tamanho do lote, e conferir os seis extremos esperados.
+## Extensões condicionais
 
-**Inspeção concluída — Elaphes:** o arquivo externo
-``/run/media/midnavi/Pablo/TCC/DATA/RAW/elaphes_cave.ply`` é PLY ASCII 1.0,
-declara ``94_465_067`` vértices, traz ``vertex`` como primeiro elemento e
-inclui as propriedades ``float64 x``, ``float64 y`` e ``float64 z``. As 16
-propriedades adicionais são escalares e podem ser ignoradas pelo leitor XYZ.
-Um lote real de 2.048 pontos foi lido como ``float32`` com coordenadas finitas.
+- [x] Prototipar peso espacial no CA e verificar peso zero equivalente ao CA básico na branch `CA`.
+- [ ] Validar um guia procedural independente do scan de teste sob o contrato de SDF já fixado, registrando regra de borda e origem, e comparar CA condicionado com o básico sob protocolo comum. A extensão não bloqueia o benchmark clássico.
+- [ ] Aplicar otimização genética aos parâmetros de CA e Random Walk, depois de definir espaços de busca, função de aptidão e orçamento comparável. Reservar sementes de avaliação e comparar com busca simples de igual orçamento. Distinguir custo de otimização do custo de geração.
+- [ ] Usar Unity para inspeção dos volumes e malhas exportados. gRPC e AMD/ROCm ficam para depois do pipeline científico.
 
-**Concluído no dataset real:** em 2026-08-30, a função foi executada sobre os
-``94_465_067`` vértices do PLY ASCII completo, em lotes de ``65_536`` pontos.
-Os limites definitivos ``float32`` são:
+## Reconstrução real fora do escopo atual
 
-```text
-min_xyz = [-9.9391, -3.23727, -6.96334]
-max_xyz = [73.7245, 12.9577, 69.7809]
-```
+Os ensaios com Poisson, linha central e dilatação melhoraram diagnósticos, mas as malhas avaliadas não satisfizeram conjuntamente fechamento, ausência de auto-interseções, conectividade e aderência. O flood fill e a EDT da branch `CA` calculam um campo da grade de **parede** e não resolvem entradas, regiões não observadas ou o ar interno real. A IoU diagnóstica relatada para o CA guiado pelo Elaphes não é uma métrica volumétrica válida contra `VOID` real. Ball Pivoting, Alpha Shapes, winding numbers e fechos controlados foram discutidos, sem comparação concluída. Uma retomada exigiria validação geométrica, classificação interior/exterior e unidade espacial. Preservar códigos e registros; o rollback é metodológico.
 
-Os metadados reproduzíveis, incluindo hash SHA-256 da fonte, estão em
-``data/params/elaphes_xyz_bounds.json``. Esses limites devem ser usados na
-normalização e não alteram a semântica dos pontos como superfície.
-
-### Concluído — Normalizar e voxelizar uma referência PLY em lotes
-
-**Estado:** ``normalize_xyz_to_zyx_indices`` em
-``cavegen.core.normalization`` converte lotes ``float32`` de coordenadas XYZ
-para índices ZYX válidos, com uma escala compartilhada, padding simétrico e
-tratamento explícito de eixos degenerados. ``voxelize_surface_zyx`` em
-``cavegen.core.voxelization`` marca os índices em uma grade booleana de
-superfície. Ambos possuem testes unitários.
-
-**Integração concluída:** ``cavegen.datastream.reference_preprocessing`` lê os
-limites persistidos, transmite os lotes de ``iter_ply_xyz`` pela normalização e
-os entrega diretamente ao voxelizador por ``voxelize_ply_surface``. O fluxo não
-armazena a nuvem inteira: mantém somente o lote corrente, seus índices e a
-grade final. Um teste de integração com PLY ASCII sintético verifica o fluxo.
-
-**Decisão adotada:** uma única escala preserva as proporções espaciais; o espaço
-remanescente é dividido como padding ao redor da nuvem. A conversão de XYZ para
-ZYX torna o resultado compatível com volumes na forma ``(depth, height, width)``.
-
-**Semântica:** ``True`` na grade retornada significa superfície observada, e não
-espaço aberto de caverna. Portanto, essa grade ainda não deve ser usada como um
-``Volume3D`` dos geradores nem comparada diretamente por IoU a eles.
-
-**Persistência concluída:** ``cavegen.datastream.surface_io`` salva e carrega
-grades de superfície em NPZ comprimido, sem usar ``Volume3D``. O arquivo inclui
-metadados de fonte, limites XYZ, resolução e convenção de normalização. O
-comando de voxelização exige o caminho de saída para não perder a inspeção.
-
-**Verificação concluída — Elaphes em ``32³``:** o processamento completo dos
-``94_465_067`` vértices gerou ``elaphes_surface_32.npz`` com grade booleana
-``(32, 32, 32)``. Foram marcados 245 dos 32.768 voxels (0,75%). A estrutura do
-arquivo e seus metadados de limites, origem e normalização foram validados após
-a escrita.
-
-**Interpretação atual:** a grade `32³` é um artefato diagnóstico de superfície.
-Ela não é entrada suficiente para o Screened Poisson nem uma referência de
-`VOID`. A próxima rota parte novamente da point cloud contínua e inclui
-normais, reconstrução de malha, classificação e SDF/TSDF. Inspeções em
-resoluções distintas continuam úteis para sensibilidade, mas não substituem a
-validação da malha. As tarefas foram divididas entre
-[`Pablo`](tarefas-pablo-reconstrucao-modelos.md) e
-[`Felipe`](tarefas-felipe-sdf-ca.md).
-
-## Fase 1 — Baselines clássicos (implementação básica concluída)
-
-Random Walk 3D e Cellular Automata 3D já geram `Volume3D`. O CA básico será
-preservado como controle para `CA+SDF` e, depois, `CA+SDF+GA`. Reexecutar esses
-baselines após fixar o protocolo final.
-
-## Fase 2 — Reconstrução de malha real
-
-Estimar/orientar normais da point cloud, reconstruir com Screened Poisson e
-validar malha, entradas, tampas sintéticas e regiões extrapoladas. Estudar Ball
-Pivoting/Alpha Shapes como fallbacks quando os critérios não forem cumpridos.
-A malha de Marching Cubes já existente é extraída de volumes gerados e não
-substitui esta fase.
-
-Os ensaios Poisson do Elaphes ainda não produziram uma malha real validada
-para interior/exterior e SDF; as candidatas têm aberturas, problemas de
-topologia ou extrapolação. Os diagnósticos e HTMLs estão preservados na branch
-`experiment/elaphes-meshing` (commit `21cff18`). A reconstrução por trechos
-sobrepostos, com busca local de parâmetros e união das malhas, permanece
-hipótese de pesquisa futura, fora do escopo atual. O SDF de controle
-sintético permite prosseguir com CA+SDF sem atribuir aos dados reais um
-sinal ainda não verificado.
-
-## Fase 3 — Interior/exterior, SDF e rótulos
-
-Implementar flood fill e SDF/TSDF primeiro em geometria sintética, em paralelo
-à reconstrução do Elaphes. Integrar depois a malha validada. Tratar entradas,
-gaps e `UNKNOWN` explicitamente. Persistir campo físico, campo truncado,
-`VOID/SURFACE/SOLID/UNKNOWN`, máscara de validade, escala e parâmetros.
-
-## Fase 4 — CA condicionado e otimização genética
-
-Usar um SDF simplificado independente do scan de teste para enviesar o CA;
-comparar pesos e regras contra o CA básico. Quando `CA+SDF` estiver estável,
-testar um algoritmo genético para otimizar parâmetros sob orçamento controlado,
-com treino/validação/teste separados. Relatar custo de busca à parte.
-
-## Fase 5 — Métricas e modelos neurais
-
-Há implementações básicas de IoU, conectividade e morfologia. Adicionar
-alinhamento/máscara válida e métricas de superfície antes da avaliação real.
-Auditar dados para GAN/TSDF; especificar o MDP do PCGRL e validar ambiente
-pequeno antes de PPO. As interfaces neurais atuais ainda não geram volumes.
-
-## Fase 6 — Benchmark principal
-
-Comparar Random Walk, CA, CA+SDF, CA+SDF+GA e modelos neurais quando prontos,
-com geração repetida, domínio comum e dispersão. Separar custos de preparação
-da referência, otimização por GA, treinamento neural, geração e exportação.
-Controlar vazamento entre regiões vizinhas; limitar conclusões quando não
-houver cavernas independentes suficientes.
-
-## Fase 7 — Visualização e integração
-
-Unity visualiza arquivos produzidos em Python. Adicionar gRPC somente após o
-pipeline científico estar funcional.
-
-## Fase 8 — Portabilidade AMD/ROCm
-
-Executar amostra menor no ambiente AMD/ROCm, se houver tempo, tratando-a como contribuição técnica complementar.
+Ver [arquitetura](architecture.md), [metodologia](methodology-adjustments.md) e [tarefas por responsável](../Orientacao-codex.md).

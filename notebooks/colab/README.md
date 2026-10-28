@@ -1,6 +1,10 @@
 # Notebooks Colab
 
-Use esta pasta para notebooks de prototipação e treinamento.
+Use esta pasta para prototipação e treinamento após fechar o benchmark clássico
+em Python. GAN e PCGRL ainda não geram volumes no código atual. Antes de treinar
+GAN, audite a semântica e a independência dos volumes; dados sintéticos só
+verificam a infraestrutura. Para PCGRL, comece com conectividade e ocupação,
+sem IoU contra o scan do Elaphes.
 
 Sugestão de ordem:
 

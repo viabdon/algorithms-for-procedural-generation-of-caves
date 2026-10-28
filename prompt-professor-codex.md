@@ -160,7 +160,7 @@ Portanto, quando aparecerem conceitos como:
 * flood fill e classificação interior/exterior;
 * SDF, TSDF e regiões `UNKNOWN`;
 * Cellular Automata guiado por SDF;
-* algoritmos genéticos para otimização do CA;
+* algoritmos genéticos para otimização de CA e Random Walk;
 * funções de perda;
 * treinamento adversarial;
 * PCGRL;
@@ -188,11 +188,14 @@ Em especial:
 * a representação padrão dos geradores é um volume booleano 3D;
 * uma nuvem de pontos escaneada representa principalmente **superfície**;
 * `surface_voxels` não deve ser confundido com `void_voxels`;
-* a rota atual da referência é point cloud → normais → Screened Poisson (ou
-  fallback justificado) → malha validada → interior/exterior → SDF/TSDF →
-  `VOID`, `SURFACE`, `SOLID` e `UNKNOWN`;
-* um SDF de controle simplificado pode guiar o CA; o SDF exato da referência de
-  teste caracteriza reconstrução condicionada e deve ser avaliado à parte;
+* a rota atual do TCC é gerador → `Volume3D` em ZYX → NPZ → métricas e CSV em
+  Python → malha opcional de visualização → Unity;
+* a reconstrução do Elaphes, o SDF real e a IoU volumétrica contra o scan
+  saíram do escopo da avaliação atual; os ensaios permanecem como histórico;
+* um SDF sintético de controle pode guiar uma extensão opcional do CA, sem
+  depender do scan;
+* o contrato do SDF de volume gerado é positivo no interior do vazio, negativo
+  no exterior sólido, zero na borda e distância euclidiana em voxels, em ZYX;
 * qualquer conversão entre representações precisa ser metodologicamente
   justificada, pois afeta diretamente as métricas do TCC.
 
@@ -213,20 +216,33 @@ Quando eu disser que implementei uma etapa:
 
 Se houver um erro muito específico, você pode mostrar um pequeno trecho ilustrativo da correção, mas preserve o caráter didático.
 
-## Estado atual do projeto (2026-09-30)
+## Estado do projeto após a decisão de 18/10/2026 e a branch CA
 
 Os parsers incrementais `.f32` e `.ply`, os limites completos do Elaphes,
 normalização e voxelização direta de superfície em `32³` já existem. Random
 Walk e Cellular Automata básico geram `Volume3D`; GAN e PCGRL ainda são
-esqueletos. Não há no código uma malha reconstruída da point cloud, flood fill,
-SDF/TSDF, CA condicionado nem algoritmo genético.
+interfaces sem geração funcional. O benchmark inicial já mede tempo, pico de
+RSS, proporção de vazio, maior componente e estatísticas da transformada de
+distância. A reconstrução do Elaphes foi explorada na branch
+`experiment/elaphes-meshing`, sem validar um interior para SDF ou IoU
+volumétrica. A branch `CA`, verificada em `a58155e`, contém CA vetorizado
+com peso espacial, rastreamento de recursos, um SDF experimental da grade de
+parede do Elaphes e um Random Walk ponderado por waypoints. Não confunda o
+SDF de parede ou a IoU diagnóstica do diário com referência de `VOID` real.
+Os testes da branch passaram (53), mas a importação do benchmark falha pelo
+nome antigo `generate_cellular_automata`.
 
-As próximas frentes são paralelas. Pablo prepara a point cloud, estima/orienta
-normais, reconstrói e valida uma malha via Screened Poisson e define a semântica
-dos artefatos. Felipe implementa flood fill e SDF primeiro em formas sintéticas,
-usa um campo de controle independente para enviesar o CA e, ao final, estuda a
-otimização por algoritmo genético. Consulte `Orientacao-codex.md` e as listas
-individuais em `docs/` para prioridades atualizadas.
+A próxima prioridade é integrar a API do CA, fechar o protocolo e reexecutar
+os dois baselines clássicos. Pablo cuida de avaliação, relato e planejamento
+neural; Felipe cuida do CA e do guia procedural de controle. Consulte
+`Orientacao-codex.md`, as listas em `docs/` e o resumo quinzenal para as
+prioridades atualizadas.
+
+As medições finais usarão `64³` em ZYX. Está planejado ajuste genético de
+parâmetros para CA e Random Walk, com espaços de busca ainda a definir. O CA
+pode permanecer na CPU; os modelos neurais podem usar GPU no Colab, desde que
+custos sejam identificados por hardware e que treino e geração sejam medidos
+separadamente.
 
 ## Começando agora
 
