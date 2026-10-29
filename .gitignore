@@ -35,6 +35,10 @@ __pycache__/
 /random_walk_temp/npz/
 /random_walk_temp/plots/
 
+# Experimento do Indian Tunnel: a nuvem fica em data/raw/nasa, as saídas são regeneradas
+/indian_tunnel_temp/npz/
+/indian_tunnel_temp/plots/
+
 # Keep directory placeholders
 !.gitkeep
 

@@ -1,0 +1,31 @@
+{
+  "dataset": "NASA Indian Tunnel",
+  "source": {
+    "path": "data/raw/nasa/indian_tunnel.f32",
+    "original_name": "IndianTunnel_full_1x.f32",
+    "format": "f32 (x, y, z, nir, r, g, b)",
+    "sha256": "d45382dce132d7e45d262f128772dbb256e15e337d505eb99e1ee6d00410ae36",
+    "size_bytes": 3253750976,
+    "vertex_count": 116205392
+  },
+  "calculation": {
+    "function": "cavegen.datastream.bounds.calculate_xyz_bounds",
+    "iterator": "cavegen.datastream.f32.iter_f32_xyz",
+    "batch_size": 4000000,
+    "coordinate_dtype": "float32",
+    "elapsed_seconds": 4.652644,
+    "completed_on": "2026-10-29"
+  },
+  "min_xyz": [
+    -63.62175,
+    -65.01918,
+    -2.386823
+  ],
+  "max_xyz": [
+    12.838187,
+    105.428902,
+    13.038862
+  ],
+  "representation": "surface_point_cloud",
+  "normalization_note": "These bounds apply to scanned surface coordinates. They do not define a void volume. z is the vertical axis."
+}
