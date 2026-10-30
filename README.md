@@ -2,31 +2,33 @@
 
 Repositório do Trabalho de Conclusão de Curso **"Algoritmos de Geração Procedural de Cavernas: Uma Comparação Holística"**.
 
-O objetivo do projeto é comparar algoritmos clássicos e baseados em aprendizado de máquina para geração procedural de cavernas tridimensionais. A comparação considera custo computacional, tempo de execução, consumo de recursos, complexidade de implementação e similaridade volumétrica em relação a referências reais ou análogos quantitativos de cavernas.
+O objetivo do projeto é comparar algoritmos clássicos e baseados em aprendizado de máquina para geração procedural de cavernas tridimensionais. A avaliação atual prioriza custo computacional, estrutura, controle e diversidade dos volumes gerados. A IoU volumétrica contra o scan do Elaphes saiu do escopo atual porque ainda não há uma referência validada de seu espaço interno.
 
 ## Estratégia atual
 
 A arquitetura prioriza um pipeline científico **offline-first**:
 
-1. Referências reais seguem point cloud → normais → Screened Poisson Surface
-   Reconstruction → malha validada → classificação interior/exterior → SDF/TSDF
-   → `VOID`, `SURFACE`, `SOLID` e `UNKNOWN`.
-2. Python gera volumes 3D, calcula métricas e registra benchmarks.
-3. Cellular Automata básico será comparado com versões guiadas por um SDF de
-   controle e, em etapa final, otimizadas por algoritmo genético.
-4. Arquivos `.npz` e malhas permitem inspeção na Unity; gRPC é posterior.
-5. Colab/CUDA é opção inicial de treino neural, e AMD/ROCm é portabilidade
-   opcional.
+1. Python gera volumes 3D booleanos em ZYX, persiste NPZ e calcula métricas e CSV.
+2. Random Walk e Cellular Automata básico formam o benchmark inicial, com
+   domínio, resolução, sementes e orçamento documentados.
+3. Malhas extraídas dos volumes gerados por Marching Cubes permitem inspeção
+   na Unity; gRPC é posterior.
+4. GAN e PCGRL são frentes futuras; a branch `CA` contém um protótipo de CA
+   com peso espacial. O ajuste genético de parâmetros de CA e Random Walk
+   está planejado; seus espaços de busca e orçamento ainda serão definidos.
+5. O Elaphes permanece referência de superfície para inspeção qualitativa,
+   sem IoU volumétrica ou SDF real no benchmark atual.
 
 Essa decisão reduz risco operacional e mantém o foco principal na comparação quantitativa dos algoritmos.
 
 ## Algoritmos previstos
 
 - Random Walk 3D
-- Cellular Automata 3D básico, guiado por SDF e depois ajustado por algoritmo
-  genético
-- GAN 3D, com arquitetura a escolher após auditar os volumes disponíveis
-- PCGRL 3D, após definir e validar o ambiente e a recompensa
+- Cellular Automata 3D básico; uma variante guiada por campo procedural
+  poderá ser estudada depois
+- Ajuste genético dos parâmetros de CA e Random Walk
+- GAN 3D, após auditar a semântica e a independência dos volumes de treino
+- PCGRL 3D, após definir e validar um ambiente pequeno e a recompensa
 
 ## Convenção de volume
 
@@ -35,9 +37,16 @@ Neste repositório, um volume 3D é representado por um `numpy.ndarray` booleano
 - `True`: voxel aberto, isto é, espaço de caverna/túnel.
 - `False`: voxel fechado/sólido.
 
-Essa convenção descreve os **volumes gerados**. A referência real incluirá
-também SDF/TSDF, rótulos e máscara de `UNKNOWN`; IoU só será aplicada às
-regiões `VOID` válidas e comparáveis.
+Essa convenção descreve os **volumes gerados**. Na grade diagnóstica de
+superfície do Elaphes, `True` significa parede observada. Não existe uma
+conversão validada dessa grade para o ar interno real.
+
+Para o SDF de um volume gerado com vazio conhecido, o contrato adotado é
+`float32[D,H,W]` em ZYX: **positivo no interior do vazio**, **negativo no
+exterior sólido** e **zero na borda**, com distância euclidiana em **voxels**
+até o voxel de borda mais próximo. O protótipo `random_walk_temp/` na branch
+`CA` já usa essa convenção. A regra de borda e a origem do campo devem ser
+registradas; o SDF ainda não é uma API integrada ao pacote principal.
 
 ## Estrutura
 
@@ -137,26 +146,38 @@ O comando usa os limites XYZ previamente calculados, normaliza os pontos para
 um `.npz` comprimido. O arquivo preserva os limites XYZ, a resolução, o caminho
 da fonte e a convenção de normalização. Nessa grade, `True` significa superfície
 observada, e não espaço aberto de caverna. Ela serve ao diagnóstico do scan e
-não substitui a reconstrução de malha nem a classificação volumétrica.
+não fornece a classificação volumétrica necessária para IoU.
 
 Execução registrada para o Elaphes em `32³`: 245 de 32.768 voxels (0,75%) foram
 marcados como superfície. O arquivo `elaphes_surface_32.npz` é um artefato local
 de dados processados e não faz parte do Git.
 
-## Reconstrução da referência real
+## Limite da referência real
 
-A rota planejada parte novamente da point cloud em coordenadas contínuas.
-Screened Poisson é o método principal para reconstruir a malha; Ball Pivoting
-e Alpha Shapes são fallbacks a investigar. Entradas de caverna e faces de
-fechamento sintéticas devem ser registradas. Felipe implementará flood fill e
-SDF/TSDF inicialmente em casos sintéticos, enquanto Pablo prepara a malha.
-O campo terá sinal negativo em `VOID`, positivo em `SOLID/EXTERIOR`, uma banda
-`SURFACE` perto de zero e `UNKNOWN` onde a classificação for incerta.
+Os experimentos com amostragem, Screened Poisson, linha central, orientação
+de normais e espessamento não produziram uma malha com interior validado para
+o Elaphes. Mesmo as malhas sem arestas de borda no teste de dilatação tiveram
+auto-interseções. A grade de parede observada não pode ser invertida para
+obter o vazio: seu complemento reúne interior, exterior e regiões não
+observadas. Assim, SDF real e IoU volumétrica contra o scan não fazem parte
+do benchmark atual. Os experimentos estão preservados na branch
+`experiment/elaphes-meshing` e em artefatos locais; o
+[resumo quinzenal](docs/relatorios/resumo-quinzenal-tcc-2026-10-18.docx)
+registra os resultados e limites.
 
-Para o CA, um SDF de **controle simplificado**, independente da caverna de
-teste, poderá enviesar a regra. Usar o SDF exato da referência de teste é um
-experimento distinto de reconstrução condicionada. O algoritmo genético será
-avaliado depois de estabilizar `CA+SDF`.
+Na branch `CA` (`a58155e`), o CA já aceita um peso espacial somado à
+contagem de vizinhos. Há testes de equivalência entre ausência de peso e
+peso zero. A branch também contém flood fill e EDT experimentais da grade
+de **parede** do Elaphes, além de uma caminhada ponderada por waypoints
+voxelizada em `random_walk_temp/`. O campo do Elaphes usa o mesmo sinal e
+unidade, mas seu "interno" pode representar parede ou buracos fechados;
+não fornece `VOID` real validado.
+O guia por waypoints vem de modelos de cavernas reais e também não é um
+controle totalmente independente de referências. Um guia procedural com
+semântica, escala e sinal definidos continua pendente. O benchmark da branch
+ainda precisa de integração: ele importa `generate_cellular_automata`, nome
+ausente no pacote reorganizado. O ajuste genético de CA e Random Walk está
+planejado, com custo de busca separado do tempo de geração.
 
 ## Exportação de volumes gerados para malha
 
@@ -168,18 +189,19 @@ uv run python -m cavegen.meshing.export_mesh \
 
 ## Roadmap resumido
 
-1. Preparar normais, reconstruir e validar a malha da referência real.
-2. Desenvolver em paralelo flood fill, SDF/TSDF e CA guiado por um campo
-   sintético; depois integrar a malha real.
-3. Validar rótulos, máscaras e métricas no mesmo domínio espacial.
-4. Comparar CA básico, CA+SDF e, ao final, CA+SDF+algoritmo genético.
-5. Auditar dados para GAN e formalizar o MDP antes do PCGRL; treinar modelos
-   pequenos e separar custo de treinamento de geração.
-6. Consolidar benchmarks em Python e visualizar os resultados na Unity.
+1. Usar `64³` em ZYX nas medições finais; fechar sementes, repetições e
+   ambiente de execução, e reexecutar Random Walk e CA básico.
+2. Fechar avaliação estrutural com ocupação, conectividade e componentes;
+   documentar a unidade da transformada de distância.
+3. Auditar dados para GAN e definir o MDP de um PCGRL pequeno; separar treino
+   e geração quando houver modelos funcionais.
+4. Definir e executar o ajuste genético de parâmetros dos dois clássicos;
+   considerar CA com guia procedural como extensão.
+5. Consolidar resultados em Python e inspecionar volumes e malhas na Unity.
 
 A lista detalhada, com decisões ainda abertas, está em
 [`Orientacao-codex.md`](Orientacao-codex.md). A justificativa das métricas e da
-reconstrução está em [`docs/methodology-adjustments.md`](docs/methodology-adjustments.md).
+delimitação do scan está em [`docs/methodology-adjustments.md`](docs/methodology-adjustments.md).
 As tarefas individuais estão em
 [`Pablo`](docs/tarefas-pablo-reconstrucao-modelos.md) e
 [`Felipe`](docs/tarefas-felipe-sdf-ca.md).
@@ -194,3 +216,9 @@ As métricas finais devem ser calculadas em ambiente controlado e reportadas com
 - custo de integração, caso gRPC seja usado.
 
 Não misture resultados de Colab, máquina local e ROCm na mesma tabela principal sem identificá-los como ambientes distintos.
+
+As medições finais de estrutura usarão volumes `64³` em ZYX. CA e Random Walk
+podem permanecer na CPU enquanto modelos neurais usam GPU para treino ou
+inferência; o backend deve aparecer nos resultados de custo. Não é requisito
+portar o CA para GPU apenas para produzir os mesmos volumes. Uma comparação
+direta de tempo precisa considerar ambiente, etapa medida e transferências.

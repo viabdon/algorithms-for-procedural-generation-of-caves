@@ -1,96 +1,38 @@
-# Próximos passos do TCC — reconstrução, campos de distância e geração
+# Próximos passos do TCC — benchmark de geradores voxelizados
 
-**Estado em 30/09/2026.** Os leitores PLY/F32, limites XYZ do Elaphes,
-voxelização direta de superfície em `32³`, `Volume3D`, Random Walk, Cellular
-Automata básico e algumas métricas já existem. Ainda não há reconstrução de
-malha a partir da point cloud, classificação interior/exterior, SDF/TSDF,
-CA condicionado, GAN ou PCGRL funcional. A grade `elaphes_surface_32.npz`
-contém 245 células com pontos observados; ela é um diagnóstico, não a referência
-volumétrica final.
+**Direção definida em 18/10/2026; branch `CA` verificada em 28/10/2026.** O [resumo quinzenal](docs/relatorios/resumo-quinzenal-tcc-2026-10-18.docx) estabelece que a comparação dos geradores volta a partir de matrizes voxelizadas. A reconstrução do Elaphes, o SDF real e a IoU volumétrica não condicionam mais o avanço do TCC. A branch `CA` avançou no CA com peso, recursos e protótipos geométricos; esses avanços ainda não estão integrados ao `main`.
 
-## Caminho metodológico adotado
+## Contrato comum
 
 ```text
-point cloud -> normais estimadas/orientadas -> Screened Poisson (principal)
-            -> malha validada e aproximadamente watertight
-            -> entradas tratadas e interior/exterior classificados
-            -> SDF em grade -> TSDF para aprendizagem/controle
-            -> VOID / SURFACE / SOLID / UNKNOWN
+gerador -> Volume3D booleano em ZYX -> NPZ -> métricas e CSV em Python
+        -> malha opcional por Marching Cubes -> Unity
 ```
 
-Ball Pivoting e Alpha Shapes são candidatos de fallback da **reconstrução de
-malha**, caso o Poisson não produza uma geometria aceitável. Flood fill é uma
-implementação da **classificação**; consultas de ocupação ou winding numbers
-podem servir de comparação/fallback. O sinal do SDF depende da classificação:
-`SDF < 0` para `VOID`, `SDF > 0` para `SOLID/EXTERIOR`; uma banda `|SDF| ≤ ε`
-define `SURFACE`, e regiões sem evidência recebem `UNKNOWN`/máscara inválida.
-SDF e rótulos categóricos são artefatos distintos. Ver
-[`docs/architecture.md`](docs/architecture.md) e
-[`docs/methodology-adjustments.md`](docs/methodology-adjustments.md).
+`True` significa ar; `False`, sólido. As medições finais usarão `64³` em ZYX. Cada comparação deve declarar parâmetros, sementes, repetições, hardware e orçamento; escala física só deve ser atribuída aos voxels se houver conversão conhecida. Marching Cubes visualiza volumes gerados e não reconstrói a point cloud.
 
-## Responsabilidades e dependências
+O contrato para SDF **sintético de volume gerado** é positivo no interior do vazio, negativo no exterior sólido e zero na borda, com distância euclidiana em voxels ao voxel de borda mais próximo, na mesma grade ZYX. Registrar a regra de borda e a origem. O protótipo de `random_walk_temp/` já segue sinal e unidade; o campo de parede do Elaphes usa números semelhantes, sem validar a mesma classe de interior.
 
-| Frente | Responsável principal | Entrega que libera a outra frente |
+## Responsabilidades atuais
+
+| Frente | Responsável principal | Próxima entrega verificável |
 | --- | --- | --- |
-| Preparação da point cloud, normais, Screened Poisson, fallback e validação da malha | Pablo | Malha com coordenadas, orientação, entradas/tampas e proveniência documentadas |
-| Contrato semântico dos quatro rótulos, política de `UNKNOWN`, avaliação, GAN e PCGRL | Pablo | Especificação de sinal, grade, máscara de validade e protocolo de treino/teste |
-| Flood fill interior/exterior, SDF/TSDF em grade e testes geométricos | Felipe | Campo assinado e rótulos verificáveis, integráveis à malha validada |
-| CA com viés espacial por SDF de controle | Felipe | Baseline condicionado reproduzível, separado do CA original |
-| Algoritmo genético para otimizar o CA, após CA+SDF | Felipe | Comparação sob orçamento de busca e teste reservado |
+| Protocolo, avaliação estrutural, relato e frente neural | Pablo | Configurações comparáveis e definições de métricas; auditoria dos dados da GAN e MDP pequeno do PCGRL |
+| CA básico, reprodução e extensões de controle | Felipe | Integrar a API do CA da branch ao benchmark, reproduzir o baseline no protocolo comum e validar guia procedural |
+| Benchmark clássico e interpretação | Ambos | Random Walk e CA executados no mesmo protocolo, CSVs conferidos e dispersão documentada |
 
-As listas executáveis e metas indicativas estão em
-[`tarefas-pablo-reconstrucao-modelos.md`](docs/tarefas-pablo-reconstrucao-modelos.md)
-e [`tarefas-felipe-sdf-ca.md`](docs/tarefas-felipe-sdf-ca.md). As duas frentes
-podem avançar juntas: Felipe desenvolve flood fill e SDF com geometrias
-sintéticas e um campo tubular de controle, sem aguardar o PLY completo; Pablo
-entrega uma malha candidata para a integração posterior.
+Ver [tarefas de Pablo](docs/tarefas-pablo-reconstrucao-modelos.md) e [tarefas de Felipe](docs/tarefas-felipe-sdf-ca.md).
 
-## Marcos conjuntos
+## Ordem de trabalho
 
-- [ ] Acordar contrato XYZ↔ZYX, origem, espaçamento físico, sinal do SDF,
-  `ε`, `τ`, máscaras de `UNKNOWN`, limites da região de interesse e formato dos
-  artefatos. Uma mudança nesse contrato precisa ser refletida nas duas frentes.
-- [ ] Validar, em formas fechadas conhecidas, malha → classificação → SDF →
-  rótulos. Testar abertura legítima, gap acidental, orientação invertida e
-  superfície não watertight antes do Elaphes real.
-- [ ] Submeter a malha reconstruída a critérios de fechamento, orientação,
-  manifoldness, interseções, componentes, distância aos pontos, área de tampas
-  sintéticas e sensibilidade a parâmetros/resolução. `Watertight` isoladamente
-  não garante `VOID` correto.
-- [ ] Integrar a malha aceita ao flood fill/SDF. Se a incerteza impedir um
-  sinal defensável em alguma região, preservá-la como `UNKNOWN`; não converter
-  ausência de ponto em rocha ou ar por padrão.
-- [ ] Derivar `VOID`, `SURFACE` e `SOLID` do SDF apenas em células válidas;
-  persistir também SDF físico, TSDF normalizado, metadados e proveniência. Usar
-  IoU volumétrica contra dados reais só onde `VOID` de referência for válido.
-- [ ] Comparar CA clássico e CA condicionado sob seeds, forma, hardware e
-  orçamento equivalentes; medir aderência ao controle, conectividade,
-  diversidade, custo e sensibilidade ao peso do SDF.
-- [ ] Depois de estabilizar CA+SDF, avaliar se o algoritmo genético melhora
-  parâmetros da regra/controle contra uma busca simples de mesmo orçamento.
-  Reservar o teste e separar custo de otimização do tempo de geração.
-- [ ] Depois da referência validada, preparar divisões de dados sem vazamento
-  espacial e decidir modelos GAN/PCGRL. O SDF exato da caverna de teste só pode
-  alimentar um experimento separado de reconstrução condicionada, não o teste
-  principal de geração.
+1. Integrar a API do CA da branch `CA` ao benchmark, fechar o protocolo clássico e reexecutar Random Walk e CA básico. A branch traz contagem de vizinhos vetorizada, menu, resultados NPZ e amostragem de CPU/RSS e GPU/VRAM quando disponível; seus 53 testes passaram, mas a importação do benchmark falha pelo nome antigo `generate_cellular_automata`. Resultados finais comparáveis ainda precisam ser coletados.
+2. Definir avaliação estrutural com conectividade, componentes e ocupação. Declarar resolução e unidade da transformada de distância; ramificação, tortuosidade e diversidade só entram após definição e validação. Completar CPU/GPU/VRAM se fizerem parte do protocolo.
+3. Auditar dados para GAN e definir ambiente PCGRL pequeno, com recompensa de conectividade e ocupação. As interfaces atuais ainda não geram volumes. Dados sintéticos testam infraestrutura, sem demonstrar aprendizado de cavernas reais.
+4. Definir otimização genética dos parâmetros de CA e Random Walk, com espaços de busca, aptidão, orçamento e sementes de avaliação reservadas. Comparar com busca simples de mesmo orçamento; separar custo de busca e tempo de geração. O peso espacial do CA já foi prototipado e peso zero reproduz o CA básico. Um guia procedural independente do scan de teste permanece extensão distinta; seu SDF deve seguir o contrato positivo no vazio. O SDF experimental do Elaphes classifica parede, não vazio real.
+5. Inspecionar em Unity os volumes e malhas gerados. gRPC e portabilidade ROCm permanecem posteriores.
 
-## Ordem após a integração
+## Delimitação da referência real
 
-1. Medir similaridade de superfície, volume e topologia em Python, com domínio
-   e resolução comparáveis e `UNKNOWN` excluído ou explicitamente reportado.
-2. Auditar quantidade de cavernas independentes antes de treinar GAN; estudar
-   se TSDF/volume binário é a representação adequada. Um dataset sintético
-   testa infraestrutura, sem demonstrar fidelidade às cavernas reais.
-3. Especificar o MDP do PCGRL (`estado`, `ação`, `transição`, `recompensa`,
-   `término`) e usar estatísticas apenas do treino. Validar ambiente pequeno
-   antes de PPO/Conv3D; manter dados e métricas de teste fora da recompensa.
-4. Reexecutar baselines, registrar custos de preparação, treinamento e geração
-   separadamente, e atualizar o texto do TCC. Unity permanece visualizador e
-   gRPC segue posterior ao pipeline científico.
-5. Inspecionar o NASA Indian Tunnel `.f32`, seus atributos e limites completos
-   antes de aplicar nele a mesma reconstrução; não pressupor que seus dados
-   tenham cobertura ou normais equivalentes aos do Elaphes.
+Os pontos do Elaphes representam parede observada. A grade diagnóstica `32³` contém 245 voxels de superfície; o complemento mistura interior, exterior e áreas não observadas. As malhas experimentais não forneceram um interior validado: houve bordas, defeitos topológicos, auto-interseções ou extrapolação. A linha central serviu à inspeção, mas não estabeleceu o sinal do SDF. Não calcular IoU volumétrica contra o scan nem apresentar ocupação ou largura do vazio real como medidas observadas. Inspeção qualitativa e eventual comparação de superfície alinhada e toleranciada podem ser relatadas com limites explícitos.
 
-Mudanças Python com contrato observável exigem testes em `tests/`; antes de
-concluí-las, executar a suíte disponível e uma importação ou exemplo pequeno,
-conforme `AGENTS.md`.
+Mudanças Python com contrato observável exigem testes em `tests/`; antes de concluí-las, executar a suíte e uma importação ou exemplo pertinente, conforme `AGENTS.md`.
