@@ -1,6 +1,6 @@
 # Próximos passos do TCC — benchmark de geradores voxelizados
 
-**Direção definida em 18/10/2026; branch `CA` verificada em 28/10/2026.** O [resumo quinzenal](docs/relatorios/resumo-quinzenal-tcc-2026-10-18.docx) estabelece que a comparação dos geradores volta a partir de matrizes voxelizadas. A reconstrução do Elaphes, o SDF real e a IoU volumétrica não condicionam mais o avanço do TCC. A branch `CA` avançou no CA com peso, recursos e protótipos geométricos; esses avanços ainda não estão integrados ao `main`.
+**Direção definida em 18/10/2026; responsabilidades atualizadas em 02/11/2026.** O [resumo quinzenal](docs/relatorios/resumo-quinzenal-tcc-2026-10-18.docx) estabelece que a comparação dos geradores volta a partir de matrizes voxelizadas. A reconstrução do Elaphes, o SDF real e a IoU volumétrica não condicionam mais o avanço do TCC. A branch `CA` avançou no CA com peso, recursos e protótipos geométricos; Felipe também iniciou a frente de Random Walk. Esses avanços ainda não estão integrados ao `main`.
 
 ## Contrato comum
 
@@ -17,19 +17,27 @@ O contrato para SDF **sintético de volume gerado** é positivo no interior do v
 
 | Frente | Responsável principal | Próxima entrega verificável |
 | --- | --- | --- |
-| Protocolo, avaliação estrutural, relato e frente neural | Pablo | Configurações comparáveis e definições de métricas; auditoria dos dados da GAN e MDP pequeno do PCGRL |
-| CA básico, reprodução e extensões de controle | Felipe | Integrar a API do CA da branch ao benchmark, reproduzir o baseline no protocolo comum e validar guia procedural |
-| Benchmark clássico e interpretação | Ambos | Random Walk e CA executados no mesmo protocolo, CSVs conferidos e dispersão documentada |
+| Métricas e protocolo de medição | Pablo | API e esquema padronizados para métricas estruturais e de custo, com validações e testes |
+| Modelos neurais | Pablo | GAN e PCGRL funcionais sob o contrato `Volume3D`, com treino separado de geração |
+| Parsing de novas cavernas | Pablo | Inventário e leitura incremental dos formatos disponíveis no volume `D:`, após o fim da descompactação |
+| CA, Random Walk e extensões de controle | Felipe | Integrar os geradores ao protocolo comum e produzir volumes rastreáveis para avaliação |
+| Algoritmo evolutivo para CA e Random Walk | Felipe | Espaços de busca, aptidão e orçamento definidos sobre a interface de métricas padronizada |
+| Fechamento do protocolo e interpretação | Ambos | Sementes, orçamento e hardware acordados; CSVs conferidos e dispersão documentada |
 
 Ver [tarefas de Pablo](docs/tarefas-pablo-reconstrucao-modelos.md) e [tarefas de Felipe](docs/tarefas-felipe-sdf-ca.md).
 
 ## Ordem de trabalho
 
-1. Integrar a API do CA da branch `CA` ao benchmark, fechar o protocolo clássico e reexecutar Random Walk e CA básico. A branch traz contagem de vizinhos vetorizada, menu, resultados NPZ e amostragem de CPU/RSS e GPU/VRAM quando disponível; seus 53 testes passaram, mas a importação do benchmark falha pelo nome antigo `generate_cellular_automata`. Resultados finais comparáveis ainda precisam ser coletados.
-2. Definir avaliação estrutural com conectividade, componentes e ocupação. Declarar resolução e unidade da transformada de distância; ramificação, tortuosidade e diversidade só entram após definição e validação. Completar CPU/GPU/VRAM se fizerem parte do protocolo.
-3. Auditar dados para GAN e definir ambiente PCGRL pequeno, com recompensa de conectividade e ocupação. As interfaces atuais ainda não geram volumes. Dados sintéticos testam infraestrutura, sem demonstrar aprendizado de cavernas reais.
-4. Definir otimização genética dos parâmetros de CA e Random Walk, com espaços de busca, aptidão, orçamento e sementes de avaliação reservadas. Comparar com busca simples de mesmo orçamento; separar custo de busca e tempo de geração. O peso espacial do CA já foi prototipado e peso zero reproduz o CA básico. Um guia procedural independente do scan de teste permanece extensão distinta; seu SDF deve seguir o contrato positivo no vazio. O SDF experimental do Elaphes classifica parede, não vazio real.
-5. Inspecionar em Unity os volumes e malhas gerados. gRPC e portabilidade ROCm permanecem posteriores.
+1. Pablo implementa e padroniza a coleta de métricas. A primeira entrega deve fixar contratos de entrada e saída, conectividade, componentes, ocupação, transformada de distância e medidas de custo, com tratamento explícito de volumes degenerados, resolução, unidade, sementes, repetições e hardware. Essa interface é pré-requisito direto para comparar geradores e para a função de aptidão evolutiva.
+2. Com o contrato de métricas estável, Pablo implementa as redes neurais de geração. A GAN exige auditoria dos volumes de treino; o PCGRL exige um MDP pequeno. Ambos devem retornar `Volume3D` e separar treino de geração/inferência. Não é necessário esperar o encerramento de todos os experimentos clássicos para iniciar essa infraestrutura.
+3. Pablo inventaria e implementa o parsing das novas cavernas. As point clouds locais devem ser lidas preferencialmente no volume externo `D:`, sem cópia para o repositório. Três das 16 cavernas obtidas a partir da fonte associada ao KarstConduitCatalogue ainda estão em descompactação e não devem ser tratadas como entradas disponíveis. O formato e o caminho exato de cada conjunto precisam ser verificados antes de escolher ou estender um parser.
+4. Em paralelo, Felipe continua o CA e o Random Walk, integra os dois ao contrato comum e, quando a interface de métricas estiver disponível, implementa o algoritmo evolutivo para ajustar seus parâmetros. Espaços de busca, aptidão, orçamento e sementes reservadas devem ser documentados; comparar com busca simples de mesmo orçamento e separar custo de busca do tempo de geração.
+5. A padronização ampla da documentação e a redação consolidada dos resultados ocorrem somente ao fim do experimento. Durante a execução, manter apenas registros mínimos de configuração, proveniência, decisões metodológicas e mudanças de contrato necessários à reprodutibilidade.
+6. Inspecionar em Unity os volumes e malhas gerados. gRPC e portabilidade ROCm permanecem posteriores.
+
+## Dados externos locais
+
+O volume `D:` é a fonte local preferencial para point clouds e outros dados grandes de cavernas. Não mover esses arquivos para `data/` apenas para executar o pipeline e não versionar caminhos absolutos específicos sem uma opção configurável. Como há extrações longas em andamento, conferir se cada arquivo terminou de ser descompactado antes de ler, calcular hash ou validar tamanho. O parsing continua incremental, preserva `float32` e distingue superfície observada de volume de vazio.
 
 ## Delimitação da referência real
 

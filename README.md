@@ -86,6 +86,20 @@ uv pip install -e . --system
 
 Os arquivos em `requirements/` ficam apenas como fallback/compatibilidade para ambientes em que `uv` não estiver disponível.
 
+## Dados externos locais
+
+As point clouds grandes disponíveis nesta máquina devem ser acessadas
+preferencialmente no volume externo `D:`, sem cópia para o repositório. O
+caminho exato de cada dataset deve ser configurado ou informado no momento da
+execução, pois a organização do volume é local e pode mudar.
+
+Três cavernas obtidas entre as 16 usadas na fonte associada ao
+KarstConduitCatalogue ainda estão em descompactação. Elas não devem ser
+tratadas como entradas disponíveis até a extração terminar. Antes de criar ou
+escolher um parser, validar formato, cabeçalho, tamanho, eixos e unidade de
+cada conjunto. O processamento deve continuar incremental, preservar
+`float32` e não carregar a point cloud completa por padrão.
+
 ## Validação para contribuições e forks
 
 Depois de sincronizar as dependências, execute a suíte unitária completa antes
@@ -189,15 +203,17 @@ uv run python -m cavegen.meshing.export_mesh \
 
 ## Roadmap resumido
 
-1. Usar `64³` em ZYX nas medições finais; fechar sementes, repetições e
-   ambiente de execução, e reexecutar Random Walk e CA básico.
-2. Fechar avaliação estrutural com ocupação, conectividade e componentes;
-   documentar a unidade da transformada de distância.
-3. Auditar dados para GAN e definir o MDP de um PCGRL pequeno; separar treino
-   e geração quando houver modelos funcionais.
-4. Definir e executar o ajuste genético de parâmetros dos dois clássicos;
-   considerar CA com guia procedural como extensão.
-5. Consolidar resultados em Python e inspecionar volumes e malhas na Unity.
+1. Pablo implementa e padroniza a coleta de métricas, incluindo contratos,
+   casos degenerados, unidades, recursos computacionais e esquema de saída.
+2. Com essa interface estável, Pablo implementa GAN e PCGRL sob o contrato
+   `Volume3D`, mantendo treino separado de geração/inferência.
+3. Pablo inventaria e parseia incrementalmente as novas cavernas no volume
+   `D:` após a conclusão das descompactações.
+4. Em paralelo, Felipe continua CA e Random Walk e, depois, implementa o
+   algoritmo evolutivo para ajustar os dois geradores usando as métricas
+   padronizadas.
+5. Após a coleta e a análise, padronizar a documentação, consolidar os
+   resultados e inspecionar volumes e malhas na Unity.
 
 A lista detalhada, com decisões ainda abertas, está em
 [`Orientacao-codex.md`](Orientacao-codex.md). A justificativa das métricas e da

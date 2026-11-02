@@ -1,10 +1,12 @@
 # Notebooks Colab
 
-Use esta pasta para prototipação e treinamento após fechar o benchmark clássico
-em Python. GAN e PCGRL ainda não geram volumes no código atual. Antes de treinar
-GAN, audite a semântica e a independência dos volumes; dados sintéticos só
-verificam a infraestrutura. Para PCGRL, comece com conectividade e ocupação,
-sem IoU contra o scan do Elaphes.
+Use esta pasta para prototipação e treinamento depois que o contrato comum de
+métricas estiver estável. Não é necessário esperar o encerramento de toda a
+coleta dos geradores clássicos para iniciar a infraestrutura neural. GAN e
+PCGRL ainda não geram volumes no código atual. Antes de treinar GAN, audite a
+semântica e a independência dos volumes; dados sintéticos só verificam a
+infraestrutura. Para PCGRL, comece com conectividade e ocupação, sem IoU contra
+o scan do Elaphes.
 
 Sugestão de ordem:
 

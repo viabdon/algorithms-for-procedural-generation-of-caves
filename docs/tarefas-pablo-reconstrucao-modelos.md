@@ -1,10 +1,10 @@
-# Tarefas do Pablo — protocolo, avaliação e modelos neurais
+# Tarefas do Pablo — métricas, modelos neurais e parsing
 
-**Replanejamento de 18/10/2026.** A frente de reconstrução do Elaphes passa ao registro histórico e não bloqueia o TCC. O foco é fechar a comparação de geradores voxelizados. Ver o [resumo quinzenal](relatorios/resumo-quinzenal-tcc-2026-10-18.docx), o [roadmap](roadmap.md) e as [tarefas de Felipe](tarefas-felipe-sdf-ca.md).
+**Responsabilidades atualizadas em 02/11/2026.** A frente de reconstrução do Elaphes permanece como registro histórico e não bloqueia o TCC. Pablo prioriza a coleta padronizada de métricas, depois os geradores neurais e, em terceiro, o parsing das novas cavernas. Ver o [resumo quinzenal](relatorios/resumo-quinzenal-tcc-2026-10-18.docx), o [roadmap](roadmap.md) e as [tarefas de Felipe](tarefas-felipe-sdf-ca.md).
 
 ## Divisão de trabalho deste plano
 
-Pablo conduz o **protocolo comparativo**, a configuração e o ajuste de parâmetros do **Random Walk**, a definição das métricas, a análise estatística, o texto do TCC e a frente GAN/PCGRL. Felipe conduz a implementação e o ajuste do **CA**, incluindo o peso espacial e a instrumentação iniciada na branch `CA`. Os dois fecham juntos orçamento, sementes, hardware e interpretação dos resultados. Essa divisão organiza as próximas entregas; não afirma que os experimentos já foram executados.
+Pablo conduz a **implementação e a padronização das métricas**, a análise estatística, a frente GAN/PCGRL e o parsing incremental das novas cavernas. Felipe conduz **CA e Random Walk** e, depois, o algoritmo evolutivo usado para ajustar os dois geradores. Os dois fecham juntos orçamento, sementes, hardware e interpretação dos resultados. A padronização ampla da documentação fica para o fim do experimento; registros mínimos de proveniência, configuração e decisões de contrato continuam obrigatórios durante a execução.
 
 ## Já disponível e limites conhecidos
 
@@ -13,31 +13,27 @@ Pablo conduz o **protocolo comparativo**, a configuração e o ajuste de parâme
 - [x] Random Walk e CA básico geram `Volume3D`; GAN e PCGRL ainda são interfaces sem geração funcional no `main`.
 - [x] Na branch `CA`, Felipe prototipou CA vetorizado com peso espacial, amostragem de recursos, flood fill/EDT da grade de parede do Elaphes e uma caminhada ponderada por waypoints. Esses resultados não validam o interior real nem estão integrados ao benchmark do `main`.
 
-## Prioridade imediata — protocolo e baselines
+## Prioridade 1 — coleta e padronização de métricas
 
 - [x] Registrar a configuração inicial `baseline_32.yaml`: volume ZYX `32³`, sementes `0` a `4` e parâmetros dos dois geradores clássicos.
 - [x] Acordar `64³` em ZYX como grade das medições finais. `baseline_32.yaml` é configuração inicial, não o protocolo final.
-- [ ] Fixar com Felipe sementes, repetições de medição, orçamento de ajuste, hardware e versões. A escala física do voxel só será declarada se houver conversão conhecida.
-- [ ] Criar a configuração final `64³` em ZYX, separada de `baseline_32.yaml`. Registrar parâmetros fixos de cada gerador e a origem de cada configuração no CSV/NPZ.
-- [ ] Definir o espaço de busca do **Random Walk** (por exemplo, passos e raio, conforme o gerador escolhido), limites válidos e função de aptidão com métricas estruturais. Definir com Felipe os critérios comuns usados também no CA, sem exigir parâmetros idênticos entre algoritmos.
-- [ ] Reservar sementes distintas para ajuste e avaliação final. Fixar número de sementes por candidato, total de avaliações do GA, critério de parada e controle por busca simples. Registrar **número de avaliações e tempo total**: igual contagem de candidatos não garante igual tempo entre geradores.
-- [ ] Conferir com Felipe a integração da nova API do CA ao benchmark. Em `a58155e`, 53 testes passaram, mas a importação do benchmark falhou porque `generate_cellular_automata` não é exportado pelo pacote reorganizado.
-- [ ] Reexecutar o Random Walk básico e, depois do ajuste, sua versão com parâmetros escolhidos. Conferir NPZ e CSV, registrar dispersão por semente e manter os mesmos critérios de avaliação do CA.
-- [ ] Interpretar tempo de geração, pico de RSS, proporção de vazio e fração da maior componente. Especificar contagem de componentes e casos degenerados antes do relato.
-- [ ] Explicitar que as estatísticas atuais da transformada de distância são descritores do espaço livre em unidades da grade, e não largura validada de todos os túneis.
+- [ ] Inventariar as funções atuais de tempo, RSS, ocupação, conectividade e transformada de distância, incluindo contratos, unidades e comportamento em entradas degeneradas.
+- [ ] Definir uma interface comum que receba `Volume3D` ou `bool[D,H,W]` validado e devolva métricas escalares com nomes, tipos e unidades estáveis.
+- [ ] Definir e validar conectividade, contagem de componentes, fração na maior componente e ocupação. Especificar ramificação, tortuosidade e diversidade antes de implementá-las.
+- [ ] Explicitar que a transformada de distância descreve o espaço livre em unidades da grade e não é, por si só, largura validada de todos os túneis.
+- [ ] Padronizar a coleta de tempo, CPU, RSS e, quando disponível, GPU/VRAM. Separar geração, busca evolutiva, treino, inferência, transferências e visualização; leitura ausente de GPU não equivale a zero.
+- [ ] Definir tratamento de volumes vazios, totalmente abertos, desconectados, com dtype ou shape inválido, e cobrir os contratos públicos com testes.
+- [ ] Fixar o esquema de CSV e os metadados de eixos, resolução, seed, repetição, parâmetros, hardware, backend e versões. A escala física do voxel só será declarada quando houver conversão conhecida.
+- [ ] Entregar a Felipe a interface estável de métricas para integração com CA, Random Walk e a função de aptidão evolutiva.
 - [x] Definir o contrato público do SDF sintético: positivo no interior do vazio gerado, negativo no exterior sólido, zero na borda e distância euclidiana em voxels, na grade ZYX.
 - [ ] Separar no relato o SDF experimental da **parede** do Elaphes do SDF de um vazio gerado. Os dois compartilham sinal e unidade, mas não a semântica do interior; a IoU 0,49 do diário é diagnóstica, sem `VOID` real validado. O guia por waypoints do projeto base também incorpora referência a cavernas reais.
 
-## Avaliação e escrita
+## Protocolo compartilhado com Felipe
 
-- [ ] Definir medidas de conectividade, ocupação e componentes, e validar como serão agregadas entre sementes. Definir ramificação, tortuosidade e diversidade antes de usá-las.
-- [ ] Atualizar o texto do TCC: retirar IoU volumétrica contra o Elaphes da avaliação atual, registrar o limite de não haver `VOID` real validado e separar resultados confirmados de hipóteses.
-
-### Orçamento e repetições a fechar com Felipe
-
-- [ ] Definir quantas sementes independentes geram os volumes finais e quantas repetições de tempo medem a variação da máquina. Não tratar várias medições da **mesma** seed como diversidade geométrica.
-- [ ] Fixar o mesmo orçamento de busca para GA e busca simples dentro de cada algoritmo; registrar avaliações realizadas, tempo total e eventuais execuções interrompidas. Relatar o custo de ajuste separado do custo de gerar um volume com parâmetros já fixados.
-- [ ] Definir critério de seleção de candidatos antes de olhar as sementes reservadas. Aplicar a mesma regra de seleção e o mesmo conjunto de métricas a CA e Random Walk.
+- [ ] Fixar com Felipe sementes independentes, repetições de medição, orçamento de busca, hardware e versões. Não tratar várias medições da mesma seed como diversidade geométrica.
+- [ ] Definir como as métricas serão agregadas entre sementes e como casos inválidos entram na análise.
+- [ ] Validar o esquema com saídas pequenas de CA e Random Walk antes da coleta final.
+- [ ] Ajudar a fixar a aptidão e o critério de seleção antes de examinar sementes reservadas, sem assumir a implementação do algoritmo evolutivo.
 
 ### Hardware e apresentação dos custos
 
@@ -45,11 +41,32 @@ Pablo conduz o **protocolo comparativo**, a configuração e o ajuste de parâme
 - [ ] Separar tabelas de **qualidade estrutural** dos volumes `64³` e de **custo por ambiente**. CA e Random Walk podem rodar na CPU, enquanto GAN/PCGRL podem usar GPU no Colab. Não ordenar tempos de CPU local e GPU do Colab como se fossem o mesmo hardware.
 - [ ] Medir separadamente ajuste genético, treino neural, geração/inferência e exportação/visualização. Portar CA para GPU só se a pergunta experimental incluir aceleração por GPU; nesse caso, conferir equivalência e medir também transferências e sincronização.
 
-## Frente neural após o benchmark clássico
+## Prioridade 2 — geradores neurais
 
 - [ ] Auditar a quantidade, independência e semântica dos volumes de treino antes de escolher GAN. Dados sintéticos podem testar infraestrutura, sem alegação de aprendizado de cavernas reais.
 - [ ] Definir o MDP do PCGRL: estado, ações, transição, recompensa, término e orçamento. Começar em grade pequena, com conectividade e ocupação; não usar IoU com o scan.
-- [ ] Planejar geração funcional de GAN e PCGRL sob o mesmo contrato `Volume3D` e comparação com os baselines, separando treino de inferência.
+- [ ] Implementar geração funcional de GAN e PCGRL sob o mesmo contrato `Volume3D` e comparação com os baselines, separando treino de inferência.
+- [ ] Reutilizar a interface de métricas da prioridade 1; no PCGRL, selecionar para recompensa apenas medidas bem definidas e com custo adequado por passo.
+
+Esta frente pode começar quando o contrato de métricas estiver estável; não depende do encerramento de toda a coleta dos geradores clássicos.
+
+## Prioridade 3 — parsing das novas cavernas
+
+- [ ] Usar o volume externo `D:` como origem preferencial das point clouds. Não copiar arquivos grandes para o repositório apenas para processá-los.
+- [ ] Aguardar a conclusão da descompactação das três cavernas em andamento antes de calcular tamanho, hash, limites ou validar conteúdo.
+- [ ] Inventariar nomes, caminhos, formatos, tamanhos, sistemas de eixos e unidades quando conhecidas. Registrar quais entradas pertencem ao conjunto de 16 associado à fonte do KarstConduitCatalogue.
+- [ ] Reutilizar `iter_ply_xyz` e `iter_f32_xyz` quando os formatos forem compatíveis; criar parser novo somente após validar o formato real.
+- [ ] Manter leitura incremental, `numpy.memmap` quando aplicável, coordenadas `float32`, mensagens de erro com o arquivo e testes sintéticos pequenos.
+- [ ] Tratar cada point cloud como superfície observada até existir uma conversão metodologicamente documentada para outra representação.
+
+O caminho exato dentro de `D:` ainda não foi fixado na documentação e deve ser confirmado quando os arquivos estiverem prontos. Essa confirmação é um pré-requisito operacional direto, sem mudar a divisão de responsabilidades.
+
+## Padronização documental ao fim do experimento
+
+- [ ] Após a coleta e a análise, consolidar o texto do TCC, contratos, tabelas, limitações, comandos e resultados confirmados.
+- [ ] Registrar então, de forma uniforme, a retirada da IoU volumétrica contra o Elaphes e o limite de não haver `VOID` real validado.
+
+Durante o experimento, atualizar somente registros necessários para reprodução, proveniência e mudanças de contrato. Evitar uma revisão editorial ampla antes de os resultados se estabilizarem.
 
 ## Registro da reconstrução
 

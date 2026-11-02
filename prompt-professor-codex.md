@@ -180,6 +180,11 @@ Respeite rigorosamente as convenções e decisões documentadas no `AGENTS.md`.
 Em especial:
 
 * os datasets reais podem ter dezenas ou centenas de milhões de pontos;
+* as point clouds locais devem ser acessadas preferencialmente no volume
+  externo `D:`, sem duplicação no repositório;
+* três cavernas do conjunto obtido a partir da fonte associada ao
+  KarstConduitCatalogue ainda estão em descompactação e não são entradas
+  disponíveis;
 * portanto, evite soluções que carreguem arquivos inteiros na RAM sem necessidade;
 * priorize streaming, processamento incremental, amostragem e `numpy.memmap` quando apropriado;
 * preserve coordenadas como `float32`, salvo justificativa técnica;
@@ -232,11 +237,14 @@ SDF de parede ou a IoU diagnóstica do diário com referência de `VOID` real.
 Os testes da branch passaram (53), mas a importação do benchmark falha pelo
 nome antigo `generate_cellular_automata`.
 
-A próxima prioridade é integrar a API do CA, fechar o protocolo e reexecutar
-os dois baselines clássicos. Pablo cuida de avaliação, relato e planejamento
-neural; Felipe cuida do CA e do guia procedural de controle. Consulte
-`Orientacao-codex.md`, as listas em `docs/` e o resumo quinzenal para as
-prioridades atualizadas.
+A prioridade 1 de Pablo é implementar e padronizar a coleta de métricas. Com
+essa interface estável, a prioridade 2 é implementar GAN e PCGRL; a prioridade
+3 é inventariar e parsear incrementalmente as novas cavernas do volume `D:`.
+Felipe continua o CA, já iniciou o Random Walk e depois implementará o
+algoritmo evolutivo para os dois geradores. Os dois fecham sementes, orçamento
+e hardware em conjunto. A padronização ampla da documentação ocorre somente
+ao fim do experimento; durante a execução, registrar o mínimo necessário à
+reprodutibilidade e às mudanças de contrato.
 
 As medições finais usarão `64³` em ZYX. Está planejado ajuste genético de
 parâmetros para CA e Random Walk, com espaços de busca ainda a definir. O CA

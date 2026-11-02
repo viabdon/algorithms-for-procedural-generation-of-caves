@@ -1,10 +1,10 @@
-# Tarefas do Felipe — CA e extensões de controle
+# Tarefas do Felipe — CA, Random Walk e algoritmo evolutivo
 
-**Estado verificado na branch `CA` em 28/10/2026 (`a58155e`).** O CA básico e o benchmark clássico continuam prioritários. A branch avançou no CA com pesos, instrumentação e protótipos de SDF, ainda sem integração validada ao benchmark principal. Flood fill e SDF real do Elaphes não são dependências do benchmark. Ver o [resumo quinzenal](relatorios/resumo-quinzenal-tcc-2026-10-18.docx), o [roadmap](roadmap.md) e as [tarefas de Pablo](tarefas-pablo-reconstrucao-modelos.md).
+**Responsabilidades atualizadas em 02/11/2026.** Felipe continua responsável pelo CA, já iniciou o progresso no Random Walk e, depois da estabilização desses geradores e da interface comum de métricas, implementará o algoritmo evolutivo. Flood fill e SDF real do Elaphes não são dependências do benchmark. Ver o [resumo quinzenal](relatorios/resumo-quinzenal-tcc-2026-10-18.docx), o [roadmap](roadmap.md) e as [tarefas de Pablo](tarefas-pablo-reconstrucao-modelos.md).
 
 ## Divisão de trabalho deste plano
 
-Felipe conduz a **integração e os experimentos do CA**, seu peso espacial, a instrumentação da branch `CA` e o ajuste genético dos parâmetros do CA. Pablo conduz o **Random Walk** no benchmark, o ajuste de seus parâmetros, as métricas, a análise e a frente neural. Os dois fecham juntos sementes, orçamento e hardware para que os resultados tenham o mesmo critério de leitura. Isso define entregas pendentes, não resultados já obtidos.
+Felipe conduz a **integração e os experimentos do CA e do Random Walk**, incluindo extensões de controle, e implementa o **algoritmo evolutivo** para ajustar os parâmetros dos dois geradores. Pablo fornece a interface padronizada de métricas, conduz a análise e implementa a frente neural e os parsers das novas cavernas. Os dois fecham juntos sementes, orçamento e hardware para que os resultados tenham o mesmo critério de leitura.
 
 ## Base disponível
 
@@ -15,7 +15,7 @@ Felipe conduz a **integração e os experimentos do CA**, seu peso espacial, a i
 - [x] A branch inclui um amostrador de recursos do processo com tempo, CPU e RSS, além de GPU/VRAM quando disponíveis. A interpretação e a comparabilidade dessas medidas ainda dependem de protocolo.
 - [ ] Os resultados comparáveis e a dispersão entre sementes ainda precisam ser coletados no protocolo comum.
 
-## Prioridade imediata — reproduzir o CA
+## Prioridade imediata — consolidar CA e Random Walk
 
 - [ ] Reparar a integração da branch com o benchmark: `run_generation_benchmark.py` importa `generate_cellular_automata`, ausente no pacote reorganizado. O import falha em `a58155e`, embora os 53 testes da branch passem.
 - [ ] Depois da correção, executar um caso pequeno de ponta a ponta e conferir contrato `Volume3D`, formato NPZ, linha CSV e tempo medido antes de iniciar a coleta final.
@@ -24,6 +24,9 @@ Felipe conduz a **integração e os experimentos do CA**, seu peso espacial, a i
 - [ ] Fixar com Pablo sementes, repetições de medição, orçamento de ajuste, hardware e versões. A escala física do voxel só será declarada se houver conversão conhecida.
 - [ ] Criar a configuração final do CA em `64³` ZYX, separada de `baseline_32.yaml`, com probabilidade inicial, sensibilidade, iterações e regra de borda registradas. Evitar a borda aleatória na comparação que exige reprodução bit a bit, ou controlar explicitamente seus sorteios.
 - [ ] Reexecutar o CA básico e, depois do ajuste, o CA com parâmetros escolhidos; conferir arquivos NPZ e linhas CSV, registrar configuração e variação entre sementes.
+- [ ] Continuar a implementação do Random Walk já iniciada, escolher qual variante entra no benchmark e integrá-la ao contrato público `Volume3D`.
+- [ ] Registrar os parâmetros do Random Walk, sua proveniência e as decisões de voxelização; manter o protótipo por waypoints separado do baseline quando houver condicionamento por dados reais.
+- [ ] Executar casos pequenos dos dois geradores contra a interface de métricas fornecida por Pablo antes da coleta final.
 - [ ] Inspecionar conectividade, componentes e ocupação, inclusive volume sem ar e volume quase todo aberto. Conferir a semântica das bordas no relatório.
 - [ ] Registrar que a transformada de distância ao sólido depende da resolução e do espaçamento; seus resumos não são automaticamente a largura de todos os túneis.
 
@@ -35,18 +38,20 @@ Felipe conduz a **integração e os experimentos do CA**, seu peso espacial, a i
 - [ ] Consolidar um campo de controle independente do scan de teste, com origem, regra de borda e parâmetros registrados, preservando o contrato acima. Os waypoints do protótipo atual vêm de cavernas reais do projeto base.
 - [ ] Comparar CA básico e condicionado com sementes e orçamento equivalentes, medindo ocupação, conectividade, aderência ao controle permitido, diversidade e custo. Separar o efeito do controle da geração sem condicionamento.
 
-## Ajuste planejado — otimização genética
+## Etapa seguinte — algoritmo evolutivo para os dois geradores
 
-- [ ] Definir cromossomo e limites dos parâmetros do **CA**: probabilidade inicial, sensibilidade, iterações e tratamento de borda; incluir peso de controle apenas se o experimento condicionado for aprovado. Combinar com Pablo a mesma função de aptidão estrutural usada no Random Walk, com parâmetros próprios para cada gerador.
+- [ ] Definir cromossomo e limites dos parâmetros do **CA**: probabilidade inicial, sensibilidade, iterações e tratamento de borda; incluir peso de controle apenas se o experimento condicionado for aprovado.
+- [ ] Definir cromossomo e limites dos parâmetros do **Random Walk** conforme a variante escolhida, sem forçar os mesmos parâmetros ou codificação do CA.
+- [ ] Construir a função de aptidão sobre a interface de métricas de Pablo e registrar pesos, normalização, penalidades e tratamento de candidatos inválidos.
 - [ ] Fixar sementes de ajuste e sementes reservadas de avaliação, número de sementes por candidato, total de avaliações, parada e tratamento de candidatos inválidos. Não selecionar parâmetros usando os resultados reservados.
-- [ ] Comparar o GA do CA com busca simples de igual orçamento. Registrar número de avaliações e tempo total de busca; medir separadamente o tempo de gerar um volume com a configuração escolhida. Pablo faz a avaliação correspondente do Random Walk.
+- [ ] Comparar o algoritmo evolutivo de cada gerador com busca simples de igual orçamento. Registrar número de avaliações e tempo total de busca; medir separadamente o tempo de gerar um volume com a configuração escolhida.
 
 ## Orçamento, repetições e hardware a fechar com Pablo
 
 - [ ] Separar sementes diferentes para medir diversidade geométrica de repetições da mesma configuração para estimar variação de tempo. Definir quantidades antes da coleta e registrar cada execução.
 - [ ] Usar o rastreador de CPU/RSS e de GPU/VRAM quando disponível, anotando máquina, threads, backend e versões. Verificar o intervalo de amostragem e execuções curtas; célula vazia de GPU significa leitura ausente.
 - [ ] Manter o CA otimizado na CPU para o protocolo inicial. Não é necessário portá-lo para GPU porque GAN/PCGRL treinam no Colab. Uma porta para GPU seria experimento separado de aceleração, com teste de equivalência, transferências e sincronização medidos.
-- [ ] Entregar a Pablo os resultados de CA básico, CA ajustado e, se houver, CA condicionado com configuração, sementes, métricas e ambiente. Custos de CPU local e GPU do Colab devem ser apresentados por ambiente, sem uma classificação direta de velocidade entre máquinas diferentes.
+- [ ] Entregar a Pablo os resultados de CA e Random Walk, antes e depois do ajuste, e, se houver, variantes condicionadas, sempre com configuração, sementes, métricas e ambiente. Custos de CPU local e GPU do Colab devem ser apresentados por ambiente, sem uma classificação direta de velocidade entre máquinas diferentes.
 
 ## Limite da frente real
 
