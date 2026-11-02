@@ -1,0 +1,10 @@
+# Tema da bancada do CA (src/cavegen/ui/): fundo preto como os plots de radar.
+[theme]
+base = "dark"
+backgroundColor = "#000000"
+secondaryBackgroundColor = "#111111"
+textColor = "#e6e6e6"
+primaryColor = "#00e676"
+
+[browser]
+gatherUsageStats = false
