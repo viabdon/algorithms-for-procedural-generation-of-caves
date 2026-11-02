@@ -24,12 +24,27 @@ Este é o contrato escolhido para novos campos sintéticos; não afirma que já 
 | --- | --- | --- |
 | Random Walk e CA básico | `Volume3D` booleano em ZYX | Implementados |
 | Persistência | Volume gerado em NPZ | Implementada |
-| Benchmark inicial | Tempo, pico de RSS, proporção de vazio, fração da maior componente e estatísticas de distância ao sólido | Implementado para os dois geradores; reexecução comparável e resultados finais pendentes |
+| Avaliação estrutural | `evaluate_structure(Volume3D)` → `StructuralMetrics` imutável | Ocupação, componentes e EDT, validações e degeneração explícitas; registro plano `structural-v1` |
+| Benchmark inicial | Uma linha por execução no CSV central, com NPZ rastreável | Padrão `64³`, persistência incremental, tempo e RSS iniciais; protocolo computacional completo e resultados finais pendentes |
 | Marching Cubes | Malha derivada do volume gerado | Disponível para visualização |
 | GAN e PCGRL | Devem gerar `Volume3D` | Interfaces ainda lançam `NotImplementedError` |
 | CPU/GPU/VRAM e descritores adicionais | Protocolo e instrumentação | Pendentes no `main`; há protótipo de rastreamento na branch `CA` |
 
 A transformada de distância descreve o espaço livre em unidades da grade atual. Seus resumos não validam, por si sós, a largura de todos os túneis. Resolução, espaçamento e bordas precisam ser explicitados para interpretações físicas.
+
+O [contrato estrutural](metricas-estruturais.md) usa conectividade 6 por padrão,
+spacing ZYX explícito e exterior sólido para a EDT de volumes mistos. Volumes
+totalmente sólidos ou abertos têm distâncias ausentes e motivo de degeneração.
+O benchmark obtém as colunas do agregador e acrescenta linhas a
+`results/csv/experiments.csv`, preservando NPZ em subpastas por experimento.
+
+`python -m cavegen` abre o menu interativo em `cavegen.menu`. A interface usa
+`run_configuration` para geração e `evaluate_archive` para reavaliar NPZ.
+Ambos usam a mesma construção e persistência de registros, preservando o
+cabeçalho `structural-v1`; reavaliações usam a variante `structural_evaluation`
+e não preenchem custos de geração. Operações repetitivas futuras devem ser
+adicionadas ao menu com serviços reutilizáveis, validação, cancelamento e
+glossário no documento da funcionalidade.
 
 ## Código experimental na branch `CA` (`a58155e`)
 

@@ -20,11 +20,13 @@
 
 ## Prioridade 1 — Implementar e padronizar métricas
 
-- [ ] Inventariar as métricas existentes, seus contratos, unidades, casos degenerados e campos atualmente escritos no CSV.
-- [ ] Definir uma interface única que receba `Volume3D` ou `bool[D,H,W]` validado e produza resultados escalares com nomes, tipos e unidades estáveis.
-- [ ] Validar conectividade, número e proporção de componentes, ocupação e estatísticas da transformada de distância. Definir ramificação, tortuosidade e diversidade antes de implementá-las.
+- [x] Inventariar as métricas estruturais existentes e registrar contratos, unidades, casos degenerados e colunas em [métricas estruturais](metricas-estruturais.md).
+- [x] Implementar `evaluate_structure(Volume3D)` e funções individuais para `bool[D,H,W]` validado, com resultados imutáveis e registro plano `structural-v1`.
+- [x] Validar conectividade, componentes, ocupação e estatísticas da EDT por testes geométricos independentes.
+- [ ] Definir ramificação, tortuosidade e diversidade; considerar o reaproveitamento do grafo de linha central, validando extração, junções e ciclos.
 - [ ] Padronizar a medição de tempo e recursos, distinguindo tempo de geração, otimização, treino, inferência, transferências e visualização. Leituras ausentes de GPU/VRAM não equivalem a zero.
-- [ ] Definir tratamento de volumes vazios, totalmente abertos, desconectados e com shapes incompatíveis; cobrir contratos observáveis com testes.
+- [x] Definir tratamento de volumes vazios, totalmente abertos, desconectados e com shapes inválidos; cobrir contratos observáveis com testes.
+- [x] Acrescentar resultados estruturais e contexto inicial por execução ao CSV central, preservando arquivos NPZ. O inventário completo de hardware e as repetições permanecem pendentes.
 - [ ] Fixar esquema de saída e metadados de resolução, eixos, sementes, repetições, hardware, backend e versões. Não atribuir escala física aos voxels sem conversão conhecida.
 - [ ] Disponibilizar a interface ao CA, Random Walk, algoritmo evolutivo e modelos neurais antes da coleta final.
 

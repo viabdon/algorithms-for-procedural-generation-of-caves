@@ -1,89 +1,126 @@
 from __future__ import annotations
 
 import argparse
-import csv
+import inspect
+from collections.abc import Callable, Mapping
 from pathlib import Path
 from typing import Any
+from uuid import uuid4
 
+from cavegen.benchmark.records import (
+    append_experiment_record,
+    create_experiment_context,
+    make_experiment_record,
+)
 from cavegen.core.config import load_yaml
+from cavegen.datastream.voxel_io import save_volume_npz
 from cavegen.generators.cellular_automata import generate_cellular_automata
 from cavegen.generators.random_walk import generate_random_walk
-from cavegen.datastream.voxel_io import save_volume_npz
-from cavegen.metrics.connectivity import largest_component_ratio
-from cavegen.metrics.morphology import distance_transform_stats, open_ratio
+from cavegen.metrics.structural import MetricValue
 from cavegen.profiling.system_monitor import SystemMonitor
 from cavegen.profiling.timer import elapsed_timer
 
 
-def _shape(config: dict[str, Any]) -> tuple[int, int, int]:
-    value = config.get("shape", [32, 32, 32])
+def _shape(config: Mapping[str, Any]) -> tuple[int, int, int]:
+    value = config.get("shape", [64, 64, 64])
     if len(value) != 3:
         raise ValueError("shape must have three dimensions: [depth, height, width].")
     return tuple(int(v) for v in value)
 
 
 def run(config_path: str | Path, out_csv: str | Path) -> None:
+    """Generate configured volumes and append one structural record per run.
+
+    Parameters
+    ----------
+    config_path
+        YAML configuration; shape defaults to 64 cubed in ZYX. Seeds here
+        are geometric samples. This initial runner has one timing repetition.
+    out_csv
+        Central CSV with the structural-v1 columns. Legacy CSV headers are
+        rejected rather than overwritten. Use one writer at a time.
+    """
     config = load_yaml(config_path)
+    run_configuration(config, out_csv, config_path=str(config_path))
+
+
+def run_configuration(
+    config: Mapping[str, Any],
+    out_csv: str | Path,
+    *,
+    config_path: str = "interactive",
+    on_record: Callable[[dict[str, MetricValue]], None] | None = None,
+) -> str:
+    """Generate from an in-memory configuration shared by menus and YAML CLI.
+
+    Parameters
+    ----------
+    config
+        Same shape, seeds, algorithms and outputs mapping as the YAML runner.
+    out_csv
+        Central CSV to append after each completed generation/evaluation.
+    config_path
+        Configuration origin recorded along with effective arguments.
+    on_record
+        Optional progress callback called only after a row has been saved.
+
+    Returns
+    -------
+    str
+        Unique experiment identifier. No temporary YAML is required.
+    """
     shape = _shape(config)
     seeds = [int(seed) for seed in config.get("seeds", [0])]
     algorithms = config.get("algorithms", {})
     volumes_dir = Path(config.get("outputs", {}).get("volumes_dir", "results/volumes"))
-    volumes_dir.mkdir(parents=True, exist_ok=True)
-
-    rows: list[dict[str, Any]] = []
-
-    for seed in seeds:
-        if "random_walk" in algorithms:
-            params = algorithms["random_walk"] or {}
-            monitor = SystemMonitor()
-            monitor.start()
-            with elapsed_timer() as timer:
-                volume = generate_random_walk(shape=shape, seed=seed, **params)
-            monitor.stop()
-            path = volumes_dir / f"random_walk_seed_{seed}.npz"
-            save_volume_npz(volume, path)
-            rows.append(_row("random_walk", seed, volume, timer, monitor, path))
-
-        if "cellular_automata" in algorithms:
-            params = algorithms["cellular_automata"] or {}
-            monitor = SystemMonitor()
-            monitor.start()
-            with elapsed_timer() as timer:
-                volume = generate_cellular_automata(shape=shape, seed=seed, **params)
-            monitor.stop()
-            path = volumes_dir / f"cellular_automata_seed_{seed}.npz"
-            save_volume_npz(volume, path)
-            rows.append(_row("cellular_automata", seed, volume, timer, monitor, path))
-
-    out_csv = Path(out_csv)
-    out_csv.parent.mkdir(parents=True, exist_ok=True)
-    fieldnames = sorted({key for row in rows for key in row.keys()})
-    with out_csv.open("w", encoding="utf-8", newline="") as file:
-        writer = csv.DictWriter(file, fieldnames=fieldnames)
-        writer.writeheader()
-        writer.writerows(rows)
-
-
-def _row(algorithm: str, seed: int, volume, timer, monitor: SystemMonitor, path: Path) -> dict[str, Any]:
-    row = {
-        "algorithm": algorithm,
-        "seed": seed,
-        "shape": "x".join(str(v) for v in volume.shape),
-        "elapsed_seconds": timer["elapsed_seconds"],
-        "open_ratio": open_ratio(volume.data),
-        "largest_component_ratio": largest_component_ratio(volume.data),
-        "open_voxels": volume.open_voxels,
-        "peak_rss_bytes": monitor.peak_rss_bytes,
-        "volume_path": str(path),
+    context = create_experiment_context(
+        str(config.get("experiment_name", Path(config_path).stem)), config_path
+    )
+    experiment_id = context["experiment_id"]
+    volumes_dir = volumes_dir / experiment_id
+    generators = {
+        "random_walk": generate_random_walk,
+        "cellular_automata": generate_cellular_automata,
     }
-    row.update(distance_transform_stats(volume.data))
-    return row
+    unknown = set(algorithms) - generators.keys()
+    if unknown:
+        raise ValueError(f"Unknown algorithms in {config_path}: {sorted(unknown)}.")
+    for seed in seeds:
+        for algorithm, generate in generators.items():
+            if algorithm not in algorithms:
+                continue
+            params = algorithms[algorithm] or {}
+            monitor = SystemMonitor()
+            monitor.start()
+            try:
+                with elapsed_timer() as timer:
+                    volume = generate(shape=shape, seed=seed, **params)
+            finally:
+                monitor.stop()
+            run_id = uuid4().hex
+            path = volumes_dir / f"{algorithm}_{run_id}.npz"
+            effective = inspect.signature(generate).bind(shape=shape, seed=seed, **params)
+            effective.apply_defaults()
+            row = make_experiment_record(
+                volume, context=context, algorithm=algorithm, seed=seed,
+                volume_path=path, parameters=effective.arguments,
+                elapsed_seconds=timer["elapsed_seconds"],
+                peak_rss_bytes=monitor.peak_rss_bytes if monitor.samples else None,
+                rss_sample_count=len(monitor.samples),
+                rss_sampling_interval_seconds=monitor.interval_seconds,
+            )
+            row["run_id"] = run_id
+            save_volume_npz(volume, path)
+            append_experiment_record(out_csv, row)
+            if on_record is not None:
+                on_record(row)
+    return experiment_id
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Run the initial generation benchmark.")
-    parser.add_argument("--config", default="configs/experiments/baseline_32.yaml")
-    parser.add_argument("--out", default="results/csv/baseline_32.csv")
+    parser.add_argument("--config", default="configs/experiments/baseline_64.yaml")
+    parser.add_argument("--out", default="results/csv/experiments.csv")
     args = parser.parse_args()
     run(args.config, args.out)
 

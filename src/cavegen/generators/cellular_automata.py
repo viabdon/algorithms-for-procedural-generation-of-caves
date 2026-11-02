@@ -11,7 +11,7 @@ _KERNEL_26[1, 1, 1] = 0
 
 
 def generate_cellular_automata(
-    shape: tuple[int, int, int] = (32, 32, 32),
+    shape: tuple[int, int, int] = (64, 64, 64),
     seed: int | None = None,
     initial_open_probability: float = 0.45,
     iterations: int = 5,

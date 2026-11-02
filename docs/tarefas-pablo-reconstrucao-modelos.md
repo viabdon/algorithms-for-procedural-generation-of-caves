@@ -18,11 +18,12 @@ Pablo conduz a **implementação e a padronização das métricas**, a análise 
 - [x] Registrar a configuração inicial `baseline_32.yaml`: volume ZYX `32³`, sementes `0` a `4` e parâmetros dos dois geradores clássicos.
 - [x] Acordar `64³` em ZYX como grade das medições finais. `baseline_32.yaml` é configuração inicial, não o protocolo final.
 - [ ] Inventariar as funções atuais de tempo, RSS, ocupação, conectividade e transformada de distância, incluindo contratos, unidades e comportamento em entradas degeneradas.
-- [ ] Definir uma interface comum que receba `Volume3D` ou `bool[D,H,W]` validado e devolva métricas escalares com nomes, tipos e unidades estáveis.
-- [ ] Definir e validar conectividade, contagem de componentes, fração na maior componente e ocupação. Especificar ramificação, tortuosidade e diversidade antes de implementá-las.
-- [ ] Explicitar que a transformada de distância descreve o espaço livre em unidades da grade e não é, por si só, largura validada de todos os túneis.
+- [x] Implementar `evaluate_structure(Volume3D)` com resultado imutável; funções individuais exigem `bool[D,H,W]` validado.
+- [x] Definir e validar conectividade, contagem de componentes, fração na maior componente, ocupação e EDT, com testes independentes.
+- [ ] Especificar ramificação, tortuosidade e diversidade; reaproveitar a análise de grafos da linha central após validar a extração dos volumes gerados.
+- [x] Explicitar unidades, regra de borda e limites interpretativos da EDT em [métricas estruturais](metricas-estruturais.md).
 - [ ] Padronizar a coleta de tempo, CPU, RSS e, quando disponível, GPU/VRAM. Separar geração, busca evolutiva, treino, inferência, transferências e visualização; leitura ausente de GPU não equivale a zero.
-- [ ] Definir tratamento de volumes vazios, totalmente abertos, desconectados, com dtype ou shape inválido, e cobrir os contratos públicos com testes.
+- [x] Definir tratamento de volumes vazios, totalmente abertos, desconectados, com dtype ou shape inválido, e cobrir os contratos públicos com testes.
 - [ ] Fixar o esquema de CSV e os metadados de eixos, resolução, seed, repetição, parâmetros, hardware, backend e versões. A escala física do voxel só será declarada quando houver conversão conhecida.
 - [ ] Entregar a Felipe a interface estável de métricas para integração com CA, Random Walk e a função de aptidão evolutiva.
 - [x] Definir o contrato público do SDF sintético: positivo no interior do vazio gerado, negativo no exterior sólido, zero na borda e distância euclidiana em voxels, na grade ZYX.

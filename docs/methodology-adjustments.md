@@ -24,6 +24,16 @@ Não é requisito portar o CA otimizado à GPU apenas porque os modelos neurais 
 
 Conectividade, componentes e ocupação têm prioridade na avaliação estrutural. A transformada de distância ao sólido descreve o espaço livre; seus valores dependem de resolução, espaçamento e bordas, e não validam a largura de todos os túneis. Ramificação, tortuosidade e diversidade exigem definições e validação próprias. Volumes gerados usam `True = ar`, `False = sólido`, com eixos ZYX.
 
+O contrato implementado em 02/11/2026 está em
+[métricas estruturais](metricas-estruturais.md): conectividade 6 por padrão,
+opção explícita de 26, distâncias entre centros com spacing ZYX e exterior
+sólido nos volumes mistos. Nos casos totalmente sólido e totalmente aberto,
+a EDT é ausente e a degeneração é registrada. Cada execução concluída ocupa
+uma linha versionada no CSV central; mudanças de borda, resolução e contrato
+impedem a comparação automática com valores históricos. A linha central da
+branch experimental é uma base para futuros descritores de ramificação,
+dependentes de validação da extração e da preservação de ciclos.
+
 **Contrato do SDF sintético:** para um volume gerado com vazio conhecido, `SDF > 0` no interior do vazio, `SDF < 0` no exterior sólido e `SDF = 0` nos voxels de borda. A magnitude é a distância euclidiana ao voxel de borda mais próximo, em unidades de voxel, na grade ZYX. O protótipo da branch `CA` usa borda de seis vizinhos de face e coloca o zero no centro do voxel de borda. Registrar sinal, unidade, regra de borda e origem do volume com o campo. Não equiparar esse SDF às estatísticas já existentes de distância do vazio ao sólido: elas são outro descritor, sem sinal.
 
 ## 3. Extensões condicionadas e neurais

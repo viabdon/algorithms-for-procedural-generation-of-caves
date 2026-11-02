@@ -31,7 +31,7 @@ def _carve_brush(volume: np.ndarray, pos: np.ndarray, radius: int) -> None:
 
 
 def generate_random_walk(
-    shape: tuple[int, int, int] = (32, 32, 32),
+    shape: tuple[int, int, int] = (64, 64, 64),
     seed: int | None = None,
     steps: int = 6000,
     brush_radius: int = 1,
