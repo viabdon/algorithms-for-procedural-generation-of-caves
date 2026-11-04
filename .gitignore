@@ -62,6 +62,10 @@ __pycache__/
 /src/cavegen/generators/cellular_automata/seeds
 /src/cavegen/generators/cellular_automata/pesos
 
+# Random Walk
+/src/cavegen/generators/random_walk/npz
+/src/cavegen/generators/random_walk/plots
+
 # Instruções locais para agentes
 prompt-professor-codex.md
 AGENTS.md
