@@ -6,12 +6,15 @@
 
 Pablo conduz o **protocolo comparativo**, a configuração e o ajuste de parâmetros do **Random Walk**, a definição das métricas, a análise estatística, o texto do TCC e a frente GAN/PCGRL. Felipe conduz a implementação e o ajuste do **CA**, incluindo o peso espacial e a instrumentação iniciada na branch `CA`. Os dois fecham juntos orçamento, sementes, hardware e interpretação dos resultados. Essa divisão organiza as próximas entregas; não afirma que os experimentos já foram executados.
 
+**Mudança no Random Walk (02/11/2026, branch `CA`, commit `fe3fd04`).** O `src/cavegen/generators/random_walk.py` criado na estrutura inicial (`cab2d1e`), um random walk de 6 direções com `steps` e `brush_radius`, foi apagado e substituído pelo pacote `src/cavegen/generators/random_walk/`: o random walk ponderado por waypoints do projeto base 3D-Cave-Generation, portado pelo Felipe. A API nova é `generate_random_walk(shape, seed, caverna, weight, k, spacer, raio_voxels)`, com grade cúbica. A divisão acima ainda atribui ao Pablo a configuração e o ajuste do Random Walk; quem conduz essas etapas daqui em diante precisa ser combinado entre os dois. Ver [Random Walk](random-walk.md).
+
 ## Já disponível e limites conhecidos
 
 - [x] Leitura incremental do PLY/F32, limites, normalização XYZ→ZYX e voxelização diagnóstica. Os 245 voxels marcados em `32³` são parede observada, não ar.
 - [x] Ensaios de amostragem, Screened Poisson, linha central, orientação de normais e espessamento documentados na branch `experiment/elaphes-meshing` e em artefatos locais. Nenhuma malha examinada validou o volume interno real.
 - [x] Random Walk e CA básico geram `Volume3D`; GAN e PCGRL ainda são interfaces sem geração funcional no `main`.
 - [x] Na branch `CA`, Felipe prototipou CA vetorizado com peso espacial, amostragem de recursos, flood fill/EDT da grade de parede do Elaphes e uma caminhada ponderada por waypoints. Esses resultados não validam o interior real nem estão integrados ao benchmark do `main`.
+- [x] Na branch `CA`, a caminhada ponderada por waypoints virou o gerador de Random Walk do pacote (ver o aviso acima). NPZ da seed 1 das quatro cavernas idênticos bit a bit aos do protótipo; 32 testes novos, 17 em `tests/test_random_walk.py` e 15 em `tests/test_random_walk_fidelidade.py`. Commits `df9b27b` e `fe3fd04`.
 
 ## Prioridade imediata — protocolo e baselines
 
@@ -19,9 +22,10 @@ Pablo conduz o **protocolo comparativo**, a configuração e o ajuste de parâme
 - [x] Acordar `64³` em ZYX como grade das medições finais. `baseline_32.yaml` é configuração inicial, não o protocolo final.
 - [ ] Fixar com Felipe sementes, repetições de medição, orçamento de ajuste, hardware e versões. A escala física do voxel só será declarada se houver conversão conhecida.
 - [ ] Criar a configuração final `64³` em ZYX, separada de `baseline_32.yaml`. Registrar parâmetros fixos de cada gerador e a origem de cada configuração no CSV/NPZ.
-- [ ] Definir o espaço de busca do **Random Walk** (por exemplo, passos e raio, conforme o gerador escolhido), limites válidos e função de aptidão com métricas estruturais. Definir com Felipe os critérios comuns usados também no CA, sem exigir parâmetros idênticos entre algoritmos.
+- [ ] Definir o espaço de busca do **Random Walk**, limites válidos e função de aptidão com métricas estruturais. Os parâmetros do gerador atual são `weight`, `k`, `spacer` e `raio_voxels` (além da caverna); `steps` e `brush_radius` eram do gerador antigo. No C# do projeto base, `weight` fica em [0,1; 1] e `k` e `spacer` são inteiros em [1, 30]; `generate_random_walk` aceita valores fora disso, então decidir com Felipe se a busca respeita essas faixas. Definir com Felipe os critérios comuns usados também no CA, sem exigir parâmetros idênticos entre algoritmos.
+- [ ] Escolher com Felipe a caverna de waypoints do Random Walk no protocolo (padrão atual `knotlow_cavern`). Os waypoints foram postos sobre cavernas reais (Knotlow, Upper Long Churns, Odins Mine): métricas de semelhança do Random Walk medem em boa parte os waypoints, e usar uma dessas cavernas como referência de avaliação seria vazamento.
 - [ ] Reservar sementes distintas para ajuste e avaliação final. Fixar número de sementes por candidato, total de avaliações do GA, critério de parada e controle por busca simples. Registrar **número de avaliações e tempo total**: igual contagem de candidatos não garante igual tempo entre geradores.
-- [ ] Conferir com Felipe a integração da nova API do CA ao benchmark. Em `a58155e`, 53 testes passaram, mas a importação do benchmark falhou porque `generate_cellular_automata` não é exportado pelo pacote reorganizado.
+- [ ] Conferir com Felipe a integração da nova API do CA ao benchmark. Em `a58155e`, 53 testes passaram, mas a importação do benchmark falhou porque `generate_cellular_automata` não é exportado pelo pacote reorganizado. A refatoração do benchmark, planejada pelo Felipe, também precisa aceitar o Random Walk novo: `baseline_32.yaml` ainda passa `steps` e `brush_radius`.
 - [ ] Reexecutar o Random Walk básico e, depois do ajuste, sua versão com parâmetros escolhidos. Conferir NPZ e CSV, registrar dispersão por semente e manter os mesmos critérios de avaliação do CA.
 - [ ] Interpretar tempo de geração, pico de RSS, proporção de vazio e fração da maior componente. Especificar contagem de componentes e casos degenerados antes do relato.
 - [ ] Explicitar que as estatísticas atuais da transformada de distância são descritores do espaço livre em unidades da grade, e não largura validada de todos os túneis.

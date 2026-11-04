@@ -1,10 +1,12 @@
 # Tarefas do Felipe — CA e extensões de controle
 
-**Estado verificado na branch `CA` em 28/10/2026 (`a58155e`).** O CA básico e o benchmark clássico continuam prioritários. A branch avançou no CA com pesos, instrumentação e protótipos de SDF, ainda sem integração validada ao benchmark principal. Flood fill e SDF real do Elaphes não são dependências do benchmark. Ver o [resumo quinzenal](relatorios/resumo-quinzenal-tcc-2026-10-18.docx), o [roadmap](roadmap.md) e as [tarefas de Pablo](tarefas-pablo-reconstrucao-modelos.md).
+**Estado verificado na branch `CA` em 28/10/2026 (`a58155e`); migração do Random Walk verificada em 02/11/2026 (`216f38d` a `e121f44`).** O CA básico e o benchmark clássico continuam prioritários. A branch avançou no CA com pesos, instrumentação e protótipos de SDF, ainda sem integração validada ao benchmark principal. Flood fill e SDF real do Elaphes não são dependências do benchmark. Ver o [resumo quinzenal](relatorios/resumo-quinzenal-tcc-2026-10-18.docx), o [roadmap](roadmap.md) e as [tarefas de Pablo](tarefas-pablo-reconstrucao-modelos.md).
 
 ## Divisão de trabalho deste plano
 
 Felipe conduz a **integração e os experimentos do CA**, seu peso espacial, a instrumentação da branch `CA` e o ajuste genético dos parâmetros do CA. Pablo conduz o **Random Walk** no benchmark, o ajuste de seus parâmetros, as métricas, a análise e a frente neural. Os dois fecham juntos sementes, orçamento e hardware para que os resultados tenham o mesmo critério de leitura. Isso define entregas pendentes, não resultados já obtidos.
+
+Em 02/11/2026 o gerador de Random Walk do pacote passou a ser o porte do projeto base feito pelo Felipe (ver [Random Walk](random-walk.md)), no lugar do random walk de 6 direções criado na estrutura inicial do projeto (`cab2d1e`, Pablo). A divisão acima ainda atribui ao Pablo a condução do Random Walk no benchmark e o ajuste de seus parâmetros; quem conduz essas etapas daqui em diante precisa ser combinado entre os dois.
 
 ## Base disponível
 
@@ -17,7 +19,7 @@ Felipe conduz a **integração e os experimentos do CA**, seu peso espacial, a i
 
 ## Prioridade imediata — reproduzir o CA
 
-- [ ] Reparar a integração da branch com o benchmark: `run_generation_benchmark.py` importa `generate_cellular_automata`, ausente no pacote reorganizado. O import falha em `a58155e`, embora os 53 testes da branch passem.
+- [ ] Reparar a integração da branch com o benchmark: `run_generation_benchmark.py` importa `generate_cellular_automata`, ausente no pacote reorganizado. O import falha em `a58155e`, embora os 53 testes da branch passem. A mesma refatoração precisa aceitar o Random Walk novo (ver [abaixo](#random-walk-ponderado-do-projeto-base)).
 - [ ] Depois da correção, executar um caso pequeno de ponta a ponta e conferir contrato `Volume3D`, formato NPZ, linha CSV e tempo medido antes de iniciar a coleta final.
 - [x] Registrar a configuração inicial `baseline_32.yaml`: volume ZYX `32³`, sementes `0` a `4` e parâmetros dos dois geradores clássicos.
 - [x] Acordar `64³` em ZYX como grade das medições finais. `baseline_32.yaml` é configuração inicial, não o protocolo final.
@@ -30,10 +32,24 @@ Felipe conduz a **integração e os experimentos do CA**, seu peso espacial, a i
 ## Extensão em protótipo — CA com campo de controle
 
 - [x] Implementar a soma de um peso espacial à contagem de vizinhos do CA. Testes cobrem peso positivo/negativo, shape incompatível e equivalência entre ausência de peso e peso zero.
-- [x] Criar um pipeline experimental em `random_walk_temp/`: portar a caminhada ponderada por waypoints de um projeto base, voxelizar os caminhos em tubos e calcular a distância à borda. O raio padrão de 1,5 voxel em `64³` foi escolhido para manter o túnel representável, mas engrossa a geometria em relação ao original; o código ainda não integra o gerador público nem o benchmark.
-- [x] Adotar como contrato de SDF sintético o sinal positivo no interior do vazio, negativo no exterior sólido, zero na borda e distância euclidiana em voxels, na grade ZYX. O protótipo de Random Walk segue esse sinal e unidade.
-- [ ] Consolidar um campo de controle independente do scan de teste, com origem, regra de borda e parâmetros registrados, preservando o contrato acima. Os waypoints do protótipo atual vêm de cavernas reais do projeto base.
+- [x] Criar um pipeline experimental em `random_walk_temp/`: portar a caminhada ponderada por waypoints de um projeto base, voxelizar os caminhos em tubos e calcular a distância à borda (`101aa24`, `2cf8f8c`, `a58155e`). O raio padrão de 1,5 voxel em `64³` foi escolhido para manter o túnel representável, mas engrossa a geometria em relação ao original. A caminhada e a voxelização foram depois migradas para o pacote (seção [Random Walk](#random-walk-ponderado-do-projeto-base)); o SDF não.
+- [x] Adotar como contrato de SDF sintético o sinal positivo no interior do vazio, negativo no exterior sólido, zero na borda e distância euclidiana em voxels, na grade ZYX. O protótipo de SDF do Random Walk seguia esse sinal e unidade.
+- [ ] Consolidar um campo de controle independente do scan de teste, com origem, regra de borda e parâmetros registrados, preservando o contrato acima. Os waypoints do Random Walk vêm de cavernas reais do projeto base.
 - [ ] Comparar CA básico e condicionado com sementes e orçamento equivalentes, medindo ocupação, conectividade, aderência ao controle permitido, diversidade e custo. Separar o efeito do controle da geração sem condicionamento.
+
+## Random Walk ponderado do projeto base
+
+Detalhes, números medidos e limites em [Random Walk](random-walk.md).
+
+- [x] Exportar os grafos de waypoints da cena Unity do projeto base (3D-Cave-Generation, `7a6c617`) para `configs/random_walk/` (`example`, `knotlow_cavern`, `upper_long_churns`, `odins_mine`) com `exportar_cena.py`. O grafo de cada YAML é idêntico ao da cena nas quatro cavernas; o gerador não depende mais da Unity. Commit `216f38d`.
+- [x] Migrar `random_walk_temp/` para `src/cavegen/generators/random_walk/` sem mudança de lógica, com `generate_random_walk(...) -> Volume3D` e `RandomWalkGenerator`, apagando o protótipo e o `random_walk.py` de 6 direções. Evidência: NPZ da seed 1 das quatro cavernas (caminhos, inícios, classificação `64³`) idênticos bit a bit aos do protótipo; `tests/test_random_walk.py` (17) e `tests/test_random_walk_fidelidade.py` (15); suíte com 93 testes em `fe3fd04`, só `test_f32` falhando (`PermissionError` do Windows, anterior). Commits `df9b27b`, `fe3fd04` e `e121f44`.
+- [x] Criar o menu de terminal do Random Walk no padrão do CA: gera com caverna, seed, lado, raio e, opcionalmente, `weight`, `k` e `spacer` limitados às faixas do C#, grava `results/result_000.npz` medindo com `track_resources` e plota caminhos ou grade classificada. Evidência: `tests/test_random_walk_menu.py` (6); suíte com 99 testes em `e121f44`, só `test_f32` falhando. Commit `658d397`.
+- [ ] Avisar o Pablo de que `src/cavegen/generators/random_walk.py` (dele, de `cab2d1e`) foi apagado e substituído pelo pacote, com outros parâmetros (`caverna`, `weight`, `k`, `spacer`, `raio_voxels` no lugar de `steps` e `brush_radius`). Aceite: Pablo ciente e a divisão de quem conduz o Random Walk registrada nas duas listas.
+- [ ] Refatorar o benchmark para aceitar o Random Walk novo, junto com a correção do import do CA. Aceite: `baseline_32.yaml` (ou a configuração final `64³`) sem `steps`/`brush_radius`, importação do benchmark sem erro e um caso pequeno gravando NPZ e linha CSV dos dois geradores.
+- [ ] Escolher com o Pablo a caverna de waypoints do protocolo (padrão atual `knotlow_cavern`). Aceite: caverna registrada na configuração final e nos metadados, e nenhuma das cavernas reais usadas como waypoints (Knotlow, Upper Long Churns, Odins Mine) usada como referência de avaliação do Random Walk.
+- [ ] Se o GA buscar nos parâmetros do Random Walk, decidir com o Pablo se respeita as faixas do C# (`weight` em [0,1; 1], `k` e `spacer` inteiros em [1, 30]); hoje `generate_random_walk` aceita valores contínuos e fora delas. Aceite: limites escritos no espaço de busca.
+- [ ] SDF do Random Walk, quando o Felipe decidir retomá-lo: migrar ou reescrever a etapa `sdf_caminhada.py` (histórico em `a58155e`) e regravar a origem do peso 002 do CA, que aponta para `random_walk_temp/npz/knotlow_cavern_seed001_64_sdf.npz`, arquivo que não existe mais. Aceite: SDF gerado pelo pacote igual ao do peso 002 ou diferença explicada.
+- [ ] `configs/random_walk/` é encontrado por caminho relativo ao arquivo (`parents[4]`); funciona só rodando do repositório ou de instalação editável. Aceite: decisão registrada de manter assim (e onde o protocolo roda) ou de trocar o mecanismo.
 
 ## Ajuste planejado — otimização genética
 

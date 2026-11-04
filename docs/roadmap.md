@@ -1,6 +1,6 @@
 # Roadmap do TCC
 
-**Replanejamento de 18/10/2026; branch `CA` verificada em 28/10/2026 (`a58155e`).** O [resumo quinzenal](relatorios/resumo-quinzenal-tcc-2026-10-18.docx) retira a reconstrução do Elaphes, o SDF real e a IoU volumétrica do caminho crítico. Este roadmap separa o que está no checkout `main` dos avanços ainda isolados nas branches `CA` e `experiment/elaphes-meshing`.
+**Replanejamento de 18/10/2026; branch `CA` verificada em 28/10/2026 (`a58155e`); migração do Random Walk verificada em 02/11/2026 (`216f38d` a `e121f44`).** O [resumo quinzenal](relatorios/resumo-quinzenal-tcc-2026-10-18.docx) retira a reconstrução do Elaphes, o SDF real e a IoU volumétrica do caminho crítico. Este roadmap separa o que está no checkout `main` dos avanços ainda isolados nas branches `CA` e `experiment/elaphes-meshing`.
 
 ## Base disponível
 
@@ -14,13 +14,16 @@
 
 - [x] CA com contagem 3D vetorizada, bordas configuráveis, sementes/resultados NPZ, menu e peso espacial opcional. Testes verificam equivalência com o laço para bordas determinísticas e CA sem peso igual ao de peso zero.
 - [x] Amostrador de tempo, CPU e RSS do processo, com GPU/VRAM quando disponíveis. A branch contém testes do rastreador, sem protocolo final de hardware.
-- [x] Protótipos `sdf_temp/` de flood fill e EDT da **parede** voxelizada do Elaphes e `random_walk_temp/` de caminhada ponderada por waypoints, voxelização tubular e campo de distância. São experimentos, não a referência real validada nem geradores integrados ao benchmark.
-- [x] Fixar o contrato do SDF sintético: positivo no interior do vazio, negativo no exterior sólido, zero na borda e distância euclidiana em voxels, na mesma grade ZYX. O protótipo de Random Walk segue sinal e unidade; a API pública ainda não está integrada.
-- [ ] Corrigir a integração: o benchmark da branch importa `generate_cellular_automata`, que não é exportado pelo pacote reorganizado. A suíte da branch passou com 53 testes, mas a checagem de importação do benchmark falhou.
+- [x] Protótipos `sdf_temp/` de flood fill e EDT da **parede** voxelizada do Elaphes e `random_walk_temp/` de caminhada ponderada por waypoints, voxelização tubular e campo de distância. São experimentos, não a referência real validada nem geradores integrados ao benchmark. `random_walk_temp/` foi depois migrado para o pacote e apagado (item abaixo).
+- [x] Fixar o contrato do SDF sintético: positivo no interior do vazio, negativo no exterior sólido, zero na borda e distância euclidiana em voxels, na mesma grade ZYX. O protótipo de SDF do Random Walk seguia sinal e unidade; ficou só no histórico (`a58155e`) e a API pública de SDF ainda não está integrada.
+- [x] Migrar o random walk ponderado por waypoints do projeto base para `src/cavegen/generators/random_walk/`, sem mudança de lógica, substituindo o random walk de 6 direções (`steps`, `brush_radius`). Grafos exportados para `configs/random_walk/`; NPZ da seed 1 das quatro cavernas idênticos bit a bit aos do protótipo; 38 testes novos, contando os 6 do menu de terminal. Commits `216f38d` a `e121f44`. Ver [Random Walk](random-walk.md).
+- [ ] Corrigir a integração: o benchmark da branch importa `generate_cellular_automata`, que não é exportado pelo pacote reorganizado. A suíte da branch passou com 53 testes, mas a checagem de importação do benchmark falhou. A refatoração do benchmark também precisa aceitar os parâmetros do Random Walk novo (`caverna`, `weight`, `k`, `spacer`, `raio_voxels`): `baseline_32.yaml` ainda passa `steps` e `brush_radius`.
+- [ ] SDF do Random Walk, quando o Felipe decidir retomá-lo: a etapa não foi migrada, e o peso 002 do CA aponta para um arquivo do protótipo que não existe mais.
 
 ## Prioridade 1 — Fechar o benchmark clássico
 
-- [x] Registrar a configuração inicial `baseline_32.yaml`: volume ZYX `32³`, sementes `0` a `4` e parâmetros de Random Walk e CA básico.
+- [x] Registrar a configuração inicial `baseline_32.yaml`: volume ZYX `32³`, sementes `0` a `4` e parâmetros de Random Walk e CA básico. Os parâmetros de Random Walk dela são os do gerador antigo, substituído na branch `CA`.
+- [ ] Escolher a caverna de waypoints do Random Walk usada no protocolo (padrão atual `knotlow_cavern`), sem usar essa mesma caverna como referência de avaliação.
 - [x] Fixar `64³` em ZYX como grade das medições finais. A configuração `baseline_32.yaml` permanece como teste inicial e precisa de uma configuração final distinta.
 - [ ] Fixar sementes e repetições de medição; documentar hardware, versões e orçamento de ajuste. Não atribuir escala física aos voxels sem conversão conhecida.
 - [ ] Integrar a API do CA da branch ao benchmark e testar importação e uma execução pequena antes de coletar resultados.
@@ -46,7 +49,7 @@
 
 - [x] Prototipar peso espacial no CA e verificar peso zero equivalente ao CA básico na branch `CA`.
 - [ ] Validar um guia procedural independente do scan de teste sob o contrato de SDF já fixado, registrando regra de borda e origem, e comparar CA condicionado com o básico sob protocolo comum. A extensão não bloqueia o benchmark clássico.
-- [ ] Aplicar otimização genética aos parâmetros de CA e Random Walk, depois de definir espaços de busca, função de aptidão e orçamento comparável. Reservar sementes de avaliação e comparar com busca simples de igual orçamento. Distinguir custo de otimização do custo de geração.
+- [ ] Aplicar otimização genética aos parâmetros de CA e Random Walk, depois de definir espaços de busca, função de aptidão e orçamento comparável. Reservar sementes de avaliação e comparar com busca simples de igual orçamento. Distinguir custo de otimização do custo de geração. No Random Walk, decidir se a busca respeita as faixas do C# do projeto base (`weight` em [0,1; 1], `k` e `spacer` inteiros em [1, 30]).
 - [ ] Usar Unity para inspeção dos volumes e malhas exportados. gRPC e AMD/ROCm ficam para depois do pipeline científico.
 
 ## Reconstrução real fora do escopo atual

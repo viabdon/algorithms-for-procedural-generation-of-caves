@@ -11,7 +11,9 @@ gerador -> Volume3D booleano em ZYX -> NPZ -> métricas e CSV em Python
 
 `True` significa ar; `False`, sólido. As medições finais usarão `64³` em ZYX. Cada comparação deve declarar parâmetros, sementes, repetições, hardware e orçamento; escala física só deve ser atribuída aos voxels se houver conversão conhecida. Marching Cubes visualiza volumes gerados e não reconstrói a point cloud.
 
-O contrato para SDF **sintético de volume gerado** é positivo no interior do vazio, negativo no exterior sólido e zero na borda, com distância euclidiana em voxels ao voxel de borda mais próximo, na mesma grade ZYX. Registrar a regra de borda e a origem. O protótipo de `random_walk_temp/` já segue sinal e unidade; o campo de parede do Elaphes usa números semelhantes, sem validar a mesma classe de interior.
+O contrato para SDF **sintético de volume gerado** é positivo no interior do vazio, negativo no exterior sólido e zero na borda, com distância euclidiana em voxels ao voxel de borda mais próximo, na mesma grade ZYX. Registrar a regra de borda e a origem. O protótipo de SDF do Random Walk seguia sinal e unidade, mas não foi migrado para o pacote e está só no histórico (`a58155e`); o campo de parede do Elaphes usa números semelhantes, sem validar a mesma classe de interior.
+
+**Random Walk (02/11/2026, branch `CA`, commits `216f38d` a `e121f44`).** O gerador de Random Walk passou a ser o random walk ponderado por waypoints do projeto base 3D-Cave-Generation, em `src/cavegen/generators/random_walk/`, com os grafos em `configs/random_walk/`. O random walk de 6 direções (`steps`, `brush_radius`) foi apagado, assim como `random_walk_temp/`. Ver [Random Walk](docs/random-walk.md).
 
 ## Responsabilidades atuais
 
@@ -25,10 +27,10 @@ Ver [tarefas de Pablo](docs/tarefas-pablo-reconstrucao-modelos.md) e [tarefas de
 
 ## Ordem de trabalho
 
-1. Integrar a API do CA da branch `CA` ao benchmark, fechar o protocolo clássico e reexecutar Random Walk e CA básico. A branch traz contagem de vizinhos vetorizada, menu, resultados NPZ e amostragem de CPU/RSS e GPU/VRAM quando disponível; seus 53 testes passaram, mas a importação do benchmark falha pelo nome antigo `generate_cellular_automata`. Resultados finais comparáveis ainda precisam ser coletados.
+1. Integrar a API do CA da branch `CA` ao benchmark, fechar o protocolo clássico e reexecutar Random Walk e CA básico. A branch traz contagem de vizinhos vetorizada, menu, resultados NPZ e amostragem de CPU/RSS e GPU/VRAM quando disponível; seus 53 testes passaram, mas a importação do benchmark falha pelo nome antigo `generate_cellular_automata`. A refatoração do benchmark, planejada pelo Felipe, também precisa aceitar os parâmetros do Random Walk novo, porque `baseline_32.yaml` ainda passa `steps` e `brush_radius`. A caverna de waypoints do protocolo (padrão `knotlow_cavern`) precisa ser escolhida pelos dois. Resultados finais comparáveis ainda precisam ser coletados.
 2. Definir avaliação estrutural com conectividade, componentes e ocupação. Declarar resolução e unidade da transformada de distância; ramificação, tortuosidade e diversidade só entram após definição e validação. Completar CPU/GPU/VRAM se fizerem parte do protocolo.
 3. Auditar dados para GAN e definir ambiente PCGRL pequeno, com recompensa de conectividade e ocupação. As interfaces atuais ainda não geram volumes. Dados sintéticos testam infraestrutura, sem demonstrar aprendizado de cavernas reais.
-4. Definir otimização genética dos parâmetros de CA e Random Walk, com espaços de busca, aptidão, orçamento e sementes de avaliação reservadas. Comparar com busca simples de mesmo orçamento; separar custo de busca e tempo de geração. O peso espacial do CA já foi prototipado e peso zero reproduz o CA básico. Um guia procedural independente do scan de teste permanece extensão distinta; seu SDF deve seguir o contrato positivo no vazio. O SDF experimental do Elaphes classifica parede, não vazio real.
+4. Definir otimização genética dos parâmetros de CA e Random Walk, com espaços de busca, aptidão, orçamento e sementes de avaliação reservadas. Comparar com busca simples de mesmo orçamento; separar custo de busca e tempo de geração. No Random Walk, decidir se a busca respeita as faixas do C# do projeto base (`weight` em [0,1; 1], `k` e `spacer` inteiros em [1, 30]). O peso espacial do CA já foi prototipado e peso zero reproduz o CA básico. Um guia procedural independente do scan de teste permanece extensão distinta; seu SDF deve seguir o contrato positivo no vazio. O SDF experimental do Elaphes classifica parede, não vazio real.
 5. Inspecionar em Unity os volumes e malhas gerados. gRPC e portabilidade ROCm permanecem posteriores.
 
 ## Delimitação da referência real
