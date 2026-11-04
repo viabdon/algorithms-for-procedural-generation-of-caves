@@ -30,10 +30,9 @@ __pycache__/
 /sdf_temp/npz/
 /sdf_temp/plots/
 
-# Projeto base do Random Walk (Unity, de outro TCC) e o que sai dele
+# Projeto base do Random Walk (Unity, de outro TCC): só para refazer a exportação
+# dos waypoints para configs/random_walk/
 /external/
-/random_walk_temp/npz/
-/random_walk_temp/plots/
 
 # Experimento do Indian Tunnel: a nuvem fica em data/raw/nasa, as saídas são regeneradas
 /indian_tunnel_temp/npz/
