@@ -1,0 +1,225 @@
+# Exportado de SampleScene.unity (projeto base, commit 7a6c617) por
+# uv run python -m cavegen.generators.random_walk.exportar_cena
+# Não editar à mão: refazer a exportação.
+caverna: Knotlow Cavern
+origem: {projeto: 'https://github.com/freitasga/3D-Cave-Generation', commit: 7a6c617,
+  cena: Assets/Scenes/SampleScene.unity, ordem_na_cena: 1}
+eixos: x, y, z da Unity, com y para cima
+parametros: {weight: 1.0, k: 30.0, spacer: 5.0, radius: 7.0, segments: 6.0}
+waypoints:
+- nome: KC Start
+  posicao: [44.0, -617.0, 1283.0]
+- nome: KC Waypoint (12)
+  posicao: [173.1, -616.0, 1107.4]
+- nome: KC Waypoint (69)
+  posicao: [43.0, -618.0, 1313.0]
+- nome: KC Waypoint (70)
+  posicao: [18.0, -618.0, 1298.0]
+- nome: KC Waypoint
+  posicao: [383.0, -616.0, 857.0]
+- nome: KC Waypoint (66)
+  posicao: [443.0, -626.0, 829.0]
+- nome: KC Waypoint (65)
+  posicao: [421.0, -614.0, 886.0]
+- nome: KC Waypoint (1)
+  posicao: [367.0, -620.0, 840.0]
+- nome: KC Waypoint (2)
+  posicao: [269.0, -622.0, 797.0]
+- nome: KC Waypoint (3)
+  posicao: [197.0, -622.0, 668.0]
+- nome: KC Waypoint (4)
+  posicao: [87.0, -621.0, 569.0]
+- nome: KC Waypoint (5)
+  posicao: [-13.0, -620.0, 306.0]
+- nome: KC Waypoint (6)
+  posicao: [-103.0, -620.0, 190.0]
+- nome: KC Waypoint (64)
+  posicao: [-111.5, -620.0, 187.4]
+- nome: KC Waypoint (7)
+  posicao: [-69.0, -619.0, 114.0]
+- nome: KC Waypoint (8)
+  posicao: [-89.0, -619.0, -6.0]
+- nome: KC Waypoint (9)
+  posicao: [-80.0, -618.0, -106.0]
+- nome: KC Waypoint (10)
+  posicao: [-136.0, -617.0, -261.0]
+- nome: KC Waypoint (24)
+  posicao: [-208.0, -615.0, -411.0]
+- nome: KC Waypoint (11)
+  posicao: [-231.0, -615.0, -451.0]
+- nome: KC Waypoint (13)
+  posicao: [-205.0, -612.0, -451.0]
+- nome: KC Waypoint (14)
+  posicao: [-193.0, -614.0, -533.0]
+- nome: KC Waypoint (15)
+  posicao: [-179.0, -614.0, -622.0]
+- nome: KC Waypoint (16)
+  posicao: [-198.0, -550.0, -451.0]
+- nome: KC Waypoint (17)
+  posicao: [-192.0, -550.0, -409.0]
+- nome: KC Waypoint (18)
+  posicao: [-160.0, -550.0, -396.0]
+- nome: KC Waypoint (19)
+  posicao: [-160.0, -550.0, -372.0]
+- nome: KC Waypoint (20)
+  posicao: [-163.0, -550.0, -331.0]
+- nome: KC Waypoint (21)
+  posicao: [-155.0, -546.0, -359.0]
+- nome: KC Waypoint (22)
+  posicao: [-146.0, -525.0, -349.0]
+- nome: KC Waypoint (25)
+  posicao: [-144.0, -517.0, -345.0]
+- nome: KC Waypoint (23)
+  posicao: [-157.0, -523.0, -372.0]
+- nome: KC Waypoint (26)
+  posicao: [-135.0, -508.0, -381.0]
+- nome: KC Waypoint (32)
+  posicao: [-135.0, -490.0, -365.0]
+- nome: KC Waypoint (33)
+  posicao: [-135.0, -469.0, -354.0]
+- nome: KC Waypoint (34)
+  posicao: [-140.0, -448.0, -333.0]
+- nome: KC Waypoint (35)
+  posicao: [-145.0, -434.0, -307.0]
+- nome: KC Waypoint (36)
+  posicao: [-143.0, -418.0, -308.0]
+- nome: KC Waypoint (37)
+  posicao: [-150.0, -418.0, -277.0]
+- nome: KC Waypoint (39)
+  posicao: [-160.0, -426.0, -268.0]
+- nome: KC Waypoint (38)
+  posicao: [-148.0, -404.0, -271.0]
+- nome: KC Waypoint (40)
+  posicao: [-126.0, -401.0, -230.0]
+- nome: KC Waypoint (41)
+  posicao: [-121.0, -397.0, -192.0]
+- nome: KC Waypoint (43)
+  posicao: [-109.0, -387.0, -170.0]
+- nome: KC Waypoint (44)
+  posicao: [-95.0, -387.0, -175.0]
+- nome: KC Waypoint (45)
+  posicao: [-95.0, -351.0, -175.0]
+- nome: KC Waypoint (47)
+  posicao: [-89.0, -347.0, -149.0]
+- nome: KC Waypoint (67)
+  posicao: [-87.0, -313.0, -160.0]
+- nome: KC Waypoint (68)
+  posicao: [-81.0, -321.0, -121.0]
+- nome: KC Waypoint (48)
+  posicao: [-87.0, -343.0, -97.0]
+- nome: KC Waypoint (49)
+  posicao: [-95.0, -325.0, -42.0]
+- nome: KC Waypoint (50)
+  posicao: [-102.0, -310.0, -9.0]
+- nome: KC Waypoint (51)
+  posicao: [-102.0, -299.0, 36.0]
+- nome: KC Waypoint (52)
+  posicao: [-102.0, -297.0, 93.0]
+- nome: KC Waypoint (53)
+  posicao: [-102.0, -296.0, 140.0]
+- nome: KC Waypoint (55)
+  posicao: [-82.0, -292.0, 148.0]
+- nome: KC Waypoint (56)
+  posicao: [-87.0, -228.0, 145.0]
+- nome: KC Waypoint (58)
+  posicao: [-87.0, -222.0, 185.4]
+- nome: KC Waypoint (59)
+  posicao: [-87.0, -211.0, 203.0]
+- nome: KC Waypoint (60)
+  posicao: [-87.0, -186.0, 212.4]
+- nome: KC Waypoint (63)
+  posicao: [-86.0, -178.0, 210.0]
+- nome: KC Waypoint (62)
+  posicao: [-82.0, -188.0, 190.0]
+- nome: KC Waypoint (61)
+  posicao: [-78.0, -188.0, 236.0]
+- nome: KC Waypoint (57)
+  posicao: [-82.0, -228.0, 109.6]
+- nome: KC Waypoint (54)
+  posicao: [-116.0, -300.0, 201.0]
+- nome: KC Waypoint (46)
+  posicao: [-95.0, -345.0, -204.0]
+- nome: KC Waypoint (42)
+  posicao: [-138.0, -403.0, -180.0]
+- nome: KC Waypoint (27)
+  posicao: [-122.1, -508.0, -381.0]
+- nome: KC Waypoint (31)
+  posicao: [-115.0, -496.0, -357.0]
+- nome: KC Waypoint (28)
+  posicao: [-118.0, -514.0, -416.0]
+- nome: KC Waypoint (29)
+  posicao: [-139.0, -524.0, -446.0]
+- nome: KC Waypoint (30)
+  posicao: [-118.0, -550.0, -416.0]
+ligacoes:
+- [0, 1]
+- [0, 2]
+- [0, 3]
+- [1, 4]
+- [4, 7]
+- [4, 6]
+- [4, 5]
+- [7, 8]
+- [8, 9]
+- [9, 10]
+- [10, 11]
+- [11, 12]
+- [12, 14]
+- [12, 13]
+- [14, 15]
+- [15, 16]
+- [16, 17]
+- [17, 18]
+- [18, 19]
+- [19, 20]
+- [20, 21]
+- [20, 23]
+- [21, 22]
+- [23, 24]
+- [24, 25]
+- [25, 26]
+- [26, 27]
+- [26, 28]
+- [26, 31]
+- [28, 29]
+- [29, 30]
+- [31, 32]
+- [32, 67]
+- [32, 33]
+- [33, 34]
+- [34, 35]
+- [35, 36]
+- [36, 37]
+- [36, 38]
+- [38, 39]
+- [38, 40]
+- [40, 41]
+- [41, 42]
+- [42, 66]
+- [42, 43]
+- [43, 44]
+- [44, 45]
+- [45, 65]
+- [45, 46]
+- [46, 49]
+- [46, 47]
+- [47, 48]
+- [49, 50]
+- [50, 51]
+- [51, 52]
+- [52, 53]
+- [53, 54]
+- [54, 64]
+- [54, 55]
+- [55, 56]
+- [56, 63]
+- [56, 57]
+- [57, 58]
+- [58, 59]
+- [59, 62]
+- [59, 61]
+- [59, 60]
+- [67, 69]
+- [67, 68]
+- [69, 70]
+- [69, 71]

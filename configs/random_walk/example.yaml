@@ -1,0 +1,66 @@
+# Exportado de SampleScene.unity (projeto base, commit 7a6c617) por
+# uv run python -m cavegen.generators.random_walk.exportar_cena
+# Não editar à mão: refazer a exportação.
+caverna: Example
+origem: {projeto: 'https://github.com/freitasga/3D-Cave-Generation', commit: 7a6c617,
+  cena: Assets/Scenes/SampleScene.unity, ordem_na_cena: 0}
+eixos: x, y, z da Unity, com y para cima
+parametros: {weight: 1.0, k: 30.0, spacer: 5.0, radius: 7.5, segments: 6.0}
+waypoints:
+- nome: E Start
+  posicao: [33.0, 17.899998, 331.0]
+- nome: E Waypoint (44)
+  posicao: [22.0, 17.899998, 362.0]
+- nome: E Waypoint (49)
+  posicao: [-22.0, 17.899998, 250.0]
+- nome: E Waypoint (41)
+  posicao: [46.0, 17.899998, 351.0]
+- nome: E Waypoint (52)
+  posicao: [-53.0, 17.899998, 120.0]
+- nome: E Waypoint (57)
+  posicao: [-177.0, 21.899998, 84.0]
+- nome: E Waypoint (53)
+  posicao: [-78.0, 17.899998, 92.0]
+- nome: E Waypoint (45)
+  posicao: [-2.0, 17.899998, 351.0]
+- nome: E Waypoint (46)
+  posicao: [-5.0, 17.9, 323.0]
+- nome: E Waypoint (56)
+  posicao: [-172.0, 19.899998, 101.0]
+- nome: E Waypoint (43)
+  posicao: [33.0, 25.899998, 307.0]
+- nome: E Waypoint (58)
+  posicao: [-156.0, 23.899998, 121.0]
+- nome: E Waypoint (47)
+  posicao: [-30.0, 17.899998, 310.0]
+- nome: E Waypoint (51)
+  posicao: [-53.0, 17.899998, 171.0]
+- nome: E Waypoint (50)
+  posicao: [-34.0, 17.899998, 215.0]
+- nome: E Waypoint (59)
+  posicao: [-151.0, 25.899998, 152.0]
+- nome: E Waypoint (48)
+  posicao: [-25.0, 17.899998, 278.0]
+- nome: E Waypoint (54)
+  posicao: [-109.0, 17.899998, 75.0]
+- nome: E Waypoint (55)
+  posicao: [-154.5, 19.899998, 100.8999]
+ligacoes:
+- [0, 10]
+- [1, 7]
+- [2, 14]
+- [3, 1]
+- [3, 0]
+- [4, 6]
+- [6, 17]
+- [7, 8]
+- [8, 12]
+- [9, 5]
+- [11, 15]
+- [12, 16]
+- [13, 4]
+- [14, 13]
+- [16, 2]
+- [17, 18]
+- [18, 11]
+- [18, 9]
