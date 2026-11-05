@@ -21,6 +21,36 @@ A arquitetura prioriza um pipeline científico **offline-first**:
 
 Essa decisão reduz risco operacional e mantém o foco principal na comparação quantitativa dos algoritmos.
 
+## Guia de interação e reprodução
+
+Execute os comandos a partir da raiz do repositório. As interfaces disponíveis
+estão reunidas nas seções abaixo:
+
+- [Preparar o ambiente](#instalação-local-mínima-com-uv).
+- [Menu interativo e suas opções](#menu-interativo-de-terminal).
+- [Geração automatizada pela CLI](#primeiro-teste-pela-cli).
+- [Avaliação, parsing e geração pela API Python](#api-python-para-scripts-e-notebooks).
+- [Voxelização de superfície](#voxelização-direta-de-superfície-para-diagnóstico).
+- [Malhas](#exportação-de-volumes-gerados-para-malha) e [visualização](#visualização-de-volumes).
+- [Ferramentas legadas e frentes futuras](#interfaces-legadas-e-frentes-futuras).
+- [Roteiro de reprodução científica](#roteiro-de-reprodução-do-experimento).
+- [Testes e checagens](#validação-para-contribuições-e-forks).
+
+Nos exemplos, `uv run python` seleciona o ambiente do projeto. O mesmo comando
+Python pode ser chamado por qualquer uma destas formas, conforme o ambiente:
+
+| Ambiente | Prefixo do comando |
+| --- | --- |
+| uv | `uv run python` |
+| PowerShell, ambiente local existente | `.\.venv\Scripts\python.exe` |
+| Linux/macOS, ambiente local existente | `./.venv/bin/python` |
+| Ambiente virtual já ativado ou Colab com pacote instalado | `python` |
+
+Por exemplo, `uv run python -m cavegen` e
+`.\.venv\Scripts\python.exe -m cavegen` abrem o mesmo menu. Substitua apenas
+o prefixo nos demais comandos. Exemplos multilinha com `\` usam sintaxe de
+shell POSIX; no PowerShell, reúna-os em uma linha.
+
 ## Algoritmos previstos
 
 - Random Walk 3D ponderado por waypoints, portado do projeto base
@@ -88,6 +118,34 @@ uv pip install -e . --system
 
 Os arquivos em `requirements/` ficam apenas como fallback/compatibilidade para ambientes em que `uv` não estiver disponível.
 
+Em uma nova cópia sem ambiente virtual, a instalação alternativa pelo Python
+no Windows é:
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -e .
+```
+
+Para instalar os extras nessa alternativa, use
+`.\.venv\Scripts\python.exe -m pip install -e ".[ml,profiling]"`.
+Essa instalação resolve as restrições do `pyproject.toml`; para repetir a
+resolução versionada em `uv.lock`, prefira `uv sync --locked`. Dependências
+opcionais de ML/profiling não são necessárias para o menu e as métricas estruturais.
+
+## Dados externos locais
+
+As point clouds grandes disponíveis nesta máquina devem ser acessadas
+preferencialmente no volume externo `D:`, sem cópia para o repositório. O
+caminho exato de cada dataset deve ser configurado ou informado no momento da
+execução, pois a organização do volume é local e pode mudar.
+
+Três cavernas obtidas entre as 16 usadas na fonte associada ao
+KarstConduitCatalogue ainda estão em descompactação. Elas não devem ser
+tratadas como entradas disponíveis até a extração terminar. Antes de criar ou
+escolher um parser, validar formato, cabeçalho, tamanho, eixos e unidade de
+cada conjunto. O processamento deve continuar incremental, preservar
+`float32` e não carregar a point cloud completa por padrão.
+
 ## Validação para contribuições e forks
 
 Depois de sincronizar as dependências, execute a suíte unitária completa antes
@@ -114,23 +172,171 @@ uv run python -m cavegen.datastream.run_reference_voxelization --help
 git diff --check
 ```
 
-## Primeiro teste
+## Padrão das mensagens de commit
 
-Gere volumes de Random Walk e Cellular Automata em pequena escala:
+A partir de agora, cada commit deve ter um título conciso sobre a mudança e
+um corpo com esta estrutura, mantendo a ordem e os nomes das três seções:
+
+```text
+1. O que havia sido planejado:
+   Descrever o que era planejado ser feito antes desse commit.
+
+2. O que foi feito:
+   Descrever o que de fato foi feito, com qual objetivo e como se alinha
+   ao histórico de commits anteriores. Incluir verificações relevantes
+   e seus resultados reais, inclusive falhas conhecidas.
+
+3. O que será feito após este commit:
+   Descrever pendências adiante e próximos passos, distinguindo planos
+   de resultados já obtidos.
+```
+
+## Menu interativo de terminal
+
+Na raiz do repositório, abra a interface de geração e métricas:
+
+```bash
+uv run python -m cavegen
+```
+
+No PowerShell, usando diretamente o ambiente já existente:
+
+```powershell
+.\.venv\Scripts\python.exe -m cavegen
+```
+
+O menu permite gerar um volume `64³`, executar as seeds de um YAML, reavaliar
+NPZ existentes, consultar a tabela central e mudar os destinos da sessão.
+Enter aceita o valor mostrado; `:voltar` ou Ctrl+C cancela a ação. O glossário
+de cada opção está em [métricas estruturais](docs/metricas-estruturais.md#menu-interativo-e-glossário).
+
+Também é possível abrir a interface com `uv run python -m cavegen.menu`.
+
+| Opção | Operação | Saída |
+| --- | --- | --- |
+| `1` | Gerar Random Walk ou CA básico em `64³`, informando seed e parâmetros | NPZ e nova linha de métricas no CSV |
+| `2` | Executar algoritmos/seeds de um YAML, padrão `baseline_64.yaml` | Uma linha por execução concluída e seus NPZ |
+| `3` | Reavaliar NPZ existente com conectividade e spacing explícitos | Linha `structural_evaluation`, preservando o volume |
+| `4` | Consultar as últimas linhas da tabela | Exibição no terminal, sem alteração de arquivos |
+| `5` | Escolher CSV e pasta de geração individual da sessão | Destinos válidos durante a sessão; o YAML mantém sua própria pasta de volumes |
+| `6` | Consultar ajuda e atalhos | Texto no terminal |
+| `0` | Sair | Resultados concluídos permanecem salvos |
+
+Os padrões são `results/csv/experiments.csv` e `results/volumes`. Os caminhos
+são relativos ao diretório de execução, salvo quando absolutos. O menu atual
+opera geração e métricas; parsing de novas cavernas ainda não tem uma opção
+própria. Para leitura incremental já implementada, consulte a API abaixo.
+
+Funcionalidades futuras que exigirem repetir comandos, incluindo parsing,
+coleta e geração, devem ser integradas a esse menu, reutilizando as mesmas
+funções de serviço das interfaces automatizáveis.
+
+## Primeiro teste pela CLI
+
+Gere volumes de Random Walk e Cellular Automata na grade padrão `64³`:
 
 ```bash
 uv run python -m cavegen.benchmark.run_generation_benchmark \
-  --config configs/experiments/baseline_32.yaml \
-  --out results/csv/baseline_32.csv
+  --config configs/experiments/baseline_64.yaml \
+  --out results/csv/experiments.csv
 ```
 
-Os volumes gerados serão salvos em `results/volumes/` e a tabela de tempos em `results/csv/`.
+Cada execução acrescenta uma linha à tabela central, com identidade,
+parâmetros efetivos, versões, ocupação, componentes, distâncias e custo inicial.
+Os NPZ ficam em subpastas de `results/volumes/` por experimento, com caminhos
+na própria tabela; novas invocações preservam os resultados anteriores.
+`baseline_64.yaml` ainda é uma configuração de desenvolvimento, sem protocolo
+final de ajuste/repetições. O benchmark histórico `baseline_32.yaml` permanece
+disponível quando solicitado explicitamente.
 
-Na branch `CA`, esse comando não roda hoje: o benchmark importa
-`generate_cellular_automata`, nome ausente no pacote reorganizado do CA, e
-`baseline_32.yaml` ainda passa `steps` e `brush_radius`, parâmetros do Random
-Walk antigo. A refatoração do benchmark está pendente. Para gerar só o Random
-Walk, ver [`docs/random-walk.md`](docs/random-walk.md):
+O contrato `StructuralMetrics`, os casos degenerados, a explicação de EDT e
+conectividade e a proposta de reaproveitamento da linha central estão em
+[`docs/metricas-estruturais.md`](docs/metricas-estruturais.md).
+O CSV inicial tem cabeçalho diferente dos CSVs antigos e exige um único
+escritor por vez; não aponte o novo benchmark para a tabela histórica.
+
+Para consultar as flags sem gerar dados:
+
+```bash
+uv run python -m cavegen.benchmark.run_generation_benchmark --help
+```
+
+## API Python para scripts e notebooks
+
+Após instalar o pacote, execute os exemplos no REPL Python, em um script ou
+notebook. A CLI e o menu reutilizam esses serviços.
+
+Avaliar um volume em memória não grava arquivos:
+
+```python
+from cavegen.generators.random_walk import generate_random_walk
+from cavegen.metrics import evaluate_structure
+
+volume = generate_random_walk(seed=42)  # padrão 64³ em ZYX
+result = evaluate_structure(volume, connectivity=6, spacing_zyx=(1, 1, 1))
+print(result.to_record())
+```
+
+Para reavaliar um NPZ e acrescentar uma linha à tabela, sem regenerar o volume:
+
+```python
+from cavegen.benchmark.structural_evaluation import evaluate_archive
+
+row = evaluate_archive(
+    "results/volumes/EXPERIMENT_ID/random_walk_RUN_ID.npz",
+    "results/csv/experiments.csv",
+    connectivity=6,
+    spacing_zyx=(1, 1, 1),
+)
+print(row["run_id"])
+```
+
+Substitua o caminho pelo `volume_path` real da tabela. Essa operação também
+está na opção `3` do menu; não tem uma CLI própria. Sua variante é
+`structural_evaluation`, com tempo de geração e RSS ausentes.
+
+Para automatizar a geração, use
+`cavegen.benchmark.run_generation_benchmark.run(config_path, out_csv)` ou
+`run_configuration(config, out_csv)` com um dicionário equivalente ao YAML.
+Os geradores individuais são `generate_random_walk` e
+`cavegen.generators.cellular_automata.generate_cellular_automata`; ambos
+retornam `Volume3D`. A persistência isolada usa `save_volume_npz` e
+`load_volume_npz` de `cavegen.datastream.voxel_io`.
+
+Os leitores de point clouds são APIs incrementais, não comandos independentes:
+
+```python
+from itertools import islice
+
+from cavegen.datastream.ply import iter_ply_xyz
+from cavegen.datastream.f32 import iter_f32_xyz
+from cavegen.datastream.bounds import calculate_xyz_bounds
+from cavegen.datastream.sampling import reservoir_sample_xyz
+
+# Caminhos ilustrativos: confirme os arquivos reais e o fim da descompactação.
+ply_path = "D:/PASTA_DA_CAVERNA/caverna.ply"
+batches = islice(iter_ply_xyz(ply_path, batch_size=65536), 10)
+sample = reservoir_sample_xyz(batches, max_points=10000, seed=42)
+
+# Para F32 compatível, trocar por iter_f32_xyz(caminho_f32, batch_size=65536).
+# Varredura integral opcional, cara em datasets grandes:
+# minimum, maximum = calculate_xyz_bounds(iter_ply_xyz(ply_path, batch_size=65536))
+```
+
+F32 exige registros de sete `float32`: XYZ, refletância NIR e RGB. A extensão
+sozinha não garante compatibilidade. A amostra é de superfície e não pode ser
+avaliada como volume de ar. O exemplo limita a leitura aos primeiros dez
+lotes; a amostra é uniforme somente nesse prefixo, não na caverna inteira.
+Remover `islice` exige uma varredura integral, embora a memória da amostragem
+continue limitada. A voxelização PLY tem a CLI documentada a seguir;
+normalização e voxelização independentes do formato estão em
+`cavegen.core.normalization` e `cavegen.core.voxelization`.
+
+Na branch `CA`, esse comando e o menu `python -m cavegen` ainda não rodam: o
+benchmark importa `generate_cellular_automata`, ausente no pacote do CA, e o
+Felipe vai escrever essa integração separadamente. O lado do Random Walk já usa
+`caverna` e `raio_voxels` (grade cúbica com lado maior que 5). Para gerar só o
+Random Walk, ver [`docs/random-walk.md`](docs/random-walk.md):
 
 ```bash
 uv run python -m cavegen.generators.random_walk.generator [seed] [lado] [raio|proporcional]
@@ -189,31 +395,107 @@ ponderado por waypoints do projeto base (3D-Cave-Generation), em
 ver [`docs/random-walk.md`](docs/random-walk.md). Os waypoints vêm de modelos
 de cavernas reais, então essa caverna não é um controle totalmente
 independente de referências. Um guia procedural com semântica, escala e
-sinal definidos continua pendente. O benchmark da branch ainda precisa de
-integração: ele importa `generate_cellular_automata`, nome ausente no pacote
-reorganizado, e sua configuração ainda usa os parâmetros do Random Walk
-antigo. O ajuste genético de CA e Random Walk está planejado, com custo de
+sinal definidos continua pendente. O benchmark mede pelo `ResourceSampler`, mas
+ainda não importa na branch, por falta da integração do CA. O ajuste genético de CA e Random Walk está planejado, com custo de
 busca separado do tempo de geração.
 
 ## Exportação de volumes gerados para malha
 
 ```bash
 uv run python -m cavegen.meshing.export_mesh \
-  --input results/volumes/random_walk_seed_0.npz \
+  --input results/volumes/EXPERIMENT_ID/random_walk_RUN_ID.npz \
   --output results/meshes/random_walk_seed_0.obj
 ```
 
+Substitua a entrada pelo `volume_path` registrado no CSV da execução desejada.
+
+## Visualização de volumes
+
+Os scripts recebem o caminho do NPZ como primeiro argumento. Substitua os
+identificadores pelo caminho real da tabela:
+
+```bash
+uv run python plots/matriz.py "results/volumes/EXPERIMENT_ID/random_walk_RUN_ID.npz"
+uv run python plots/plot_matplotlib.py "results/volumes/EXPERIMENT_ID/random_walk_RUN_ID.npz"
+uv run python plots/plot_plotly.py "results/volumes/EXPERIMENT_ID/random_walk_RUN_ID.npz"
+```
+
+`matriz.py` imprime um resumo; Matplotlib salva PNG em `results/figures/` e
+abre uma janela; Plotly salva HTML nessa pasta e abre a figura interativa.
+O HTML atual carrega Plotly por CDN e requer acesso à biblioteca para exibição.
+Os nomes das figuras derivam do NPZ e podem ser reutilizados numa nova
+plotagem. A amostragem visual do Plotly não altera as métricas do volume.
+
+`fatia.py` é um script exploratório com entrada fixa
+`results/volumes/random_walk_seed_0.npz`, sem argumento para selecionar NPZ.
+Depende desse artefato histórico e não integra o fluxo atual de reprodução.
+
+## Interfaces legadas e frentes futuras
+
+| Interface | Como acessar | Estado e limite |
+| --- | --- | --- |
+| Resumo estatístico legado | `uv run python -m cavegen.benchmark.summarize_results --input results/csv/baseline_32.csv --output results/csv/baseline_32_summary.csv` | Agrupa apenas por algoritmo. Usar somente um conjunto homogêneo; não resumir diretamente o CSV central com variantes/experimentos misturados. O destino é regravado. |
+| IoU genérica | `uv run python -m cavegen.benchmark.run_iou_benchmark --reference CAMINHO_VOID_VALIDADO.npz --generated-dir PASTA_DO_EXPERIMENTO --out results/csv/iou.csv` | Exige volumes de vazio comparáveis, alinhados e com mesmo shape. Lê NPZ diretamente na pasta indicada, sem recursão; destino regravado. Não usar a superfície do Elaphes. Fora do benchmark atual. |
+| Treino GAN | `uv run python -m cavegen.training.train_gan` | Placeholder: encerra com mensagem, sem treinar. |
+| Treino PCGRL | `uv run python -m cavegen.training.train_pcgrl` | Placeholder: encerra com mensagem, sem treinar. |
+| Colab | [Orientações de notebooks](notebooks/colab/README.md) | Sequência planejada; os notebooks sugeridos ainda precisam ser criados. |
+| Unity e gRPC | `unity/`, `proto/caves.proto`, `cavegen.datastream.grpc_adapter` | Há contrato/serialização, mas não um aplicativo Unity ou servidor gRPC integrado para executar. |
+| Menu experimental do CA | Na branch `CA`: `uv run python -m cavegen.generators.cellular_automata.menu` | Disponível naquela branch, com API própria. Não existe nesse caminho no `main`; não misturar resultados sem conferir implementação e contrato. |
+| Reconstrução e linha central do Elaphes | Branch `experiment/elaphes-meshing` | Comandos e artefatos descritos na documentação daquela branch; não são etapas exigidas na avaliação atual. |
+
+As CLIs com `argparse` oferecem `--help`: geração, voxelização de superfície,
+exportação de malha, resumo estatístico e IoU. O menu oferece a opção `6` de
+ajuda. APIs Python e scripts de plotagem não compartilham essas mesmas flags.
+
+## Roteiro de reprodução do experimento
+
+1. Registrar a revisão e o estado do código com `git rev-parse HEAD` e
+   `git status --short`. Para outra máquina reproduzir as mudanças, usar uma
+   revisão commitada; `-dirty` não substitui um snapshot do código.
+2. Sincronizar dependências com `uv sync --locked` e executar as checagens da
+   seção de validação. Em outras instalações, registrar as versões efetivas.
+3. Conferir `configs/experiments/baseline_64.yaml`: shape, seeds e parâmetros.
+   Não alterar o YAML entre execuções que deveriam reproduzir o mesmo caso.
+4. Executar `uv run python -m cavegen.benchmark.run_generation_benchmark`
+   ou escolher a opção `2` do menu com o mesmo YAML e destino CSV.
+5. Consultar `results/csv/experiments.csv` pela opção `4` ou por um leitor CSV.
+   Cada linha identifica experimento, execução, versões, seed, argumentos,
+   contrato de métricas e caminho do NPZ. Preservar CSV e NPZ juntos.
+6. Para conferir uma geometria existente, usar a opção `3` ou
+   `evaluate_archive`. Filtrar `variant` antes de analisar resultados: uma
+   reavaliação não é outra geração independente. Exportar/plotar os NPZ
+   selecionados quando for necessária inspeção visual.
+7. Comparar somente resolução, conectividade, spacing, contratos e condições
+   experimentais compatíveis. Repetir a seed reproduz a geometria sob a mesma
+   implementação/versões; IDs, timestamps, tempos e RSS podem variar.
+
+O baseline `64³` atual permite reproduzir o pipeline de desenvolvimento.
+Sementes finais, repetições de desempenho, orçamento de ajuste e inventário
+completo de hardware ainda precisam ser fechados antes da coleta científica
+final. O monitor atual registra tempo e RSS amostrado; CPU/GPU/VRAM ainda
+exigem padronização adicional. A suíte tem uma falha F32 conhecida no Windows
+por `memmap` aberto durante a limpeza do teste, detalhada em
+[métricas estruturais](docs/metricas-estruturais.md#memória-e-verificação).
+
+Datasets reais não são necessários para gerar/avaliar os baselines sintéticos.
+Para reproduzir diagnósticos de superfície, fornecer os arquivos externos e
+seus limites/proveniência. O JSON versionado de limites do Elaphes não substitui
+a point cloud. Dados, volumes e tabelas gerados são ignorados pelo Git e devem
+ser transferidos separadamente quando necessários à reprodução.
+
 ## Roadmap resumido
 
-1. Usar `64³` em ZYX nas medições finais; fechar sementes, repetições e
-   ambiente de execução, e reexecutar Random Walk e CA básico.
-2. Fechar avaliação estrutural com ocupação, conectividade e componentes;
-   documentar a unidade da transformada de distância.
-3. Auditar dados para GAN e definir o MDP de um PCGRL pequeno; separar treino
-   e geração quando houver modelos funcionais.
-4. Definir e executar o ajuste genético de parâmetros dos dois clássicos;
-   considerar CA com guia procedural como extensão.
-5. Consolidar resultados em Python e inspecionar volumes e malhas na Unity.
+1. Pablo implementa e padroniza a coleta de métricas, incluindo contratos,
+   casos degenerados, unidades, recursos computacionais e esquema de saída.
+2. Com essa interface estável, Pablo implementa GAN e PCGRL sob o contrato
+   `Volume3D`, mantendo treino separado de geração/inferência.
+3. Pablo inventaria e parseia incrementalmente as novas cavernas no volume
+   `D:` após a conclusão das descompactações.
+4. Em paralelo, Felipe continua CA e Random Walk e, depois, implementa o
+   algoritmo evolutivo para ajustar os dois geradores usando as métricas
+   padronizadas.
+5. Após a coleta e a análise, padronizar a documentação, consolidar os
+   resultados e inspecionar volumes e malhas na Unity.
 
 A lista detalhada, com decisões ainda abertas, está em
 [`Orientacao-codex.md`](Orientacao-codex.md). A justificativa das métricas e da

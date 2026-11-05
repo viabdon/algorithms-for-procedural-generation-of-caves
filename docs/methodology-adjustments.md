@@ -20,9 +20,21 @@ Comparar Random Walk e CA básico primeiro em `64³`, com eixos ZYX. Fixar semen
 
 A branch `CA` acrescenta rastreamento de tempo, CPU e RSS do processo, além de GPU/VRAM quando houver leitura. Há testes do amostrador, mas o protocolo de comparação ainda precisa definir hardware, intervalo de amostragem e tratamento de execuções curtas e leituras ausentes. O benchmark dessa branch não importa por causa da antiga API do CA; seus resultados não devem ser tratados como benchmark integrado antes da correção e de uma execução de ponta a ponta.
 
+**Geradores do benchmark (04/11/2026).** O Random Walk de 6 direções deu lugar ao ponderado por waypoints do projeto base nas configurações, no benchmark e no menu. O lado do CA ficou como veio da `main` e não funciona na branch `CA`: o benchmark importa `generate_cellular_automata` e passa `threshold_open_neighbors`, que o pacote do CA não tem. O Felipe vai escrever essa integração separadamente. O CA antigo contava 26 vizinhos e forçava a borda sólida; o da branch conta 27 células com `sensitivity`, então os parâmetros antigos não valem para ele sem decisão explícita.
+
 Não é requisito portar o CA otimizado à GPU apenas porque os modelos neurais treinam no Colab. A comparação estrutural usa saídas `64³` e as mesmas métricas, independentemente do dispositivo. Para custo, identificar máquina e backend em cada linha, separar treino de geração e evitar uma classificação única de velocidade baseada em CPU local versus GPU do Colab. Se a pergunta experimental incluir aceleração por GPU, implementar e medir uma variante do CA como estudo próprio; isso exigiria verificar equivalência de resultados e medir também transferências e sincronização.
 
 Conectividade, componentes e ocupação têm prioridade na avaliação estrutural. A transformada de distância ao sólido descreve o espaço livre; seus valores dependem de resolução, espaçamento e bordas, e não validam a largura de todos os túneis. Ramificação, tortuosidade e diversidade exigem definições e validação próprias. Volumes gerados usam `True = ar`, `False = sólido`, com eixos ZYX.
+
+O contrato implementado em 02/11/2026 está em
+[métricas estruturais](metricas-estruturais.md): conectividade 6 por padrão,
+opção explícita de 26, distâncias entre centros com spacing ZYX e exterior
+sólido nos volumes mistos. Nos casos totalmente sólido e totalmente aberto,
+a EDT é ausente e a degeneração é registrada. Cada execução concluída ocupa
+uma linha versionada no CSV central; mudanças de borda, resolução e contrato
+impedem a comparação automática com valores históricos. A linha central da
+branch experimental é uma base para futuros descritores de ramificação,
+dependentes de validação da extração e da preservação de ciclos.
 
 **Contrato do SDF sintético:** para um volume gerado com vazio conhecido, `SDF > 0` no interior do vazio, `SDF < 0` no exterior sólido e `SDF = 0` nos voxels de borda. A magnitude é a distância euclidiana ao voxel de borda mais próximo, em unidades de voxel, na grade ZYX. O protótipo da branch `CA` usa borda de seis vizinhos de face e coloca o zero no centro do voxel de borda. Registrar sinal, unidade, regra de borda e origem do volume com o campo. Não equiparar esse SDF às estatísticas já existentes de distância do vazio ao sólido: elas são outro descritor, sem sinal.
 

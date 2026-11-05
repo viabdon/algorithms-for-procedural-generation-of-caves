@@ -1,6 +1,6 @@
 # Roadmap do TCC
 
-**Replanejamento de 18/10/2026; branch `CA` verificada em 28/10/2026 (`a58155e`); migração do Random Walk verificada em 02/11/2026 (`216f38d` a `e121f44`).** O [resumo quinzenal](relatorios/resumo-quinzenal-tcc-2026-10-18.docx) retira a reconstrução do Elaphes, o SDF real e a IoU volumétrica do caminho crítico. Este roadmap separa o que está no checkout `main` dos avanços ainda isolados nas branches `CA` e `experiment/elaphes-meshing`.
+**Replanejamento de 18/10/2026; responsabilidades atualizadas em 02/11/2026; migração do Random Walk em `216f38d` a `e121f44`.** O [resumo quinzenal](relatorios/resumo-quinzenal-tcc-2026-10-18.docx) retira a reconstrução do Elaphes, o SDF real e a IoU volumétrica do caminho crítico. Pablo prioriza métricas, redes neurais e parsing de novas cavernas; Felipe continua CA e Random Walk e depois implementa a otimização evolutiva. Este roadmap separa o que está no checkout `main` dos avanços ainda isolados nas branches `CA` e `experiment/elaphes-meshing`.
 
 ## Base disponível
 
@@ -17,40 +17,56 @@
 - [x] Protótipos `sdf_temp/` de flood fill e EDT da **parede** voxelizada do Elaphes e `random_walk_temp/` de caminhada ponderada por waypoints, voxelização tubular e campo de distância. São experimentos, não a referência real validada nem geradores integrados ao benchmark. `random_walk_temp/` foi depois migrado para o pacote e apagado (item abaixo).
 - [x] Fixar o contrato do SDF sintético: positivo no interior do vazio, negativo no exterior sólido, zero na borda e distância euclidiana em voxels, na mesma grade ZYX. O protótipo de SDF do Random Walk seguia sinal e unidade; ficou só no histórico (`a58155e`) e a API pública de SDF ainda não está integrada.
 - [x] Migrar o random walk ponderado por waypoints do projeto base para `src/cavegen/generators/random_walk/`, sem mudança de lógica, substituindo o random walk de 6 direções (`steps`, `brush_radius`). Grafos exportados para `configs/random_walk/`; NPZ da seed 1 das quatro cavernas idênticos bit a bit aos do protótipo; 38 testes novos, contando os 6 do menu de terminal. Commits `216f38d` a `e121f44`. Ver [Random Walk](random-walk.md).
-- [ ] Corrigir a integração: o benchmark da branch importa `generate_cellular_automata`, que não é exportado pelo pacote reorganizado. A suíte da branch passou com 53 testes, mas a checagem de importação do benchmark falhou. A refatoração do benchmark também precisa aceitar os parâmetros do Random Walk novo (`caverna`, `weight`, `k`, `spacer`, `raio_voxels`): `baseline_32.yaml` ainda passa `steps` e `brush_radius`.
+- [ ] Integrar o CA ao benchmark refatorado da `main`: ele importa `generate_cellular_automata`, ausente no pacote do CA, e passa `threshold_open_neighbors`. O Felipe vai escrever essa integração separadamente; até lá o benchmark, `python -m cavegen`, `tests/test_menu.py` e `tests/test_experiment_records.py` não importam.
 - [ ] SDF do Random Walk, quando o Felipe decidir retomá-lo: a etapa não foi migrada, e o peso 002 do CA aponta para um arquivo do protótipo que não existe mais.
 
-## Prioridade 1 — Fechar o benchmark clássico
+## Prioridade 1 — Implementar e padronizar métricas
 
-- [x] Registrar a configuração inicial `baseline_32.yaml`: volume ZYX `32³`, sementes `0` a `4` e parâmetros de Random Walk e CA básico. Os parâmetros de Random Walk dela são os do gerador antigo, substituído na branch `CA`.
-- [ ] Escolher a caverna de waypoints do Random Walk usada no protocolo (padrão atual `knotlow_cavern`), sem usar essa mesma caverna como referência de avaliação.
-- [x] Fixar `64³` em ZYX como grade das medições finais. A configuração `baseline_32.yaml` permanece como teste inicial e precisa de uma configuração final distinta.
-- [ ] Fixar sementes e repetições de medição; documentar hardware, versões e orçamento de ajuste. Não atribuir escala física aos voxels sem conversão conhecida.
-- [ ] Integrar a API do CA da branch ao benchmark e testar importação e uma execução pequena antes de coletar resultados.
-- [ ] Reexecutar ambos, registrar resultados e dispersão por semente. Conferir NPZ, CSV e casos degenerados antes de interpretar diferenças.
-- [ ] Interpretar tempo, pico de RAM, proporção de vazio e fração da maior componente. Completar a contagem de componentes quando necessária ao relatório.
-- [ ] Documentar resolução e unidade da transformada de distância. Não chamar seus resumos de largura validada de todos os túneis.
+- [x] Inventariar as métricas estruturais existentes e registrar contratos, unidades, casos degenerados e colunas em [métricas estruturais](metricas-estruturais.md).
+- [x] Implementar `evaluate_structure(Volume3D)` e funções individuais para `bool[D,H,W]` validado, com resultados imutáveis e registro plano `structural-v1`.
+- [x] Validar conectividade, componentes, ocupação e estatísticas da EDT por testes geométricos independentes.
+- [ ] Definir ramificação, tortuosidade e diversidade; considerar o reaproveitamento do grafo de linha central, validando extração, junções e ciclos.
+- [ ] Padronizar a medição de tempo e recursos, distinguindo tempo de geração, otimização, treino, inferência, transferências e visualização. Leituras ausentes de GPU/VRAM não equivalem a zero.
+- [x] Definir tratamento de volumes vazios, totalmente abertos, desconectados e com shapes inválidos; cobrir contratos observáveis com testes.
+- [x] Acrescentar resultados estruturais e contexto inicial por execução ao CSV central, preservando arquivos NPZ. O inventário completo de hardware e as repetições permanecem pendentes.
+- [ ] Fixar esquema de saída e metadados de resolução, eixos, sementes, repetições, hardware, backend e versões. Não atribuir escala física aos voxels sem conversão conhecida.
+- [ ] Disponibilizar a interface ao CA, Random Walk, algoritmo evolutivo e modelos neurais antes da coleta final.
 
-## Prioridade 2 — Avaliação estrutural e relato
-
-- [ ] Definir e validar conectividade, componentes e ocupação como medidas estruturais centrais. Especificar ramificação, tortuosidade e diversidade antes de usá-las.
-- [ ] Integrar e validar a instrumentação de CPU/RSS e GPU/VRAM da branch `CA` no protocolo comum; GPU/VRAM podem ficar ausentes quando não houver leitura. Definir como amostragem e execuções curtas entram no relato.
-- [ ] Definir a apresentação de custos por ambiente: CA e Random Walk podem permanecer na CPU; modelos neurais podem usar GPU no Colab. Separar treino, inferência/geração e transferências. Portar CA para GPU somente se surgir uma pergunta experimental específica sobre esse backend.
-- [ ] Separar custo de geração, treino, otimização e visualização; identificar cada ambiente de execução.
-- [ ] Atualizar o texto do TCC para explicitar a retirada da IoU volumétrica e a impossibilidade atual de afirmar recuperação do volume interno real do Elaphes.
-
-## Prioridade 3 — Frente neural
+## Prioridade 2 — Implementar os geradores neurais
 
 - [ ] Auditar volume, independência e semântica dos dados de treino antes de escolher uma GAN. Dados sintéticos servem a testes de infraestrutura, não à alegação de aprendizagem de cavernas reais.
 - [ ] Especificar um MDP pequeno para PCGRL, com recompensa inicial de conectividade e ocupação, sem IoU com o scan.
 - [ ] Implementar geração funcional e comparar com os baselines sob o mesmo contrato `Volume3D`; reportar treino e geração separadamente. As interfaces atuais lançam `NotImplementedError`.
+- [ ] Reutilizar a interface de métricas da prioridade 1 para avaliação e, no PCGRL, somente para recompensas que tenham definição e custo compatíveis com o ambiente.
+
+## Prioridade 3 — Inventariar e parsear novas cavernas
+
+- [ ] Usar o volume externo `D:` como origem preferencial das point clouds, evitando duplicação de arquivos grandes no repositório.
+- [ ] Aguardar o término da descompactação das três cavernas em andamento antes de validar tamanho, hash, formato ou conteúdo.
+- [ ] Inventariar as cavernas disponíveis, incluindo quais pertencem ao conjunto de 16 associado à fonte do KarstConduitCatalogue, sem presumir que todas tenham o mesmo formato ou semântica.
+- [ ] Para cada formato novo, documentar cabeçalho, tipo de registro, eixos, unidade quando conhecida e representação; reutilizar `iter_ply_xyz` ou `iter_f32_xyz` quando o contrato for compatível.
+- [ ] Implementar parsing incremental com validações, `float32`, limites de memória e testes sintéticos pequenos. Não carregar a point cloud completa por padrão.
+- [ ] Manter a distinção entre superfície observada e vazio; qualquer voxelização ou uso como treino exige decisão metodológica própria.
+
+## Trabalho de Felipe — geradores clássicos e algoritmo evolutivo
+
+- [ ] Integrar a API do CA da branch ao benchmark e testar importação e uma execução pequena. Versão personalizada do Felipe, separada do que veio da `main`.
+- [x] Adaptar o benchmark e `python -m cavegen` ao Random Walk por waypoints (`caverna`, `raio_voxels`), medindo pelo `ResourceSampler`. Só executa depois da integração do CA. Feito no merge da `main` de 04/11/2026.
+- [ ] Escolher a caverna de waypoints do Random Walk usada no protocolo (padrão atual `knotlow_cavern`), sem usar essa mesma caverna como referência de avaliação.
+- [ ] Criar configurações finais `64³` distintas de `baseline_32.yaml` e fornecer saídas rastreáveis para a interface comum de métricas.
+- [ ] Definir e implementar o algoritmo evolutivo para os parâmetros de CA e Random Walk após a estabilização das métricas, com espaços de busca próprios e aptidão comum quando metodologicamente aplicável. No Random Walk, decidir se a busca respeita as faixas do C# do projeto base (`weight` em [0,1; 1], `k` e `spacer` inteiros em [1, 30]).
+- [ ] Reservar sementes de avaliação, comparar com busca simples de igual orçamento e separar custo de otimização do custo de geração.
 
 ## Extensões condicionais
 
 - [x] Prototipar peso espacial no CA e verificar peso zero equivalente ao CA básico na branch `CA`.
 - [ ] Validar um guia procedural independente do scan de teste sob o contrato de SDF já fixado, registrando regra de borda e origem, e comparar CA condicionado com o básico sob protocolo comum. A extensão não bloqueia o benchmark clássico.
-- [ ] Aplicar otimização genética aos parâmetros de CA e Random Walk, depois de definir espaços de busca, função de aptidão e orçamento comparável. Reservar sementes de avaliação e comparar com busca simples de igual orçamento. Distinguir custo de otimização do custo de geração. No Random Walk, decidir se a busca respeita as faixas do C# do projeto base (`weight` em [0,1; 1], `k` e `spacer` inteiros em [1, 30]).
 - [ ] Usar Unity para inspeção dos volumes e malhas exportados. gRPC e AMD/ROCm ficam para depois do pipeline científico.
+
+## Fechamento do experimento
+
+- [ ] Reexecutar os geradores sob o protocolo final, registrar resultados e dispersão por semente e conferir NPZ, CSV e casos degenerados antes da interpretação.
+- [ ] Somente após a coleta e a análise, padronizar de forma ampla a documentação, atualizar o texto do TCC e consolidar tabelas, limitações e conclusões. Durante o experimento, registrar apenas o necessário para reprodutibilidade e decisões de contrato.
 
 ## Reconstrução real fora do escopo atual
 

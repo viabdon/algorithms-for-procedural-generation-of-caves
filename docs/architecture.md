@@ -24,18 +24,33 @@ Este é o contrato escolhido para novos campos sintéticos; não afirma que já 
 | --- | --- | --- |
 | Random Walk e CA básico | `Volume3D` booleano em ZYX | Implementados; no `main` o Random Walk ainda é o de 6 direções, substituído na branch `CA` (ver abaixo) |
 | Persistência | Volume gerado em NPZ | Implementada |
-| Benchmark inicial | Tempo, pico de RSS, proporção de vazio, fração da maior componente e estatísticas de distância ao sólido | Implementado para os dois geradores; reexecução comparável e resultados finais pendentes |
+| Avaliação estrutural | `evaluate_structure(Volume3D)` → `StructuralMetrics` imutável | Ocupação, componentes e EDT, validações e degeneração explícitas; registro plano `structural-v1` |
+| Benchmark inicial | Uma linha por execução no CSV central, com NPZ rastreável | Padrão `64³`, persistência incremental, tempo e RSS iniciais; protocolo computacional completo e resultados finais pendentes |
 | Marching Cubes | Malha derivada do volume gerado | Disponível para visualização |
 | GAN e PCGRL | Devem gerar `Volume3D` | Interfaces ainda lançam `NotImplementedError` |
 | CPU/GPU/VRAM e descritores adicionais | Protocolo e instrumentação | Pendentes no `main`; há protótipo de rastreamento na branch `CA` |
 
 A transformada de distância descreve o espaço livre em unidades da grade atual. Seus resumos não validam, por si sós, a largura de todos os túneis. Resolução, espaçamento e bordas precisam ser explicitados para interpretações físicas.
 
+O [contrato estrutural](metricas-estruturais.md) usa conectividade 6 por padrão,
+spacing ZYX explícito e exterior sólido para a EDT de volumes mistos. Volumes
+totalmente sólidos ou abertos têm distâncias ausentes e motivo de degeneração.
+O benchmark obtém as colunas do agregador e acrescenta linhas a
+`results/csv/experiments.csv`, preservando NPZ em subpastas por experimento.
+
+`python -m cavegen` abre o menu interativo em `cavegen.menu`. A interface usa
+`run_configuration` para geração e `evaluate_archive` para reavaliar NPZ.
+Ambos usam a mesma construção e persistência de registros, preservando o
+cabeçalho `structural-v1`; reavaliações usam a variante `structural_evaluation`
+e não preenchem custos de geração. Operações repetitivas futuras devem ser
+adicionadas ao menu com serviços reutilizáveis, validação, cancelamento e
+glossário no documento da funcionalidade.
+
 ## Código experimental na branch `CA` (`a58155e`)
 
 O CA foi reorganizado em um pacote com convolução 3D para contar a vizinhança, bordas configuráveis, sementes/resultados NPZ, menu e pesos espaciais opcionais. O peso é somado à contagem antes do limiar em cada passo. Testes da branch verificam equivalência com a versão em laço nas bordas determinísticas e igualdade entre CA sem peso e com peso zero. A borda aleatória não é reproduzível bit a bit.
 
-O rastreador novo amostra tempo, CPU e RSS do processo, além de GPU/VRAM quando houver leitura; resultados ausentes não devem ser interpretados como zero. O benchmark da branch foi adaptado para esse rastreador, mas ainda importa `generate_cellular_automata`, nome ausente no novo pacote. Em revisão isolada, 53 testes passaram e a importação do benchmark falhou. Integrar a API e executar um caso pequeno são pré-requisitos para usar a branch no benchmark principal.
+O rastreador novo amostra tempo, CPU e RSS do processo, além de GPU/VRAM quando houver leitura; resultados ausentes não devem ser interpretados como zero. O benchmark usa o `ResourceSampler` para tempo e pico de RSS; CPU e GPU/VRAM são amostradas, mas não entram nas 45 colunas do CSV central. Ele ainda não importa na branch, porque a integração do CA será feita separadamente pelo Felipe.
 
 ### Random Walk (migração verificada em 02/11/2026, commits `216f38d` a `e121f44`)
 
@@ -49,7 +64,7 @@ O gerador público de Random Walk passou a ser o random walk ponderado por waypo
 | Gerador | `generate_random_walk(shape, seed, caverna, weight, k, spacer, raio_voxels) -> Volume3D` e `RandomWalkGenerator`; grade cúbica com lado > 5 | Implementado |
 | Menu | `menu.py` grava `results/result_000.npz` por `run_and_save`, medido com `track_resources`, e plota caminhos ou grade classificada; não passa pelo benchmark | Implementado (`658d397`) |
 | SDF do Random Walk | Contrato de SDF sintético acima | Fora do pacote por decisão do Felipe; protótipo só no histórico (`a58155e`) |
-| Benchmark | Aceitar os parâmetros novos | Pendente: `baseline_32.yaml` ainda passa `steps` e `brush_radius` |
+| Benchmark | Aceitar os parâmetros novos | Lado do Random Walk adaptado no merge da `main` de 04/11/2026; só executa depois da integração do CA |
 
 Os waypoints vêm de modelos de cavernas reais do projeto base, portanto a forma da caverna não é independente dessa informação. O raio padrão de 1,5 voxel em `64³` engrossa os tubos em relação à escala original. Os grafos são encontrados por caminho relativo ao arquivo, o que exige rodar do repositório ou de instalação editável. Detalhes, números medidos e limites em [Random Walk](random-walk.md).
 
