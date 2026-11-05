@@ -1,5 +1,12 @@
 algorithm: random_walk
+# Random walk ponderado do projeto base (3D-Cave-Generation, commit 7a6c617).
+# A grade precisa ser cúbica: a caverna é encaixada com a mesma escala nos três eixos.
 shape: [64, 64, 64]
-steps: 6000
-brush_radius: 1
-connectivity_cleanup: true
+# Grafo de waypoints em configs/random_walk/<caverna>.yaml.
+caverna: knotlow_cavern
+# null usa o valor gravado na cena (weight 1, k 30, spacer 5 nas quatro cavernas).
+weight: null
+k: null
+spacer: null
+# Raio do tubo em voxels; null usa o radius da cena convertido pela escala.
+raio_voxels: 1.5

@@ -53,7 +53,8 @@ shell POSIX; no PowerShell, reúna-os em uma linha.
 
 ## Algoritmos previstos
 
-- Random Walk 3D
+- Random Walk 3D ponderado por waypoints, portado do projeto base
+  3D-Cave-Generation ([`docs/random-walk.md`](docs/random-walk.md))
 - Cellular Automata 3D básico; uma variante guiada por campo procedural
   poderá ser estudada depois
 - Ajuste genético dos parâmetros de CA e Random Walk
@@ -74,9 +75,10 @@ conversão validada dessa grade para o ar interno real.
 Para o SDF de um volume gerado com vazio conhecido, o contrato adotado é
 `float32[D,H,W]` em ZYX: **positivo no interior do vazio**, **negativo no
 exterior sólido** e **zero na borda**, com distância euclidiana em **voxels**
-até o voxel de borda mais próximo. O protótipo `random_walk_temp/` na branch
-`CA` já usa essa convenção. A regra de borda e a origem do campo devem ser
-registradas; o SDF ainda não é uma API integrada ao pacote principal.
+até o voxel de borda mais próximo. O protótipo de SDF do Random Walk, que
+ficou no histórico da branch `CA` (`a58155e`), usava essa convenção. A regra
+de borda e a origem do campo devem ser registradas; o SDF ainda não é uma API
+integrada ao pacote principal.
 
 ## Estrutura
 
@@ -330,6 +332,16 @@ continue limitada. A voxelização PLY tem a CLI documentada a seguir;
 normalização e voxelização independentes do formato estão em
 `cavegen.core.normalization` e `cavegen.core.voxelization`.
 
+Na branch `CA`, esse comando e o menu `python -m cavegen` ainda não rodam: o
+benchmark importa `generate_cellular_automata`, ausente no pacote do CA, e o
+Felipe vai escrever essa integração separadamente. O lado do Random Walk já usa
+`caverna` e `raio_voxels` (grade cúbica com lado maior que 5). Para gerar só o
+Random Walk, ver [`docs/random-walk.md`](docs/random-walk.md):
+
+```bash
+uv run python -m cavegen.generators.random_walk.generator [seed] [lado] [raio|proporcional]
+```
+
 ## Voxelização direta de superfície para diagnóstico
 
 Para inspecionar uma nuvem de pontos PLY como grade de voxels de superfície,
@@ -374,16 +386,18 @@ registra os resultados e limites.
 Na branch `CA` (`a58155e`), o CA já aceita um peso espacial somado à
 contagem de vizinhos. Há testes de equivalência entre ausência de peso e
 peso zero. A branch também contém flood fill e EDT experimentais da grade
-de **parede** do Elaphes, além de uma caminhada ponderada por waypoints
-voxelizada em `random_walk_temp/`. O campo do Elaphes usa o mesmo sinal e
-unidade, mas seu "interno" pode representar parede ou buracos fechados;
-não fornece `VOID` real validado.
-O guia por waypoints vem de modelos de cavernas reais e também não é um
-controle totalmente independente de referências. Um guia procedural com
-semântica, escala e sinal definidos continua pendente. O benchmark da branch
-ainda precisa de integração: ele importa `generate_cellular_automata`, nome
-ausente no pacote reorganizado. O ajuste genético de CA e Random Walk está
-planejado, com custo de busca separado do tempo de geração.
+de **parede** do Elaphes. O campo do Elaphes usa o mesmo sinal e unidade,
+mas seu "interno" pode representar parede ou buracos fechados; não fornece
+`VOID` real validado.
+Na mesma branch, o gerador de Random Walk passou a ser o random walk
+ponderado por waypoints do projeto base (3D-Cave-Generation), em
+`src/cavegen/generators/random_walk/`, no lugar do random walk de 6 direções;
+ver [`docs/random-walk.md`](docs/random-walk.md). Os waypoints vêm de modelos
+de cavernas reais, então essa caverna não é um controle totalmente
+independente de referências. Um guia procedural com semântica, escala e
+sinal definidos continua pendente. O benchmark mede pelo `ResourceSampler`, mas
+ainda não importa na branch, por falta da integração do CA. O ajuste genético de CA e Random Walk está planejado, com custo de
+busca separado do tempo de geração.
 
 ## Exportação de volumes gerados para malha
 
@@ -486,6 +500,7 @@ ser transferidos separadamente quando necessários à reprodução.
 A lista detalhada, com decisões ainda abertas, está em
 [`Orientacao-codex.md`](Orientacao-codex.md). A justificativa das métricas e da
 delimitação do scan está em [`docs/methodology-adjustments.md`](docs/methodology-adjustments.md).
+O Random Walk está descrito em [`docs/random-walk.md`](docs/random-walk.md).
 As tarefas individuais estão em
 [`Pablo`](docs/tarefas-pablo-reconstrucao-modelos.md) e
 [`Felipe`](docs/tarefas-felipe-sdf-ca.md).

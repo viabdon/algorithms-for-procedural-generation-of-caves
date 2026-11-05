@@ -4,6 +4,7 @@ import argparse
 import inspect
 from collections.abc import Callable, Mapping
 from pathlib import Path
+from time import perf_counter
 from typing import Any
 from uuid import uuid4
 
@@ -17,8 +18,7 @@ from cavegen.datastream.voxel_io import save_volume_npz
 from cavegen.generators.cellular_automata import generate_cellular_automata
 from cavegen.generators.random_walk import generate_random_walk
 from cavegen.metrics.structural import MetricValue
-from cavegen.profiling.system_monitor import SystemMonitor
-from cavegen.profiling.timer import elapsed_timer
+from cavegen.profiling.resource_tracker import ResourceSampler
 
 
 def _shape(config: Mapping[str, Any]) -> tuple[int, int, int]:
@@ -90,13 +90,12 @@ def run_configuration(
             if algorithm not in algorithms:
                 continue
             params = algorithms[algorithm] or {}
-            monitor = SystemMonitor()
-            monitor.start()
-            try:
-                with elapsed_timer() as timer:
-                    volume = generate(shape=shape, seed=seed, **params)
-            finally:
-                monitor.stop()
+            # Mesma regua do track_resources: comparar algoritmos exige o mesmo
+            # amostrador nos dois lados.
+            with ResourceSampler() as sampler:
+                start = perf_counter()
+                volume = generate(shape=shape, seed=seed, **params)
+                elapsed_seconds = perf_counter() - start
             run_id = uuid4().hex
             path = volumes_dir / f"{algorithm}_{run_id}.npz"
             effective = inspect.signature(generate).bind(shape=shape, seed=seed, **params)
@@ -104,10 +103,10 @@ def run_configuration(
             row = make_experiment_record(
                 volume, context=context, algorithm=algorithm, seed=seed,
                 volume_path=path, parameters=effective.arguments,
-                elapsed_seconds=timer["elapsed_seconds"],
-                peak_rss_bytes=monitor.peak_rss_bytes if monitor.samples else None,
-                rss_sample_count=len(monitor.samples),
-                rss_sampling_interval_seconds=monitor.interval_seconds,
+                elapsed_seconds=elapsed_seconds,
+                peak_rss_bytes=max((s.rss_bytes for s in sampler.samples), default=None),
+                rss_sample_count=len(sampler.samples),
+                rss_sampling_interval_seconds=sampler.interval_seconds,
             )
             row["run_id"] = run_id
             save_volume_npz(volume, path)

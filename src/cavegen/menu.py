@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import csv
+import math
 from collections import deque
 from collections.abc import Callable
 from dataclasses import dataclass
@@ -14,6 +15,9 @@ import yaml
 from cavegen.benchmark.run_generation_benchmark import run_configuration
 from cavegen.benchmark.structural_evaluation import evaluate_archive
 from cavegen.core.config import load_yaml
+from cavegen.generators.random_walk.cena import carregar_caverna, cavernas_disponiveis
+from cavegen.generators.random_walk.generator import CAVERNA_PADRAO
+from cavegen.generators.random_walk.voxelizacao import RAIO_PADRAO
 from cavegen.metrics.structural import MetricValue
 from cavegen.metrics.validation import validate_connectivity, validate_spacing
 
@@ -62,6 +66,25 @@ def _probability(session: _Session) -> float:
             session.write("Digite um número finito de 0 a 1, usando ponto decimal.")
 
 
+def _tube_radius(session: _Session) -> float:
+    while True:
+        try:
+            value = float(_answer(session, "Raio do tubo em voxels", str(RAIO_PADRAO)))
+            if not math.isfinite(value) or value <= 0:
+                raise ValueError
+            return value
+        except ValueError:
+            session.write("Digite um número finito maior que 0, usando ponto decimal.")
+
+
+def _cave(session: _Session) -> str:
+    caves = cavernas_disponiveis()
+    for index, cave in enumerate(caves, 1):
+        graph = carregar_caverna(cave)
+        session.write(f"  {index}) {graph.nome}: {len(graph.nomes)} waypoints")
+    return caves[_integer(session, "Caverna", caves.index(CAVERNA_PADRAO) + 1, 1, len(caves)) - 1]
+
+
 def _path(session: _Session, label: str, default: str = "") -> Path:
     while True:
         value = _answer(session, label, default).strip('"').strip("'")
@@ -88,17 +111,14 @@ def _describe_record(session: _Session, row: dict[str, MetricValue]) -> None:
 
 def _generate(session: _Session) -> None:
     session.write("\nGerar um volume 64³ em ZYX e salvar NPZ + métricas no CSV.")
-    session.write("1) Random Walk: escava uma caminhada por seis direções.")
+    session.write("1) Random Walk: caminha entre os waypoints do projeto base e escava um tubo.")
     session.write("2) CA básico do main: suaviza ruído pela contagem de 26 vizinhos.")
     choice = _integer(session, "Algoritmo", 1, 1, 2)
     seed = _integer(session, "Seed reprodutível", 0, 0)
     if choice == 1:
-        session.write("Passos controlam a duração da caminhada; raio engrossa a escavação.")
+        session.write("A forma vem dos waypoints da caverna; o raio engrossa o tubo escavado.")
         algorithm = "random_walk"
-        params = {
-            "steps": _integer(session, "Passos", 6000, 1),
-            "brush_radius": _integer(session, "Raio do pincel em voxels", 1, 0, 63),
-        }
+        params = {"caverna": _cave(session), "raio_voxels": _tube_radius(session)}
     else:
         session.write("Limiar menor tende a abrir mais ar; a borda permanece sólida.")
         algorithm = "cellular_automata"

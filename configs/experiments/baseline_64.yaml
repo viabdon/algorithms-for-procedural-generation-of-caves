@@ -4,8 +4,8 @@ shape: [64, 64, 64]
 seeds: [0, 1, 2, 3, 4]
 algorithms:
   random_walk:
-    steps: 6000
-    brush_radius: 1
+    caverna: knotlow_cavern
+    raio_voxels: 1.5
   cellular_automata:
     initial_open_probability: 0.45
     iterations: 5

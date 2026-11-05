@@ -39,6 +39,9 @@ profiling = [
   "scalene>=1.5",
   "py-spy>=0.3"
 ]
+ui = [
+    "streamlit>=1.65.0",
+]
 
 [tool.setuptools.packages.find]
 where = ["src"]

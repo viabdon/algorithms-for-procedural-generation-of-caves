@@ -6,12 +6,15 @@
 
 Pablo conduz a **implementação e a padronização das métricas**, a análise estatística, a frente GAN/PCGRL e o parsing incremental das novas cavernas. Felipe conduz **CA e Random Walk** e, depois, o algoritmo evolutivo usado para ajustar os dois geradores. Os dois fecham juntos orçamento, sementes, hardware e interpretação dos resultados. A padronização ampla da documentação fica para o fim do experimento; registros mínimos de proveniência, configuração e decisões de contrato continuam obrigatórios durante a execução.
 
+**Mudança no Random Walk (02/11/2026, branch `CA`, commit `fe3fd04`).** O `src/cavegen/generators/random_walk.py` criado na estrutura inicial (`cab2d1e`), um random walk de 6 direções com `steps` e `brush_radius`, foi apagado e substituído pelo pacote `src/cavegen/generators/random_walk/`: o random walk ponderado por waypoints do projeto base 3D-Cave-Generation, portado pelo Felipe. A API nova é `generate_random_walk(shape, seed, caverna, weight, k, spacer, raio_voxels)`, com grade cúbica. No merge da `main` de 04/11/2026, o lado do Random Walk em `run_generation_benchmark.py`, `src/cavegen/menu.py`, `baseline_64.yaml` e nos testes foi adaptado a isso, e `SystemMonitor` deu lugar a `ResourceSampler`, mantendo as 45 colunas do CSV. O lado do CA ficou como veio da `main` e não importa na branch `CA`, porque o Felipe vai escrever essa integração separadamente. Ver [Random Walk](random-walk.md).
+
 ## Já disponível e limites conhecidos
 
 - [x] Leitura incremental do PLY/F32, limites, normalização XYZ→ZYX e voxelização diagnóstica. Os 245 voxels marcados em `32³` são parede observada, não ar.
 - [x] Ensaios de amostragem, Screened Poisson, linha central, orientação de normais e espessamento documentados na branch `experiment/elaphes-meshing` e em artefatos locais. Nenhuma malha examinada validou o volume interno real.
 - [x] Random Walk e CA básico geram `Volume3D`; GAN e PCGRL ainda são interfaces sem geração funcional no `main`.
 - [x] Na branch `CA`, Felipe prototipou CA vetorizado com peso espacial, amostragem de recursos, flood fill/EDT da grade de parede do Elaphes e uma caminhada ponderada por waypoints. Esses resultados não validam o interior real nem estão integrados ao benchmark do `main`.
+- [x] Na branch `CA`, a caminhada ponderada por waypoints virou o gerador de Random Walk do pacote (ver o aviso acima). NPZ da seed 1 das quatro cavernas idênticos bit a bit aos do protótipo; 32 testes novos, 17 em `tests/test_random_walk.py` e 15 em `tests/test_random_walk_fidelidade.py`. Commits `df9b27b` e `fe3fd04`.
 
 ## Prioridade 1 — coleta e padronização de métricas
 

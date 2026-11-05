@@ -12,12 +12,13 @@ import numpy as np
 import yaml
 
 from cavegen.benchmark.records import append_experiment_record
-from cavegen.benchmark.run_generation_benchmark import run
+from cavegen.benchmark.run_generation_benchmark import run, run_configuration
 from cavegen.core.volume import Volume3D
 from cavegen.datastream.voxel_io import load_volume_npz
 from cavegen.generators.cellular_automata import generate_cellular_automata
 from cavegen.generators.random_walk import generate_random_walk
 from cavegen.metrics import evaluate_structure
+from cavegen.profiling.resource_tracker import INTERVALO_PADRAO
 
 
 class ExperimentRecordTests(unittest.TestCase):
@@ -65,8 +66,8 @@ class ExperimentRecordTests(unittest.TestCase):
             root = Path(directory)
             config = root / "small.yaml"
             config.write_text(yaml.safe_dump({
-                "shape": [5, 6, 7], "seeds": [42],
-                "algorithms": {"random_walk": {"steps": 12},
+                "shape": [8, 8, 8], "seeds": [42],
+                "algorithms": {"random_walk": {"caverna": "example"},
                                "cellular_automata": {"iterations": 1}},
                 "outputs": {"volumes_dir": str(root / "volumes")},
             }), encoding="utf-8")
@@ -86,14 +87,14 @@ class ExperimentRecordTests(unittest.TestCase):
                 self.assertEqual(Path(path_string).read_bytes(), original)
             for row in rows:
                 saved = load_volume_npz(row["volume_path"])
-                self.assertEqual(saved.shape, (5, 6, 7))
+                self.assertEqual(saved.shape, (8, 8, 8))
                 self.assertEqual(row["axis_order"], "ZYX")
                 self.assertEqual(row["backend"], "cpu")
                 self.assertEqual(row["repetition"], "0")
                 self.assertTrue(row["python_version"])
                 params = json.loads(row["parameters_json"])
                 self.assertEqual(params["seed"], 42)
-                self.assertEqual(params["shape"], [5, 6, 7])
+                self.assertEqual(params["shape"], [8, 8, 8])
                 structural = evaluate_structure(saved).to_record()
                 for key, value in structural.items():
                     self.assertEqual(row[key], "" if value is None else str(value))
@@ -104,13 +105,13 @@ class ExperimentRecordTests(unittest.TestCase):
 
     def test_generation_defaults_and_missing_config_shape_use_64_cubed(self) -> None:
         # Cheap generation exercises actual defaults, not signature inspection.
-        self.assertEqual(generate_random_walk(seed=0, steps=1).shape, (64, 64, 64))
+        self.assertEqual(generate_random_walk(seed=0, caverna="example").shape, (64, 64, 64))
         self.assertEqual(generate_cellular_automata(seed=0, iterations=0).shape, (64, 64, 64))
         with TemporaryDirectory() as directory:
             root = Path(directory)
             config = root / "default.yaml"
             config.write_text(yaml.safe_dump({
-                "seeds": [0], "algorithms": {"random_walk": {"steps": 1}},
+                "seeds": [0], "algorithms": {"random_walk": {"caverna": "example"}},
                 "outputs": {"volumes_dir": str(root / "volumes")},
             }), encoding="utf-8")
             path = root / "experiments.csv"
@@ -118,6 +119,51 @@ class ExperimentRecordTests(unittest.TestCase):
             row = self._read_rows(path)[0]
             self.assertEqual(row["shape"], "64x64x64")
             self.assertEqual(int(row["total_voxels"]), 64 ** 3)
+
+    def test_non_cubic_grid_keeps_zyx_order_through_the_benchmark(self) -> None:
+        # O Random Walk exige grade cúbica; o CA aceita qualquer formato.
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            config = root / "small.yaml"
+            config.write_text(yaml.safe_dump({
+                "shape": [5, 6, 7], "seeds": [42],
+                "algorithms": {"cellular_automata": {"iterations": 1}},
+                "outputs": {"volumes_dir": str(root / "volumes")},
+            }), encoding="utf-8")
+            path = root / "experiments.csv"
+            run(config, path)
+            row = self._read_rows(path)[0]
+            self.assertEqual(row["shape"], "5x6x7")
+            self.assertEqual(load_volume_npz(row["volume_path"]).shape, (5, 6, 7))
+
+    def test_generation_cost_uses_the_project_resource_sampler(self) -> None:
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            config = root / "small.yaml"
+            config.write_text(yaml.safe_dump({
+                "shape": [8, 8, 8], "seeds": [0],
+                "algorithms": {"random_walk": {"caverna": "example"},
+                               "cellular_automata": {"iterations": 1}},
+                "outputs": {"volumes_dir": str(root / "volumes")},
+            }), encoding="utf-8")
+            path = root / "experiments.csv"
+            run(config, path)
+            for row in self._read_rows(path):
+                self.assertGreater(float(row["elapsed_seconds"]), 0)
+                self.assertGreater(int(row["peak_rss_bytes"]), 0)
+                self.assertGreaterEqual(int(row["rss_sample_count"]), 1)
+                self.assertEqual(float(row["rss_sampling_interval_seconds"]), INTERVALO_PADRAO)
+
+    def test_old_random_walk_parameters_are_refused_before_writing(self) -> None:
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            path = root / "experiments.csv"
+            with self.assertRaises(TypeError):
+                run_configuration({
+                    "shape": [8, 8, 8], "seeds": [0], "algorithms": {"random_walk": {"steps": 1}},
+                    "outputs": {"volumes_dir": str(root / "volumes")},
+                }, path)
+            self.assertFalse(path.exists())
 
     @staticmethod
     def _read_rows(path: Path) -> list[dict[str, str]]:

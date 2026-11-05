@@ -23,6 +23,21 @@ __pycache__/
 /results/volumes/*
 /models/checkpoints/*
 
+# Experimento do SDF: só o código e a documentação são versionados. A entrada
+# vem do PLY em data/, as saídas são regeneradas e os artigos são das editoras.
+/sdf_temp/articles/
+/sdf_temp/entrada/
+/sdf_temp/npz/
+/sdf_temp/plots/
+
+# Projeto base do Random Walk (Unity, de outro TCC): só para refazer a exportação
+# dos waypoints para configs/random_walk/
+/external/
+
+# Experimento do Indian Tunnel: a nuvem fica em data/raw/nasa, as saídas são regeneradas
+/indian_tunnel_temp/npz/
+/indian_tunnel_temp/plots/
+
 # Keep directory placeholders
 !.gitkeep
 
@@ -40,6 +55,18 @@ __pycache__/
 .vscode/
 .idea/
 
+# CA
+/src/cavegen/generators/cellular_automata/results
+/src/cavegen/generators/cellular_automata/plots
+/src/cavegen/generators/cellular_automata/seeds
+/src/cavegen/generators/cellular_automata/pesos
+
+# Random Walk
+/src/cavegen/generators/random_walk/npz
+/src/cavegen/generators/random_walk/plots
+/src/cavegen/generators/random_walk/results
+
 # Instruções locais para agentes
 prompt-professor-codex.md
 AGENTS.md
+CLAUDE.md

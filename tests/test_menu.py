@@ -51,15 +51,15 @@ class TerminalMenuTests(unittest.TestCase):
     def test_generates_random_walk_then_reevaluates_in_the_same_csv(self) -> None:
         with TemporaryDirectory() as directory:
             root = Path(directory)
-            self._menu(root, ["1", "1", "42", "10", "0", "0"])
+            self._menu(root, ["1", "1", "42", "1", "2", "0"])
             original = self._rows(root)[0]
             source = Path(original["volume_path"])
             before = source.read_bytes()
             self.assertEqual(load_volume_npz(source).shape, (64, 64, 64))
             params = json.loads(original["parameters_json"])
             self.assertEqual(params["seed"], 42)
-            self.assertEqual(params["steps"], 10)
-            self.assertEqual(params["brush_radius"], 0)
+            self.assertEqual(params["caverna"], "example")
+            self.assertEqual(params["raio_voxels"], 2.0)
 
             text = self._menu(root, ["3", "1", "18", "26", "nan 1 1", "2 3 4", "0"])
             rows = self._rows(root)
@@ -83,6 +83,15 @@ class TerminalMenuTests(unittest.TestCase):
             self.assertIn("permitidas são 6 e 26", text)
             self.assertIn("positivos e finitos", text)
 
+    def test_random_walk_retries_radius_and_defaults_to_the_project_cave(self) -> None:
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            text = self._menu(root, ["1", "1", "", "", "nan", "-1", "2", "0"])
+            params = json.loads(self._rows(root)[0]["parameters_json"])
+            self.assertEqual(params["caverna"], "knotlow_cavern")
+            self.assertEqual(params["raio_voxels"], 2.0)
+            self.assertEqual(text.count("número finito maior que 0"), 2)
+
     def test_ca_retries_probability_and_keeps_effective_parameters(self) -> None:
         with TemporaryDirectory() as directory:
             root = Path(directory)
@@ -101,15 +110,15 @@ class TerminalMenuTests(unittest.TestCase):
             root = Path(directory)
             config_path = root / "small experiment.yaml"
             config_path.write_text(yaml.safe_dump({
-                "shape": [5, 6, 7], "seeds": [8, 9],
-                "algorithms": {"random_walk": {"steps": 1}},
+                "shape": [8, 8, 8], "seeds": [8, 9],
+                "algorithms": {"random_walk": {"caverna": "example"}},
                 "outputs": {"volumes_dir": str(root / "yaml volumes")},
             }), encoding="utf-8")
             text = self._menu(root, ["2", f'"{config_path}"', "", "0"])
             rows = self._rows(root)
             self.assertEqual([row["seed"] for row in rows], ["8", "9"])
             self.assertEqual(text.count("Salvo:"), 2)
-            self.assertTrue(all(row["shape"] == "5x6x7" for row in rows))
+            self.assertTrue(all(row["shape"] == "8x8x8" for row in rows))
             self.assertTrue(all(row["config_path"] == str(config_path) for row in rows))
             self.assertTrue(all(Path(row["volume_path"]).is_file() for row in rows))
 
@@ -128,8 +137,8 @@ class TerminalMenuTests(unittest.TestCase):
             root = Path(directory)
             path = root / "experiments.csv"
             run_configuration({
-                "shape": [5, 5, 5], "seeds": [0, 1, 2],
-                "algorithms": {"random_walk": {"steps": 1}},
+                "shape": [8, 8, 8], "seeds": [0, 1, 2],
+                "algorithms": {"random_walk": {"caverna": "example"}},
                 "outputs": {"volumes_dir": str(root / "volumes")},
             }, path)
             before = path.read_bytes()
@@ -145,7 +154,7 @@ class TerminalMenuTests(unittest.TestCase):
             csv_path = root / "new location" / "all.csv"
             volumes = root / "new volumes"
             self._menu(root, ["5", str(csv_path), str(volumes),
-                              "1", "1", "0", "1", "0", "0"])
+                              "1", "1", "0", "1", "", "0"])
             self.assertFalse((root / "experiments.csv").exists())
             self.assertFalse((root / "volumes").exists())
             with csv_path.open(encoding="utf-8", newline="") as file:
@@ -183,8 +192,8 @@ class TerminalMenuTests(unittest.TestCase):
             root = Path(directory)
             config = root / "small.yaml"
             config.write_text(yaml.safe_dump({
-                "shape": [5, 5, 5], "seeds": [1, 2],
-                "algorithms": {"random_walk": {"steps": 1}},
+                "shape": [8, 8, 8], "seeds": [1, 2],
+                "algorithms": {"random_walk": {"caverna": "example"}},
                 "outputs": {"volumes_dir": str(root / "volumes")},
             }), encoding="utf-8")
             answers = iter(["2", str(config), "", "0"])

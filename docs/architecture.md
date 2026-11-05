@@ -14,7 +14,7 @@ gerador -> Volume3D (bool[D,H,W], ZYX) -> NPZ
 
 ## Contrato público do SDF de volumes gerados
 
-Para uma caverna voxelizada com interior conhecido, o SDF é um campo `float32[D,H,W]` na mesma grade ZYX do volume. O sinal é **positivo no interior do vazio da caverna**, **negativo no exterior sólido** e **zero nos voxels classificados como borda**. A magnitude é a distância euclidiana até o voxel de borda mais próximo, expressa em **voxels**; o zero fica no centro do voxel de borda. O protótipo de `random_walk_temp/` classifica como borda o voxel vazio que toca sólido por uma das seis faces, tratando fora da grade como sólido. Guardar a convenção de sinal, a regra de borda, os eixos e a unidade nos metadados.
+Para uma caverna voxelizada com interior conhecido, o SDF é um campo `float32[D,H,W]` na mesma grade ZYX do volume. O sinal é **positivo no interior do vazio da caverna**, **negativo no exterior sólido** e **zero nos voxels classificados como borda**. A magnitude é a distância euclidiana até o voxel de borda mais próximo, expressa em **voxels**; o zero fica no centro do voxel de borda. A classificação auxiliar do Random Walk (`classificar` em `src/cavegen/generators/random_walk/voxelizacao.py`) trata como borda o voxel vazio que toca sólido por uma das seis faces, com fora da grade contando como sólido; o protótipo de SDF do Random Walk, hoje só no histórico (`a58155e`), partia dessa classificação. Guardar a convenção de sinal, a regra de borda, os eixos e a unidade nos metadados.
 
 Este é o contrato escolhido para novos campos sintéticos; não afirma que já exista uma API pública de SDF integrada ao pacote `cavegen`. Se um futuro campo usar espaçamento físico ou outra regra de borda, a conversão e os metadados precisarão ser explícitos.
 
@@ -22,7 +22,7 @@ Este é o contrato escolhido para novos campos sintéticos; não afirma que já 
 
 | Etapa | Contrato | Estado |
 | --- | --- | --- |
-| Random Walk e CA básico | `Volume3D` booleano em ZYX | Implementados |
+| Random Walk e CA básico | `Volume3D` booleano em ZYX | Implementados; no `main` o Random Walk ainda é o de 6 direções, substituído na branch `CA` (ver abaixo) |
 | Persistência | Volume gerado em NPZ | Implementada |
 | Avaliação estrutural | `evaluate_structure(Volume3D)` → `StructuralMetrics` imutável | Ocupação, componentes e EDT, validações e degeneração explícitas; registro plano `structural-v1` |
 | Benchmark inicial | Uma linha por execução no CSV central, com NPZ rastreável | Padrão `64³`, persistência incremental, tempo e RSS iniciais; protocolo computacional completo e resultados finais pendentes |
@@ -50,9 +50,23 @@ glossário no documento da funcionalidade.
 
 O CA foi reorganizado em um pacote com convolução 3D para contar a vizinhança, bordas configuráveis, sementes/resultados NPZ, menu e pesos espaciais opcionais. O peso é somado à contagem antes do limiar em cada passo. Testes da branch verificam equivalência com a versão em laço nas bordas determinísticas e igualdade entre CA sem peso e com peso zero. A borda aleatória não é reproduzível bit a bit.
 
-O rastreador novo amostra tempo, CPU e RSS do processo, além de GPU/VRAM quando houver leitura; resultados ausentes não devem ser interpretados como zero. O benchmark da branch foi adaptado para esse rastreador, mas ainda importa `generate_cellular_automata`, nome ausente no novo pacote. Em revisão isolada, 53 testes passaram e a importação do benchmark falhou. Integrar a API e executar um caso pequeno são pré-requisitos para usar a branch no benchmark principal.
+O rastreador novo amostra tempo, CPU e RSS do processo, além de GPU/VRAM quando houver leitura; resultados ausentes não devem ser interpretados como zero. O benchmark usa o `ResourceSampler` para tempo e pico de RSS; CPU e GPU/VRAM são amostradas, mas não entram nas 45 colunas do CSV central. Ele ainda não importa na branch, porque a integração do CA será feita separadamente pelo Felipe.
 
-`random_walk_temp/` contém um porte experimental de caminhada ponderada por waypoints, voxelização tubular e campo de distância; não substitui o gerador público de Random Walk. Os waypoints vêm de modelos de cavernas reais do projeto base, portanto o guia não é independente dessa informação. O raio padrão de 1,5 voxel em `64³` engrossa os tubos em relação à escala original.
+### Random Walk (migração verificada em 02/11/2026, commits `216f38d` a `e121f44`)
+
+O gerador público de Random Walk passou a ser o random walk ponderado por waypoints do projeto base (3D-Cave-Generation, commit `7a6c617`), no pacote `src/cavegen/generators/random_walk/`. Ele substitui `src/cavegen/generators/random_walk.py` (random walk de 6 direções com `steps` e `brush_radius`), que foi apagado. O protótipo `random_walk_temp/` também foi apagado; a migração não mudou a lógica, e os NPZ da seed 1 das quatro cavernas são idênticos bit a bit aos do protótipo.
+
+| Etapa | Contrato | Estado |
+| --- | --- | --- |
+| Grafos de waypoints | `configs/random_walk/<caverna>.yaml`, exportados uma vez da cena Unity por `exportar_cena.py`; eixos da Unity | Implementado; quatro cavernas, grafo idêntico ao da cena |
+| Caminhada | `gerar_caminhos(grafo, rng) -> (pontos, inicios)`, porte de `WeightedRandomWalk.cs`/`PathGenerator.cs` com `numpy_rng` | Implementado; testes com tradução literal do C# como oráculo |
+| Voxelização | Cápsulas de raio `raio_voxels` (padrão 1,5) em grade cúbica, encaixe com a mesma escala e margem de 2 voxels | Implementado |
+| Gerador | `generate_random_walk(shape, seed, caverna, weight, k, spacer, raio_voxels) -> Volume3D` e `RandomWalkGenerator`; grade cúbica com lado > 5 | Implementado |
+| Menu | `menu.py` grava `results/result_000.npz` por `run_and_save`, medido com `track_resources`, e plota caminhos ou grade classificada; não passa pelo benchmark | Implementado (`658d397`) |
+| SDF do Random Walk | Contrato de SDF sintético acima | Fora do pacote por decisão do Felipe; protótipo só no histórico (`a58155e`) |
+| Benchmark | Aceitar os parâmetros novos | Lado do Random Walk adaptado no merge da `main` de 04/11/2026; só executa depois da integração do CA |
+
+Os waypoints vêm de modelos de cavernas reais do projeto base, portanto a forma da caverna não é independente dessa informação. O raio padrão de 1,5 voxel em `64³` engrossa os tubos em relação à escala original. Os grafos são encontrados por caminho relativo ao arquivo, o que exige rodar do repositório ou de instalação editável. Detalhes, números medidos e limites em [Random Walk](random-walk.md).
 
 ## Referência real como frente exploratória
 

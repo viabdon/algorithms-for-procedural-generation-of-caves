@@ -1,0 +1,430 @@
+# Exportado de SampleScene.unity (projeto base, commit 7a6c617) por
+# uv run python -m cavegen.generators.random_walk.exportar_cena
+# Não editar à mão: refazer a exportação.
+caverna: Odins Mine
+origem: {projeto: 'https://github.com/freitasga/3D-Cave-Generation', commit: 7a6c617,
+  cena: Assets/Scenes/SampleScene.unity, ordem_na_cena: 3}
+eixos: x, y, z da Unity, com y para cima
+parametros: {weight: 1.0, k: 30.0, spacer: 5.0, radius: 7.0, segments: 6.0}
+waypoints:
+- nome: OM Start
+  posicao: [69.0, -254.0, -758.0]
+- nome: OM Waypoint
+  posicao: [67.0, -250.0, -714.0]
+- nome: OM Waypoint (5)
+  posicao: [63.0, -249.0, -685.0]
+- nome: OM Waypoint (6)
+  posicao: [51.0, -247.0, -639.0]
+- nome: OM Waypoint (7)
+  posicao: [63.0, -262.0, -754.0]
+- nome: OM Waypoint (14)
+  posicao: [55.0, -268.0, -770.0]
+- nome: OM Waypoint (8)
+  posicao: [57.86, -268.28, -732.31]
+- nome: OM Waypoint (9)
+  posicao: [51.0, -277.0, -711.0]
+- nome: OM Waypoint (10)
+  posicao: [45.0, -289.0, -685.0]
+- nome: OM Waypoint (11)
+  posicao: [35.0, -308.0, -686.0]
+- nome: OM Waypoint (12)
+  posicao: [26.0, -322.0, -669.0]
+- nome: OM Waypoint (13)
+  posicao: [17.0, -337.0, -638.0]
+- nome: OM Waypoint (15)
+  posicao: [11.0, -350.0, -613.0]
+- nome: OM Waypoint (16)
+  posicao: [-1.0, -378.0, -574.0]
+- nome: OM Waypoint (18)
+  posicao: [15.0, -369.0, -566.0]
+- nome: OM Waypoint (19)
+  posicao: [28.0, -354.0, -555.0]
+- nome: OM Waypoint (17)
+  posicao: [-13.0, -392.0, -548.0]
+- nome: OM Waypoint (20)
+  posicao: [-17.0, -397.0, -531.0]
+- nome: OM Waypoint (21)
+  posicao: [-22.0, -397.0, -512.0]
+- nome: OM Waypoint (22)
+  posicao: [-32.0, -397.0, -510.0]
+- nome: OM Waypoint (23)
+  posicao: [-34.0, -380.0, -514.0]
+- nome: OM Waypoint (24)
+  posicao: [-49.0, -393.0, -497.0]
+- nome: OM Waypoint (25)
+  posicao: [-21.0, -388.0, -490.0]
+- nome: OM Waypoint (26)
+  posicao: [-22.0, -388.0, -468.0]
+- nome: OM Waypoint (27)
+  posicao: [-28.0, -394.0, -442.0]
+- nome: OM Waypoint (28)
+  posicao: [-29.0, -377.0, -416.0]
+- nome: OM Waypoint (29)
+  posicao: [-35.0, -363.0, -383.0]
+- nome: OM Waypoint (30)
+  posicao: [-41.0, -357.0, -340.0]
+- nome: OM Waypoint (31)
+  posicao: [-47.0, -340.0, -294.0]
+- nome: OM Waypoint (32)
+  posicao: [-49.0, -320.0, -269.0]
+- nome: OM Waypoint (51)
+  posicao: [-50.0, -306.0, -242.0]
+- nome: OM Waypoint (53)
+  posicao: [-59.0, -283.0, -192.0]
+- nome: OM Waypoint (52)
+  posicao: [-38.0, -271.0, -240.0]
+- nome: OM Waypoint (50)
+  posicao: [-33.0, -328.0, -270.0]
+- nome: OM Waypoint (33)
+  posicao: [-60.0, -356.0, -279.0]
+- nome: OM Waypoint (34)
+  posicao: [-38.0, -245.0, -232.0]
+- nome: OM Waypoint (35)
+  posicao: [-47.0, -245.0, -192.0]
+- nome: OM Waypoint (41)
+  posicao: [-20.0, -245.0, -159.0]
+- nome: OM Waypoint (42)
+  posicao: [16.0, -240.0, -133.0]
+- nome: OM Waypoint (43)
+  posicao: [7.0, -246.0, -112.0]
+- nome: OM Waypoint (44)
+  posicao: [15.0, -246.0, -65.0]
+- nome: OM Waypoint (45)
+  posicao: [19.0, -246.0, -6.4]
+- nome: OM Waypoint (46)
+  posicao: [18.0, -243.0, 62.0]
+- nome: OM Waypoint (54)
+  posicao: [3.0, -238.0, 61.0]
+- nome: OM Waypoint (47)
+  posicao: [17.0, -243.0, 120.0]
+- nome: OM Waypoint (55)
+  posicao: [11.0, -256.0, 147.0]
+- nome: OM Waypoint (48)
+  posicao: [16.0, -235.0, 184.0]
+- nome: OM Waypoint (56)
+  posicao: [16.0, -235.0, 202.0]
+- nome: OM Waypoint (58)
+  posicao: [16.0, -248.0, 222.0]
+- nome: OM Waypoint (59)
+  posicao: [16.0, -249.0, 253.0]
+- nome: OM Waypoint (60)
+  posicao: [16.0, -263.0, 264.0]
+- nome: OM Waypoint (61)
+  posicao: [16.0, -245.0, 302.0]
+- nome: OM Waypoint (62)
+  posicao: [18.0, -214.0, 340.0]
+- nome: OM Waypoint (63)
+  posicao: [18.0, -171.0, 388.0]
+- nome: OM Waypoint (64)
+  posicao: [11.0, -141.0, 426.0]
+- nome: OM Waypoint (65)
+  posicao: [12.0, -114.0, 459.0]
+- nome: OM Waypoint (71)
+  posicao: [13.0, -103.0, 477.0]
+- nome: OM Waypoint (72)
+  posicao: [17.0, -90.0, 469.0]
+- nome: OM Waypoint (73)
+  posicao: [19.0, -81.0, 454.0]
+- nome: OM Waypoint (74)
+  posicao: [22.0, -62.0, 453.0]
+- nome: OM Waypoint (75)
+  posicao: [25.0, -51.0, 450.0]
+- nome: OM Waypoint (79)
+  posicao: [25.0, -47.0, 420.0]
+- nome: OM Waypoint (80)
+  posicao: [28.48, -37.9, 393.7]
+- nome: OM Waypoint (83)
+  posicao: [25.3, -9.2, 391.1]
+- nome: OM Waypoint (84)
+  posicao: [25.3, 3.4, 398.5]
+- nome: OM Waypoint (85)
+  posicao: [25.3, 9.3, 411.1]
+- nome: OM Waypoint (81)
+  posicao: [30.9, -30.3, 367.3]
+- nome: OM Waypoint (82)
+  posicao: [33.0, -28.0, 344.0]
+- nome: OM Waypoint (88)
+  posicao: [32.0, -17.0, 319.0]
+- nome: OM Waypoint (94)
+  posicao: [32.0, -11.0, 292.0]
+- nome: OM Waypoint (97)
+  posicao: [21.0, -12.0, 305.0]
+- nome: OM Waypoint (98)
+  posicao: [21.0, 2.0, 289.0]
+- nome: OM Waypoint (99)
+  posicao: [21.0, 15.54, 275.5]
+- nome: OM Waypoint (100)
+  posicao: [21.0, 22.31, 263.4]
+- nome: OM Waypoint (101)
+  posicao: [29.7, 15.8, 251.3]
+- nome: OM Waypoint (95)
+  posicao: [37.0, -11.0, 255.0]
+- nome: OM Waypoint (96)
+  posicao: [36.0, -27.7, 242.9]
+- nome: OM Waypoint (102)
+  posicao: [36.5, -47.1, 221.5]
+- nome: OM Waypoint (103)
+  posicao: [38.0, -63.0, 193.0]
+- nome: OM Waypoint (105)
+  posicao: [38.0, -53.0, 162.0]
+- nome: OM Waypoint (106)
+  posicao: [37.0, -44.0, 133.0]
+- nome: OM Waypoint (113)
+  posicao: [37.0, -44.0, 98.0]
+- nome: OM Waypoint (114)
+  posicao: [38.0, -35.0, 61.0]
+- nome: OM Waypoint (115)
+  posicao: [41.0, -26.0, 22.0]
+- nome: OM Waypoint (116)
+  posicao: [45.0, -22.0, -11.0]
+- nome: OM Waypoint (129)
+  posicao: [49.4, -19.2, -47.0]
+- nome: OM Waypoint (130)
+  posicao: [53.0, -1.1, -89.9]
+- nome: OM Waypoint (131)
+  posicao: [55.0, 16.0, -96.0]
+- nome: OM Waypoint (132)
+  posicao: [57.0, 29.0, -115.0]
+- nome: OM Waypoint (133)
+  posicao: [63.0, 38.0, -146.0]
+- nome: OM Waypoint (134)
+  posicao: [63.0, 33.0, -165.0]
+- nome: OM Waypoint (138)
+  posicao: [54.0, 15.0, -176.0]
+- nome: OM Waypoint (135)
+  posicao: [61.0, 25.0, -191.0]
+- nome: OM Waypoint (136)
+  posicao: [67.0, 34.0, -210.0]
+- nome: OM Waypoint (137)
+  posicao: [71.0, 49.0, -225.0]
+- nome: OM Waypoint (117)
+  posicao: [29.0, -14.0, -17.0]
+- nome: OM Waypoint (118)
+  posicao: [7.0, -22.0, -36.0]
+- nome: OM Waypoint (119)
+  posicao: [-44.0, -22.0, -56.0]
+- nome: OM Waypoint (121)
+  posicao: [-33.0, -22.0, -78.0]
+- nome: OM Waypoint (122)
+  posicao: [-15.0, -22.0, -107.0]
+- nome: OM Waypoint (123)
+  posicao: [-1.0, -22.0, -135.0]
+- nome: OM Waypoint (124)
+  posicao: [20.0, -24.0, -188.0]
+- nome: OM Waypoint (126)
+  posicao: [-2.0, -68.0, -178.0]
+- nome: OM Waypoint (128)
+  posicao: [15.0, -40.0, -187.0]
+- nome: OM Waypoint (127)
+  posicao: [7.0, -63.0, -194.0]
+- nome: OM Waypoint (125)
+  posicao: [32.0, -18.0, -227.0]
+- nome: OM Waypoint (120)
+  posicao: [-59.0, -16.0, -34.0]
+- nome: OM Waypoint (107)
+  posicao: [-37.26, -33.7, 90.3]
+- nome: OM Waypoint (110)
+  posicao: [-6.0, -39.0, 113.0]
+- nome: OM Waypoint (111)
+  posicao: [-2.34, -4.89, 117.23]
+- nome: OM Waypoint (112)
+  posicao: [-18.38, -4.89, 111.93]
+- nome: OM Waypoint (108)
+  posicao: [-45.0, -31.0, 107.0]
+- nome: OM Waypoint (109)
+  posicao: [-76.0, -31.0, 120.0]
+- nome: OM Waypoint (104)
+  posicao: [33.8, -90.2, 199.2]
+- nome: OM Waypoint (89)
+  posicao: [32.0, 3.0, 317.0]
+- nome: OM Waypoint (90)
+  posicao: [33.0, 13.0, 324.0]
+- nome: OM Waypoint (91)
+  posicao: [33.0, 19.0, 336.0]
+- nome: OM Waypoint (92)
+  posicao: [34.0, 28.0, 319.0]
+- nome: OM Waypoint (93)
+  posicao: [34.0, 28.0, 307.0]
+- nome: OM Waypoint (86)
+  posicao: [34.0, -41.0, 347.0]
+- nome: OM Waypoint (87)
+  posicao: [35.0, -56.0, 340.0]
+- nome: OM Waypoint (78)
+  posicao: [28.0, -17.0, 484.0]
+- nome: OM Waypoint (76)
+  posicao: [31.0, -42.0, 457.0]
+- nome: OM Waypoint (77)
+  posicao: [51.0, -39.0, 468.0]
+- nome: OM Waypoint (66)
+  posicao: [9.0, -119.0, 476.7]
+- nome: OM Waypoint (70)
+  posicao: [9.0, -128.0, 481.0]
+- nome: OM Waypoint (67)
+  posicao: [9.0, -114.0, 496.0]
+- nome: OM Waypoint (68)
+  posicao: [16.0, -94.0, 497.0]
+- nome: OM Waypoint (69)
+  posicao: [18.0, -83.0, 490.0]
+- nome: OM Waypoint (57)
+  posicao: [16.0, -273.0, 232.0]
+- nome: OM Waypoint (49)
+  posicao: [25.0, -193.0, 173.0]
+- nome: OM Waypoint (36)
+  posicao: [-62.0, -246.0, -147.0]
+- nome: OM Waypoint (37)
+  posicao: [-79.0, -247.0, -108.0]
+- nome: OM Waypoint (38)
+  posicao: [-100.0, -247.0, -68.0]
+- nome: OM Waypoint (39)
+  posicao: [-118.0, -241.0, -23.0]
+- nome: OM Waypoint (40)
+  posicao: [-124.0, -236.0, 4.0]
+- nome: OM Waypoint (1)
+  posicao: [106.0, -252.0, -686.0]
+- nome: OM Waypoint (2)
+  posicao: [133.0, -246.0, -701.0]
+- nome: OM Waypoint (3)
+  posicao: [120.0, -246.0, -729.0]
+- nome: OM Waypoint (4)
+  posicao: [145.0, -240.0, -671.0]
+ligacoes:
+- [0, 1]
+- [0, 4]
+- [1, 2]
+- [2, 136]
+- [2, 3]
+- [4, 5]
+- [4, 6]
+- [6, 7]
+- [7, 8]
+- [8, 9]
+- [9, 10]
+- [10, 11]
+- [11, 12]
+- [12, 13]
+- [13, 14]
+- [13, 16]
+- [14, 15]
+- [16, 17]
+- [17, 18]
+- [18, 19]
+- [18, 22]
+- [19, 20]
+- [19, 21]
+- [22, 23]
+- [23, 24]
+- [24, 25]
+- [25, 26]
+- [26, 27]
+- [27, 28]
+- [28, 29]
+- [28, 34]
+- [28, 33]
+- [29, 30]
+- [30, 32]
+- [30, 31]
+- [32, 35]
+- [35, 36]
+- [36, 131]
+- [36, 37]
+- [37, 39]
+- [39, 38]
+- [39, 40]
+- [40, 41]
+- [41, 42]
+- [42, 44]
+- [42, 43]
+- [44, 46]
+- [44, 45]
+- [46, 130]
+- [46, 47]
+- [47, 48]
+- [48, 49]
+- [48, 129]
+- [49, 50]
+- [50, 51]
+- [51, 52]
+- [52, 53]
+- [53, 54]
+- [54, 55]
+- [55, 124]
+- [55, 56]
+- [56, 57]
+- [57, 58]
+- [58, 59]
+- [59, 60]
+- [60, 122]
+- [60, 121]
+- [60, 61]
+- [61, 62]
+- [62, 63]
+- [62, 66]
+- [63, 64]
+- [64, 65]
+- [66, 67]
+- [67, 119]
+- [67, 68]
+- [68, 114]
+- [68, 69]
+- [69, 75]
+- [69, 70]
+- [70, 71]
+- [71, 72]
+- [72, 73]
+- [73, 74]
+- [75, 76]
+- [76, 77]
+- [77, 78]
+- [78, 113]
+- [78, 79]
+- [79, 80]
+- [80, 108]
+- [80, 81]
+- [81, 82]
+- [82, 83]
+- [83, 84]
+- [84, 95]
+- [84, 85]
+- [85, 86]
+- [86, 87]
+- [87, 88]
+- [88, 89]
+- [89, 90]
+- [90, 92]
+- [90, 91]
+- [92, 93]
+- [93, 94]
+- [95, 96]
+- [96, 97]
+- [97, 106]
+- [97, 98]
+- [98, 99]
+- [99, 100]
+- [100, 101]
+- [101, 105]
+- [101, 103]
+- [102, 104]
+- [103, 102]
+- [107, 111]
+- [108, 109]
+- [108, 107]
+- [109, 110]
+- [110, 111]
+- [111, 112]
+- [114, 115]
+- [115, 116]
+- [115, 117]
+- [117, 118]
+- [119, 120]
+- [122, 123]
+- [124, 125]
+- [124, 126]
+- [126, 127]
+- [127, 128]
+- [131, 132]
+- [132, 133]
+- [133, 134]
+- [134, 135]
+- [136, 137]
+- [137, 138]
+- [137, 139]
