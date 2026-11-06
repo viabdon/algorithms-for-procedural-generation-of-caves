@@ -41,8 +41,8 @@ class PesoTests(unittest.TestCase):
         zeros = np.zeros(inicial.shape, dtype=np.float32)
 
         for borda in (BorderTreatment.ZEROS, BorderTreatment.ONES):
-            basico, historico_basico = cellular_automata(inicial, 14, borda, 4)
-            com_peso, historico_peso = cellular_automata(inicial, 14, borda, 4, peso=zeros)
+            basico, historico_basico, *_ = cellular_automata(inicial, 14, borda, 4)
+            com_peso, historico_peso, *_ = cellular_automata(inicial, 14, borda, 4, peso=zeros)
             np.testing.assert_array_equal(com_peso, basico)
             np.testing.assert_array_equal(historico_peso, historico_basico)
 
@@ -115,7 +115,9 @@ class ArmazenamentoDePesoTests(unittest.TestCase):
 
             gravado = load_peso_matrix(1, destino_pesos)
             np.testing.assert_array_equal(gravado, comprimir_log(sdf, 2.0))
-            self.assertEqual(load_peso_info(1, destino_pesos)["escala_log"], 2.0)
+            info = load_peso_info(1, destino_pesos)
+            self.assertEqual(info["escala_log"], 2.0)
+            self.assertTrue(info["convencao"].startswith("interno positivo; comprimido com 2"))
             # O SDF de origem continua sendo distância: a compressão só existe na cópia.
             with np.load(origem) as arquivo:
                 np.testing.assert_array_equal(arquivo["sdf"], sdf)

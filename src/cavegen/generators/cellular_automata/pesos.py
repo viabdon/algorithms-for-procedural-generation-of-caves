@@ -59,10 +59,11 @@ def comprimir_log(sdf: np.ndarray, escala: float) -> np.ndarray:
         nasce em qualquer lugar. Com escala 2 o peso quase não muda até 3 voxels
         da superfície e cresce bem menos depois disso.
         sdf: campo com sinal, em voxels.
-        escala: multiplicador do logaritmo, maior que 0.
+        escala: multiplicador do logaritmo, finito e maior que 0.
     """
-    if escala <= 0:
-        raise ValueError(f"A escala do logaritmo precisa ser maior que 0, veio {escala}.")
+    # NaN passaria por um "escala <= 0" e zeraria o volume do CA sem nenhum erro.
+    if not np.isfinite(escala) or escala <= 0:
+        raise ValueError(f"A escala do logaritmo precisa ser finita e maior que 0, veio {escala}.")
 
     return (escala * np.sign(sdf) * np.log1p(np.abs(sdf))).astype(np.float32)
 
@@ -86,6 +87,8 @@ def importar_sdf(origem: Path = SDF_ELAPHES, directory: Path = PESOS_DIR,
     if escala_log is not None:
         matrix = comprimir_log(matrix, escala_log)
         extras["escala_log"] = float(escala_log)
+        # A convenção da origem fala em distância, e o peso comprimido não é mais isso.
+        convencao = f"{convencao}; comprimido com {escala_log:g} * sinal(d) * ln(1 + |d|)"
 
     peso_id = next_id(directory, PESO_PREFIX)
     np.savez_compressed(
