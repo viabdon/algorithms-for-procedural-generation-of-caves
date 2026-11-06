@@ -84,7 +84,7 @@ integrada ao pacote principal.
 
 ```text
 cavegen-tcc/
-├── configs/              # Configurações de algoritmos, experimentos e hardware
+├── configs/              # Configurações de experimentos, cavernas do RW, dados e hardware
 ├── data/                 # Dados externos, brutos, processados e referências
 ├── docs/                 # Arquitetura, roadmap e decisões metodológicas
 ├── models/               # Checkpoints de modelos treinados
@@ -115,8 +115,6 @@ No Google Colab, quando estiver trabalhando a partir de uma cópia do repositór
 pip install uv
 uv pip install -e . --system
 ```
-
-Os arquivos em `requirements/` ficam apenas como fallback/compatibilidade para ambientes em que `uv` não estiver disponível.
 
 Em uma nova cópia sem ambiente virtual, a instalação alternativa pelo Python
 no Windows é:
@@ -423,24 +421,17 @@ Substitua a entrada pelo `volume_path` registrado no CSV da execução desejada.
 
 ## Visualização de volumes
 
-Os scripts recebem o caminho do NPZ como primeiro argumento. Substitua os
-identificadores pelo caminho real da tabela:
+Cada gerador desenha os resultados gravados pelo próprio menu, informados pelo
+número, e também oferece isso no menu. A figura é um HTML do Plotly, salvo em
+`plots/` dentro da pasta do gerador:
 
 ```bash
-uv run python plots/matriz.py "results/volumes/EXPERIMENT_ID/random_walk_RUN_ID.npz"
-uv run python plots/plot_matplotlib.py "results/volumes/EXPERIMENT_ID/random_walk_RUN_ID.npz"
-uv run python plots/plot_plotly.py "results/volumes/EXPERIMENT_ID/random_walk_RUN_ID.npz"
+uv run python -m cavegen.generators.cellular_automata.plot 1 [altura|vizinhos] [paleta]
+uv run python -m cavegen.generators.random_walk.plot 1 [caminhos|classificacao]
 ```
 
-`matriz.py` imprime um resumo; Matplotlib salva PNG em `results/figures/` e
-abre uma janela; Plotly salva HTML nessa pasta e abre a figura interativa.
-O HTML atual carrega Plotly por CDN e requer acesso à biblioteca para exibição.
-Os nomes das figuras derivam do NPZ e podem ser reutilizados numa nova
-plotagem. A amostragem visual do Plotly não altera as métricas do volume.
-
-`fatia.py` é um script exploratório com entrada fixa
-`results/volumes/random_walk_seed_0.npz`, sem argumento para selecionar NPZ.
-Depende desse artefato histórico e não integra o fluxo atual de reprodução.
+Os volumes gravados pelo benchmark em `results/volumes/` não têm script próprio
+de visualização: esses comandos leem apenas os resultados dos menus.
 
 ## Interfaces legadas e frentes futuras
 
