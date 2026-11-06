@@ -112,7 +112,9 @@ def rotulo_seed(seed_id: int) -> str:
 def rotulo_peso(peso_id) -> str:
     if peso_id is None:
         return "nenhum (CA básico)"
-    return f"{peso_id:03d} · {load_peso_info(peso_id)['origem']}"
+    info = load_peso_info(peso_id)
+    escala = f" · log x{info['escala_log']:g}" if info["escala_log"] is not None else ""
+    return f"{peso_id:03d} · {info['origem']}{escala}"
 
 
 def rotulo_resultado(result_id: int) -> str:

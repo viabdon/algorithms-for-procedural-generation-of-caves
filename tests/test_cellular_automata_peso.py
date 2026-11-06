@@ -22,6 +22,7 @@ from cavegen.generators.cellular_automata.generator import (
     neighbor_counts,
 )
 from cavegen.generators.cellular_automata.pesos import (
+    comprimir_log,
     importar_sdf,
     load_peso_info,
     load_peso_matrix,
@@ -100,6 +101,74 @@ class ArmazenamentoDePesoTests(unittest.TestCase):
             self.assertEqual(info["shape"], (4, 5, 6))
             self.assertEqual(info["convencao"], "interno positivo")
             self.assertTrue(info["origem"].endswith("campo_sdf.npz"))
+            self.assertIsNone(info["escala_log"])
+
+    def test_importar_sdf_com_escala_grava_o_peso_comprimido_e_anota_a_escala(self) -> None:
+        sdf = np.random.default_rng(5).uniform(-48, 2, size=(4, 5, 6)).astype(np.float32)
+
+        with tempfile.TemporaryDirectory() as pasta:
+            origem = Path(pasta) / "campo_sdf.npz"
+            np.savez_compressed(origem, sdf=sdf, convencao="interno positivo")
+            destino_pesos = Path(pasta) / "pesos"
+
+            importar_sdf(origem, destino_pesos, escala_log=2.0)
+
+            gravado = load_peso_matrix(1, destino_pesos)
+            np.testing.assert_array_equal(gravado, comprimir_log(sdf, 2.0))
+            self.assertEqual(load_peso_info(1, destino_pesos)["escala_log"], 2.0)
+            # O SDF de origem continua sendo distância: a compressão só existe na cópia.
+            with np.load(origem) as arquivo:
+                np.testing.assert_array_equal(arquivo["sdf"], sdf)
+
+    def test_peso_gravado_antes_da_escala_continua_legivel(self) -> None:
+        with tempfile.TemporaryDirectory() as pasta:
+            np.savez_compressed(
+                Path(pasta) / "peso_001.npz",
+                matrix=np.zeros((2, 2, 2), dtype=np.float32),
+                peso_id=1,
+                shape=np.array((2, 2, 2)),
+                origem="antigo.npz",
+                convencao="",
+            )
+
+            self.assertIsNone(load_peso_info(1, Path(pasta))["escala_log"])
+
+
+class CompressaoLogTests(unittest.TestCase):
+    def test_mantem_o_sinal_e_o_zero_da_superficie(self) -> None:
+        sdf = np.array([-48.0, -1.0, 0.0, 1.0, 2.0], dtype=np.float32)
+
+        saida = comprimir_log(sdf, 2.0)
+
+        np.testing.assert_array_equal(np.sign(saida), np.sign(sdf))
+        self.assertEqual(saida[2], 0.0)
+        self.assertTrue(np.all(np.isfinite(saida)))
+
+    def test_valores_conferidos_a_mao(self) -> None:
+        # e - 1 é a distância em que ln(1 + d) vale exatamente 1.
+        sdf = np.array([-(np.e - 1), np.e - 1], dtype=np.float64)
+
+        np.testing.assert_allclose(comprimir_log(sdf, 2.0), [-2.0, 2.0], atol=1e-6)
+
+    def test_ordem_das_distancias_e_preservada(self) -> None:
+        sdf = np.linspace(-60, 3, 200, dtype=np.float32)
+
+        self.assertTrue(np.all(np.diff(comprimir_log(sdf, 2.0)) > 0))
+
+    def test_escala_2_quase_nao_muda_perto_da_superficie_e_alivia_longe(self) -> None:
+        perto = np.array([-1.0, -2.0, -3.0], dtype=np.float32)
+        longe = np.array([-14.0, -48.0], dtype=np.float32)
+
+        np.testing.assert_allclose(comprimir_log(perto, 2.0), perto, atol=0.4)
+        self.assertTrue(np.all(comprimir_log(longe, 2.0) > longe / 2))
+
+    def test_saida_em_float32_como_o_peso_gravado(self) -> None:
+        self.assertEqual(comprimir_log(np.zeros(3, dtype=np.float64), 2.0).dtype, np.float32)
+
+    def test_escala_nao_positiva_falha(self) -> None:
+        for escala in (0, -1.0):
+            with self.assertRaises(ValueError):
+                comprimir_log(np.zeros(3), escala)
 
 
 if __name__ == "__main__":

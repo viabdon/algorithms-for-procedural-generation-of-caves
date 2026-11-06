@@ -168,7 +168,8 @@ def escolher_peso(lado: int):
     )
     for numero in sorted(compativeis):
         info = load_peso_info(numero)
-        print(f"    {numero:03d}  {lado}^3  <- {info['origem']}")
+        escala = f"  (log x{info['escala_log']:g})" if info["escala_log"] is not None else ""
+        print(f"    {numero:03d}  {lado}^3  <- {info['origem']}{escala}")
 
     while True:
         escolha = perguntar("peso", 0, int)
