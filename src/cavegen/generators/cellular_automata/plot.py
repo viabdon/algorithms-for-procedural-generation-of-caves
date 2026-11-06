@@ -8,6 +8,10 @@ A cor vem da altura da celula ou da quantidade de vizinhos vivos dela, em uma
 das PALETAS. Por vizinhos, a opacidade tambem acompanha a contagem: a celula
 com menos vizinhos fica meio transparente e a mais cercada, opaca.
 
+O grafico de linha mostra, na mesma paleta, as celulas vivas e as que viraram 1
+e 0 em cada iteracao. Um resultado rodado com peso ganha um controle deslizante
+que troca o volume pelo peso (o SDF) que guiou o CA, na mesma camera.
+
 O HTML vai para plots/, ao lado do codigo, e o caminho e impresso para copiar
 no navegador. A pasta results/ guarda apenas os npz.
 
@@ -20,9 +24,16 @@ from pathlib import Path
 
 import numpy as np
 import plotly.graph_objects as go
+from plotly.colors import get_colorscale, sample_colorscale, unlabel_rgb
 from plotly.subplots import make_subplots
 
 from cavegen.generators.cellular_automata.generator import neighbor_counts
+from cavegen.generators.cellular_automata.pesos import (
+    PESOS_DIR,
+    comprimir_log,
+    load_peso_info,
+    load_peso_matrix,
+)
 from cavegen.generators.cellular_automata.results import RESULTS_DIR, load_result
 from cavegen.generators.cellular_automata.storage import storage_dir
 
@@ -50,6 +61,19 @@ MIN_VIZINHOS, MAX_VIZINHOS = 1, 27
 
 # Opacidade da celula com menos vizinhos; a mais cercada fica opaca (1.0).
 OPACIDADE_MINIMA = 0.25
+
+# Contraste minimo de uma linha contra o fundo preto (WCAG para elementos graficos).
+# As pontas escuras das paletas sumiriam no fundo, entao ficam de fora das linhas.
+CONTRASTE_MINIMO_LINHA = 3.0
+
+# Peso no estilo do plot do SDF (sdf_temp/sdf.py): a paleta Tropic e a opacidade em
+# rampa, transparente no corte e opaca no valor mais positivo. Longe da superficie
+# nao ha nada para ver, entao o que esta a mais de CORTE_PESO_VOXELS nem entra.
+PALETA_PESO = "Tropic"
+CORTE_PESO_VOXELS = 10.0
+TAMANHO_PONTO_PESO = 4
+
+ETAPA_PESO, ETAPA_RESULTADO = "peso (SDF)", "resultado"
 
 
 def camera_isometrica(elevacao=ELEVACAO, azimute=AZIMUTE, raio=RAIO):
@@ -152,31 +176,87 @@ def gizmo_eixos(minimos, maximos):
     return traces
 
 
-def adicionar_historico(figura, historico, total_celulas):
+def contraste_no_preto(cor):
     """
-        Linha de células vivas por iteração, no painel 2D da direita.
+        Contraste WCAG de uma cor contra o fundo preto.
+        cor: texto "rgb(r, g, b)".
+    """
+    canais = np.array(unlabel_rgb(cor)) / 255
+    lineares = np.where(canais <= 0.03928, canais / 12.92, ((canais + 0.055) / 1.055) ** 2.4)
+    luminancia = float(lineares @ np.array([0.2126, 0.7152, 0.0722]))
+    return (luminancia + 0.05) / 0.05
+
+def cores_das_linhas(paleta):
+    """
+        Três cores da paleta para as linhas: a primeira, a do meio e a última entre
+        as que aparecem no fundo preto. Devolve (vivas, viraram_1, viraram_0).
+        paleta: nome de uma escala de cor do plotly, como as de PALETAS.
+    """
+    amostras = sample_colorscale(get_colorscale(paleta), np.linspace(0, 1, 101).tolist())
+    visiveis = [cor for cor in amostras if contraste_no_preto(cor) >= CONTRASTE_MINIMO_LINHA]
+    return visiveis[0], visiveis[len(visiveis) // 2], visiveis[-1]
+
+def trace_da_linha(passos, valores, nome, cor, simbolo, tracejado, total_celulas, com_legenda):
+    """
+        Uma linha do gráfico de histórico. O traço e o símbolo também mudam de uma
+        linha para outra, para a leitura não depender só da cor.
+        passos, valores: pontos da linha.
+        nome: texto da legenda e do hover.
+        cor, simbolo, tracejado: aparência da linha.
+        total_celulas: tamanho do volume, para mostrar a porcentagem no hover.
+        com_legenda: mostra a linha na legenda.
+    """
+    # Anel preto separa os marcadores da linha quando os pontos ficam colados.
+    return go.Scatter(
+        x=passos, y=valores,
+        mode="lines+markers",
+        name=nome,
+        line=dict(color=cor, width=2, dash=tracejado),
+        marker=dict(color=cor, size=9, symbol=simbolo, line=dict(color="black", width=2)),
+        customdata=100 * valores / total_celulas,
+        hovertemplate=("iteracao %{x}<br>%{y} " + nome +
+                       "<br>%{customdata:.1f}% do volume<extra></extra>"),
+        showlegend=com_legenda,
+    )
+
+def adicionar_historico(figura, historico, total_celulas, viraram_1=None, viraram_0=None,
+                        paleta="Jet"):
+    """
+        Linhas de células por iteração, no painel 2D da direita.
         figura: figura de make_subplots com o painel xy na coluna 2.
         historico: células vivas em cada passo, do 0 (seed) ao último.
         total_celulas: tamanho do volume, para mostrar a porcentagem no hover.
+        viraram_1, viraram_0: células que mudaram em cada iteração; resultados
+                              antigos não têm, e ficam só com a linha de vivas.
+        paleta: de onde saem as cores das linhas.
     """
     historico = np.asarray(historico)
     passos = np.arange(historico.size)
-    porcentagem = 100 * historico / total_celulas
+    com_transicoes = viraram_1 is not None and viraram_0 is not None
+    cor_vivas, cor_1, cor_0 = cores_das_linhas(paleta)
 
     figura.add_trace(
-        go.Scatter(
-            x=passos, y=historico,
-            mode="lines+markers",
-            line=dict(color=COR_CAIXA, width=2),
-            # Anel preto separa os marcadores da linha quando os pontos ficam colados.
-            marker=dict(color=COR_CAIXA, size=8, line=dict(color="black", width=2)),
-            customdata=porcentagem,
-            hovertemplate=("iteracao %{x}<br>%{y} celulas vivas"
-                            "<br>%{customdata:.1f}% do volume<extra></extra>"),
-            showlegend=False,
-        ),
+        trace_da_linha(passos, historico, "celulas vivas", cor_vivas, "circle", "solid",
+                       total_celulas, com_transicoes),
         row=1, col=2,
     )
+    if com_transicoes:
+        # A transição acontece entre dois passos: a primeira chega no passo 1.
+        iteracoes = np.arange(1, np.asarray(viraram_1).size + 1)
+        figura.add_trace(
+            trace_da_linha(iteracoes, np.asarray(viraram_1), "viraram 1", cor_1, "triangle-up",
+                           "dash", total_celulas, True),
+            row=1, col=2,
+        )
+        figura.add_trace(
+            trace_da_linha(iteracoes, np.asarray(viraram_0), "viraram 0", cor_0, "triangle-down",
+                           "dot", total_celulas, True),
+            row=1, col=2,
+        )
+        figura.update_layout(legend=dict(
+            font=dict(color="white", size=12), bgcolor="rgba(0,0,0,0)",
+            x=0.99, xanchor="right", y=FAIXA_VERTICAL_HISTORICO[1] - 0.01, yanchor="top",
+        ))
 
     eixo = dict(
         color="white", gridcolor="#333333", zeroline=False,
@@ -186,12 +266,12 @@ def adicionar_historico(figura, historico, total_celulas):
                         dtick=max(1, int(np.ceil(passos.size / 10))), row=1, col=2)
     # O painel ocupa so a faixa central da altura: na altura toda da figura a
     # linha ficava alta e estreita demais ao lado do 3D.
-    figura.update_yaxes(eixo, title_text="celulas vivas", tickformat=",d",
-                        domain=list(FAIXA_VERTICAL_HISTORICO), row=1, col=2)
+    figura.update_yaxes(eixo, title_text="celulas" if com_transicoes else "celulas vivas",
+                        tickformat=",d", domain=list(FAIXA_VERTICAL_HISTORICO), row=1, col=2)
 
     inicio, fim = figura.layout.xaxis.domain
     figura.add_annotation(
-        text="celulas vivas por iteração",
+        text="celulas por iteração" if com_transicoes else "celulas vivas por iteração",
         x=(inicio + fim) / 2, y=FAIXA_VERTICAL_HISTORICO[1],
         xref="paper", yref="paper", xanchor="center", yanchor="bottom",
         yshift=8, showarrow=False, font=dict(color="white", size=13),
@@ -230,13 +310,15 @@ def trace_da_nuvem(x, y, z, valores, tamanho, paleta, limites_cor, opacidade,
 
 def figura_volumetrica(x, y, z, valores, titulo, minimos=None, maximos=None,
                     rotulo_escala="intensidade", limites_cor=None,
-                    historico=None, total_celulas=None, paleta="Jet", opacidades=None):
+                    historico=None, total_celulas=None, paleta="Jet", opacidades=None,
+                    viraram_1=None, viraram_0=None):
     """
-        Nuvem 3D; com historico, ganha ao lado a linha de células vivas por iteração.
+        Nuvem 3D; com historico, ganha ao lado as linhas de células por iteração.
         historico: células vivas em cada passo, do 0 (seed) ao último.
         total_celulas: tamanho do volume, para mostrar a porcentagem no hover.
         paleta: nome de uma escala de cor do plotly, como as de PALETAS.
         opacidades: opacidade de cada ponto; sem ela, a nuvem toda fica com 0.7.
+        viraram_1, viraram_0: células que mudaram em cada iteração, se conhecidas.
     """
     x, y, z, valores = (np.asarray(v) for v in (x, y, z, valores))
     # Sem limites explicitos o plotly normaliza pelo min/max dos proprios dados,
@@ -288,7 +370,7 @@ def figura_volumetrica(x, y, z, valores, titulo, minimos=None, maximos=None,
         figura.add_trace(trace, **celula_3d)
 
     if com_historico:
-        adicionar_historico(figura, historico, total_celulas)
+        adicionar_historico(figura, historico, total_celulas, viraram_1, viraram_0, paleta)
 
     eixo_limpo = dict(
         showgrid=False, zeroline=False, showticklabels=False, showbackground=False,
@@ -308,6 +390,111 @@ def figura_volumetrica(x, y, z, valores, titulo, minimos=None, maximos=None,
         ),
     )
     return figura
+
+
+def corte_do_peso(escala_log=None):
+    """
+        Valor do peso a CORTE_PESO_VOXELS da superfície, do lado de fora. Com o log,
+        o corte passa pela mesma conta, então os voxels mostrados são os mesmos do
+        SDF sem log.
+        escala_log: escala do logaritmo do peso; None se ele não foi comprimido.
+    """
+    # float32 como o peso gravado: em float64 o arredondamento pode ser outro, e o
+    # voxel exatamente no corte apareceria com log e sumiria sem log.
+    corte = np.array(-CORTE_PESO_VOXELS, dtype=np.float32)
+    return float(corte if escala_log is None else comprimir_log(corte, escala_log))
+
+def traces_do_peso(peso, escala_log=None):
+    """
+        Um Scatter3d por nível do peso, porque o plotly só aceita uma opacidade por
+        trace. Numa grade de voxels as distâncias se repetem muito, então são poucas
+        dezenas de traces. Do mais negativo ao mais positivo: o interno, opaco, é
+        desenhado por último. Todos saem escondidos, e o controle deslizante mostra.
+        peso: matriz do peso (depth, height, width).
+        escala_log: escala do logaritmo do peso; None se ele não foi comprimido.
+    """
+    corte = corte_do_peso(escala_log)
+    niveis = np.unique(peso[peso > corte])
+    if niveis.size == 0:
+        return []
+
+    maximo = float(niveis[-1])
+    traces = []
+    for nivel in niveis:
+        x, y, z = dados_da_matriz(peso == nivel)
+        com_escala = bool(nivel == niveis[-1])
+        traces.append(go.Scatter3d(
+            x=x, y=y, z=z,
+            mode="markers",
+            visible=False,
+            marker=dict(
+                size=TAMANHO_PONTO_PESO,
+                color=np.full(x.size, float(nivel)),
+                colorscale=PALETA_PESO,
+                cmin=corte,
+                cmax=maximo,
+                opacity=(float(nivel) - corte) / (maximo - corte),
+                showscale=com_escala,
+                colorbar=dict(
+                    title=dict(text="peso", font=dict(color="white", size=12)),
+                    x=-0.06, xanchor="left", len=0.75, thickness=14,
+                    bgcolor="black", outlinecolor="white", outlinewidth=1,
+                    tickfont=dict(color="white", size=11),
+                ) if com_escala else None,
+            ),
+            hovertemplate=f"(%{{x}}, %{{y}}, %{{z}})<br>peso: {float(nivel):.2f}<extra></extra>",
+            showlegend=False,
+        ))
+    return traces
+
+def titulo_do_peso(peso_id, info, voxels):
+    """
+        Título da etapa do peso no controle deslizante.
+        peso_id: número do peso.
+        info: dicionário de load_peso_info.
+        voxels: quantos voxels do peso aparecem na figura.
+    """
+    log = f", log x{info['escala_log']:g}" if info["escala_log"] is not None else ""
+    return (f"Peso {peso_id:03d} que guiou este resultado - {info['origem']}{log} - "
+            f"{voxels} voxels a ate {CORTE_PESO_VOXELS:g} da superficie")
+
+def adicionar_controle_do_peso(figura, peso, titulo_resultado, titulo_peso, escala_log=None):
+    """
+        Põe o peso na figura e um controle deslizante embaixo que troca a nuvem do
+        resultado por ele. Caixa, gizmo e linhas ficam nas duas etapas. A figura abre
+        no resultado, e o peso vem antes no controle porque veio antes no processo.
+        figura: saída de figura_volumetrica.
+        peso: matriz do peso (depth, height, width).
+        titulo_resultado, titulo_peso: título de cada etapa.
+        escala_log: escala do logaritmo do peso; None se ele não foi comprimido.
+    """
+    # A nuvem do resultado é o que já está na figura como marcadores 3D.
+    eh_resultado = [t.type == "scatter3d" and t.mode == "markers" for t in figura.data]
+    traces = traces_do_peso(peso, escala_log)
+    figura.add_traces(traces)
+
+    no_resultado = [True] * len(eh_resultado) + [False] * len(traces)
+    no_peso = [not e for e in eh_resultado] + [True] * len(traces)
+    passos = [
+        dict(label=ETAPA_PESO, method="update",
+             args=[{"visible": no_peso}, {"title.text": titulo_peso}]),
+        dict(label=ETAPA_RESULTADO, method="update",
+             args=[{"visible": no_resultado}, {"title.text": titulo_resultado}]),
+    ]
+    figura.update_layout(
+        height=880,
+        margin=dict(b=90),
+        # uirevision fixo: trocar de etapa não mexe na câmera que o usuário girou.
+        uirevision="etapas",
+        scene=dict(uirevision="etapas"),
+        sliders=[dict(
+            active=1, steps=passos, x=0.03, len=0.5, pad=dict(t=10, b=10),
+            font=dict(color="white", size=12),
+            currentvalue=dict(visible=False),
+            bgcolor="#2a2a27", activebgcolor="#ffffff", bordercolor="#666666",
+            tickcolor="#666666",
+        )],
+    )
 
 
 def dados_da_matriz(matrix):
@@ -379,7 +566,7 @@ def figura_ja_existe(result_id, modo="altura", paleta="Jet", directory=PASTA_FIG
     return caminho_da_figura(result_id, modo, paleta, directory).exists()
 
 def plotar_resultado(result_id, directory=RESULTS_DIR, mostrar=False, refazer=False,
-                     modo="altura", paleta="Jet"):
+                     modo="altura", paleta="Jet", pesos_dir=PESOS_DIR, figuras=PASTA_FIGURAS):
     """
         Grava o HTML da figura e devolve o caminho do arquivo.
         Se a figura já existir, devolve o caminho sem remontar.
@@ -390,17 +577,28 @@ def plotar_resultado(result_id, directory=RESULTS_DIR, mostrar=False, refazer=Fa
         modo: "altura" colore pela altura; "vizinhos" colore pela contagem de
               vizinhos vivos e deixa mais transparente quem tem menos.
         paleta: uma das PALETAS.
+        pesos_dir: pasta onde os pesos são gravados.
+        figuras: pasta onde os HTML são gravados.
     """
     if modo not in MODOS_COR:
         raise ValueError(f"modo precisa ser um de {MODOS_COR}, recebeu {modo!r}.")
 
-    destino = caminho_da_figura(result_id, modo, paleta)
+    destino = caminho_da_figura(result_id, modo, paleta, figuras)
     if destino.exists() and not refazer and not mostrar:
         return destino
 
     dados = load_result(result_id, directory)
     x, y, z = dados_da_matriz(dados["matrix"])
     titulo = titulo_do_resultado(dados, x.size)
+
+    # Os pesos não vão para o Git: num clone sem o arquivo, o resultado ainda plota.
+    peso, info_peso = None, None
+    if "peso_id" in dados:
+        try:
+            peso = load_peso_matrix(dados["peso_id"], pesos_dir)
+            info_peso = load_peso_info(dados["peso_id"], pesos_dir)
+        except FileNotFoundError:
+            titulo += " (arquivo do peso nao encontrado)"
 
     # A caixa e o volume inteiro, nao a extensao das celulas vivas: mantem a
     # escala comparavel entre resultados e sobrevive a um volume sem nenhuma viva.
@@ -426,7 +624,15 @@ def plotar_resultado(result_id, directory=RESULTS_DIR, mostrar=False, refazer=Fa
         total_celulas=lado ** 3,
         paleta=paleta,
         opacidades=opacidades,
+        viraram_1=dados["viraram_1_history"],
+        viraram_0=dados["viraram_0_history"],
     )
+
+    if peso is not None:
+        escala_log = info_peso["escala_log"]
+        voxels = int((peso > corte_do_peso(escala_log)).sum())
+        adicionar_controle_do_peso(figura, peso, titulo,
+                                   titulo_do_peso(dados["peso_id"], info_peso, voxels), escala_log)
 
     figura.write_html(destino, include_plotlyjs="cdn")
 
