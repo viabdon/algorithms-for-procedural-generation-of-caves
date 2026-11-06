@@ -1,75 +1,83 @@
 # Roadmap do TCC
 
-**Replanejamento de 18/10/2026; responsabilidades atualizadas em 02/11/2026; migração do Random Walk em `216f38d` a `e121f44`.** O [resumo quinzenal](relatorios/resumo-quinzenal-tcc-2026-10-18.docx) retira a reconstrução do Elaphes, o SDF real e a IoU volumétrica do caminho crítico. Pablo prioriza métricas, redes neurais e parsing de novas cavernas; Felipe continua CA e Random Walk e depois implementa a otimização evolutiva. Este roadmap separa o que está no checkout `main` dos avanços ainda isolados nas branches `CA` e `experiment/elaphes-meshing`.
+**Atualizado em 06/11/2026.** A `feat/neural-models` incorporou a `main` até
+`a7dd1e7`. Felipe se aproxima do fim dos clássicos e passa à coleta de métricas
+e consolidação da tabela comparativa; Pablo inicia GAN, PCGRL e PCGARL em
+paralelo. As tarefas neurais estão detalhadas no [plano neural](plano-redes-neurais.md).
 
-## Base disponível
+A decisão de retorno ao pipeline de volumes gerados permanece vigente: não há
+interior real validado do Elaphes, logo SDF real e IoU volumétrica contra o
+scan estão fora do benchmark. Os documentos externos do projeto de TC,
+inclusive os denominados atualizados, antecedem esse rollback. O
+[resumo quinzenal](relatorios/resumo-quinzenal-tcc-2026-10-18.docx), a
+[arquitetura](architecture.md) e a [metodologia](methodology-adjustments.md)
+registram os limites e os experimentos preservados.
 
-- [x] Leitura incremental de PLY/F32, limites XYZ, normalização XYZ→ZYX e voxelização diagnóstica de superfície. O PLY do Elaphes declara 94.465.067 pontos; em `32³`, 245 de 32.768 células foram marcadas como parede observada. Essa grade não representa vazio.
-- [x] `Volume3D` booleano, Random Walk e CA básico, com `True = ar` e `False = sólido`.
-- [x] Persistência NPZ, exportação de malha de volumes gerados por Marching Cubes e benchmark inicial em Python.
-- [x] Métricas iniciais de tempo, pico de RSS, proporção de vazio, fração na maior componente e estatísticas da transformada de distância.
-- [x] Ensaios exploratórios de Poisson, linha central, orientação de normais e espessamento registrados na branch experimental e em artefatos locais. Nenhum produziu uma referência volumétrica validada.
+## Base integrada e limitações verificadas
 
-### Avanços na branch `CA` ainda não integrados ao `main`
+- [x] `Volume3D` booleano ZYX (`True = ar`), NPZ e extração de malha para
+  visualização; leitores incrementais de PLY/F32 e voxelização diagnóstica da
+  superfície. A superfície do scan não representa o ar interior.
+- [x] Pacotes de CA com peso espacial e Random Walk ponderado por waypoints,
+  testes e ferramentas próprias. A origem dos waypoints condiciona a
+  independência do Random Walk; detalhes em [Random Walk](random-walk.md).
+- [x] `evaluate_structure`, contrato `structural-v1`, casos degenerados e
+  testes de métricas geométricas; ver [métricas estruturais](metricas-estruturais.md).
+- [x] Código de registro incremental CSV, configuração inicial `64³` e
+  amostragem de recursos; isso não comprova uma coleta final ou integração
+  funcional do benchmark. Esquema e protocolo de hardware ainda precisam evoluir.
+- [ ] Concluir a integração do CA: em `a7dd1e7`, benchmark e menu importam
+  `generate_cellular_automata`, ausente no pacote atual. A suíte local executou
+  116 testes com 2 erros de importação e 2 ignorados em 06/11; os módulos de
+  testes do menu e dos registros são os afetados. Felipe conduz a correção.
+- [ ] Substituir a referência obsoleta do peso 002 do CA ao SDF removido com
+  `random_walk_temp/`, se essa extensão voltar ao escopo.
+- [ ] Gerar e avaliar GAN, PCGRL e PCGARL: os dois primeiros só têm interfaces
+  e rotinas de treino placeholder; o terceiro ainda não foi implementado.
 
-- [x] CA com contagem 3D vetorizada, bordas configuráveis, sementes/resultados NPZ, menu e peso espacial opcional. Testes verificam equivalência com o laço para bordas determinísticas e CA sem peso igual ao de peso zero.
-- [x] Amostrador de tempo, CPU e RSS do processo, com GPU/VRAM quando disponíveis. A branch contém testes do rastreador, sem protocolo final de hardware.
-- [x] Protótipos `sdf_temp/` de flood fill e EDT da **parede** voxelizada do Elaphes e `random_walk_temp/` de caminhada ponderada por waypoints, voxelização tubular e campo de distância. São experimentos, não a referência real validada nem geradores integrados ao benchmark. `random_walk_temp/` foi depois migrado para o pacote e apagado (item abaixo).
-- [x] Fixar o contrato do SDF sintético: positivo no interior do vazio, negativo no exterior sólido, zero na borda e distância euclidiana em voxels, na mesma grade ZYX. O protótipo de SDF do Random Walk seguia sinal e unidade; ficou só no histórico (`a58155e`) e a API pública de SDF ainda não está integrada.
-- [x] Migrar o random walk ponderado por waypoints do projeto base para `src/cavegen/generators/random_walk/`, sem mudança de lógica, substituindo o random walk de 6 direções (`steps`, `brush_radius`). Grafos exportados para `configs/random_walk/`; NPZ da seed 1 das quatro cavernas idênticos bit a bit aos do protótipo; 38 testes novos, contando os 6 do menu de terminal. Commits `216f38d` a `e121f44`. Ver [Random Walk](random-walk.md).
-- [ ] Integrar o CA ao benchmark refatorado da `main`: ele importa `generate_cellular_automata`, ausente no pacote do CA, e passa `threshold_open_neighbors`. O Felipe vai escrever essa integração separadamente; até lá o benchmark, `python -m cavegen`, `tests/test_menu.py` e `tests/test_experiment_records.py` não importam.
-- [ ] SDF do Random Walk, quando o Felipe decidir retomá-lo: a etapa não foi migrada, e o peso 002 do CA aponta para um arquivo do protótipo que não existe mais.
+## Frente de Felipe — clássicos, métricas e tabela
 
-## Prioridade 1 — Implementar e padronizar métricas
+- [ ] Finalizar CA e Random Walk, corrigir integração ao benchmark e validar
+  importação, teste pequeno de ponta a ponta, NPZ e registro no CSV.
+- [ ] Confirmar com Pablo conectividade, spacing, degeneração, métricas comuns,
+  resolução `64³`, seeds independentes, repetições, parâmetros e versões antes
+  da coleta final. Testes pequenos de desenvolvimento podem usar outras grades.
+- [ ] Padronizar tempo, CPU/RSS e GPU/VRAM quando disponíveis; separar geração,
+  ajuste, treino, inferência, transferência e visualização. Registrar leituras
+  indisponíveis como ausentes, não zero.
+- [ ] Consolidar tabela com um registro por execução e arquivos preservados:
+  identificação, código/configuração, algoritmo/variante, seed, repetição,
+  hardware/backend, tempo por etapa, métricas, falhas e caminho do volume.
+  O esquema existente exige cabeçalho fixo e um escritor sequencial; versionar
+  eventual extensão e migração sem misturar colunas incompatíveis.
+- [ ] Definir sumários e dispersão por condição, distinguindo sementes de
+  geometria de repetições de tempo. Não comparar diretamente tempos de máquinas
+  distintas como se medissem o mesmo ambiente.
+- [ ] Se houver ajuste evolutivo, definir espaços, aptidão, orçamento e sementes
+  reservadas; comparar com busca simples e relatar custo de busca separado.
 
-- [x] Inventariar as métricas estruturais existentes e registrar contratos, unidades, casos degenerados e colunas em [métricas estruturais](metricas-estruturais.md).
-- [x] Implementar `evaluate_structure(Volume3D)` e funções individuais para `bool[D,H,W]` validado, com resultados imutáveis e registro plano `structural-v1`.
-- [x] Validar conectividade, componentes, ocupação e estatísticas da EDT por testes geométricos independentes.
-- [ ] Definir ramificação, tortuosidade e diversidade; considerar o reaproveitamento do grafo de linha central, validando extração, junções e ciclos.
-- [ ] Padronizar a medição de tempo e recursos, distinguindo tempo de geração, otimização, treino, inferência, transferências e visualização. Leituras ausentes de GPU/VRAM não equivalem a zero.
-- [x] Definir tratamento de volumes vazios, totalmente abertos, desconectados e com shapes inválidos; cobrir contratos observáveis com testes.
-- [x] Acrescentar resultados estruturais e contexto inicial por execução ao CSV central, preservando arquivos NPZ. O inventário completo de hardware e as repetições permanecem pendentes.
-- [ ] Fixar esquema de saída e metadados de resolução, eixos, sementes, repetições, hardware, backend e versões. Não atribuir escala física aos voxels sem conversão conhecida.
-- [ ] Disponibilizar a interface ao CA, Random Walk, algoritmo evolutivo e modelos neurais antes da coleta final.
+## Frente de Pablo — modelos neurais
 
-## Prioridade 2 — Implementar os geradores neurais
+- [ ] Definir estado, ações, transições, recompensa, término e orçamento do
+  PCGRL; validar ambiente pequeno e política aleatória antes do treinamento.
+- [ ] Auditar dados de GAN, origem, independência e divisão por fonte, limites
+  de memória, resolução e pós-processamento antes de interpretar resultados.
+- [ ] Confirmar o significado de PCGARL e definir gerador, adversário, objetivo,
+  avaliação de alcançabilidade e custo antes de implementá-lo.
+- [ ] Produzir volumes sob o contrato comum, registrar checkpoints e avaliar
+  amostras reservadas com a mesma interface estrutural e condições explícitas.
+- [ ] Acordar com Felipe como registrar seeds de treino/geração, dataset,
+  checkpoint, backend e métricas, sem preencher metadados desconhecidos com zero.
 
-- [ ] Auditar volume, independência e semântica dos dados de treino antes de escolher uma GAN. Dados sintéticos servem a testes de infraestrutura, não à alegação de aprendizagem de cavernas reais.
-- [ ] Especificar um MDP pequeno para PCGRL, com recompensa inicial de conectividade e ocupação, sem IoU com o scan.
-- [ ] Implementar geração funcional e comparar com os baselines sob o mesmo contrato `Volume3D`; reportar treino e geração separadamente. As interfaces atuais lançam `NotImplementedError`.
-- [ ] Reutilizar a interface de métricas da prioridade 1 para avaliação e, no PCGRL, somente para recompensas que tenham definição e custo compatíveis com o ambiente.
+## Frentes auxiliares
 
-## Prioridade 3 — Inventariar e parsear novas cavernas
-
-- [ ] Usar o volume externo `D:` como origem preferencial das point clouds, evitando duplicação de arquivos grandes no repositório.
-- [ ] Aguardar o término da descompactação das três cavernas em andamento antes de validar tamanho, hash, formato ou conteúdo.
-- [ ] Inventariar as cavernas disponíveis, incluindo quais pertencem ao conjunto de 16 associado à fonte do KarstConduitCatalogue, sem presumir que todas tenham o mesmo formato ou semântica.
-- [ ] Para cada formato novo, documentar cabeçalho, tipo de registro, eixos, unidade quando conhecida e representação; reutilizar `iter_ply_xyz` ou `iter_f32_xyz` quando o contrato for compatível.
-- [ ] Implementar parsing incremental com validações, `float32`, limites de memória e testes sintéticos pequenos. Não carregar a point cloud completa por padrão.
-- [ ] Manter a distinção entre superfície observada e vazio; qualquer voxelização ou uso como treino exige decisão metodológica própria.
-
-## Trabalho de Felipe — geradores clássicos e algoritmo evolutivo
-
-- [ ] Integrar a API do CA da branch ao benchmark e testar importação e uma execução pequena. Versão personalizada do Felipe, separada do que veio da `main`.
-- [x] Adaptar o benchmark e `python -m cavegen` ao Random Walk por waypoints (`caverna`, `raio_voxels`), medindo pelo `ResourceSampler`. Só executa depois da integração do CA. Feito no merge da `main` de 04/11/2026.
-- [ ] Escolher a caverna de waypoints do Random Walk usada no protocolo (padrão atual `knotlow_cavern`), sem usar essa mesma caverna como referência de avaliação.
-- [ ] Criar configurações finais `64³` distintas de `baseline_32.yaml` e fornecer saídas rastreáveis para a interface comum de métricas.
-- [ ] Definir e implementar o algoritmo evolutivo para os parâmetros de CA e Random Walk após a estabilização das métricas, com espaços de busca próprios e aptidão comum quando metodologicamente aplicável. No Random Walk, decidir se a busca respeita as faixas do C# do projeto base (`weight` em [0,1; 1], `k` e `spacer` inteiros em [1, 30]).
-- [ ] Reservar sementes de avaliação, comparar com busca simples de igual orçamento e separar custo de otimização do custo de geração.
-
-## Extensões condicionais
-
-- [x] Prototipar peso espacial no CA e verificar peso zero equivalente ao CA básico na branch `CA`.
-- [ ] Validar um guia procedural independente do scan de teste sob o contrato de SDF já fixado, registrando regra de borda e origem, e comparar CA condicionado com o básico sob protocolo comum. A extensão não bloqueia o benchmark clássico.
-- [ ] Usar Unity para inspeção dos volumes e malhas exportados. gRPC e AMD/ROCm ficam para depois do pipeline científico.
-
-## Fechamento do experimento
-
-- [ ] Reexecutar os geradores sob o protocolo final, registrar resultados e dispersão por semente e conferir NPZ, CSV e casos degenerados antes da interpretação.
-- [ ] Somente após a coleta e a análise, padronizar de forma ampla a documentação, atualizar o texto do TCC e consolidar tabelas, limitações e conclusões. Durante o experimento, registrar apenas o necessário para reprodutibilidade e decisões de contrato.
-
-## Reconstrução real fora do escopo atual
-
-Os ensaios com Poisson, linha central e dilatação melhoraram diagnósticos, mas as malhas avaliadas não satisfizeram conjuntamente fechamento, ausência de auto-interseções, conectividade e aderência. O flood fill e a EDT da branch `CA` calculam um campo da grade de **parede** e não resolvem entradas, regiões não observadas ou o ar interno real. A IoU diagnóstica relatada para o CA guiado pelo Elaphes não é uma métrica volumétrica válida contra `VOID` real. Ball Pivoting, Alpha Shapes, winding numbers e fechos controlados foram discutidos, sem comparação concluída. Uma retomada exigiria validação geométrica, classificação interior/exterior e unidade espacial. Preservar códigos e registros; o rollback é metodológico.
-
-Ver [arquitetura](architecture.md), [metodologia](methodology-adjustments.md) e [tarefas por responsável](../Orientacao-codex.md).
+- [ ] Inventariar novas point clouds e verificar existência, término de extração,
+  formato, eixos e unidade antes do parsing incremental. Caminhos e estado dos
+  dados externos são locais e precisam de confirmação; não presumir que `D:`
+  esteja montado ou que as três extrações históricas tenham terminado.
+- [ ] Validar guia procedural independente do scan antes de comparar CA guiado;
+  o SDF da parede voxelizada não é SDF validado do ar real.
+- [ ] Inspecionar volumes e malhas na Unity quando útil. gRPC e ROCm continuam
+  posteriores ao núcleo científico.
+- [ ] Atualizar a escrita do TCC após análise, registrando protocolo e decisões
+  durante o trabalho; não apresentar hipóteses como resultados confirmados.

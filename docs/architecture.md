@@ -22,13 +22,13 @@ Este é o contrato escolhido para novos campos sintéticos; não afirma que já 
 
 | Etapa | Contrato | Estado |
 | --- | --- | --- |
-| Random Walk e CA básico | `Volume3D` booleano em ZYX | Implementados; no `main` o Random Walk ainda é o de 6 direções, substituído na branch `CA` (ver abaixo) |
+| Random Walk e CA básico | Saída-alvo `Volume3D` booleano em ZYX | Random Walk já retorna `Volume3D`; CA retorna matriz e histórico e precisa de adaptação ao benchmark |
 | Persistência | Volume gerado em NPZ | Implementada |
 | Avaliação estrutural | `evaluate_structure(Volume3D)` → `StructuralMetrics` imutável | Ocupação, componentes e EDT, validações e degeneração explícitas; registro plano `structural-v1` |
-| Benchmark inicial | Uma linha por execução no CSV central, com NPZ rastreável | Padrão `64³`, persistência incremental, tempo e RSS iniciais; protocolo computacional completo e resultados finais pendentes |
+| Benchmark inicial | Uma linha por execução no CSV central, com NPZ rastreável | Código de persistência incremental e medições iniciais disponível; importação bloqueada pela API do CA; protocolo e resultados finais pendentes |
 | Marching Cubes | Malha derivada do volume gerado | Disponível para visualização |
 | GAN e PCGRL | Devem gerar `Volume3D` | Interfaces ainda lançam `NotImplementedError` |
-| CPU/GPU/VRAM e descritores adicionais | Protocolo e instrumentação | Pendentes no `main`; há protótipo de rastreamento na branch `CA` |
+| CPU/GPU/VRAM e descritores adicionais | Protocolo e instrumentação | Amostrador disponível; protocolo e inclusão no CSV ainda pendentes |
 
 A transformada de distância descreve o espaço livre em unidades da grade atual. Seus resumos não validam, por si sós, a largura de todos os túneis. Resolução, espaçamento e bordas precisam ser explicitados para interpretações físicas.
 
@@ -46,11 +46,11 @@ e não preenchem custos de geração. Operações repetitivas futuras devem ser
 adicionadas ao menu com serviços reutilizáveis, validação, cancelamento e
 glossário no documento da funcionalidade.
 
-## Código experimental na branch `CA` (`a58155e`)
+## Código de clássicos integrado e histórico da branch `CA`
 
 O CA foi reorganizado em um pacote com convolução 3D para contar a vizinhança, bordas configuráveis, sementes/resultados NPZ, menu e pesos espaciais opcionais. O peso é somado à contagem antes do limiar em cada passo. Testes da branch verificam equivalência com a versão em laço nas bordas determinísticas e igualdade entre CA sem peso e com peso zero. A borda aleatória não é reproduzível bit a bit.
 
-O rastreador novo amostra tempo, CPU e RSS do processo, além de GPU/VRAM quando houver leitura; resultados ausentes não devem ser interpretados como zero. O benchmark usa o `ResourceSampler` para tempo e pico de RSS; CPU e GPU/VRAM são amostradas, mas não entram nas 45 colunas do CSV central. Ele ainda não importa na branch, porque a integração do CA será feita separadamente pelo Felipe.
+O rastreador novo amostra tempo, CPU e RSS do processo, além de GPU/VRAM quando houver leitura; resultados ausentes não devem ser interpretados como zero. O benchmark usa o `ResourceSampler` para tempo e pico de RSS; CPU e GPU/VRAM são amostradas, mas não entram nas 45 colunas do CSV central. Ele ainda não importa neste checkout, porque a integração do CA será feita separadamente pelo Felipe.
 
 ### Random Walk (migração verificada em 02/11/2026, commits `216f38d` a `e121f44`)
 

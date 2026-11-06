@@ -2,15 +2,38 @@
 
 **Responsabilidades atualizadas em 02/11/2026; migração do Random Walk em `216f38d` a `e121f44`.** Felipe continua responsável pelo CA, já iniciou o progresso no Random Walk e, depois da estabilização desses geradores e da interface comum de métricas, implementará o algoritmo evolutivo. Flood fill e SDF real do Elaphes não são dependências do benchmark. Ver o [resumo quinzenal](relatorios/resumo-quinzenal-tcc-2026-10-18.docx), o [roadmap](roadmap.md) e as [tarefas de Pablo](tarefas-pablo-reconstrucao-modelos.md).
 
+
+> **Atualização em 06/11/2026:** Felipe finaliza os clássicos e assume a coleta
+> de métricas e a consolidação da tabela comparativa. Pablo inicia GAN, PCGRL e
+> PCGARL; as definições comuns são acordadas pela dupla. As atribuições antigas
+> a Pablo de coleta principal e de entrega da interface ficam superadas. O
+> código da branch CA foi incorporado à main e à branch neural em `a7dd1e7`;
+> a integração do CA ao benchmark continua pendente.
+
+## Coleta e tabela comparativa
+
+- [ ] Corrigir a integração do CA, testar importação e execução de ponta a ponta.
+- [ ] Acordar com Pablo métricas estruturais, casos degenerados e a versão do
+  esquema, usando `structural-v1` e sem assumir que o protocolo final já existe.
+- [ ] Registrar por execução algoritmo, variante, configuração, revisão, seed,
+  repetição, hardware/backend, métricas, custos, falhas e caminho do NPZ.
+- [ ] Evoluir o CSV com versão de esquema e escrita sequencial; preservar
+  resultados anteriores e registrar ausência de leituras como dado ausente.
+- [ ] Separar treinamento, ajuste, geração e visualização; calcular sumários e
+  dispersão por condição, distinguindo seeds de repetições de tempo.
+
+Os resultados históricos abaixo identificam suas revisões; as tarefas seguem
+o estado verificado neste checkout e o [roadmap](roadmap.md).
+
 ## Divisão de trabalho deste plano
 
-Felipe conduz a **integração e os experimentos do CA e do Random Walk**, incluindo extensões de controle, e implementa o **algoritmo evolutivo** para ajustar os parâmetros dos dois geradores. Pablo fornece a interface padronizada de métricas, conduz a análise e implementa a frente neural e os parsers das novas cavernas. Os dois fecham juntos sementes, orçamento e hardware para que os resultados tenham o mesmo critério de leitura.
+Felipe finaliza a integração dos clássicos e conduz coleta de métricas e tabela comparativa; o algoritmo evolutivo continua planejado. Pablo conduz a frente neural. Os dois fecham juntos métricas, sementes, orçamento e hardware.
 
-Em 02/11/2026 o gerador de Random Walk do pacote passou a ser o porte do projeto base feito pelo Felipe (ver [Random Walk](random-walk.md)), no lugar do random walk de 6 direções criado na estrutura inicial do projeto (`cab2d1e`, Pablo). A divisão acima ainda atribui ao Pablo a condução do Random Walk no benchmark e o ajuste de seus parâmetros; quem conduz essas etapas daqui em diante precisa ser combinado entre os dois.
+Em 02/11/2026 o gerador de Random Walk do pacote passou a ser o porte do projeto base feito pelo Felipe (ver [Random Walk](random-walk.md)), no lugar do random walk de 6 direções criado na estrutura inicial do projeto (`cab2d1e`, Pablo). Felipe conduz sua integração e experimentos no benchmark.
 
 ## Base disponível
 
-- [x] CA básico gera `Volume3D` booleano em ZYX, com `True = ar` e `False = sólido`.
+- [x] CA básico produz matriz binária e histórico; falta adaptar a saída ao contrato `Volume3D` booleano em ZYX (`True = ar`).
 - [x] O benchmark inicial mede tempo de geração, pico de RSS, proporção de vazio, fração da maior componente e estatísticas da transformada de distância.
 - [x] Na branch `CA`, a contagem de vizinhos foi vetorizada por convolução 3D; testes comparam o resultado à versão em laço para bordas determinísticas. O modo de borda aleatório não é reproduzível bit a bit.
 - [x] Na branch `CA`, há seeds e resultados NPZ, menu de execução/visualização, pesos espaciais opcionais e teste de equivalência do CA sem peso com peso zero. O peso é somado à contagem de vizinhos antes do limiar em cada iteração.
@@ -28,7 +51,7 @@ Em 02/11/2026 o gerador de Random Walk do pacote passou a ser o porte do projeto
 - [ ] Reexecutar o CA básico e, depois do ajuste, o CA com parâmetros escolhidos; conferir arquivos NPZ e linhas CSV, registrar configuração e variação entre sementes.
 - [x] Escolher a variante do Random Walk e integrá-la ao contrato público `Volume3D`: a ponderada por waypoints do projeto base. O benchmark e `python -m cavegen` já passam `caverna` e `raio_voxels`, mas só executam depois da integração do CA.
 - [ ] Registrar os parâmetros do Random Walk, sua proveniência e as decisões de voxelização; manter o protótipo por waypoints separado do baseline quando houver condicionamento por dados reais. O gerador por waypoints é hoje o único Random Walk do pacote, então essa separação precisa ser revista com o Pablo.
-- [ ] Executar casos pequenos dos dois geradores contra a interface de métricas fornecida por Pablo.
+- [ ] Executar casos pequenos dos dois geradores contra a interface comum de métricas.
 - [ ] Inspecionar conectividade, componentes e ocupação, inclusive volume sem ar e volume quase todo aberto. Conferir a semântica das bordas no relatório.
 - [ ] Registrar que a transformada de distância ao sólido depende da resolução e do espaçamento; seus resumos não são automaticamente a largura de todos os túneis.
 
@@ -47,7 +70,7 @@ Detalhes, números medidos e limites em [Random Walk](random-walk.md).
 - [x] Exportar os grafos de waypoints da cena Unity do projeto base (3D-Cave-Generation, `7a6c617`) para `configs/random_walk/` (`example`, `knotlow_cavern`, `upper_long_churns`, `odins_mine`) com `exportar_cena.py`. O grafo de cada YAML é idêntico ao da cena nas quatro cavernas; o gerador não depende mais da Unity. Commit `216f38d`.
 - [x] Migrar `random_walk_temp/` para `src/cavegen/generators/random_walk/` sem mudança de lógica, com `generate_random_walk(...) -> Volume3D` e `RandomWalkGenerator`, apagando o protótipo e o `random_walk.py` de 6 direções. Evidência: NPZ da seed 1 das quatro cavernas (caminhos, inícios, classificação `64³`) idênticos bit a bit aos do protótipo; `tests/test_random_walk.py` (17) e `tests/test_random_walk_fidelidade.py` (15); suíte com 93 testes em `fe3fd04`, só `test_f32` falhando (`PermissionError` do Windows, anterior). Commits `df9b27b`, `fe3fd04` e `e121f44`.
 - [x] Criar o menu de terminal do Random Walk no padrão do CA: gera com caverna, seed, lado, raio e, opcionalmente, `weight`, `k` e `spacer` limitados às faixas do C#, grava `results/result_000.npz` medindo com `track_resources` e plota caminhos ou grade classificada. Evidência: `tests/test_random_walk_menu.py` (6); suíte com 99 testes em `e121f44`, só `test_f32` falhando. Commit `658d397`.
-- [ ] Avisar o Pablo de que `src/cavegen/generators/random_walk.py` foi substituído pelo pacote (`caverna`, `weight`, `k`, `spacer`, `raio_voxels` no lugar de `steps` e `brush_radius`) e de que o merge da `main` de 04/11/2026 adaptou o lado do Random Walk no benchmark, em `src/cavegen/menu.py`, nas configurações e nos testes dele, trocando `SystemMonitor` por `ResourceSampler`. O lado do CA ficou como ele escreveu e não importa na branch `CA` até a integração própria do Felipe. Aceite: Pablo ciente.
+- [ ] Avisar o Pablo de que `src/cavegen/generators/random_walk.py` foi substituído pelo pacote (`caverna`, `weight`, `k`, `spacer`, `raio_voxels` no lugar de `steps` e `brush_radius`) e de que o merge da `main` de 04/11/2026 adaptou o lado do Random Walk no benchmark, em `src/cavegen/menu.py`, nas configurações e nos testes dele, trocando `SystemMonitor` por `ResourceSampler`. O lado do CA ficou como ele escreveu e não importa neste checkout até a integração própria do Felipe. Aceite: Pablo ciente.
 - [x] Fazer o benchmark aceitar o Random Walk novo. Feito no merge da `main` de 04/11/2026; o import do CA segue pendente na integração própria do Felipe.
 - [ ] Escolher com o Pablo a caverna de waypoints do protocolo (padrão atual `knotlow_cavern`). Aceite: caverna registrada na configuração final e nos metadados, e nenhuma das cavernas reais usadas como waypoints (Knotlow, Upper Long Churns, Odins Mine) usada como referência de avaliação do Random Walk.
 - [ ] Se o GA buscar nos parâmetros do Random Walk, decidir com o Pablo se respeita as faixas do C# (`weight` em [0,1; 1], `k` e `spacer` inteiros em [1, 30]); hoje `generate_random_walk` aceita valores contínuos e fora delas. Aceite: limites escritos no espaço de busca.
@@ -58,7 +81,7 @@ Detalhes, números medidos e limites em [Random Walk](random-walk.md).
 
 - [ ] Definir cromossomo e limites dos parâmetros do **CA**: probabilidade inicial, sensibilidade, iterações e tratamento de borda; incluir peso de controle apenas se o experimento condicionado for aprovado.
 - [ ] Definir cromossomo e limites dos parâmetros do **Random Walk** conforme a variante escolhida, sem forçar os mesmos parâmetros ou codificação do CA.
-- [ ] Construir a função de aptidão sobre a interface de métricas de Pablo e registrar pesos, normalização, penalidades e tratamento de candidatos inválidos.
+- [ ] Construir a função de aptidão sobre a interface comum de métricas e registrar pesos, normalização, penalidades e tratamento de candidatos inválidos.
 - [ ] Fixar sementes de ajuste e sementes reservadas de avaliação, número de sementes por candidato, total de avaliações, parada e tratamento de candidatos inválidos. Não selecionar parâmetros usando os resultados reservados.
 - [ ] Comparar o algoritmo evolutivo de cada gerador com busca simples de igual orçamento. Registrar número de avaliações e tempo total de busca; medir separadamente o tempo de gerar um volume com a configuração escolhida.
 

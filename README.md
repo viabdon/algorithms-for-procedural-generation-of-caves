@@ -1,5 +1,13 @@
 # CaveGen TCC — Algoritmos de Geração Procedural de Cavernas 3D
 
+> **Estado em 06/11/2026:** a `feat/neural-models` incorporou a `main` em
+> `a7dd1e7`. O benchmark e o menu ainda falham ao importar o CA; as instruções
+> dependentes deles abaixo ficam condicionadas à integração pendente de Felipe.
+> A suíte local executou 116 testes: 2 erros de importação e 2 ignorados.
+> Veja o [roadmap](docs/roadmap.md) e o [plano neural](docs/plano-redes-neurais.md).
+> Os documentos externos do projeto de TC, inclusive os intitulados atualizados,
+> estão desatualizados em relação ao rollback descrito na arquitetura.
+
 Repositório do Trabalho de Conclusão de Curso **"Algoritmos de Geração Procedural de Cavernas: Uma Comparação Holística"**.
 
 O objetivo do projeto é comparar algoritmos clássicos e baseados em aprendizado de máquina para geração procedural de cavernas tridimensionais. A avaliação atual prioriza custo computacional, estrutura, controle e diversidade dos volumes gerados. A IoU volumétrica contra o scan do Elaphes saiu do escopo atual porque ainda não há uma referência validada de seu espaço interno.
@@ -13,7 +21,7 @@ A arquitetura prioriza um pipeline científico **offline-first**:
    domínio, resolução, sementes e orçamento documentados.
 3. Malhas extraídas dos volumes gerados por Marching Cubes permitem inspeção
    na Unity; gRPC é posterior.
-4. GAN e PCGRL são frentes futuras; a branch `CA` contém um protótipo de CA
+4. GAN, PCGRL e PCGARL estão em planejamento; o pacote contém um protótipo de CA
    com peso espacial. O ajuste genético de parâmetros de CA e Random Walk
    está planejado; seus espaços de busca e orçamento ainda serão definidos.
 5. O Elaphes permanece referência de superfície para inspeção qualitativa,
@@ -193,6 +201,8 @@ um corpo com esta estrutura, mantendo a ordem e os nomes das três seções:
 
 ## Menu interativo de terminal
 
+**Pendente:** a importação falha até a integração do CA ao benchmark.
+
 Na raiz do repositório, abra a interface de geração e métricas:
 
 ```bash
@@ -232,6 +242,8 @@ coleta e geração, devem ser integradas a esse menu, reutilizando as mesmas
 funções de serviço das interfaces automatizáveis.
 
 ## Primeiro teste pela CLI
+
+**Pendente:** a importação falha até a integração do CA ao benchmark.
 
 Gere volumes de Random Walk e Cellular Automata na grade padrão `64³`:
 
@@ -298,9 +310,10 @@ está na opção `3` do menu; não tem uma CLI própria. Sua variante é
 Para automatizar a geração, use
 `cavegen.benchmark.run_generation_benchmark.run(config_path, out_csv)` ou
 `run_configuration(config, out_csv)` com um dicionário equivalente ao YAML.
-Os geradores individuais são `generate_random_walk` e
-`cavegen.generators.cellular_automata.generate_cellular_automata`; ambos
-retornam `Volume3D`. A persistência isolada usa `save_volume_npz` e
+O Random Walk individual `generate_random_walk` retorna `Volume3D`. O CA atual
+expõe `cellular_automata`, que recebe uma matriz e retorna matriz e histórico;
+a adaptação ao contrato `Volume3D` do benchmark ainda está pendente. A
+persistência isolada usa `save_volume_npz` e
 `load_volume_npz` de `cavegen.datastream.voxel_io`.
 
 Os leitores de point clouds são APIs incrementais, não comandos independentes:
@@ -332,7 +345,7 @@ continue limitada. A voxelização PLY tem a CLI documentada a seguir;
 normalização e voxelização independentes do formato estão em
 `cavegen.core.normalization` e `cavegen.core.voxelization`.
 
-Na branch `CA`, esse comando e o menu `python -m cavegen` ainda não rodam: o
+Neste checkout, esse comando e o menu `python -m cavegen` ainda não rodam: o
 benchmark importa `generate_cellular_automata`, ausente no pacote do CA, e o
 Felipe vai escrever essa integração separadamente. O lado do Random Walk já usa
 `caverna` e `raio_voxels` (grade cúbica com lado maior que 5). Para gerar só o
@@ -383,9 +396,9 @@ do benchmark atual. Os experimentos estão preservados na branch
 [resumo quinzenal](docs/relatorios/resumo-quinzenal-tcc-2026-10-18.docx)
 registra os resultados e limites.
 
-Na branch `CA` (`a58155e`), o CA já aceita um peso espacial somado à
+No pacote integrado, o CA já aceita um peso espacial somado à
 contagem de vizinhos. Há testes de equivalência entre ausência de peso e
-peso zero. A branch também contém flood fill e EDT experimentais da grade
+peso zero. O repositório também contém flood fill e EDT experimentais da grade
 de **parede** do Elaphes. O campo do Elaphes usa o mesmo sinal e unidade,
 mas seu "interno" pode representar parede ou buracos fechados; não fornece
 `VOID` real validado.
@@ -396,7 +409,7 @@ ver [`docs/random-walk.md`](docs/random-walk.md). Os waypoints vêm de modelos
 de cavernas reais, então essa caverna não é um controle totalmente
 independente de referências. Um guia procedural com semântica, escala e
 sinal definidos continua pendente. O benchmark mede pelo `ResourceSampler`, mas
-ainda não importa na branch, por falta da integração do CA. O ajuste genético de CA e Random Walk está planejado, com custo de
+ainda não importa neste checkout, por falta da integração do CA. O ajuste genético de CA e Random Walk está planejado, com custo de
 busca separado do tempo de geração.
 
 ## Exportação de volumes gerados para malha
@@ -411,24 +424,11 @@ Substitua a entrada pelo `volume_path` registrado no CSV da execução desejada.
 
 ## Visualização de volumes
 
-Os scripts recebem o caminho do NPZ como primeiro argumento. Substitua os
-identificadores pelo caminho real da tabela:
-
-```bash
-uv run python plots/matriz.py "results/volumes/EXPERIMENT_ID/random_walk_RUN_ID.npz"
-uv run python plots/plot_matplotlib.py "results/volumes/EXPERIMENT_ID/random_walk_RUN_ID.npz"
-uv run python plots/plot_plotly.py "results/volumes/EXPERIMENT_ID/random_walk_RUN_ID.npz"
-```
-
-`matriz.py` imprime um resumo; Matplotlib salva PNG em `results/figures/` e
-abre uma janela; Plotly salva HTML nessa pasta e abre a figura interativa.
-O HTML atual carrega Plotly por CDN e requer acesso à biblioteca para exibição.
-Os nomes das figuras derivam do NPZ e podem ser reutilizados numa nova
-plotagem. A amostragem visual do Plotly não altera as métricas do volume.
-
-`fatia.py` é um script exploratório com entrada fixa
-`results/volumes/random_walk_seed_0.npz`, sem argumento para selecionar NPZ.
-Depende desse artefato histórico e não integra o fluxo atual de reprodução.
+O menu próprio do CA (`uv run python -m cavegen.generators.cellular_automata.menu`)
+e o do Random Walk (`uv run python -m cavegen.generators.random_walk.menu`)
+fornecem opções de visualização. `plots/plot_plotly.py` permanece disponível;
+`plots/matriz.py`, `plots/plot_matplotlib.py` e `fatia.py` foram removidos
+na versão integrada e não são comandos disponíveis.
 
 ## Interfaces legadas e frentes futuras
 
@@ -440,7 +440,7 @@ Depende desse artefato histórico e não integra o fluxo atual de reprodução.
 | Treino PCGRL | `uv run python -m cavegen.training.train_pcgrl` | Placeholder: encerra com mensagem, sem treinar. |
 | Colab | [Orientações de notebooks](notebooks/colab/README.md) | Sequência planejada; os notebooks sugeridos ainda precisam ser criados. |
 | Unity e gRPC | `unity/`, `proto/caves.proto`, `cavegen.datastream.grpc_adapter` | Há contrato/serialização, mas não um aplicativo Unity ou servidor gRPC integrado para executar. |
-| Menu experimental do CA | Na branch `CA`: `uv run python -m cavegen.generators.cellular_automata.menu` | Disponível naquela branch, com API própria. Não existe nesse caminho no `main`; não misturar resultados sem conferir implementação e contrato. |
+| Menu experimental do CA | `uv run python -m cavegen.generators.cellular_automata.menu` | Disponível no pacote, com API própria; integração ao benchmark pendente. |
 | Reconstrução e linha central do Elaphes | Branch `experiment/elaphes-meshing` | Comandos e artefatos descritos na documentação daquela branch; não são etapas exigidas na avaliação atual. |
 
 As CLIs com `argparse` oferecem `--help`: geração, voxelização de superfície,
@@ -448,6 +448,8 @@ exportação de malha, resumo estatístico e IoU. O menu oferece a opção `6` d
 ajuda. APIs Python e scripts de plotagem não compartilham essas mesmas flags.
 
 ## Roteiro de reprodução do experimento
+
+**Pendente:** execute o roteiro após corrigir a integração do CA ao benchmark.
 
 1. Registrar a revisão e o estado do código com `git rev-parse HEAD` e
    `git status --short`. Para outra máquina reproduzir as mudanças, usar uma
@@ -485,25 +487,14 @@ ser transferidos separadamente quando necessários à reprodução.
 
 ## Roadmap resumido
 
-1. Pablo implementa e padroniza a coleta de métricas, incluindo contratos,
-   casos degenerados, unidades, recursos computacionais e esquema de saída.
-2. Com essa interface estável, Pablo implementa GAN e PCGRL sob o contrato
-   `Volume3D`, mantendo treino separado de geração/inferência.
-3. Pablo inventaria e parseia incrementalmente as novas cavernas no volume
-   `D:` após a conclusão das descompactações.
-4. Em paralelo, Felipe continua CA e Random Walk e, depois, implementa o
-   algoritmo evolutivo para ajustar os dois geradores usando as métricas
-   padronizadas.
-5. Após a coleta e a análise, padronizar a documentação, consolidar os
-   resultados e inspecionar volumes e malhas na Unity.
-
-A lista detalhada, com decisões ainda abertas, está em
-[`Orientacao-codex.md`](Orientacao-codex.md). A justificativa das métricas e da
-delimitação do scan está em [`docs/methodology-adjustments.md`](docs/methodology-adjustments.md).
-O Random Walk está descrito em [`docs/random-walk.md`](docs/random-walk.md).
-As tarefas individuais estão em
-[`Pablo`](docs/tarefas-pablo-reconstrucao-modelos.md) e
-[`Felipe`](docs/tarefas-felipe-sdf-ca.md).
+1. Felipe finaliza a integração dos clássicos, passa à coleta de métricas e
+   consolida a tabela comparativa com rastreabilidade por execução.
+2. Pablo inicia GAN, PCGRL e PCGARL em paralelo, começando por contratos,
+   ambiente pequeno e auditoria de dados conforme o [plano neural](docs/plano-redes-neurais.md).
+3. A dupla acorda métricas, seeds, orçamento, hardware e esquema comum antes
+   da coleta final, separando custo de treino, ajuste e geração.
+4. Parsing adicional, algoritmo evolutivo e inspeção na Unity seguem o
+   [roadmap](docs/roadmap.md), conforme disponibilidade e prioridades.
 
 ## Observação sobre benchmarks
 

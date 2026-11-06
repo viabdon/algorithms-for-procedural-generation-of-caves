@@ -1,6 +1,6 @@
 # Próximos passos do TCC — benchmark de geradores voxelizados
 
-**Direção definida em 18/10/2026; responsabilidades atualizadas em 02/11/2026.** O [resumo quinzenal](docs/relatorios/resumo-quinzenal-tcc-2026-10-18.docx) estabelece que a comparação dos geradores volta a partir de matrizes voxelizadas. A reconstrução do Elaphes, o SDF real e a IoU volumétrica não condicionam mais o avanço do TCC. A branch `CA` avançou no CA com peso, recursos e protótipos geométricos; Felipe também iniciou a frente de Random Walk. Esses avanços ainda não estão integrados ao `main`.
+**Direção definida em 18/10/2026; responsabilidades atualizadas em 02/11/2026.** O [resumo quinzenal](docs/relatorios/resumo-quinzenal-tcc-2026-10-18.docx) estabelece que a comparação dos geradores volta a partir de matrizes voxelizadas. A reconstrução do Elaphes, o SDF real e a IoU volumétrica não condicionam mais o avanço do TCC. A branch `CA` avançou no CA com peso, recursos e protótipos geométricos; Felipe também iniciou a frente de Random Walk. Esses avanços foram integrados à `main`; a conexão do CA ao benchmark permanece pendente.
 
 ## Contrato comum
 
@@ -15,31 +15,23 @@ O contrato para SDF **sintético de volume gerado** é positivo no interior do v
 
 **Random Walk (02/11/2026, branch `CA`, commits `216f38d` a `e121f44`).** O gerador de Random Walk passou a ser o random walk ponderado por waypoints do projeto base 3D-Cave-Generation, em `src/cavegen/generators/random_walk/`, com os grafos em `configs/random_walk/`. O random walk de 6 direções (`steps`, `brush_radius`) foi apagado, assim como `random_walk_temp/`. Ver [Random Walk](docs/random-walk.md).
 
-## Responsabilidades atuais
+## Responsabilidades e ordem de trabalho — 06/11/2026
 
-| Frente | Responsável principal | Próxima entrega verificável |
-| --- | --- | --- |
-| Métricas e protocolo de medição | Pablo | API e esquema padronizados para métricas estruturais e de custo, com validações e testes |
-| Modelos neurais | Pablo | GAN e PCGRL funcionais sob o contrato `Volume3D`, com treino separado de geração |
-| Parsing de novas cavernas | Pablo | Inventário e leitura incremental dos formatos disponíveis no volume `D:`, após o fim da descompactação |
-| CA, Random Walk e extensões de controle | Felipe | Integrar os geradores ao protocolo comum e produzir volumes rastreáveis para avaliação |
-| Algoritmo evolutivo para CA e Random Walk | Felipe | Espaços de busca, aptidão e orçamento definidos sobre a interface de métricas padronizada |
-| Fechamento do protocolo e interpretação | Ambos | Sementes, orçamento e hardware acordados; CSVs conferidos e dispersão documentada |
+Felipe está finalizando CA e Random Walk; em seguida conduz a coleta de métricas
+e a tabela comparativa. Pablo inicia em paralelo GAN, PCGRL e PCGARL. Ambos
+acordam o protocolo de avaliação, sementes, hardware e versão do esquema.
 
-Ver [tarefas de Pablo](docs/tarefas-pablo-reconstrucao-modelos.md) e [tarefas de Felipe](docs/tarefas-felipe-sdf-ca.md).
+1. Felipe integra a API do CA ao benchmark e confere uma execução pequena; o
+   import falha na versão integrada `a7dd1e7`.
+2. A dupla usa as métricas `structural-v1` existentes e completa o contrato de
+   custo e metadados para consolidar registros brutos e sumários por condição.
+3. Pablo especifica MDP e recompensa de RL, audita dados e limites da GAN e
+   confirma a abordagem adversarial. Ver [plano neural](docs/plano-redes-neurais.md).
+4. Busca evolutiva dos clássicos, parsing adicional e Unity seguem conforme
+   disponibilidade e prioridade, com orçamento e sementes documentados.
 
-## Ordem de trabalho
-
-1. Pablo implementa e padroniza a coleta de métricas. A primeira entrega deve fixar contratos de entrada e saída, conectividade, componentes, ocupação, transformada de distância e medidas de custo, com tratamento explícito de volumes degenerados, resolução, unidade, sementes, repetições e hardware. Essa interface é pré-requisito direto para comparar geradores e para a função de aptidão evolutiva.
-2. Com o contrato de métricas estável, Pablo implementa as redes neurais de geração. A GAN exige auditoria dos volumes de treino; o PCGRL exige um MDP pequeno. Ambos devem retornar `Volume3D` e separar treino de geração/inferência. Não é necessário esperar o encerramento de todos os experimentos clássicos para iniciar essa infraestrutura.
-3. Pablo inventaria e implementa o parsing das novas cavernas. As point clouds locais devem ser lidas preferencialmente no volume externo `D:`, sem cópia para o repositório. Três das 16 cavernas obtidas a partir da fonte associada ao KarstConduitCatalogue ainda estão em descompactação e não devem ser tratadas como entradas disponíveis. O formato e o caminho exato de cada conjunto precisam ser verificados antes de escolher ou estender um parser.
-4. Em paralelo, Felipe continua o CA e o Random Walk, integra os dois ao contrato comum e, quando a interface de métricas estiver disponível, implementa o algoritmo evolutivo para ajustar seus parâmetros. Espaços de busca, aptidão, orçamento e sementes reservadas devem ser documentados; comparar com busca simples de mesmo orçamento e separar custo de busca do tempo de geração. No Random Walk, decidir se a busca respeita as faixas do C# do projeto base (`weight` em [0,1; 1], `k` e `spacer` inteiros em [1, 30]). Escolher a caverna de waypoints do protocolo (padrão `knotlow_cavern`).
-5. A padronização ampla da documentação e a redação consolidada dos resultados ocorrem somente ao fim do experimento. Durante a execução, manter apenas registros mínimos de configuração, proveniência, decisões metodológicas e mudanças de contrato necessários à reprodutibilidade.
-6. Inspecionar em Unity os volumes e malhas gerados. gRPC e portabilidade ROCm permanecem posteriores.
-
-## Dados externos locais
-
-O volume `D:` é a fonte local preferencial para point clouds e outros dados grandes de cavernas. Não mover esses arquivos para `data/` apenas para executar o pipeline e não versionar caminhos absolutos específicos sem uma opção configurável. Como há extrações longas em andamento, conferir se cada arquivo terminou de ser descompactado antes de ler, calcular hash ou validar tamanho. O parsing continua incremental, preserva `float32` e distingue superfície observada de volume de vazio.
+Ver [tarefas de Pablo](docs/tarefas-pablo-reconstrucao-modelos.md),
+[tarefas de Felipe](docs/tarefas-felipe-sdf-ca.md) e [roadmap](docs/roadmap.md).
 
 ## Delimitação da referência real
 

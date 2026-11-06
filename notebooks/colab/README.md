@@ -1,5 +1,8 @@
 # Notebooks Colab
 
+Consultar o [plano neural](../../docs/plano-redes-neurais.md), inclusive
+PCGARL e a auditoria de dados; os notebooks abaixo são propostas.
+
 Use esta pasta para prototipação e treinamento depois que o contrato comum de
 métricas estiver estável. Não é necessário esperar o encerramento de toda a
 coleta dos geradores clássicos para iniciar a infraestrutura neural. GAN e
