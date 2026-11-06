@@ -38,6 +38,11 @@ __pycache__/
 /indian_tunnel_temp/npz/
 /indian_tunnel_temp/plots/
 
+# Experimento do Random Walk com pontos sorteados: as saídas são regeneradas
+/temp_rw/npz/
+/temp_rw/results/
+/temp_rw/plots/
+
 # Keep directory placeholders
 !.gitkeep
 
