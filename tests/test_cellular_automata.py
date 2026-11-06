@@ -95,10 +95,44 @@ class ContagemVetorizadaTests(unittest.TestCase):
             esperado = iterate_em_laco(esperado, 14, BorderTreatment.ZEROS)
             historico_esperado.append(int(esperado.sum()))
 
-        final, historico = cellular_automata(volume, 14, BorderTreatment.ZEROS, 4)
+        final, historico, _, _ = cellular_automata(volume, 14, BorderTreatment.ZEROS, 4)
 
         self.assertTrue(np.array_equal(esperado, final))
         self.assertEqual(historico_esperado, list(historico))
+
+    def test_transicoes_batem_com_a_comparacao_celula_a_celula(self) -> None:
+        volume = volume_aleatorio((12, 12, 12), semente=6)
+        anterior, esperado_1, esperado_0 = volume.copy(), [], []
+        for _ in range(5):
+            seguinte = iterate_em_laco(anterior, 13, BorderTreatment.ONES)
+            esperado_1.append(sum(int(a == 0 and b == 1)
+                                  for a, b in zip(anterior.ravel(), seguinte.ravel())))
+            esperado_0.append(sum(int(a == 1 and b == 0)
+                                  for a, b in zip(anterior.ravel(), seguinte.ravel())))
+            anterior = seguinte
+
+        _, historico, viraram_1, viraram_0 = cellular_automata(volume, 13, BorderTreatment.ONES, 5)
+
+        self.assertEqual(esperado_1, list(viraram_1))
+        self.assertEqual(esperado_0, list(viraram_0))
+        # O saldo das transições de cada iteração é a variação das células vivas.
+        np.testing.assert_array_equal(np.diff(historico), viraram_1 - viraram_0)
+
+    def test_sem_iteracoes_nao_ha_transicoes(self) -> None:
+        volume = volume_aleatorio((6, 6, 6), semente=7)
+
+        final, historico, viraram_1, viraram_0 = cellular_automata(volume, 13, "zeros", 0)
+
+        np.testing.assert_array_equal(final, volume)
+        self.assertEqual(historico.size, 1)
+        self.assertEqual((viraram_1.size, viraram_0.size), (0, 0))
+
+    def test_transicoes_aceitam_seed_booleana(self) -> None:
+        booleano = np.random.default_rng(8).random((8, 8, 8)) < 0.5
+
+        _, historico, viraram_1, viraram_0 = cellular_automata(booleano, 13, "zeros", 3)
+
+        np.testing.assert_array_equal(np.diff(historico), viraram_1 - viraram_0)
 
     def test_contagem_preserva_o_formato_e_respeita_o_maximo(self) -> None:
         volume = np.ones((6, 7, 8), dtype=int)

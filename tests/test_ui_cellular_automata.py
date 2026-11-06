@@ -21,6 +21,7 @@ from cavegen.generators.cellular_automata.seeds import load_seed_info, load_seed
 from cavegen.ui.cellular_automata.dados import (
     Execucao,
     historico_dos_passos,
+    transicoes_dos_passos,
     rodar_passo_a_passo,
     salvar,
 )
@@ -48,12 +49,16 @@ class RodarPassoAPassoTests(unittest.TestCase):
             for peso_usado in (None, peso):
                 with self.subTest(borda=borda, peso=peso_usado is not None):
                     passos, _ = rodar_passo_a_passo(seed, 14, borda, 4, peso_usado)
-                    final, historico = cellular_automata(seed, 14, borda, 4, peso=peso_usado)
+                    final, historico, viraram_1, viraram_0 = cellular_automata(
+                        seed, 14, borda, 4, peso=peso_usado)
 
                     self.assertEqual(len(passos), 5)
                     np.testing.assert_array_equal(passos[0], seed.astype(bool))
                     np.testing.assert_array_equal(passos[-1], final.astype(bool))
                     np.testing.assert_array_equal(historico_dos_passos(passos), historico)
+                    para_1, para_0 = transicoes_dos_passos(passos)
+                    np.testing.assert_array_equal(para_1, viraram_1)
+                    np.testing.assert_array_equal(para_0, viraram_0)
 
     def test_progress_recebe_cada_passo(self) -> None:
         chamadas = []
@@ -82,6 +87,19 @@ class SalvarTests(unittest.TestCase):
             self.assertEqual(dados["peso_id"], 2)
             np.testing.assert_array_equal(dados["matrix"], execucao.final)
             np.testing.assert_array_equal(dados["live_cells_history"], execucao.historico)
+            para_1, para_0 = transicoes_dos_passos(execucao.passos)
+            np.testing.assert_array_equal(dados["viraram_1_history"], para_1)
+            np.testing.assert_array_equal(dados["viraram_0_history"], para_0)
+
+    def test_volume_lido_de_arquivo_salva_sem_transicoes(self) -> None:
+        execucao = execucao_de(seed_aleatoria(), seed_id=5)
+        execucao.passos = None
+        with tempfile.TemporaryDirectory() as pasta:
+            _, result_id = salvar(execucao, Path(pasta) / "seeds", Path(pasta) / "results")
+            dados = load_result(result_id, Path(pasta) / "results")
+
+        self.assertIsNone(dados["viraram_1_history"])
+        self.assertIsNone(dados["viraram_0_history"])
 
     def test_seed_gravada_nao_e_duplicada_e_ca_basico_nao_leva_peso(self) -> None:
         execucao = execucao_de(seed_aleatoria(), seed_id=5)

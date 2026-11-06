@@ -21,11 +21,24 @@ class BorderTreatment(Enum):
     ONES = "ones"
     RANDOM = "random"
 
-def cellular_automata(matrix: np.ndarray, sensitivity: int, border_treatment: BorderTreatment, iterations: int, progress=None, peso=None) -> tuple[np.ndarray, np.ndarray]:
+def contar_transicoes(anterior: np.ndarray, seguinte: np.ndarray) -> tuple[int, int]:
+    """
+        Conta as células que mudaram de um passo para o outro.
+        Devolve (viraram_1, viraram_0).
+        anterior, seguinte: matrizes binárias de dois passos seguidos.
+    """
+    return int(np.count_nonzero(seguinte > anterior)), int(np.count_nonzero(seguinte < anterior))
+
+def cellular_automata(matrix: np.ndarray, sensitivity: int, border_treatment: BorderTreatment, iterations: int, progress=None, peso=None) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """
         Aplica o autômato celular sobre a matriz, repetindo o passo N vezes.
-        Devolve a matriz final e a quantidade de células vivas em cada passo,
-        começando pela matriz inicial (passo 0), então o histórico tem iterations + 1 valores.
+        Devolve (final, historico, viraram_1, viraram_0).
+        final: matriz depois da última iteração.
+        historico: células vivas em cada passo, começando pela matriz inicial
+                   (passo 0), então tem iterations + 1 valores.
+        viraram_1, viraram_0: células que mudaram em cada iteração. Têm iterations
+                   valores: o primeiro é a mudança do passo 0 para o passo 1. O
+                   histórico sozinho não mostra isso, porque só vê o saldo.
         matrix: matriz binária inicial.
         sensitivity: mínimo de vizinhos para a célula virar 1.
         border_treatment: membro de BorderTreatment, ou a string equivalente.
@@ -36,14 +49,20 @@ def cellular_automata(matrix: np.ndarray, sensitivity: int, border_treatment: Bo
     """
     border_treatment = BorderTreatment(border_treatment)
     historico = [int(matrix.sum())]
+    viraram_1, viraram_0 = [], []
 
     for i in range(iterations):
-        matrix = iterate(matrix, sensitivity, border_treatment, peso)
+        seguinte = iterate(matrix, sensitivity, border_treatment, peso)
+        para_1, para_0 = contar_transicoes(matrix, seguinte)
+        viraram_1.append(para_1)
+        viraram_0.append(para_0)
+        matrix = seguinte
         historico.append(int(matrix.sum()))
         if progress is not None:
             progress(i + 1, iterations)
 
-    return matrix, np.array(historico, dtype=np.int64)
+    return (matrix, np.array(historico, dtype=np.int64),
+            np.array(viraram_1, dtype=np.int64), np.array(viraram_0, dtype=np.int64))
 
 def iterate(matrix: np.ndarray, sensitivity: int, border_treatment: BorderTreatment, peso=None) -> np.ndarray:
     """

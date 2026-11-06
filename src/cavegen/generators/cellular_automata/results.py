@@ -67,8 +67,8 @@ def run_and_save(seed_id: int, sensitivity: int, border_treatment: BorderTreatme
 
     inicial = load_seed_matrix(seed_id)
     peso = load_peso_matrix(peso_id) if peso_id is not None else None
-    final, historico = cellular_automata(inicial, sensitivity, border_treatment, iterations,
-                                         progress, peso)
+    final, historico, viraram_1, viraram_0 = cellular_automata(
+        inicial, sensitivity, border_treatment, iterations, progress, peso)
 
     # Resultados do CA básico não levam peso_id, como as seeds sorteadas não levam origem.
     extras = {"peso_id": peso_id} if peso_id is not None else {}
@@ -78,6 +78,8 @@ def run_and_save(seed_id: int, sensitivity: int, border_treatment: BorderTreatme
         result_path(result_id, directory),
         matrix=final,
         live_cells_history=historico,
+        viraram_1_history=viraram_1,
+        viraram_0_history=viraram_0,
         result_id=result_id,
         seed_id=seed_id,
         size=final.shape[0],
@@ -114,14 +116,15 @@ def load_result_info(result_id: int, directory: Path = RESULTS_DIR) -> dict:
 def load_result(result_id: int, directory: Path = RESULTS_DIR) -> dict:
     """
         Lê de volta a matriz de um resultado junto dos parâmetros que o geraram.
-        Resultados gravados antes do histórico existir devolvem live_cells_history como None.
+        Resultados gravados antes de um histórico existir devolvem esse campo como
+        None: live_cells_history, viraram_1_history e viraram_0_history.
         result_id: número de identificação do resultado.
         directory: pasta onde os resultados são gravados.
     """
     dados = load_result_info(result_id, directory)
     with np.load(result_path(result_id, directory)) as arquivo:
         dados["matrix"] = arquivo["matrix"]
-        dados["live_cells_history"] = (arquivo["live_cells_history"]
-                                    if "live_cells_history" in arquivo.files else None)
+        for campo in ("live_cells_history", "viraram_1_history", "viraram_0_history"):
+            dados[campo] = arquivo[campo] if campo in arquivo.files else None
 
     return dados

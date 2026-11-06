@@ -15,7 +15,11 @@ from pathlib import Path
 
 import numpy as np
 
-from cavegen.generators.cellular_automata.generator import BorderTreatment, iterate
+from cavegen.generators.cellular_automata.generator import (
+    BorderTreatment,
+    contar_transicoes,
+    iterate,
+)
 from cavegen.generators.cellular_automata.results import (
     RESULTS_DIR,
     next_result_id,
@@ -95,6 +99,17 @@ def historico_dos_passos(passos: list) -> np.ndarray:
     return np.array([int(passo.sum()) for passo in passos], dtype=np.int64)
 
 
+def transicoes_dos_passos(passos: list) -> tuple[np.ndarray, np.ndarray]:
+    """
+        Células que viraram 1 e 0 em cada iteração, como cellular_automata devolve.
+        passos: matrizes de cada passo.
+    """
+    contagens = np.array([contar_transicoes(anterior, seguinte)
+                          for anterior, seguinte in zip(passos, passos[1:])],
+                         dtype=np.int64).reshape(-1, 2)
+    return contagens[:, 0], contagens[:, 1]
+
+
 def salvar(execucao: Execucao, seeds_dir: Path = SEEDS_DIR,
            results_dir: Path = RESULTS_DIR) -> tuple[int, int]:
     """
@@ -120,6 +135,10 @@ def salvar(execucao: Execucao, seeds_dir: Path = SEEDS_DIR,
 
     # Resultados do CA básico não levam peso_id, igual ao run_and_save.
     extras = {"peso_id": execucao.peso_id} if execucao.peso_id is not None else {}
+    # Um volume lido de arquivo não tem os passos, então fica sem as transições.
+    if execucao.passos is not None:
+        extras["viraram_1_history"], extras["viraram_0_history"] = transicoes_dos_passos(
+            execucao.passos)
 
     results_dir.mkdir(parents=True, exist_ok=True)
     result_id = next_result_id(results_dir)
