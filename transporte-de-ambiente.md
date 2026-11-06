@@ -81,19 +81,13 @@ utilizar**. Confira `configs/datasets.yaml`, `configs/hardware/` e o comando
 pertinente no `README.md` antes de executar experimentos. Não copie caminhos
 absolutos da máquina antiga sem revisá-los.
 
-Nesta máquina, o volume externo `D:` é a origem preferencial para point clouds
-e outros dados grandes de cavernas. Processe-os no próprio volume quando
-possível; não os duplique no repositório. Três cavernas obtidas entre as 16 da
-fonte associada ao KarstConduitCatalogue ainda estão em descompactação. Não
-calcule hashes, limites nem tente validar esses arquivos antes de a extração
-terminar. O caminho exato de cada dataset dentro de `D:` deve ser confirmado
-antes da execução, pois não é uma configuração portátil do repositório.
+Os caminhos de dados externos dependem da máquina. O volume `D:` foi usado em
+outro ambiente; confirme montagem, caminho e término de qualquer extração antes
+de ler, calcular hashes ou validar arquivos. Evite duplicar point clouds grandes.
 
-As responsabilidades atuais são: Pablo implementa e padroniza as métricas
-(prioridade 1), implementa os geradores neurais (prioridade 2) e parseia as
-novas cavernas (prioridade 3). Felipe continua CA e Random Walk e, depois,
-implementa o algoritmo evolutivo para ajustar ambos. A padronização ampla da
-documentação fica para o encerramento do experimento.
+Felipe finaliza os clássicos e assume coleta de métricas e tabela comparativa;
+Pablo inicia GAN, PCGRL e PCGARL. A dupla acorda o protocolo comum. Consulte o
+[roadmap](docs/roadmap.md) e o [plano neural](docs/plano-redes-neurais.md).
 
 Registre o ambiente de cada medição. Resultados de Colab, máquina local e
 ROCm devem ser identificados separadamente; não misture seus tempos em uma
@@ -113,8 +107,8 @@ Use esta mensagem ao iniciar uma nova sessão, completando a última linha:
 > volumes booleanos ZYX; o Elaphes é somente referência de superfície, sem
 > IoU volumétrica validada. Use preferencialmente o volume `D:` para point
 > clouds e confirme se qualquer descompactação terminou antes da leitura.
-> Pablo prioriza métricas, redes neurais e parsing; Felipe conduz CA, Random
-> Walk e o algoritmo evolutivo. Siga as regras de testes do projeto.
+> Pablo inicia GAN, PCGRL e PCGARL; Felipe finaliza os clássicos e conduz
+> coleta e tabela comparativa. Siga as regras de testes do projeto.
 > Minha próxima tarefa é: **[descrever aqui]**.
 
 Atualize esta seção quando uma decisão nova ainda não estiver registrada nos

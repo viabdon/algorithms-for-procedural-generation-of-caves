@@ -248,10 +248,11 @@ de resumir uma tabela central com experimentos diferentes.
 
 ## Menu interativo e glossário
 
-A interface segue o padrão de perguntas e repetição do menu do CA na branch
-do Felipe. Ela opera os serviços disponíveis no `main`, com o CA básico de
-26 vizinhos; não importa ou substitui a implementação experimental da outra
-branch. Execute na raiz do repositório:
+A interface central está presente no código, mas na revisão `a7dd1e7` não
+importa porque o benchmark espera a antiga API do CA. Felipe fará a integração;
+os comandos e o glossário abaixo descrevem o comportamento pretendido e devem
+ser revistos após a correção. O Random Walk atual usa waypoints, não passos de
+um caminhante de seis direções. Após a integração, execute na raiz do repositório:
 
 ```bash
 uv run python -m cavegen
@@ -271,7 +272,7 @@ uma biblioteca nova de terminal.
 
 | Comando | Ação e parâmetros | Efeito nos arquivos |
 | --- | --- | --- |
-| `1` — Gerar e avaliar um volume 64³ | Escolher Random Walk ou CA básico; informar seed e parâmetros com padrões visíveis. Random Walk pergunta passos e raio; CA pergunta probabilidade inicial de ar, iterações e limiar de vizinhos. | Gera NPZ em subpasta própria e acrescenta uma linha `baseline` ao CSV da sessão. |
+| `1` — Gerar e avaliar um volume 64³ | Escolher Random Walk ou CA básico; informar seed e parâmetros com padrões visíveis. Random Walk usa caverna e raio; os parâmetros do CA dependem da integração pendente. | Gera NPZ em subpasta própria e acrescenta uma linha `baseline` ao CSV da sessão. |
 | `2` — Executar experimento YAML | Informar o caminho da configuração, conferir shape/seeds e iniciar. O padrão é `configs/experiments/baseline_64.yaml`. | Executa todos os algoritmos/seeds do YAML, mostrando cada resultado persistido. Usa a pasta de volumes do YAML e o CSV da sessão. |
 | `3` — Avaliar NPZ existente | Escolher entre as últimas dez linhas da tabela ou informar outro caminho. Definir conectividade 6/26 e spacing Z Y X; o padrão é `6` e `1 1 1`. | Mantém o NPZ original e acrescenta nova linha `structural_evaluation`, com novo run_id. Tempo de geração e RSS ficam ausentes. |
 | `4` — Consultar resultados recentes | Informar quantas linhas mostrar, de 1 a 1000; o padrão é 10. Mostra identidade, variante, seed, shape, ocupação, componentes, EDT, conectividade, spacing e caminho do volume. | Apenas lê o CSV. Usa streaming e retém somente as linhas solicitadas, sem abrir os volumes. |
