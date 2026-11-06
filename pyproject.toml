@@ -49,3 +49,16 @@ where = ["src"]
 [tool.ruff]
 line-length = 100
 src = ["src"]
+
+[dependency-groups]
+dev = [
+    "poethepoet>=0.49.0",
+]
+
+# Atalhos de comando: uv run poe <tarefa>. Sem nome de tarefa, lista todas.
+[tool.poe.tasks]
+test = { cmd = "python tests/rodar.py", help = "Roda a suite completa com relatorio (--detalhe mostra tudo)" }
+test-um = { cmd = "python tests/rodar.py --detalhe", help = "Roda um modulo: poe test-um tests/test_volume.py" }
+menu-ca = { cmd = "python -m cavegen.generators.cellular_automata.menu", help = "Abre o menu do CA" }
+menu-rw = { cmd = "python -m cavegen.generators.random_walk.menu", help = "Abre o menu do Random Walk" }
+ui = { cmd = "uv run --extra ui streamlit run src/cavegen/ui/cellular_automata/app.py", help = "Abre a bancada Streamlit do CA" }

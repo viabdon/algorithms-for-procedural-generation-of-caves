@@ -162,6 +162,18 @@ Para investigar apenas um módulo, substitua o caminho pelo arquivo desejado:
 uv run python -m unittest tests/test_normalization.py -v
 ```
 
+Os comandos mais usados têm atalhos no `pyproject.toml`, pelo Poe the Poet:
+
+```bash
+uv run poe                                  # lista os atalhos
+uv run poe test                             # suíte completa, com relatório por módulo
+uv run poe test --detalhe                   # cada teste e o traceback inteiro
+uv run poe test-um tests/test_volume.py     # um módulo, teste por teste
+uv run poe menu-ca                          # menu do CA
+uv run poe menu-rw                          # menu do Random Walk
+uv run poe ui                               # bancada Streamlit do CA
+```
+
 Os comandos abaixo são verificações leves que não exigem os datasets externos:
 
 ```bash
