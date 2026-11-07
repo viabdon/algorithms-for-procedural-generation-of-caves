@@ -357,7 +357,7 @@ uv run python -m cavegen.generators.random_walk.generator [seed] [lado] [raio|pr
 
 ## Voxelização direta de superfície para diagnóstico
 
-Para inspecionar uma nuvem de pontos PLY como grade de voxels de superfície,
+Para inspecionar uma nuvem de pontos PLY, XYZ ou F32 como grade de voxels de superfície,
 execute uma primeira passagem em baixa resolução. O leitor processa o arquivo
 em lotes, portanto não carrega toda a nuvem na memória:
 
@@ -382,6 +382,100 @@ não fornece a classificação volumétrica necessária para IoU.
 Execução registrada para o Elaphes em `32³`: 245 de 32.768 voxels (0,75%) foram
 marcados como superfície. O arquivo `elaphes_surface_32.npz` é um artefato local
 de dados processados e não faz parte do Git.
+
+### Menu de preparação e reprodutibilidade
+
+Para preparar nuvens XYZ, PLY ou F32 pelo menu independente dos geradores:
+
+```bash
+.venv/bin/python -m cavegen.datastream
+```
+
+O menu solicita entrada, resolução, pasta, limites, lote, progresso e flood
+fill. Permite executar em primeiro plano ou em background, mostra o comando
+equivalente e protege saídas anteriores. Cada geração concluída salva
+`<saida>.run.json` com configuração efetiva, comando e versões. O progresso é
+impresso a cada milhão de pontos tanto nos limites quanto na voxelização,
+com contadores separados por etapa. A etapa de flood fill funciona com todos
+os três formatos e salva o interior candidato em outro NPZ.
+
+Consulte o [guia de preparação de volumes](docs/preparacao-volumes.md) para
+contratos de entrada, arquivos gerados, logs/PIDs, exemplos de CLI e protocolo
+de reprodução em outra máquina.
+
+### Novas nuvens XYZ e execução em segundo plano
+
+O leitor `cavegen.datastream.xyz.iter_xyz_xyz` processa texto com X, Y e Z
+nas três primeiras colunas, separadas por espaços ou tabulações. Colunas
+adicionais (RGB, intensidade etc.) são ignoradas. Aceita linhas vazias,
+comentários iniciados por `#`, comentários ao final da linha e BOM UTF-8.
+Não aceita cabeçalho de nomes, contagem inicial de pontos, XYZ molecular ou
+CSV com vírgulas. Coordenadas inválidas, infinitas ou fora da faixa de
+`float32` interrompem a leitura com caminho e número da linha.
+
+Use `--input` para selecionar o leitor pela extensão (`.ply`, `.xyz`, `.f32`).
+O alias `--ply` permanece disponível. Sem `--bounds`, o comando faz duas
+passagens pelo arquivo: calcula e salva os limites em `OUTPUT.bounds.json`,
+depois voxeliza. A memória depende do lote e da grade, não do número total de
+pontos. Os arquivos do HD são lidos diretamente, sem conversão intermediária.
+Os limites precisam corresponder à mesma nuvem; não reutilize os do Elaphes
+para outra caverna. Coordenadas e limites seguem o contrato `float32` do
+pipeline; coordenadas georreferenciadas muito grandes podem perder detalhes
+pequenos nessa precisão e devem ter sua origem local definida antes da leitura.
+
+Na raiz do repositório, ajuste os caminhos e execute:
+
+```bash
+mkdir -p results/logs data/processed/references/nova_caverna
+nohup .venv/bin/python -u -m cavegen.datastream.run_reference_voxelization \
+  --input "/caminho/no/HD/nova_caverna.xyz" \
+  --shape 64 64 64 \
+  --batch-size 65536 \
+  --progress-every 1000000 \
+  --output data/processed/references/nova_caverna/surface_64.npz \
+  --interior-output data/processed/references/nova_caverna/interior_64.npz \
+  > results/logs/nova_caverna_surface_64.log 2>&1 < /dev/null &
+echo $! > results/logs/nova_caverna_surface_64.pid
+```
+
+O `-u` mantém o log atualizado sem buffer de saída; `nohup` permite fechar o
+terminal sem enviar SIGHUP ao processo. Acompanhe com
+`tail -f results/logs/nova_caverna_surface_64.log` (Ctrl+C encerra apenas o
+acompanhamento). Para interromper a geração, use
+`kill "$(cat results/logs/nova_caverna_surface_64.pid)"` enquanto esse PID
+ainda corresponder à execução. O log anuncia a passagem de limites e o progresso
+da voxelização, a cada milhão de pontos em ambas as passagens.
+
+Para outra resolução da mesma nuvem, acrescente
+`--bounds data/processed/references/nova_caverna/surface_64.bounds.json`
+e escolha outro `--shape` e `--output`. Isso evita recalcular os limites.
+A saída `--output` contém a **superfície observada**. O parâmetro opcional
+`--interior-output` acrescenta um flood fill externo com conectividade 6 e
+salva, separadamente, um `Volume3D` com os voxels não observados que ficaram
+isolados do exterior (`True = candidato a ar interno`). Sem esse parâmetro,
+apenas a superfície é gerada. Nenhuma dessas etapas calcula SDF.
+
+### Classificação por flood fill
+
+`cavegen.core.surface_filling.classify_surface_by_flood_fill` devolve rótulos
+`uint8`: 0 exterior, 1 superfície observada, 2 vazio fechado. O exterior entra
+pelos limites da grade e se propaga por faces, como no procedimento de
+inundação da branch `CA`. A superfície bloqueia a propagação; os voxels não
+observados que não foram alcançados formam a máscara de interior candidata.
+
+A classificação mantém todos os voxels observados como superfície. Isso difere
+do rótulo interno do protótipo do Felipe, que também incluía voxels cheios
+sem contato com a água em paredes espessas. Aqui eles não entram como ar.
+Não há dilatação, fechamento automático de entradas ou reparo de lacunas.
+Uma entrada aberta pode deixar todo o túnel acessível ao exterior; nesse caso,
+o comando salva uma máscara vazia e informa que não encontrou interior fechado.
+Conectividade por faces também pode considerar fechada uma passagem diagonal.
+
+Os metadados registram método, conectividade e estado
+`candidate_requires_geometric_validation`. Inspecione cortes, abertura de
+entradas e sensibilidade à resolução antes de aceitar os volumes para treino:
+o flood fill reconhece regiões fechadas da grade, mas não determina sozinho
+se são ar da caverna ou lacunas da amostragem.
 
 ## Limite da referência real
 

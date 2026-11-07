@@ -1,6 +1,6 @@
-"""Voxelize a PLY reference surface without loading its point cloud at once.
+"""Voxelize a point-cloud reference surface without loading its point cloud at once.
 
-This module connects the PLY reader with the format-independent normalization
+This module connects the point-cloud readers with the format-independent normalization
 and surface-voxelization steps. Bounds are read from the JSON artifact produced
 by :mod:`cavegen.datastream.bounds`; the resulting boolean array uses the
 surface convention, where ``True`` marks an observed surface voxel.
@@ -16,7 +16,8 @@ import numpy as np
 
 from cavegen.core.normalization import normalize_xyz_to_zyx_indices
 from cavegen.core.voxelization import voxelize_surface_zyx
-from cavegen.datastream.ply import iter_ply_xyz
+from cavegen.datastream.point_cloud import iter_point_cloud_xyz
+from cavegen.datastream.progress import report_point_progress
 
 
 def load_xyz_bounds(path: str | Path) -> tuple[np.ndarray, np.ndarray]:
@@ -51,35 +52,35 @@ def load_xyz_bounds(path: str | Path) -> tuple[np.ndarray, np.ndarray]:
     return min_xyz, max_xyz
 
 
-def voxelize_ply_surface(
-    ply_path: str | Path,
+def voxelize_point_cloud_surface(
+    source_path: str | Path,
     bounds_path: str | Path,
     volume_shape: tuple[int, int, int],
     batch_size: int,
     progress_every: int | None = None,
     progress_callback: Callable[[int], None] | None = None,
 ) -> np.ndarray:
-    """Return a surface grid generated incrementally from a PLY file.
+    """Return a surface grid generated incrementally from a PLY, XYZ or F32 file.
 
-    Each PLY XYZ batch is normalized with the persisted global bounds and is
+    Each XYZ batch is normalized with the persisted global bounds and is
     immediately consumed by the voxelizer. Memory therefore holds only one
     coordinate batch, one index batch, and the target boolean grid.
 
     Parameters
     ----------
-    ply_path
-        Source PLY path accepted by :func:`iter_ply_xyz`.
+    source_path
+        Source path accepted by :func:`iter_point_cloud_xyz`.
     bounds_path
         JSON file containing the complete-cloud ``min_xyz`` and ``max_xyz``.
     volume_shape
         Target grid shape in ``(depth, height, width)`` order.
     batch_size
-        Maximum number of PLY vertices read at a time.
+        Maximum number of points read at a time.
     progress_every
-        Emit progress after this many additional vertices. ``None`` disables
+        Report each crossed point-count milestone at batch boundaries. ``None`` disables
         progress reporting.
     progress_callback
-        Function that receives the cumulative number of processed vertices.
+        Function that receives the milestone number of processed points.
         It is required when ``progress_every`` is set.
 
     Returns
@@ -89,27 +90,30 @@ def voxelize_ply_surface(
         means an observed surface voxel, not an open cave voxel.
     """
 
-    if progress_every is not None:
-        if progress_every <= 0:
-            raise ValueError("progress_every must be positive when provided.")
-        if progress_callback is None:
-            raise ValueError("progress_callback is required when progress_every is set.")
-
     min_xyz, max_xyz = load_xyz_bounds(bounds_path)
 
     def iter_normalized_batches() -> Iterator[np.ndarray]:
-        """Normalize batches and report cumulative progress after each interval."""
-
-        processed_vertices = 0
-        next_progress = progress_every
-        for xyz_batch in iter_ply_xyz(ply_path, batch_size):
-            processed_vertices += len(xyz_batch)
-            if next_progress is not None and processed_vertices >= next_progress:
-                progress_callback(processed_vertices)
-                next_progress += progress_every
+        batches = report_point_progress(
+            iter_point_cloud_xyz(source_path, batch_size), progress_every, progress_callback
+        )
+        for xyz_batch in batches:
             yield normalize_xyz_to_zyx_indices(
                 xyz_batch, min_xyz, max_xyz, volume_shape
             )
 
     index_batches = iter_normalized_batches()
     return voxelize_surface_zyx(index_batches, volume_shape)
+
+
+def voxelize_ply_surface(
+    ply_path: str | Path,
+    bounds_path: str | Path,
+    volume_shape: tuple[int, int, int],
+    batch_size: int,
+    progress_every: int | None = None,
+    progress_callback: Callable[[int], None] | None = None,
+) -> np.ndarray:
+    """Backward-compatible PLY entry point for surface voxelization."""
+    return voxelize_point_cloud_surface(
+        ply_path, bounds_path, volume_shape, batch_size, progress_every, progress_callback
+    )
