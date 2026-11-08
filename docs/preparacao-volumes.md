@@ -1,6 +1,6 @@
 # Preparação de volumes de cavernas
 
-Este guia descreve o fluxo integrado para ler nuvens XYZ, PLY ou F32, calcular
+Este guia descreve o fluxo integrado para ler nuvens XYZ, PLY, F32 ou LAS, calcular
 limites globais, voxelizar a superfície observada e, opcionalmente, inferir
 interior por flood fill. Os arquivos brutos são lidos diretamente, inclusive de
 um HD externo. O processamento é determinístico para uma mesma entrada,
@@ -58,7 +58,7 @@ fosse um volume de ar. Para ler os resultados, use `load_surface_npz` e
 
 ## Progresso e execução em background
 
-Os três leitores usam o mesmo mecanismo de progresso. Na primeira passagem,
+Os quatro leitores usam o mesmo mecanismo de progresso. Na primeira passagem,
 `[Bounds]` informa os pontos lidos para calcular os limites; na segunda,
 `[Voxelization]` informa os pontos consumidos para construir a grade. Os
 contadores reiniciam em cada etapa: não são pontos diferentes. Com limites
@@ -92,7 +92,7 @@ sistema depois que o processo termina. Um log com traceback indica falha;
 consulte o aviso final e o registro `.run.json` para conferir a conclusão.
 Suspender/desmontar o HD durante a execução pode interromper a leitura.
 
-## Comandos diretos para os três formatos
+## Comandos diretos para os quatro formatos
 
 A sintaxe é a mesma para todas as nuvens. Ajuste o caminho, o nome da pasta e a
 extensão de entrada; o formato é selecionado automaticamente:
@@ -108,7 +108,8 @@ extensão de entrada; o formato é selecionado automaticamente:
 ```
 
 Para F32, use `--input "/caminho/no/HD/caverna.f32"`; para XYZ, use
-`--input "/caminho/no/HD/caverna.xyz"`. O flood fill é aplicado após a
+`--input "/caminho/no/HD/caverna.xyz"`; para LAS, use
+`--input "/caminho/no/HD/caverna.las"`. O flood fill é aplicado após a
 voxelização em todos os casos. Remova `--interior-output` para gerar apenas
 superfície. `--ply` é um alias legado de `--input`.
 
@@ -136,6 +137,21 @@ também mostra lançamento direto com `nohup` e redirecionamento de log.
 - F32: binário sem cabeçalho, sete atributos float32 por ponto na ordem
   `x y z nir r g b`, conforme `cavegen.datastream.f32`. Apenas XYZ é usado.
 
+- LAS: binário não comprimido, lido em lotes pelo `laspy` (dependência base
+  `>=2.5,<3`, fixada no `uv.lock`). As coordenadas decodificadas são
+  `inteiro * scale + offset`, não os inteiros crus X/Y/Z do registro. O leitor
+  usa x/y/z escalados, rejeita cabeçalho inválido, escala não positiva,
+  coordenadas não finitas, nuvens vazias e registros truncados. Intensidade,
+  RGB, classificação e retornos adicionais não são usados para filtrar pontos.
+  Os testes incluem formatos de pontos 0 e 3 em LAS 1.2 e formato 6 em LAS 1.4.
+  LAS comprimido e extensão `.laz` não são aceitos neste fluxo; não há backend
+  de descompressão instalado por esta mudança. Escalas, offsets, versão LAS,
+  formato e contagem de pontos são gravados em `las_header` nos metadados.
+  Não é aplicada reprojeção de CRS; registre a unidade e o sistema de referência
+  da fonte na documentação do dataset. Consulte a documentação oficial de
+  [leitura em lotes](https://laspy.readthedocs.io/en/latest/basic.html#chunked-reading)
+  e de [coordenadas escaladas](https://laspy.readthedocs.io/en/latest/complete_tutorial.html).
+
 O contrato de coordenadas é float32. Coordenadas georreferenciadas de grande
 magnitude podem perder detalhes nessa precisão; definir origem local é uma
 etapa explícita de preparação quando necessária. A normalização usa escala
@@ -158,7 +174,7 @@ Inspecione cortes e sensibilidade à resolução antes do uso em treino.
 Guarde os brutos originais, o JSON de limites, os NPZ, o registro `.run.json` e
 o log. Esse registro inclui comando com parâmetros efetivos e caminhos
 absolutos, argumentos solicitados, diretório de trabalho, limites, shape ZYX,
-lote, intervalo de progresso, opção de flood fill, versões de Python/NumPy/SciPy,
+lote, intervalo de progresso, opção de flood fill, versões de Python/NumPy/SciPy/laspy,
 commit Git e indicador de alterações locais. O interior registra conectividade,
 tratamento da borda e exclusão dos voxels de superfície. A data de início e a
 duração também são salvas.
@@ -187,8 +203,8 @@ geométrica do interior candidato.
 .venv/bin/python -m unittest discover -s tests -v
 ```
 
-Os testes cobrem leitura XYZ, marcos de progresso, geração de interior para os
-três formatos, campos do registro de reprodução, menu em primeiro plano,
+Os testes cobrem leitura XYZ/LAS, marcos de progresso, geração de interior para os
+quatro formatos, campos do registro de reprodução, menu em primeiro plano,
 lançamento em background, cancelamento e proteção de saídas no menu. Casos de
 superfície fechada, entrada aberta, contato diagonal e parede espessa verificam
 o contrato do flood fill. Datasets externos não são necessários para esses testes.

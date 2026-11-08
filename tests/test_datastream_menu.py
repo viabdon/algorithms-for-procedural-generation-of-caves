@@ -6,6 +6,8 @@ from tempfile import TemporaryDirectory
 from unittest.mock import patch
 import json
 import unittest
+import laspy
+import numpy as np
 
 from cavegen.datastream.menu import main
 from cavegen.datastream.voxel_io import load_volume_npz
@@ -26,6 +28,23 @@ class DatastreamMenuTests(unittest.TestCase):
             self.assertEqual(receipt['surface_metadata']['volume_shape_zyx'], [8, 8, 8])
             self.assertEqual(receipt['processing']['progress_every'], 1000000)
             self.assertIn('Comando equivalente', log.getvalue())
+
+    def test_menu_accepts_las_and_preserves_its_transform_metadata(self):
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            source, folder = root / 'cloud.las', root / 'out'
+            header = laspy.LasHeader(point_format=0, version='1.2')
+            header.scales = np.array([.01, .01, .01])
+            header.offsets = np.array([1000., 2000., 3000.])
+            cloud = laspy.LasData(header)
+            cloud.x, cloud.y, cloud.z = [1000., 1001.], [2000., 2001.], [3000., 3001.]
+            cloud.write(source)
+            answers = ['1', str(source), '8', str(folder), '', '', '', '', '1', '0']
+            with patch('builtins.input', side_effect=answers), redirect_stdout(StringIO()):
+                main()
+            volume = load_volume_npz(folder / 'interior.npz')
+            self.assertEqual(volume.metadata['source_format'], 'las')
+            self.assertEqual(volume.metadata['las_header']['offsets_xyz'], [1000, 2000, 3000])
 
     def test_background_launch_is_detached_and_records_log_and_pid(self):
         with TemporaryDirectory() as directory:

@@ -25,6 +25,7 @@ dependencies = [
   "pyspark>=4.1.2",
   "matplotlib>=3.10.9",
   "plotly>=6.0",
+  "laspy>=2.5,<3",
 ]
 
 [project.optional-dependencies]
