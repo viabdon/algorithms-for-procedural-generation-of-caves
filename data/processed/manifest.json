@@ -1,0 +1,205 @@
+{
+  "origin_branch": "experiment/elaphes-meshing",
+  "origin_evidence": "Nomes e comandos documentados na branch; artefatos locais ignorados pelo Git, sem prova de autoria por commit.",
+  "notes": "Referências de caminho nos JSON foram atualizadas. NPZ e CSV preservados byte a byte; caminhos internos de NPZ, se presentes, são históricos.",
+  "files": [
+    {
+      "original_path": "data/processed/elaphes_centreline_cosine_experiment_01_cos050.json",
+      "path": "data/processed/experiments/experiment_elaphes-meshing/elaphes_centreline_cosine_experiment_01_cos050.json",
+      "original_sha256": "8c5893ae0198ed6ee622fce75b38028b29917b459e6c61e6eef62963c80141ce",
+      "sha256": "dc61c50bcb225e703a4dab29b1c5774a70fe603c76a0755235028d5bdc4d7456"
+    },
+    {
+      "original_path": "data/processed/elaphes_centreline_cosine_experiment_01_cos050.npz",
+      "path": "data/processed/experiments/experiment_elaphes-meshing/elaphes_centreline_cosine_experiment_01_cos050.npz",
+      "original_sha256": "040d3793f9b15665687abbb57f211eb96e2908596bcd0c53011177e9de157275",
+      "sha256": "040d3793f9b15665687abbb57f211eb96e2908596bcd0c53011177e9de157275"
+    },
+    {
+      "original_path": "data/processed/elaphes_centreline_cosine_experiment_01_cos050.uncertain.csv",
+      "path": "data/processed/experiments/experiment_elaphes-meshing/elaphes_centreline_cosine_experiment_01_cos050.uncertain.csv",
+      "original_sha256": "4cc609f12b93160341b9741e4057128f927bab29365d092e99066c0db9dc9b77",
+      "sha256": "4cc609f12b93160341b9741e4057128f927bab29365d092e99066c0db9dc9b77"
+    },
+    {
+      "original_path": "data/processed/elaphes_centreline_cosine_experiment_01_cos075.json",
+      "path": "data/processed/experiments/experiment_elaphes-meshing/elaphes_centreline_cosine_experiment_01_cos075.json",
+      "original_sha256": "18a9997efd6b5dc4f095be0c67f6befc36d7d77c5dfe439101d99b4aa088136a",
+      "sha256": "79a811905d9d9a41fc1f9dc91009e8b2474b5cc30d66ee88601fd4679647d1ff"
+    },
+    {
+      "original_path": "data/processed/elaphes_centreline_cosine_experiment_01_cos075.npz",
+      "path": "data/processed/experiments/experiment_elaphes-meshing/elaphes_centreline_cosine_experiment_01_cos075.npz",
+      "original_sha256": "43be15da5a4f11a9a6daf627fbff094b6d408a7d8101d311dc81dd35269b5c77",
+      "sha256": "43be15da5a4f11a9a6daf627fbff094b6d408a7d8101d311dc81dd35269b5c77"
+    },
+    {
+      "original_path": "data/processed/elaphes_centreline_cosine_experiment_01_cos075.uncertain.csv",
+      "path": "data/processed/experiments/experiment_elaphes-meshing/elaphes_centreline_cosine_experiment_01_cos075.uncertain.csv",
+      "original_sha256": "41c819fa25a8fffedaf1449474bd1bccab6cdb4167ff58fb1cca98adf4b47a1f",
+      "sha256": "41c819fa25a8fffedaf1449474bd1bccab6cdb4167ff58fb1cca98adf4b47a1f"
+    },
+    {
+      "original_path": "data/processed/elaphes_centreline_cosine_experiment_01_cos094.json",
+      "path": "data/processed/experiments/experiment_elaphes-meshing/elaphes_centreline_cosine_experiment_01_cos094.json",
+      "original_sha256": "8cfa868be09de15b74bfc1dde099a0ce256bc1299dd217a6f9bc9c6378d9cd73",
+      "sha256": "8a39ffb92468c4e60f0b36bf193b936aebc4c417cd9bfb1361f72d5c898dc4fd"
+    },
+    {
+      "original_path": "data/processed/elaphes_centreline_cosine_experiment_01_cos094.npz",
+      "path": "data/processed/experiments/experiment_elaphes-meshing/elaphes_centreline_cosine_experiment_01_cos094.npz",
+      "original_sha256": "3c26d008633dca86d0e361e48a40f8e58533623a465a38a82c0842658491fa51",
+      "sha256": "3c26d008633dca86d0e361e48a40f8e58533623a465a38a82c0842658491fa51"
+    },
+    {
+      "original_path": "data/processed/elaphes_centreline_cosine_experiment_01_cos094.uncertain.csv",
+      "path": "data/processed/experiments/experiment_elaphes-meshing/elaphes_centreline_cosine_experiment_01_cos094.uncertain.csv",
+      "original_sha256": "4f9cdf7e81220811a78fd781cbe7e56d843004593576067a8eef1cdeab8eeb4a",
+      "sha256": "4f9cdf7e81220811a78fd781cbe7e56d843004593576067a8eef1cdeab8eeb4a"
+    },
+    {
+      "original_path": "data/processed/elaphes_centreline_cosine_experiment_01_summary.json",
+      "path": "data/processed/experiments/experiment_elaphes-meshing/elaphes_centreline_cosine_experiment_01_summary.json",
+      "original_sha256": "a32e38e59c20d7ec87d9428b009ef5361156e1255413676749f601d4e69769c5",
+      "sha256": "74e1d4dfa60b2fb16810e46236fef8406fe673e421433ad70ac818eda0a34753"
+    },
+    {
+      "original_path": "data/processed/elaphes_centreline_exploratory.npz",
+      "path": "data/processed/experiments/experiment_elaphes-meshing/elaphes_centreline_exploratory.npz",
+      "original_sha256": "702764b7975752081bf02b75e3ece8cc7f3bcee9be1ca96a07839c6221a6a640",
+      "sha256": "702764b7975752081bf02b75e3ece8cc7f3bcee9be1ca96a07839c6221a6a640"
+    },
+    {
+      "original_path": "data/processed/elaphes_centreline_exploratory.npz.json",
+      "path": "data/processed/experiments/experiment_elaphes-meshing/elaphes_centreline_exploratory.npz.json",
+      "original_sha256": "0a11baefb43b468a729b59cf1efafc3a7c623713f48b6bafd8aaaa9ab51c92d4",
+      "sha256": "f655c0e7ecd9ba93a08e48d735829781cdbc93b7855c41b53db90a21e33d557f"
+    },
+    {
+      "original_path": "data/processed/elaphes_centreline_normals_review.json",
+      "path": "data/processed/experiments/experiment_elaphes-meshing/elaphes_centreline_normals_review.json",
+      "original_sha256": "9d4c1aae1ae97cc54439a9d9cce76575c8fe1604160907595893b0e4746c43b5",
+      "sha256": "021fe96a67229f043aa5565ba4826b0ea6d37b76a20c82f52e70689098e23136"
+    },
+    {
+      "original_path": "data/processed/elaphes_centreline_normals_review.npz",
+      "path": "data/processed/experiments/experiment_elaphes-meshing/elaphes_centreline_normals_review.npz",
+      "original_sha256": "464af1725677b50fdf6433d2314a087b1a9ebdf9e4a8b012b516945f05aca422",
+      "sha256": "464af1725677b50fdf6433d2314a087b1a9ebdf9e4a8b012b516945f05aca422"
+    },
+    {
+      "original_path": "data/processed/elaphes_centreline_normals_review.references.template.json",
+      "path": "data/processed/experiments/experiment_elaphes-meshing/elaphes_centreline_normals_review.references.template.json",
+      "original_sha256": "2c8fae36b454e0b2d1cd1af85fd3ad1d82c3daacd837ead38e37dc2fe3f1781a",
+      "sha256": "2c8fae36b454e0b2d1cd1af85fd3ad1d82c3daacd837ead38e37dc2fe3f1781a"
+    },
+    {
+      "original_path": "data/processed/elaphes_centreline_normals_review.uncertain.csv",
+      "path": "data/processed/experiments/experiment_elaphes-meshing/elaphes_centreline_normals_review.uncertain.csv",
+      "original_sha256": "746c1dc1e528ffd2eb32dcee9058fc7c346eefaf685f99f5237e21801d5b930c",
+      "sha256": "746c1dc1e528ffd2eb32dcee9058fc7c346eefaf685f99f5237e21801d5b930c"
+    },
+    {
+      "original_path": "data/processed/elaphes_centreline_roi_x12_35_exploratory.npz",
+      "path": "data/processed/experiments/experiment_elaphes-meshing/elaphes_centreline_roi_x12_35_exploratory.npz",
+      "original_sha256": "022359bf0bfb49b14d0ceb237c2389ebd4ead35bd2daa809942d731b2afdafdc",
+      "sha256": "022359bf0bfb49b14d0ceb237c2389ebd4ead35bd2daa809942d731b2afdafdc"
+    },
+    {
+      "original_path": "data/processed/elaphes_centreline_roi_x12_35_weight_0.05_exploratory.npz",
+      "path": "data/processed/experiments/experiment_elaphes-meshing/elaphes_centreline_roi_x12_35_weight_0.05_exploratory.npz",
+      "original_sha256": "307199a01d5f95adca1562a9522f784a3f1bb35ce434bdf3d9638a99c3792f30",
+      "sha256": "307199a01d5f95adca1562a9522f784a3f1bb35ce434bdf3d9638a99c3792f30"
+    },
+    {
+      "original_path": "data/processed/elaphes_centreline_roi_x12_45_pruned_exploratory.npz",
+      "path": "data/processed/experiments/experiment_elaphes-meshing/elaphes_centreline_roi_x12_45_pruned_exploratory.npz",
+      "original_sha256": "316548d83061964d2a421f2084f4268f9f0ffecc6812aca4e345422b01ea15ba",
+      "sha256": "316548d83061964d2a421f2084f4268f9f0ffecc6812aca4e345422b01ea15ba"
+    },
+    {
+      "original_path": "data/processed/elaphes_centreline_roi_x12_45_weight_0.05_exploratory.npz",
+      "path": "data/processed/experiments/experiment_elaphes-meshing/elaphes_centreline_roi_x12_45_weight_0.05_exploratory.npz",
+      "original_sha256": "b2db3a0aeabc85dccca02cd159756f8d9e4739778ae39f7d1a7d6e5ae026d4ca",
+      "sha256": "b2db3a0aeabc85dccca02cd159756f8d9e4739778ae39f7d1a7d6e5ae026d4ca"
+    },
+    {
+      "original_path": "data/processed/elaphes_full_first_bins_50m.npz",
+      "path": "data/processed/experiments/experiment_elaphes-meshing/elaphes_full_first_bins_50m.npz",
+      "original_sha256": "82a3c318c3e207814e8241f146d6832b54fbda3bc706f641bdb528506196700d",
+      "sha256": "82a3c318c3e207814e8241f146d6832b54fbda3bc706f641bdb528506196700d"
+    },
+    {
+      "original_path": "data/processed/elaphes_gallery_roi_x12_35.npz",
+      "path": "data/processed/experiments/experiment_elaphes-meshing/elaphes_gallery_roi_x12_35.npz",
+      "original_sha256": "e2391e68faa8f54106b7a039192a8f54c05c6b3bf9373cd29c6a872dae1b7ada",
+      "sha256": "e2391e68faa8f54106b7a039192a8f54c05c6b3bf9373cd29c6a872dae1b7ada"
+    },
+    {
+      "original_path": "data/processed/elaphes_gallery_roi_x12_35_dense2m_bins.npz",
+      "path": "data/processed/experiments/experiment_elaphes-meshing/elaphes_gallery_roi_x12_35_dense2m_bins.npz",
+      "original_sha256": "011f6dd6b8ef69dee3f24abb213d171793bcd51e0434cfdd4a0aa9b2e301bbe7",
+      "sha256": "011f6dd6b8ef69dee3f24abb213d171793bcd51e0434cfdd4a0aa9b2e301bbe7"
+    },
+    {
+      "original_path": "data/processed/elaphes_gallery_roi_x12_35_raw_occupancy_010.npz",
+      "path": "data/processed/experiments/experiment_elaphes-meshing/elaphes_gallery_roi_x12_35_raw_occupancy_010.npz",
+      "original_sha256": "53047e4057bcdc0bd9ae8c05049931ff0d3792244f9fa25bd8080fa4f4e7fdc2",
+      "sha256": "53047e4057bcdc0bd9ae8c05049931ff0d3792244f9fa25bd8080fa4f4e7fdc2"
+    },
+    {
+      "original_path": "data/processed/elaphes_gallery_roi_x12_45.npz",
+      "path": "data/processed/experiments/experiment_elaphes-meshing/elaphes_gallery_roi_x12_45.npz",
+      "original_sha256": "c15678a998c76b02131f772128d204479bf8a69d65511d84eaa00b5d53109be6",
+      "sha256": "c15678a998c76b02131f772128d204479bf8a69d65511d84eaa00b5d53109be6"
+    },
+    {
+      "original_path": "data/processed/elaphes_global_z_le_8_600k_bins.npz",
+      "path": "data/processed/experiments/experiment_elaphes-meshing/elaphes_global_z_le_8_600k_bins.npz",
+      "original_sha256": "7ed3764a857a2eb15563d4da62d82ab83fe25a1ab6b58a17495361487f358e06",
+      "sha256": "7ed3764a857a2eb15563d4da62d82ab83fe25a1ab6b58a17495361487f358e06"
+    },
+    {
+      "original_path": "data/processed/elaphes_global_z_le_8_600k_bins.npz.json",
+      "path": "data/processed/experiments/experiment_elaphes-meshing/elaphes_global_z_le_8_600k_bins.npz.json",
+      "original_sha256": "8a5477b3c6a45fa53d13f55444d70111114993403ae56a7a659a294fa9e29612",
+      "sha256": "8a5477b3c6a45fa53d13f55444d70111114993403ae56a7a659a294fa9e29612"
+    },
+    {
+      "original_path": "data/processed/elaphes_lbc_roi_contraction_0.005.npz",
+      "path": "data/processed/experiments/experiment_elaphes-meshing/elaphes_lbc_roi_contraction_0.005.npz",
+      "original_sha256": "307e966a796ea1da9398bf22c1d91f2d7899d50bb108fd5f02a4b826e021fcc5",
+      "sha256": "307e966a796ea1da9398bf22c1d91f2d7899d50bb108fd5f02a4b826e021fcc5"
+    },
+    {
+      "original_path": "data/processed/elaphes_lbc_roi_contraction_0.01.npz",
+      "path": "data/processed/experiments/experiment_elaphes-meshing/elaphes_lbc_roi_contraction_0.01.npz",
+      "original_sha256": "d0c0acead9629610927a16c1bbc5ee962f21bbdae7f0d4d6a6c99d1945184fc0",
+      "sha256": "d0c0acead9629610927a16c1bbc5ee962f21bbdae7f0d4d6a6c99d1945184fc0"
+    },
+    {
+      "original_path": "data/processed/elaphes_lbc_roi_contraction_0.05.npz",
+      "path": "data/processed/experiments/experiment_elaphes-meshing/elaphes_lbc_roi_contraction_0.05.npz",
+      "original_sha256": "9ecebf138845ce6ce5b6d0c55d5fc8bd3f974a240cf72e3e9c5dfab3fbba79df",
+      "sha256": "9ecebf138845ce6ce5b6d0c55d5fc8bd3f974a240cf72e3e9c5dfab3fbba79df"
+    },
+    {
+      "original_path": "data/processed/elaphes_lbc_roi_contraction_0.1.npz",
+      "path": "data/processed/experiments/experiment_elaphes-meshing/elaphes_lbc_roi_contraction_0.1.npz",
+      "original_sha256": "2abed9e53f7ec49f408404c0b2114c9f559137d20648b37b23b2c345d83760bf",
+      "sha256": "2abed9e53f7ec49f408404c0b2114c9f559137d20648b37b23b2c345d83760bf"
+    },
+    {
+      "original_path": "data/processed/elaphes_poisson_centroid_100k.npz",
+      "path": "data/processed/experiments/experiment_elaphes-meshing/elaphes_poisson_centroid_100k.npz",
+      "original_sha256": "e5588ae392afec3ca7a3907fb9256b936b331acc43e181a99bf9afc4ff469d3f",
+      "sha256": "e5588ae392afec3ca7a3907fb9256b936b331acc43e181a99bf9afc4ff469d3f"
+    },
+    {
+      "original_path": "data/processed/elaphes_poisson_sample.npz",
+      "path": "data/processed/experiments/experiment_elaphes-meshing/elaphes_poisson_sample.npz",
+      "original_sha256": "6f66de361b85e23c6a455e0d13e099966232de4eaceb7bf9b863e445e01559aa",
+      "sha256": "6f66de361b85e23c6a455e0d13e099966232de4eaceb7bf9b863e445e01559aa"
+    }
+  ]
+}
