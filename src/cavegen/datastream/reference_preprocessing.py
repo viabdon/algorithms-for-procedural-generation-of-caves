@@ -60,7 +60,7 @@ def voxelize_point_cloud_surface(
     progress_every: int | None = None,
     progress_callback: Callable[[int], None] | None = None,
 ) -> np.ndarray:
-    """Return a surface grid generated incrementally from a PLY, XYZ or F32 file.
+    """Return a surface grid generated incrementally from a PLY, XYZ, F32 or LAS file.
 
     Each XYZ batch is normalized with the persisted global bounds and is
     immediately consumed by the voxelizer. Memory therefore holds only one

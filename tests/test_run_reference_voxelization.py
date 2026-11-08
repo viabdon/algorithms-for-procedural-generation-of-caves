@@ -11,6 +11,7 @@ import unittest
 from unittest.mock import patch
 
 import numpy as np
+import laspy
 
 from cavegen.datastream.run_reference_voxelization import main, run
 from cavegen.datastream.surface_io import load_surface_npz
@@ -93,12 +94,19 @@ class ReferenceVoxelizationRunnerTests(unittest.TestCase):
         shell = np.ones((5, 5, 5), dtype=bool)
         shell[1:4, 1:4, 1:4] = False
         points = np.argwhere(shell)[:, ::-1].astype(np.float32)
-        for extension in ["xyz", "ply", "f32"]:
+        for extension in ["xyz", "ply", "f32", "las"]:
             with self.subTest(extension=extension), TemporaryDirectory() as directory:
                 root = Path(directory)
                 source = root / ("shell." + extension)
                 if extension == "xyz":
                     np.savetxt(source, points)
+                elif extension == "las":
+                    header = laspy.LasHeader(point_format=0, version="1.2")
+                    header.scales = [.01, .01, .01]
+                    header.offsets = [1000., 2000., 3000.]
+                    cloud = laspy.LasData(header)
+                    cloud.x, cloud.y, cloud.z = (points + header.offsets).T
+                    cloud.write(source)
                 elif extension == "f32":
                     np.column_stack([points, np.zeros((len(points), 4), np.float32)]).tofile(source)
                 else:
@@ -128,6 +136,10 @@ class ReferenceVoxelizationRunnerTests(unittest.TestCase):
                 self.assertEqual(receipt["software"]["numpy"], np.__version__)
                 self.assertEqual(receipt["processing"]["bounds_mode"], "computed")
                 self.assertEqual(volume.metadata["processing"]["batch_size"], 64)
+                if extension == "las":
+                    self.assertEqual(volume.metadata["las_header"]["offsets_xyz"], [1000, 2000, 3000])
+                    self.assertEqual(receipt["software"]["laspy"], laspy.__version__)
+                    self.assertEqual(receipt["surface_metadata"]["las_header"]["point_count"], len(points))
 
     def test_rejects_invalid_configuration_before_reading_cloud(self):
         for extra in [["--progress-every", "-1"], ["--batch-size", "0"],

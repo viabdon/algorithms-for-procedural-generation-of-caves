@@ -41,10 +41,10 @@ def _choice(prompt: str, default: str, choices: tuple[str, ...]) -> str:
 
 def _prepare() -> tuple[list[str], Path]:
     while True:
-        source = _path(_ask("Arquivo da nuvem (.xyz, .ply ou .f32)"))
-        if source.is_file() and source.suffix.lower() in (".xyz", ".ply", ".f32"):
+        source = _path(_ask("Arquivo da nuvem (.xyz, .ply, .f32 ou .las)"))
+        if source.is_file() and source.suffix.lower() in (".xyz", ".ply", ".f32", ".las"):
             break
-        print("Escolha um arquivo existente com extensão XYZ, PLY ou F32.")
+        print("Escolha um arquivo existente com extensão XYZ, PLY, F32 ou LAS.")
     while True:
         try:
             parts = [int(x) for x in _ask("Grade ZYX (um lado ou três dimensões)", "64").split()]
@@ -84,7 +84,7 @@ def main() -> None:
     """Ask for a source and parameters, then run or detach the same CLI pipeline."""
     try:
         while True:
-            print("\nPreparação de cavernas — XYZ / PLY / F32")
+            print("\nPreparação de cavernas — XYZ / PLY / F32 / LAS")
             print("1. Gerar superfície e, opcionalmente, interior candidato")
             print("0. Sair")
             if _choice("Opção", "1", ("0", "1")) == "0":

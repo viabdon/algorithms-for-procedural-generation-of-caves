@@ -16,6 +16,7 @@ import sys
 from datetime import datetime, timezone
 
 import scipy
+import laspy
 from pathlib import Path
 from time import perf_counter
 
@@ -25,6 +26,7 @@ from cavegen.core.surface_filling import INTERIOR, classify_surface_by_flood_fil
 from cavegen.core.volume import Volume3D
 from cavegen.datastream.bounds import calculate_xyz_bounds
 from cavegen.datastream.point_cloud import iter_point_cloud_xyz
+from cavegen.datastream.las import read_las_metadata
 from cavegen.datastream.progress import report_point_progress
 from cavegen.datastream.reference_preprocessing import (
     load_xyz_bounds,
@@ -61,10 +63,10 @@ def _parse_arguments(argv: list[str] | None = None) -> argparse.Namespace:
     """Parse command-line paths and resource parameters for one voxelization."""
 
     parser = argparse.ArgumentParser(
-        description="Voxelize a PLY/XYZ/F32 reference surface incrementally and save it as NPZ."
+        description="Voxelize a PLY/XYZ/F32/LAS reference surface incrementally and save it as NPZ."
     )
     source = parser.add_mutually_exclusive_group(required=True)
-    source.add_argument("--input", dest="source_path", help="Source PLY, XYZ or F32 file.")
+    source.add_argument("--input", dest="source_path", help="Source PLY, XYZ, F32 or LAS file.")
     source.add_argument("--ply", dest="source_path", help="Legacy alias for --input.")
     parser.add_argument(
         "--output",
@@ -135,6 +137,8 @@ def _build_metadata(
         "semantic": "true_means_observed_surface",
         "source_path": str(ply_path),
         "source_format": Path(ply_path).suffix.lower().lstrip("."),
+        **({"las_header": read_las_metadata(ply_path)}
+           if Path(ply_path).suffix.lower() == ".las" else {}),
         **({"source_ply": str(ply_path)} if Path(ply_path).suffix.lower() == ".ply" else {}),
         "bounds_path": str(bounds_path),
         "min_xyz": min_xyz.tolist(),
@@ -273,7 +277,7 @@ def main(argv: list[str] | None = None) -> None:
         "surface_metadata": _build_metadata(args.source_path, bounds_path, volume_shape),
         "processing": metadata["processing"],
         "software": {"python": platform.python_version(), "numpy": np.__version__,
-                     "scipy": scipy.__version__, "git_commit": revision, "git_dirty": dirty},
+                     "scipy": scipy.__version__, "laspy": laspy.__version__, "git_commit": revision, "git_dirty": dirty},
     }
     receipt_path.write_text(json.dumps(receipt, indent=2) + "\n", encoding="utf-8")
     print(f"Saved reproduction record: {receipt_path}", flush=True)

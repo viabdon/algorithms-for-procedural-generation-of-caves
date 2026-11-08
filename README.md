@@ -372,7 +372,7 @@ uv run python -m cavegen.generators.random_walk.generator [seed] [lado] [raio|pr
 
 ## Voxelização direta de superfície para diagnóstico
 
-Para inspecionar uma nuvem de pontos PLY, XYZ ou F32 como grade de voxels de superfície,
+Para inspecionar uma nuvem de pontos PLY, XYZ, F32 ou LAS como grade de voxels de superfície,
 execute uma primeira passagem em baixa resolução. O leitor processa o arquivo
 em lotes, portanto não carrega toda a nuvem na memória:
 
@@ -400,7 +400,7 @@ de dados processados e não faz parte do Git.
 
 ### Menu de preparação e reprodutibilidade
 
-Para preparar nuvens XYZ, PLY ou F32 pelo menu independente dos geradores:
+Para preparar nuvens XYZ, PLY, F32 ou LAS pelo menu independente dos geradores:
 
 ```bash
 .venv/bin/python -m cavegen.datastream
@@ -412,11 +412,26 @@ equivalente e protege saídas anteriores. Cada geração concluída salva
 `<saida>.run.json` com configuração efetiva, comando e versões. O progresso é
 impresso a cada milhão de pontos tanto nos limites quanto na voxelização,
 com contadores separados por etapa. A etapa de flood fill funciona com todos
-os três formatos e salva o interior candidato em outro NPZ.
+os quatro formatos e salva o interior candidato em outro NPZ.
 
 Consulte o [guia de preparação de volumes](docs/preparacao-volumes.md) para
 contratos de entrada, arquivos gerados, logs/PIDs, exemplos de CLI e protocolo
 de reprodução em outra máquina.
+
+### Nuvens LAS
+
+O leitor `cavegen.datastream.las.iter_las_xyz` usa `laspy.open` e
+`chunk_iterator` para ler LAS sem carregar a nuvem inteira. Aplica os fatores
+`scale` e `offset` do cabeçalho e entrega coordenadas XYZ `float32`, como os
+outros leitores. Não reprojeta coordenadas nem subtrai a origem automaticamente.
+Escala, offset, versão LAS e formato de pontos ficam nos metadados; a versão
+do laspy fica no registro de execução. Os testes incluem LAS 1.2 e 1.4.
+
+Após atualizar o checkout, execute `uv sync --locked` para instalar a nova
+dependência. Escolha o arquivo `.las` no mesmo menu ou use `--input arquivo.las`
+no CLI com `--interior-output` para acrescentar o flood fill. LAS comprimido e
+arquivos `.laz` não fazem parte deste suporte. As ressalvas de precisão
+float32 para coordenadas georreferenciadas também se aplicam ao LAS.
 
 ### Novas nuvens XYZ e execução em segundo plano
 
@@ -428,7 +443,7 @@ Não aceita cabeçalho de nomes, contagem inicial de pontos, XYZ molecular ou
 CSV com vírgulas. Coordenadas inválidas, infinitas ou fora da faixa de
 `float32` interrompem a leitura com caminho e número da linha.
 
-Use `--input` para selecionar o leitor pela extensão (`.ply`, `.xyz`, `.f32`).
+Use `--input` para selecionar o leitor pela extensão (`.ply`, `.xyz`, `.f32`, `.las`).
 O alias `--ply` permanece disponível. Sem `--bounds`, o comando faz duas
 passagens pelo arquivo: calcula e salva os limites em `OUTPUT.bounds.json`,
 depois voxeliza. A memória depende do lote e da grade, não do número total de
