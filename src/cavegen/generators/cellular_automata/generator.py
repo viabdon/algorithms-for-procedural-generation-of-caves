@@ -15,11 +15,16 @@ class BorderTreatment(Enum):
         Valores aceitos para o tratamento de borda.
         ZEROS: fora da matriz conta como 0, a borda tende a fechar.
         ONES: fora da matriz conta como 1, a borda tende a abrir.
-        RANDOM: fora da matriz sorteia 0 ou 1 a cada vizinho consultado.
+        RANDOM: fora da matriz sorteia 0 ou 1 a cada vizinho consultado. Não é
+                reproduzível (usa o gerador global) e fica fora do ajuste genético.
+        NEAREST: fora da matriz repete a célula de borda mais próxima. Não empurra
+                 para 0 nem para 1, então a caverna que chega na beirada continua
+                 do lado de fora, e a rocha continua rocha.
     """
     ZEROS = "zeros"
     ONES = "ones"
     RANDOM = "random"
+    NEAREST = "nearest"
 
 def contar_transicoes(anterior: np.ndarray, seguinte: np.ndarray) -> tuple[int, int]:
     """
@@ -118,6 +123,9 @@ def aplicar_moldura(matrix: np.ndarray, border_treatment: BorderTreatment) -> np
         border_treatment: membro de BorderTreatment, ou a string equivalente.
     """
     border_treatment = BorderTreatment(border_treatment)
+    if border_treatment is BorderTreatment.NEAREST:
+        return np.pad(np.asarray(matrix, dtype=np.int16), 1, mode="edge")
+
     tamanho_com_moldura = tuple(dimensao + 2 for dimensao in matrix.shape)
 
     if border_treatment is BorderTreatment.RANDOM:

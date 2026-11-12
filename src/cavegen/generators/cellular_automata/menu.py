@@ -45,6 +45,7 @@ EXPLICACAO_BORDAS = {
     BorderTreatment.ZEROS: "fora da matriz conta como rocha (0), a caverna fecha nas paredes",
     BorderTreatment.ONES: "fora da matriz conta como vazio (1), a caverna abre nas paredes",
     BorderTreatment.RANDOM: "fora da matriz sorteia 0 ou 1 a cada consulta, paredes irregulares",
+    BorderTreatment.NEAREST: "fora da matriz repete a celula da beirada, a caverna pode atravessar a borda",
 }
 
 def explicar(titulo: str, linhas: tuple, faixa: str = "", tipico: str = ""):
