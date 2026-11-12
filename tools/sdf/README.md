@@ -122,13 +122,14 @@ No Elaphes 64³ (`L = −4`): a região com nota positiva passa de 292 voxels
 (só o interno) para 7.891, e 401 voxels ficam exatamente neutros. Com
 `L = −4` e log × 2, o campo vai de −8,19 a +3,89, com a borda em +3,22.
 
-**Para o algoritmo genético, atenção ao alvo:** no Elaphes, o positivo é a
-espessura da parede (o ar do túnel é alcançado pela água e fica negativo), e o
-`docs/architecture.md` registra que esse campo não valida `VOID` real. Como
-pontuação, ele premiaria escavar a casca da parede. O alvo da aptidão precisa
-ser um campo em que o positivo seja vazio de caverna (como o do Random Walk de
-pontos, `tools/random_walk_points/peso.py`), e essa escolha precisa ficar
-registrada.
+**Para o algoritmo genético, atenção ao alvo:** no Elaphes, o positivo do SDF
+base é a espessura da parede (o ar do túnel é alcançado pela água e fica
+negativo), e o `docs/architecture.md` registra que esse campo não valida `VOID`
+real. Mesmo assim, o Felipe decidiu (12/11/2026) usar o Elaphes com `L = −3`
+como alvo do GA do CA: 5.201 voxels positivos (2% da grade), a casca da parede
+mais a faixa de até 3 voxels em volta. A nota mede aderência a esse campo, não
+ao vazio real, e exige o controle de cópia pura; ver
+`docs/methodology-adjustments.md`.
 
 ## Como regenerar
 
