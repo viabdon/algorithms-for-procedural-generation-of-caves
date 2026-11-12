@@ -23,10 +23,12 @@ __pycache__/
 /results/volumes/*
 /models/checkpoints/*
 
-# Experimento do SDF: só o código e a documentação são versionados. A entrada
-# vem do PLY em data/, as saídas são regeneradas e os artigos são das editoras.
+# Ferramentas de tools/: só o código e a documentação são versionados. A entrada
+# (data/processed/references) vem do PLY em data/, as saídas são regeneradas e os
+# artigos são das editoras.
+/tools/flood_fill/npz/
+/tools/flood_fill/plots/
 /tools/sdf/articles/
-/tools/sdf/entrada/
 /tools/sdf/npz/
 /tools/sdf/plots/
 
@@ -38,7 +40,7 @@ __pycache__/
 /indian_tunnel_temp/npz/
 /indian_tunnel_temp/plots/
 
-# Experimento do Random Walk com pontos sorteados: as saídas são regeneradas
+# Random Walk com pontos sorteados (tools/): as saídas são regeneradas
 /tools/random_walk_points/npz/
 /tools/random_walk_points/results/
 /tools/random_walk_points/plots/

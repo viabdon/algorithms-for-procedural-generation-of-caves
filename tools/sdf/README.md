@@ -1,15 +1,17 @@
 # tools/sdf — pipeline do SDF no Elaphes
 
-Experimento para calcular o SDF da referência do Elaphes a partir da grade de
-superfície. Cada etapa é um script que lê o npz da etapa anterior e grava o
-seu npz e o seu plot.
+Calcula o SDF de uma grade de superfície; sem argumento, a do Elaphes. O sinal
+vem do flood fill, que é uma ferramenta à parte
+([`tools/flood_fill`](../flood_fill/README.md)): o `sdf.py` chama a inundação
+direto da grade e grava só o SDF e o plot dele.
 
 ```
-entrada/elaphes_surface_64.npz          grade 64³ (depth, height, width), 1 = superfície observada
-  -> inundacao.py                       flood fill: 0 vazio, 1 borda, 2 interno
-       npz/elaphes_surface_64_inundacao.npz
-  -> sdf.py                             tira o 2, binariza a borda, mede a distância
-       npz/elaphes_surface_64_sdf.npz   e devolve o sinal: interno +, externo -
+data/processed/references/elaphes_surface_64.npz   grade 64³ (depth, height, width), 1 = superfície observada
+  -> sdf.py
+       1. tools/flood_fill: 0 vazio, 1 borda, 2 interno
+       2. tira o 2, binariza a borda, mede a distância
+       3. devolve o sinal: interno +, externo -
+       npz/elaphes_surface_64_sdf.npz
 ```
 
 Os links `file:///` abrem no navegador (cole na barra de endereço). As figuras
@@ -19,9 +21,9 @@ carregam o Plotly pela internet, então precisa estar online.
 
 | pasta | conteúdo | no git |
 |---|---|---|
-| `entrada/` | npz base do Elaphes | não (vem do PLY em `data/`) |
-| `npz/` | resultado de cada etapa | não (regenerado) |
-| `plots/` | figura de cada etapa | não (regenerado) |
+| `../../data/processed/references/` | npz base do Elaphes (entrada) | não (vem do PLY em `data/raw`) |
+| `npz/` | o SDF | não (regenerado) |
+| `plots/` | figura do SDF | não (regenerado) |
 | `articles/` | artigos de base (EDT e FEED) | não (PDFs das editoras) |
 
 ## Etapas
@@ -35,15 +37,13 @@ histórico do git (commit `d20feaf`, `sdf_temp/remover_outlier.py`).
 
 ### 1. Inundação (flood fill)
 
-Separa borda e interno pela conectividade com o lado de fora da grade.
-Metodologia, resultados, limitações e a comparação com as abordagens
-descartadas estão em [inundacao.md](inundacao.md).
-
-- [elaphes_surface_64_inundacao.html](file:///C:/Users/Felipe%20Cruz/Desktop/CESUPA/TCC/code/algorithms-for-procedural-generation-of-caves/tools/sdf/plots/elaphes_surface_64_inundacao.html)
+Separa borda e interno pela conectividade com o lado de fora da grade. Fica em
+[`tools/flood_fill`](../flood_fill/README.md), com a metodologia, os
+resultados, as limitações e a comparação com as abordagens descartadas.
 
 ### 2. SDF
 
-`sdf.py` lê a classificação da inundação e:
+`sdf.py` classifica a grade com a inundação e:
 
 1. tira os voxels 2 (interno) e binariza: só a borda (1) fica 1;
 2. mede a distância euclidiana de cada voxel até o voxel de borda mais
@@ -90,15 +90,16 @@ A entrada vem da voxelização do PLY (que fica em `data/`, fora do git), da
 raiz do projeto:
 
 ```
-uv run python -m cavegen.datastream.run_reference_voxelization --ply data/raw/elaphes/elaphes_cave.ply --output tools/sdf/entrada/elaphes_surface_64.npz --shape 64 64 64
+uv run python -m cavegen.datastream.run_reference_voxelization --ply data/raw/elaphes/elaphes_cave.ply --output data/processed/references/elaphes_surface_64.npz --shape 64 64 64
 ```
 
 A voxelização devolve o outlier: zere o índice (60, 31, 13) da grade
 `surface_voxels` (o (13, 60, 31) do plot) antes de seguir.
 
-Depois, as etapas na ordem:
+Depois, o SDF (a inundação roda dentro dele):
 
 ```
-uv run python -m tools.sdf.inundacao
-uv run python -m tools.sdf.sdf
+uv run python -m tools.sdf.sdf [superficie.npz]
 ```
+
+O plot da inundação sozinha sai com `uv run python -m tools.flood_fill.inundacao`.

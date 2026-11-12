@@ -1,14 +1,20 @@
-# inundacao — borda e interno por flood fill
+# tools/flood_fill — borda e interno por inundação
 
-Primeira etapa da pipeline do SDF (ver [README.md](README.md)). Separa os
-voxels do Elaphes em borda e interno pela conectividade com o lado de fora da
-grade, em vez de pela contagem de vizinhos. Entrada:
-`entrada/elaphes_surface_64.npz` (o npz base do Elaphes).
+Ferramenta à parte: separa os voxels de uma grade em borda e interno pela
+conectividade com o lado de fora da grade, em vez de pela contagem de
+vizinhos. As funções (`inundar`, `classificar_por_inundacao`) servem a
+qualquer grade booleana `(depth, height, width)`. O SDF
+([`tools/sdf`](../sdf/README.md)) chama as duas para decidir o sinal, e o
+Indian Tunnel também.
+
+O script grava a classificação e o plot de uma grade de superfície. Sem
+argumento, a entrada é a do Elaphes, `data/processed/references/elaphes_surface_64.npz`
+(o npz base, sem o outlier; ver o README do SDF).
 
 O link abre no navegador (cole na barra de endereço). A figura carrega o Plotly
 pela internet, então precisa estar online.
 
-- [elaphes_surface_64_inundacao.html](file:///C:/Users/Felipe%20Cruz/Desktop/CESUPA/TCC/code/algorithms-for-procedural-generation-of-caves/tools/sdf/plots/elaphes_surface_64_inundacao.html)
+- [elaphes_surface_64_inundacao.html](file:///C:/Users/Felipe%20Cruz/Desktop/CESUPA/TCC/code/algorithms-for-procedural-generation-of-caves/tools/flood_fill/plots/elaphes_surface_64_inundacao.html)
 
 ## O problema que motivou
 
@@ -140,27 +146,28 @@ Formas de contornar sem consertar os dados na mão:
 ## Relação com o SDF
 
 Um SDF precisa do sinal: dentro ou fora. A inundação é uma forma clássica de
-decidir esse sinal (o que a água alcança é fora). A distância vem depois, na
-etapa `sdf.py`.
+decidir esse sinal (o que a água alcança é fora). A distância vem depois, em
+`tools/sdf/sdf.py`, que chama `inundar` e `classificar_por_inundacao` direto
+da grade de superfície, sem precisar do npz gravado aqui.
 
 ## Arquivos
 
 | arquivo | conteúdo |
 |---|---|
 | `inundacao.py` | inundação, classificação e plot |
-| `npz/elaphes_surface_64_inundacao.npz` | `classificacao` (0 vazio, 1 borda, 2 interno), `agua`, `buracos_fechados` (para saber quais 2 eram vazio), `metadata` |
-| `plots/elaphes_surface_64_inundacao.html` | figura |
+| `npz/<entrada>_inundacao.npz` | `classificacao` (0 vazio, 1 borda, 2 interno), `agua`, `buracos_fechados` (para saber quais 2 eram vazio), `metadata` |
+| `plots/<entrada>_inundacao.html` | figura |
 
-O script é independente dentro de `tools/sdf/`: do resto do projeto ele só
-usa a caixa wireframe, o gizmo e a câmera do plot do CA
+`npz/` e `plots/` ficam fora do Git. Do resto do projeto, o script só usa a
+caixa wireframe, o gizmo e a câmera do plot do CA
 (`cavegen.generators.cellular_automata.plot`).
 
 ## Como regenerar
 
-Da raiz do projeto:
+Da raiz do projeto (sem argumento, o Elaphes 64³):
 
 ```
-uv run python -m tools.sdf.inundacao
+uv run python -m tools.flood_fill.inundacao [superficie.npz]
 ```
 
 ## Referências

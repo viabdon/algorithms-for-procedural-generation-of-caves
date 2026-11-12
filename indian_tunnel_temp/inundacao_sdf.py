@@ -20,11 +20,11 @@ import numpy as np
 
 from voxelizacao import LADO_PADRAO, PASTA_PLOTS, caminho_superficie
 
-# As funções da inundação e do SDF ficam em tools/sdf. O script roda pelo caminho
-# (python indian_tunnel_temp/...), então a raiz do projeto entra no sys.path à mão.
+# A inundação fica em tools/flood_fill e o SDF em tools/sdf. O script roda pelo
+# caminho (python indian_tunnel_temp/...), então a raiz entra no sys.path à mão.
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-from tools.sdf.inundacao import BORDA, INTERNO, classificar_por_inundacao, inundar
-from tools.sdf.inundacao import figura as figura_inundacao
+from tools.flood_fill.inundacao import BORDA, INTERNO, classificar_por_inundacao, inundar
+from tools.flood_fill.inundacao import figura as figura_inundacao
 from tools.sdf.sdf import (
     CONVENCAO,
     CORTE_NEGATIVO,

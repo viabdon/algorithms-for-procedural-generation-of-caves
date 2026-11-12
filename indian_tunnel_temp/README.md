@@ -9,7 +9,7 @@ data/raw/nasa/indian_tunnel.f32         nuvem de pontos (era IndianTunnel_full_1
   -> voxelizacao.py                     limites, giro, grade 64³ da superfície
        data/params/indian_tunnel_xyz_bounds.json
        npz/indian_tunnel_surface_64.npz                 1 = superfície observada
-  -> inundacao_sdf.py                   funções de tools/sdf: inundação e SDF
+  -> inundacao_sdf.py                   funções de tools/flood_fill e tools/sdf
        npz/indian_tunnel_surface_64_inundacao.npz      0 vazio, 1 borda, 2 interno
        npz/indian_tunnel_surface_64_sdf.npz            interno +, externo -
 ```
@@ -53,7 +53,7 @@ outlier, como no Elaphes, por isso o `depth` não chega a 63.
 
 ### 2. Inundação e SDF (`inundacao_sdf.py`)
 
-Importa as funções de `tools/sdf/inundacao.py` e `tools/sdf/sdf.py`, então
+Importa as funções de `tools/flood_fill/inundacao.py` e `tools/sdf/sdf.py`, então
 classificação, distância, sinal e plots seguem iguais aos do Elaphes.
 
 | | Indian Tunnel 64³ | Elaphes 64³ |
