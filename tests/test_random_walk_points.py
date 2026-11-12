@@ -25,6 +25,7 @@ from tools.random_walk_points.generator import (
     escavar_rede,
     gerar_rede,
     montar_vizinhos,
+    nota_dos_candidatos,
     par_mais_proximo,
     proximo_no,
     separar_componentes,
@@ -32,7 +33,12 @@ from tools.random_walk_points.generator import (
 )
 from tools.random_walk_points.peso import calcular_sdf, gerar_peso
 from tools.random_walk_points.plot import ETAPAS, figura_progressao
-from tools.random_walk_points.results import load_result, run_and_save
+from tools.random_walk_points.results import (
+    load_result,
+    load_result_info,
+    result_path,
+    run_and_save,
+)
 
 SEEDS = range(25)
 
@@ -58,7 +64,43 @@ class RegrasTests(unittest.TestCase):
         pontos = np.array([[0, 50, 0], [20, 30, 0], [30, 40, 0], [0, 10, 0]], float)
         veio_de = {0: 0, 1: 1, 2: 2, 3: 2}
 
-        self.assertEqual(proximo_no(0, pontos, veio_de, {0}), 1)
+        self.assertEqual(proximo_no(0, pontos, veio_de, {0}, peso_angulo=1.0), 1)
+
+    def test_nota_troca_o_no_reto_e_longe_pelo_torto_e_perto(self):
+        # Nó 1 reto embaixo a 40 voxels; nó 2 a 30° da vertical e 15 voxels.
+        angulo = np.radians(30)
+        pontos = np.array([[0, 50, 0], [0, 10, 0],
+                           [15 * np.sin(angulo), 50 - 15 * np.cos(angulo), 0]])
+        veio_de = {0: 0, 1: 1, 2: 2}
+
+        notas = nota_dos_candidatos(0, [1, 2], pontos, 0.5)
+
+        np.testing.assert_allclose(notas, [0.5, 0.5 * 30 / 90 + 0.5 * 15 / 40])
+        self.assertEqual(proximo_no(0, pontos, veio_de, {0}, peso_angulo=1.0), 1)
+        self.assertEqual(proximo_no(0, pontos, veio_de, {0}, peso_angulo=0.5), 2)
+        self.assertEqual(proximo_no(0, pontos, veio_de, {0}, peso_angulo=0.0), 2)
+
+    def test_peso_angulo_1_e_a_regra_antiga_so_pelo_angulo(self):
+        rng = np.random.default_rng(0)
+        for _ in range(300):
+            pontos = rng.uniform(0, 64, size=(12, 3))
+            veio_de = {no: int(rng.integers(4)) for no in range(12)}
+            atual = int(np.argmax(pontos[:, 1]))
+            candidatos = candidatos_abaixo(atual, pontos, veio_de, {atual})
+
+            antigo = min(candidatos, key=lambda no: angulo_de_desvio(pontos[atual], pontos[no]))
+            self.assertEqual(proximo_no(atual, pontos, veio_de, {atual}, peso_angulo=1.0), antigo)
+
+    def test_peso_angulo_0_escolhe_o_mais_perto(self):
+        rng = np.random.default_rng(1)
+        for _ in range(300):
+            pontos = rng.uniform(0, 64, size=(12, 3))
+            veio_de = {no: int(rng.integers(4)) for no in range(12)}
+            atual = int(np.argmax(pontos[:, 1]))
+            candidatos = candidatos_abaixo(atual, pontos, veio_de, {atual})
+
+            perto = min(candidatos, key=lambda no: np.linalg.norm(pontos[no] - pontos[atual]))
+            self.assertEqual(proximo_no(atual, pontos, veio_de, {atual}, peso_angulo=0.0), perto)
 
     def test_proximo_no_sem_nada_abaixo(self):
         pontos = np.array([[0, 10, 0], [5, 20, 0]], float)
@@ -158,9 +200,17 @@ class RedeTests(unittest.TestCase):
             self.assertEqual(pedacos, 1)
 
     def test_entradas_invalidas(self):
-        for argumentos in (dict(n_pontos=1), dict(weight=0.1, k=1.0), dict(lado=8, raio=3.0)):
+        for argumentos in (dict(n_pontos=1), dict(weight=0.1, k=1.0), dict(lado=8, raio=3.0),
+                           dict(peso_angulo=-0.1), dict(peso_angulo=1.1),
+                           dict(peso_angulo=float("nan"))):
             with self.assertRaises(ValueError):
                 gerar_rede(1, **argumentos)
+
+    def test_peso_angulo_muda_o_veio_central(self):
+        # Sem isso, o parâmetro poderia estar chegando à etapa 7 sem efeito.
+        mudou = [gerar_rede(seed, peso_angulo=1.0).central_nos
+                 != gerar_rede(seed, peso_angulo=0.5).central_nos for seed in SEEDS]
+        self.assertTrue(any(mudou))
 
     def test_menor_rede_possivel(self):
         rede = gerar_rede(1, n_pontos=2)
@@ -215,6 +265,21 @@ class GravacaoEFiguraTests(unittest.TestCase):
             self.assertEqual((x.origem, x.destino, x.etapa), (y.origem, y.destino, y.etapa))
             np.testing.assert_array_equal(x.pontos, y.pontos)
         np.testing.assert_array_equal(dados["matrix"], escavar_rede(rede, 64, 1.5)[0])
+
+    def test_peso_angulo_fica_gravado_e_resultado_antigo_le_como_1(self):
+        with tempfile.TemporaryDirectory() as pasta:
+            pasta = Path(pasta)
+            run_and_save(3, directory=pasta, peso_angulo=0.25)
+            gravado = load_result_info(1, pasta)["peso_angulo"]
+
+            # Resultado de antes da nota: o mesmo npz sem o campo peso_angulo.
+            with np.load(result_path(1, pasta)) as arquivo:
+                campos = {k: arquivo[k] for k in arquivo.files if k != "peso_angulo"}
+            np.savez_compressed(result_path(2, pasta), **campos)
+            antigo = load_result_info(2, pasta)["peso_angulo"]
+
+        self.assertEqual(gravado, 0.25)
+        self.assertEqual(antigo, 1.0)
 
     def test_resultado_sem_soltos_tambem_volta(self):
         with tempfile.TemporaryDirectory() as pasta:

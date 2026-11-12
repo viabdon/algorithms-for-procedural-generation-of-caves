@@ -17,6 +17,8 @@ from tools.random_walk_points.generator import (
     K_PADRAO,
     LADO_PADRAO,
     N_PONTOS_PADRAO,
+    PESO_ANGULO_ANTIGO,
+    PESO_ANGULO_PADRAO,
     RAIO_PADRAO,
     SPACER_PADRAO,
     WEIGHT_PADRAO,
@@ -40,8 +42,12 @@ CAMPOS_INFO = {
     "weight": float,
     "k": float,
     "spacer": float,
+    "peso_angulo": float,
     "escala": float,
 }
+
+# Campos que resultados antigos não têm, com o valor que equivale ao que eles rodaram.
+CAMPOS_ANTIGOS = {"peso_angulo": PESO_ANGULO_ANTIGO}
 
 def used_result_ids(directory: Path = RESULTS_DIR) -> set:
     """
@@ -60,16 +66,17 @@ def result_path(result_id: int, directory: Path = RESULTS_DIR) -> Path:
 
 def run_and_save(seed: int, n_pontos: int = N_PONTOS_PADRAO, lado: int = LADO_PADRAO,
                  raio: float = RAIO_PADRAO, weight: float = WEIGHT_PADRAO, k: float = K_PADRAO,
-                 spacer: float = SPACER_PADRAO, directory: Path = RESULTS_DIR) -> Path:
+                 spacer: float = SPACER_PADRAO, directory: Path = RESULTS_DIR,
+                 peso_angulo: float = PESO_ANGULO_PADRAO) -> Path:
     """
         Gera a rede, escava a grade e guarda tudo em um npz novo.
-        seed, n_pontos, lado, raio, weight, k, spacer: os de gerar_rede.
+        seed, n_pontos, lado, raio, weight, k, spacer, peso_angulo: os de gerar_rede.
         directory: pasta onde os resultados são gravados.
     """
     directory = Path(directory)
     directory.mkdir(parents=True, exist_ok=True)
 
-    rede = gerar_rede(seed, n_pontos, lado, raio, weight, k, spacer)
+    rede = gerar_rede(seed, n_pontos, lado, raio, weight, k, spacer, peso_angulo)
     vazio, info = escavar_rede(rede, lado, raio)
     pontos, inicios = juntar_caminhos(rede.caminhos)
     nos = rede.nos
@@ -104,6 +111,7 @@ def run_and_save(seed: int, n_pontos: int = N_PONTOS_PADRAO, lado: int = LADO_PA
         weight=weight,
         k=k,
         spacer=spacer,
+        peso_angulo=peso_angulo,
         escala=info["escala"],
     )
 
@@ -111,12 +119,16 @@ def run_and_save(seed: int, n_pontos: int = N_PONTOS_PADRAO, lado: int = LADO_PA
 
 def load_result_info(result_id: int, directory: Path = RESULTS_DIR) -> dict:
     """
-        Lê só os parâmetros gravados no resultado.
+        Lê só os parâmetros gravados no resultado. Resultado antigo, sem algum
+        campo de CAMPOS_ANTIGOS, volta com o valor equivalente ao que ele rodou.
         result_id: número de identificação do resultado.
         directory: pasta onde os resultados são gravados.
     """
     with np.load(result_path(result_id, directory)) as arquivo:
-        return {campo: tipo(arquivo[campo]) for campo, tipo in CAMPOS_INFO.items()}
+        return {
+            campo: tipo(arquivo[campo]) if campo in arquivo.files else CAMPOS_ANTIGOS[campo]
+            for campo, tipo in CAMPOS_INFO.items()
+        }
 
 def load_result(result_id: int, directory: Path = RESULTS_DIR) -> dict:
     """

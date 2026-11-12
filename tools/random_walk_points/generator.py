@@ -13,8 +13,11 @@
        nós ligados por caminhadas é um veio, ainda independente dos outros.
     6. O veio central nasce no nó mais alto de todos e desce até o nó mais baixo
        ligado a ele.
-    7. Dos nós abaixo, escolhe o de menor ângulo de desvio da vertical (o mais
-       em linha reta para baixo).
+    7. Dos nós abaixo, escolhe o de menor nota, que soma o ângulo de desvio da
+       vertical e a distância até o nó (ver nota_dos_candidatos). Só pelo ângulo,
+       um nó reto embaixo e lá no fundo sempre ganha e o veio desce quase em
+       linha reta; com a distância, um nó um pouco mais torto e mais perto pode
+       ganhar, e o veio faz mais curvas.
     8. Só concorre, de cada veio, o nó mais alto entre os que estão abaixo do
        ponto atual.
     9. Caminha até o nó escolhido.
@@ -49,6 +52,12 @@ RAIO_PADRAO = 1.5
 WEIGHT_PADRAO = 1.0
 K_PADRAO = 6.0
 SPACER_PADRAO = 1.5
+
+# Peso do ângulo na nota da etapa 7; o resto (1 - peso) vai para a distância.
+# 1 é a regra antiga, só pelo ângulo; 0 escolhe só o nó mais perto.
+PESO_ANGULO_PADRAO = 0.5
+# Resultados gravados antes da nota, que escolhiam só pelo ângulo.
+PESO_ANGULO_ANTIGO = 1.0
 
 # Abaixo disso a caminhada quase não sente o destino. Medido em 20 caminhadas de
 # 35 voxels: com 0.5 levam 2 s no total e com 0.1 passam de 60 s (o corte de laços
@@ -210,18 +219,41 @@ def candidatos_abaixo(atual: int, pontos: np.ndarray, veio_de: dict, usados: set
             mais_alto[veio] = no
     return sorted(mais_alto.values())
 
-def proximo_no(atual: int, pontos: np.ndarray, veio_de: dict, usados: set) -> int | None:
+def nota_dos_candidatos(atual: int, candidatos: list, pontos: np.ndarray,
+                        peso_angulo: float) -> np.ndarray:
     """
-        Etapas 7 e 8: o candidato de menor ângulo de desvio, ou None se não há nó abaixo.
+        Etapa 7: nota de cada candidato; a menor vence.
+        nota = peso_angulo * ângulo / 90° + (1 - peso_angulo) * distância / maior distância
+        As duas partes vão de 0 a 1: o ângulo pelo máximo possível (90°, na
+        horizontal) e a distância euclidiana pela do candidato mais longe, então
+        o peso decide sozinho quanto cada uma conta. A maior distância nunca é 0,
+        porque todo candidato está abaixo do nó atual.
+        atual: nó onde o veio central está.
+        candidatos: nós de candidatos_abaixo.
+        pontos: todos os pontos.
+        peso_angulo: de 0 (só distância) a 1 (só ângulo).
+    """
+    de = pontos[atual]
+    angulos = np.array([angulo_de_desvio(de, pontos[no]) for no in candidatos])
+    distancias = np.linalg.norm(pontos[candidatos] - de, axis=1)
+    return peso_angulo * angulos / 90.0 + (1 - peso_angulo) * distancias / distancias.max()
+
+def proximo_no(atual: int, pontos: np.ndarray, veio_de: dict, usados: set,
+               peso_angulo: float = PESO_ANGULO_PADRAO) -> int | None:
+    """
+        Etapas 7 e 8: o candidato de menor nota, ou None se não há nó abaixo.
+        No empate vence o de menor índice, como no min() da regra antiga.
         atual: nó onde o veio central está.
         pontos: todos os pontos.
         veio_de: veio de cada nó.
         usados: nós que já estão no veio central.
+        peso_angulo: peso do ângulo na nota (ver nota_dos_candidatos).
     """
     candidatos = candidatos_abaixo(atual, pontos, veio_de, usados)
     if not candidatos:
         return None
-    return min(candidatos, key=lambda no: angulo_de_desvio(pontos[atual], pontos[no]))
+    notas = nota_dos_candidatos(atual, candidatos, pontos, peso_angulo)
+    return candidatos[int(np.argmin(notas))]
 
 def indice_do_caminho(caminhos: list, a: int, b: int) -> int:
     """
@@ -234,12 +266,14 @@ def indice_do_caminho(caminhos: list, a: int, b: int) -> int:
             return indice
     raise ValueError(f"não existe caminhada entre {a} e {b}")
 
-def construir_veio_central(rede: Rede, caminhar_entre) -> None:
+def construir_veio_central(rede: Rede, caminhar_entre,
+                           peso_angulo: float = PESO_ANGULO_PADRAO) -> None:
     """
         Etapas 6 a 10: desce do nó mais alto até o nó mais baixo, preenchendo
         central_nos e central_caminhos.
         rede: rede com as caminhadas iniciais, alterada no lugar.
         caminhar_entre: função (origem, destino) que devolve os pontos da caminhada.
+        peso_angulo: peso do ângulo na nota da etapa 7.
     """
     alturas = rede.pontos[:, 1]
     vizinhos = montar_vizinhos(rede.caminhos)
@@ -253,7 +287,7 @@ def construir_veio_central(rede: Rede, caminhar_entre) -> None:
             rede.central_nos.append(b)
         atual = descida[-1]
 
-        alvo = proximo_no(atual, rede.pontos, rede.veio_de, set(rede.central_nos))
+        alvo = proximo_no(atual, rede.pontos, rede.veio_de, set(rede.central_nos), peso_angulo)
         if alvo is None:
             return
 
@@ -292,7 +326,8 @@ def ligar_soltos(rede: Rede, caminhar_entre) -> None:
 
 def gerar_rede(seed: int, n_pontos: int = N_PONTOS_PADRAO, lado: int = LADO_PADRAO,
                raio: float = RAIO_PADRAO, weight: float = WEIGHT_PADRAO, k: float = K_PADRAO,
-               spacer: float = SPACER_PADRAO) -> Rede:
+               spacer: float = SPACER_PADRAO,
+               peso_angulo: float = PESO_ANGULO_PADRAO) -> Rede:
     """
         Roda as etapas 1 a 11 e devolve a rede com tudo guardado.
         seed: seed do numpy_rng.
@@ -301,9 +336,13 @@ def gerar_rede(seed: int, n_pontos: int = N_PONTOS_PADRAO, lado: int = LADO_PADR
         raio: raio do tubo, em voxels (entra na folga até a parede).
         weight, k: viés da caminhada; o produto precisa ser ao menos VIES_MINIMO.
         spacer: tamanho do passo, em voxels.
+        peso_angulo: peso do ângulo na nota da etapa 7, de 0 a 1.
     """
     if n_pontos < 2:
         raise ValueError(f"Precisa de ao menos 2 pontos, recebeu {n_pontos}.")
+    # Escrito assim, o NaN também cai aqui (toda comparação com NaN é falsa).
+    if not 0 <= peso_angulo <= 1:
+        raise ValueError(f"peso_angulo precisa estar entre 0 e 1, recebeu {peso_angulo}.")
     if weight * k < VIES_MINIMO:
         raise ValueError(f"weight * k precisa ser ao menos {VIES_MINIMO}, "
                          f"recebeu {weight * k:g}.")
@@ -329,7 +368,7 @@ def gerar_rede(seed: int, n_pontos: int = N_PONTOS_PADRAO, lado: int = LADO_PADR
     for veio, nos in enumerate(separar_componentes(vizinhos)):
         rede.veio_de.update({no: veio for no in nos})
 
-    construir_veio_central(rede, caminhar_entre)
+    construir_veio_central(rede, caminhar_entre, peso_angulo)
     ligar_soltos(rede, caminhar_entre)
     return rede
 

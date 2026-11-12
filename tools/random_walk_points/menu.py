@@ -15,6 +15,7 @@ from tools.random_walk_points.generator import (
     K_PADRAO,
     LADO_PADRAO,
     N_PONTOS_PADRAO,
+    PESO_ANGULO_PADRAO,
     RAIO_PADRAO,
     SPACER_PADRAO,
     VIES_MINIMO,
@@ -35,6 +36,7 @@ FAIXA_RAIO = (0.87, 4.0)
 FAIXA_WEIGHT = (0.1, 1.0)
 FAIXA_K = (1.0, 30.0)
 FAIXA_SPACER = (0.5, 5.0)
+FAIXA_PESO_ANGULO = (0.0, 1.0)
 
 EXPLICACAO_MODOS = {
     "progressao": "as 4 etapas na mesma figura, com um controle deslizante",
@@ -110,8 +112,19 @@ def gerar():
     )
     spacer = perguntar("spacer", SPACER_PADRAO, float, *FAIXA_SPACER)
 
+    explicar(
+        "Peso do angulo no veio central",
+        ("O veio central escolhe o proximo no pela menor nota:",
+        "peso * angulo/90 + (1 - peso) * distancia/maior distancia.",
+        "1 e so o angulo: um no reto embaixo, mesmo la no fundo, sempre ganha.",
+        "MENOR da mais valor aos nos perto e o veio faz mais curvas; 0 e so a distancia."),
+        faixa=f"{FAIXA_PESO_ANGULO[0]:g} a {FAIXA_PESO_ANGULO[1]:g}", tipico="0.5",
+    )
+    peso_angulo = perguntar("peso do angulo", PESO_ANGULO_PADRAO, float, *FAIXA_PESO_ANGULO)
+
     print("\n  gerando...")
-    destino = run_and_save(seed, n_pontos, lado, raio, weight, k, spacer)
+    destino = run_and_save(seed, n_pontos, lado, raio, weight, k, spacer,
+                           peso_angulo=peso_angulo)
     resumir_resultado(int(destino.stem[-3:]))
 
 def resumir_resultado(result_id: int):
@@ -156,7 +169,7 @@ def escolher_resultado():
         info = load_result_info(numero)
         print(f"    {numero:03d}  seed {info['seed']:<4d} {info['n_pontos']:3d} pontos  "
               f"{info['size']}^3  r={info['raio']:g}  w={info['weight']:g} k={info['k']:g} "
-              f"sp={info['spacer']:g}")
+              f"sp={info['spacer']:g}  ang={info['peso_angulo']:g}")
 
     while True:
         escolha = perguntar("resultado", max(disponiveis), int)
