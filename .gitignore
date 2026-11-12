@@ -67,6 +67,7 @@ __pycache__/
 /src/cavegen/generators/cellular_automata/plots
 /src/cavegen/generators/cellular_automata/seeds
 /src/cavegen/generators/cellular_automata/pesos
+/src/cavegen/optimization/genetic/results
 
 # Random Walk
 /src/cavegen/generators/random_walk/npz
