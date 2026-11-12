@@ -19,8 +19,8 @@ PESOS_DIR = storage_dir("pesos")
 PESO_PREFIX = "peso"
 
 RAIZ_DO_PROJETO = Path(__file__).resolve().parents[4]
-# SDF do Elaphes calculado no sdf_temp: a origem padrão da importação.
-SDF_ELAPHES = RAIZ_DO_PROJETO / "sdf_temp" / "npz" / "elaphes_surface_64_sdf.npz"
+# SDF do Elaphes calculado em tools/sdf: a origem padrão da importação.
+SDF_ELAPHES = RAIZ_DO_PROJETO / "tools" / "sdf" / "npz" / "elaphes_surface_64_sdf.npz"
 
 def used_peso_ids(directory: Path = PESOS_DIR) -> set:
     """
@@ -71,7 +71,7 @@ def importar_sdf(origem: Path = SDF_ELAPHES, directory: Path = PESOS_DIR,
                  escala_log: float | None = None) -> Path:
     """
         Copia o SDF de um npz para um peso novo e devolve o caminho do arquivo.
-        origem: npz com o campo "sdf" (o de sdf_temp/sdf.py, por padrão).
+        origem: npz com o campo "sdf" (o de tools/sdf/sdf.py, por padrão).
         directory: pasta onde os pesos são gravados.
         escala_log: escala de comprimir_log; None copia o SDF sem transformar.
     """

@@ -1,6 +1,6 @@
 # Random Walk com pontos sorteados (experimento)
 
-Experimento de um Random Walk que monta a caverna sem pontos marcados à mão. Esta pasta serve para testar a ideia e não faz parte da pipeline do projeto: nada em `src/` ou `tests/` depende dela. Daqui só são reaproveitadas a caminhada (`caminhar`) e a voxelização (`voxelizar`) do RW do pacote.
+Experimento de um Random Walk que monta a caverna sem pontos marcados à mão. É uma ferramenta auxiliar do CA (gera redes que viram peso) e não entra na comparação do TCC: nada em `src/` depende dela, só os testes em `tests/test_random_walk_points.py`. Ela reaproveita só a caminhada (`caminhar`) e a voxelização (`voxelizar`) do RW do pacote e o SDF de `tools/sdf/`.
 
 ## Motivação
 
@@ -46,10 +46,10 @@ O plot mostra, na mesma figura, a progressão dos veios:
 ## Como rodar
 
 ```bash
-uv run python temp_rw/menu.py                # gerar e plotar
-uv run python temp_rw/plot.py 1 progressao   # plotar direto um resultado
-uv run python temp_rw/peso.py 1 2            # peso do CA a partir do resultado 1, com log x2
-uv run python temp_rw/test_temp_rw.py        # conferir as regras
+uv run python -m tools.random_walk_points.menu                # gerar e plotar
+uv run python -m tools.random_walk_points.plot 1 progressao   # plotar direto um resultado
+uv run python -m tools.random_walk_points.peso 1 2            # peso do CA a partir do resultado 1, com log x2
+uv run python -m unittest tests/test_random_walk_points.py -v # conferir as regras
 ```
 
 Os resultados vão para `results/`, os SDF para `npz/` e as figuras para `plots/`, todos fora do Git. O `peso.py` grava o peso na pasta de pesos do CA.
@@ -61,7 +61,7 @@ Os resultados vão para `results/`, os SDF para `npz/` e as figuras para `plots/
 | `plot.py` | A figura da progressão, com controle deslizante, e a grade escavada |
 | `menu.py` | Menu de terminal, como o do CA |
 | `peso.py` | Transforma um resultado em peso do CA, para testes |
-| `test_temp_rw.py` | Testes das regras; ficam aqui para sair junto com a pasta |
+| `tests/test_random_walk_points.py` | Testes das regras, na suíte do projeto |
 
 ## Decisões de implementação
 

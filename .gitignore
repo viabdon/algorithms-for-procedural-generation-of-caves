@@ -25,10 +25,10 @@ __pycache__/
 
 # Experimento do SDF: só o código e a documentação são versionados. A entrada
 # vem do PLY em data/, as saídas são regeneradas e os artigos são das editoras.
-/sdf_temp/articles/
-/sdf_temp/entrada/
-/sdf_temp/npz/
-/sdf_temp/plots/
+/tools/sdf/articles/
+/tools/sdf/entrada/
+/tools/sdf/npz/
+/tools/sdf/plots/
 
 # Projeto base do Random Walk (Unity, de outro TCC): só para refazer a exportação
 # dos waypoints para configs/random_walk/
@@ -39,9 +39,9 @@ __pycache__/
 /indian_tunnel_temp/plots/
 
 # Experimento do Random Walk com pontos sorteados: as saídas são regeneradas
-/temp_rw/npz/
-/temp_rw/results/
-/temp_rw/plots/
+/tools/random_walk_points/npz/
+/tools/random_walk_points/results/
+/tools/random_walk_points/plots/
 
 # Keep directory placeholders
 !.gitkeep

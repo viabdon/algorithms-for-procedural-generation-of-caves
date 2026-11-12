@@ -27,7 +27,7 @@
     em linha reta do CORTE_NEGATIVO (transparente) até o valor mais positivo
     (opaco). Abaixo do corte o voxel nem entra no plot.
 
-    uv run python sdf_temp/sdf.py
+    uv run python -m tools.sdf.sdf
 """
 from pathlib import Path
 
@@ -40,8 +40,7 @@ from cavegen.generators.cellular_automata.plot import (
     camera_isometrica,
     gizmo_eixos,
 )
-
-from inundacao import BORDA, INTERNO
+from tools.sdf.inundacao import BORDA, INTERNO
 
 PASTA = Path(__file__).resolve().parent
 ENTRADA = PASTA / "npz" / "elaphes_surface_64_inundacao.npz"

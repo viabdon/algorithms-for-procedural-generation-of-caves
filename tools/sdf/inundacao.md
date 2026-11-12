@@ -8,7 +8,7 @@ grade, em vez de pela contagem de vizinhos. Entrada:
 O link abre no navegador (cole na barra de endereço). A figura carrega o Plotly
 pela internet, então precisa estar online.
 
-- [elaphes_surface_64_inundacao.html](file:///C:/Users/Felipe%20Cruz/Desktop/CESUPA/TCC/code/algorithms-for-procedural-generation-of-caves/sdf_temp/plots/elaphes_surface_64_inundacao.html)
+- [elaphes_surface_64_inundacao.html](file:///C:/Users/Felipe%20Cruz/Desktop/CESUPA/TCC/code/algorithms-for-procedural-generation-of-caves/tools/sdf/plots/elaphes_surface_64_inundacao.html)
 
 ## O problema que motivou
 
@@ -151,7 +151,7 @@ etapa `sdf.py`.
 | `npz/elaphes_surface_64_inundacao.npz` | `classificacao` (0 vazio, 1 borda, 2 interno), `agua`, `buracos_fechados` (para saber quais 2 eram vazio), `metadata` |
 | `plots/elaphes_surface_64_inundacao.html` | figura |
 
-O script é independente dentro de `sdf_temp/`: do resto do projeto ele só
+O script é independente dentro de `tools/sdf/`: do resto do projeto ele só
 usa a caixa wireframe, o gizmo e a câmera do plot do CA
 (`cavegen.generators.cellular_automata.plot`).
 
@@ -160,7 +160,7 @@ usa a caixa wireframe, o gizmo e a câmera do plot do CA
 Da raiz do projeto:
 
 ```
-uv run python sdf_temp/inundacao.py
+uv run python -m tools.sdf.inundacao
 ```
 
 ## Referências

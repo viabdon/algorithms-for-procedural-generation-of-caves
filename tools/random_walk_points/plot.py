@@ -12,7 +12,7 @@
     Eixos como nos outros plots: x é o x, y é o z e z é o y (a altura), para o
     que está em cima no algoritmo aparecer em cima na figura.
 
-    uv run python temp_rw/plot.py <resultado> [progressao|classificacao]
+    uv run python -m tools.random_walk_points.plot <resultado> [progressao|classificacao]
 """
 import sys
 from pathlib import Path
@@ -27,8 +27,8 @@ from cavegen.generators.cellular_automata.plot import (
 )
 from cavegen.generators.random_walk.plot import figura_classificacao
 from cavegen.generators.random_walk.voxelizacao import BORDA, INTERNO
-from generator import INICIAL, LIGACAO, Rede
-from results import RESULTS_DIR, load_result
+from tools.random_walk_points.generator import INICIAL, LIGACAO, Rede
+from tools.random_walk_points.results import RESULTS_DIR, load_result
 
 PASTA_FIGURAS = Path(__file__).resolve().parent / "plots"
 MODOS = ("progressao", "classificacao")
@@ -241,7 +241,8 @@ def plotar_resultado(result_id: int, modo: str = "progressao", directory: Path =
 
 def main():
     if len(sys.argv) < 2:
-        raise SystemExit("informe o numero do resultado, ex: python temp_rw/plot.py 1 progressao")
+        raise SystemExit("informe o resultado, ex: "
+                         "python -m tools.random_walk_points.plot 1 progressao")
 
     modo = sys.argv[2] if len(sys.argv) > 2 else "progressao"
     print("figura salva em:", plotar_resultado(int(sys.argv[1]), modo))

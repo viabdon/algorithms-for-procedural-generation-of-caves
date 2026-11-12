@@ -236,6 +236,10 @@ class Relatorio(unittest.TestResult):
 def carregar(alvos: list[str]) -> unittest.TestSuite:
     """Suíte inteira, ou só os alvos: caminho (tests/test_x.py) ou nome (test_x.Classe)."""
     carregador = unittest.TestLoader()
+    # As ferramentas de tools/ ficam na raiz, fora do pacote instalado: rodando
+    # "python tests/rodar.py", a raiz não entra sozinha no sys.path.
+    if str(RAIZ) not in sys.path:
+        sys.path.insert(0, str(RAIZ))
     if not alvos:
         return carregador.discover(str(PASTA_TESTES), top_level_dir=str(PASTA_TESTES))
     if str(PASTA_TESTES) not in sys.path:

@@ -16,7 +16,7 @@
 
     Fora da grade conta como água, então voxel cheio na borda da grade é 1.
 
-    uv run python sdf_temp/inundacao.py
+    uv run python -m tools.sdf.inundacao
 """
 from pathlib import Path
 

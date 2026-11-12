@@ -1,5 +1,5 @@
 """
-    Inundação e SDF do Indian Tunnel com as funções do sdf_temp.
+    Inundação e SDF do Indian Tunnel com as funções de tools/sdf.
 
     Mesmas etapas do Elaphes, na ordem:
     1. Inundação: a água entra pelas bordas da grade e separa 0 vazio,
@@ -7,7 +7,7 @@
     2. SDF: binariza a borda, mede a distância euclidiana exata até ela e
        volta com o sinal (interno positivo, externo negativo, borda 0).
 
-    Cada etapa grava o seu npz e o seu plot, nos formatos do sdf_temp. O npz
+    Cada etapa grava o seu npz e o seu plot, nos formatos de tools/sdf. O npz
     do SDF é o que o pesos.py do CA importa:
     uv run python -m cavegen.generators.cellular_automata.pesos indian_tunnel_temp/npz/indian_tunnel_surface_64_sdf.npz
 
@@ -20,18 +20,19 @@ import numpy as np
 
 from voxelizacao import LADO_PADRAO, PASTA_PLOTS, caminho_superficie
 
-# As funções da inundação e do SDF ficam no sdf_temp.
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "sdf_temp"))
-from inundacao import BORDA, INTERNO, classificar_por_inundacao, inundar
-from inundacao import figura as figura_inundacao
-from sdf import (
+# As funções da inundação e do SDF ficam em tools/sdf. O script roda pelo caminho
+# (python indian_tunnel_temp/...), então a raiz do projeto entra no sys.path à mão.
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from tools.sdf.inundacao import BORDA, INTERNO, classificar_por_inundacao, inundar
+from tools.sdf.inundacao import figura as figura_inundacao
+from tools.sdf.sdf import (
     CONVENCAO,
     CORTE_NEGATIVO,
     aplicar_sinal,
     binarizar_borda,
     distancia_ate_borda,
 )
-from sdf import figura as figura_sdf
+from tools.sdf.sdf import figura as figura_sdf
 
 def main():
     lado = int(sys.argv[1]) if len(sys.argv) > 1 else LADO_PADRAO

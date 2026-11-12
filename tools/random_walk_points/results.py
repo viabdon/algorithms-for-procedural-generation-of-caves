@@ -1,5 +1,5 @@
 """
-    Resultados do experimento, numerados como os do CA, em temp_rw/results/.
+    Resultados do experimento, numerados como os do CA, em tools/random_walk_points/results/.
 
     Cada result_000.npz guarda a grade escavada, a classificação e todas as etapas
     da rede, para dar para plotar a progressão depois sem gerar de novo.
@@ -13,7 +13,7 @@ import numpy as np
 
 from cavegen.generators.cellular_automata.storage import build_path, next_id, used_ids
 from cavegen.generators.random_walk.voxelizacao import classificar
-from generator import (
+from tools.random_walk_points.generator import (
     K_PADRAO,
     LADO_PADRAO,
     N_PONTOS_PADRAO,

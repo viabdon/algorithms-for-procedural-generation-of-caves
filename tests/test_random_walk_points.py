@@ -1,18 +1,21 @@
-"""Confere as regras do experimento. Fica aqui, fora de tests/, para sair junto com a pasta.
+"""Confere as regras do Random Walk com pontos sorteados (tools/random_walk_points).
 
-    uv run python temp_rw/test_temp_rw.py
+    uv run python -m unittest tests/test_random_walk_points.py -v
 """
-import sys
 import tempfile
 import unittest
 from pathlib import Path
 
 import numpy as np
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
-
+from cavegen.generators.cellular_automata.pesos import (
+    comprimir_log,
+    load_peso_info,
+    load_peso_matrix,
+)
+from cavegen.generators.random_walk.voxelizacao import classificar
 from cavegen.metrics.connectivity import connected_components
-from generator import (
+from tools.random_walk_points.generator import (
     DESCIDA,
     INICIAL,
     LIGACAO,
@@ -27,15 +30,9 @@ from generator import (
     separar_componentes,
     target_mais_proximo,
 )
-from cavegen.generators.cellular_automata.pesos import (
-    comprimir_log,
-    load_peso_info,
-    load_peso_matrix,
-)
-from cavegen.generators.random_walk.voxelizacao import classificar
-from peso import calcular_sdf, gerar_peso
-from plot import ETAPAS, figura_progressao
-from results import load_result, run_and_save
+from tools.random_walk_points.peso import calcular_sdf, gerar_peso
+from tools.random_walk_points.plot import ETAPAS, figura_progressao
+from tools.random_walk_points.results import load_result, run_and_save
 
 SEEDS = range(25)
 

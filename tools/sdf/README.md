@@ -1,4 +1,4 @@
-# sdf_temp — pipeline do SDF no Elaphes
+# tools/sdf — pipeline do SDF no Elaphes
 
 Experimento para calcular o SDF da referência do Elaphes a partir da grade de
 superfície. Cada etapa é um script que lê o npz da etapa anterior e grava o
@@ -39,7 +39,7 @@ Separa borda e interno pela conectividade com o lado de fora da grade.
 Metodologia, resultados, limitações e a comparação com as abordagens
 descartadas estão em [inundacao.md](inundacao.md).
 
-- [elaphes_surface_64_inundacao.html](file:///C:/Users/Felipe%20Cruz/Desktop/CESUPA/TCC/code/algorithms-for-procedural-generation-of-caves/sdf_temp/plots/elaphes_surface_64_inundacao.html)
+- [elaphes_surface_64_inundacao.html](file:///C:/Users/Felipe%20Cruz/Desktop/CESUPA/TCC/code/algorithms-for-procedural-generation-of-caves/tools/sdf/plots/elaphes_surface_64_inundacao.html)
 
 ### 2. SDF
 
@@ -78,7 +78,7 @@ entra no plot: dos 262.144 voxels, ficam 28.321. Cada nível distinto do SDF
 vira um trace (o plotly só aceita uma opacidade por trace); no Elaphes são 89
 níveis.
 
-- [elaphes_surface_64_sdf.html](file:///C:/Users/Felipe%20Cruz/Desktop/CESUPA/TCC/code/algorithms-for-procedural-generation-of-caves/sdf_temp/plots/elaphes_surface_64_sdf.html)
+- [elaphes_surface_64_sdf.html](file:///C:/Users/Felipe%20Cruz/Desktop/CESUPA/TCC/code/algorithms-for-procedural-generation-of-caves/tools/sdf/plots/elaphes_surface_64_sdf.html)
 
 A EDT do scipy entra por enquanto. A implementação do artigo do Fuseiller
 (`articles/`) pode substituir `distancia_ate_borda()`: qualquer EDT exata dá o
@@ -90,7 +90,7 @@ A entrada vem da voxelização do PLY (que fica em `data/`, fora do git), da
 raiz do projeto:
 
 ```
-uv run python -m cavegen.datastream.run_reference_voxelization --ply data/raw/elaphes/elaphes_cave.ply --output sdf_temp/entrada/elaphes_surface_64.npz --shape 64 64 64
+uv run python -m cavegen.datastream.run_reference_voxelization --ply data/raw/elaphes/elaphes_cave.ply --output tools/sdf/entrada/elaphes_surface_64.npz --shape 64 64 64
 ```
 
 A voxelização devolve o outlier: zere o índice (60, 31, 13) da grade
@@ -99,6 +99,6 @@ A voxelização devolve o outlier: zere o índice (60, 31, 13) da grade
 Depois, as etapas na ordem:
 
 ```
-uv run python sdf_temp/inundacao.py
-uv run python sdf_temp/sdf.py
+uv run python -m tools.sdf.inundacao
+uv run python -m tools.sdf.sdf
 ```

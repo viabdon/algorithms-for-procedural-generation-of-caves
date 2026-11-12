@@ -44,7 +44,7 @@ where = ["src"]
 
 [tool.ruff]
 line-length = 100
-src = ["src"]
+src = ["src", "."]
 
 [dependency-groups]
 dev = [
