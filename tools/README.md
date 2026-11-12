@@ -11,7 +11,7 @@ daqui. Quem usa são os experimentos, os testes e quem roda os scripts.
 | pasta | o que faz | quem usa |
 |---|---|---|
 | [`flood_fill/`](flood_fill/README.md) | inundação: separa borda, interno e buracos fechados de uma grade, com plot | `sdf/`, `indian_tunnel_temp/` |
-| [`sdf/`](sdf/README.md) | SDF de uma grade de superfície, com o sinal vindo do `flood_fill/`, e plot | `random_walk_points/`, `indian_tunnel_temp/`, o peso padrão do CA |
+| [`sdf/`](sdf/README.md) | SDF de uma grade de superfície, com o sinal vindo do `flood_fill/`, manipulável (limiar e log) e com plot | `random_walk_points/`, `indian_tunnel_temp/`, o peso padrão do CA |
 | [`random_walk_points/`](random_walk_points/README.md) | Random Walk com pontos sorteados, cuja rede vira peso do CA | o CA, pelos pesos |
 
 ## Como rodar
