@@ -26,6 +26,17 @@ class BorderTreatment(Enum):
     RANDOM = "random"
     NEAREST = "nearest"
 
+class ModoPeso(Enum):
+    """
+        Como o peso entra na contagem de vizinhos.
+        COMPLETO: soma o peso inteiro, positivo e negativo.
+        SO_NEGATIVO: zera o positivo antes de somar. O peso só atrapalha o vazio
+                     de nascer fora da forma; dentro dela (peso >= 0) o CA segue a
+                     regra dele sem ajuda, como o CA básico.
+    """
+    COMPLETO = "completo"
+    SO_NEGATIVO = "so_negativo"
+
 def contar_transicoes(anterior: np.ndarray, seguinte: np.ndarray) -> tuple[int, int]:
     """
         Conta as células que mudaram de um passo para o outro.
@@ -34,7 +45,7 @@ def contar_transicoes(anterior: np.ndarray, seguinte: np.ndarray) -> tuple[int, 
     """
     return int(np.count_nonzero(seguinte > anterior)), int(np.count_nonzero(seguinte < anterior))
 
-def cellular_automata(matrix: np.ndarray, sensitivity: int, border_treatment: BorderTreatment, iterations: int, progress=None, peso=None) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+def cellular_automata(matrix: np.ndarray, sensitivity: int, border_treatment: BorderTreatment, iterations: int, progress=None, peso=None, modo_peso: ModoPeso = ModoPeso.COMPLETO) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """
         Aplica o autômato celular sobre a matriz, repetindo o passo N vezes.
         Devolve (final, historico, viraram_1, viraram_0).
@@ -51,8 +62,10 @@ def cellular_automata(matrix: np.ndarray, sensitivity: int, border_treatment: Bo
         progress: função opcional chamada ao fim de cada passo com (passo, iterations).
         peso: matriz opcional do mesmo formato, somada à contagem de vizinhos em
               todo passo (ver aplicar_peso). Sem peso, é o autômato básico.
+        modo_peso: membro de ModoPeso, ou a string equivalente.
     """
     border_treatment = BorderTreatment(border_treatment)
+    peso = preparar_peso(peso, modo_peso)
     historico = [int(matrix.sum())]
     viraram_1, viraram_0 = [], []
 
@@ -69,15 +82,28 @@ def cellular_automata(matrix: np.ndarray, sensitivity: int, border_treatment: Bo
     return (matrix, np.array(historico, dtype=np.int64),
             np.array(viraram_1, dtype=np.int64), np.array(viraram_0, dtype=np.int64))
 
-def iterate(matrix: np.ndarray, sensitivity: int, border_treatment: BorderTreatment, peso=None) -> np.ndarray:
+def preparar_peso(peso, modo_peso: ModoPeso = ModoPeso.COMPLETO):
+    """
+        Devolve o peso como ele entra na contagem, conforme o modo.
+        peso: matriz de peso, ou None (CA básico, em qualquer modo).
+        modo_peso: membro de ModoPeso, ou a string equivalente.
+    """
+    modo_peso = ModoPeso(modo_peso)
+    if peso is None or modo_peso is ModoPeso.COMPLETO:
+        return peso
+    return np.minimum(peso, 0)
+
+def iterate(matrix: np.ndarray, sensitivity: int, border_treatment: BorderTreatment, peso=None, modo_peso: ModoPeso = ModoPeso.COMPLETO) -> np.ndarray:
     """
         Executa um único passo do autômato, gerando a matriz seguinte.
         matrix: matriz binária do passo anterior.
         sensitivity: mínimo de vizinhos para a célula virar 1.
         border_treatment: membro de BorderTreatment, ou a string equivalente.
         peso: matriz opcional somada à contagem de vizinhos (ver aplicar_peso).
+        modo_peso: membro de ModoPeso, ou a string equivalente (ver preparar_peso).
     """
     vizinhos = neighbor_counts(matrix, border_treatment)
+    peso = preparar_peso(peso, modo_peso)
     if peso is not None:
         vizinhos = aplicar_peso(vizinhos, peso)
 

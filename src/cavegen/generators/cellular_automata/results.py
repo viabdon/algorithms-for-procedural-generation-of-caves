@@ -2,7 +2,11 @@ from pathlib import Path
 
 import numpy as np
 
-from cavegen.generators.cellular_automata.generator import BorderTreatment, cellular_automata
+from cavegen.generators.cellular_automata.generator import (
+    BorderTreatment,
+    ModoPeso,
+    cellular_automata,
+)
 from cavegen.generators.cellular_automata.pesos import load_peso_matrix
 from cavegen.generators.cellular_automata.seeds import load_seed_matrix
 from cavegen.generators.cellular_automata.storage import build_path, next_id, storage_dir, used_ids
@@ -22,6 +26,9 @@ def config_do_run(argumentos: dict) -> str:
     borda = BorderTreatment(argumentos["border_treatment"]).value
     peso_id = argumentos.get("peso_id")
     peso = f" peso{peso_id:03d}" if peso_id is not None else ""
+    modo = ModoPeso(argumentos.get("modo_peso", ModoPeso.COMPLETO))
+    if peso_id is not None and modo is ModoPeso.SO_NEGATIVO:
+        peso += " so_negativo"
     return (f"seed{argumentos['seed_id']:03d} s{argumentos['sensitivity']} "
             f"{borda} it{argumentos['iterations']}{peso}")
 
@@ -50,7 +57,8 @@ def result_path(result_id: int, directory: Path = RESULTS_DIR) -> Path:
 @track_resources(label=config_do_run)
 def run_and_save(seed_id: int, sensitivity: int, border_treatment: BorderTreatment,
                 iterations: int, directory: Path = RESULTS_DIR, progress=None,
-                peso_id: int | None = None) -> Path:
+                peso_id: int | None = None,
+                modo_peso: ModoPeso = ModoPeso.COMPLETO) -> Path:
     """
         Roda o CA sobre uma seed gravada e guarda o volume final em um npz novo.
         seed_id: número da seed usada como matriz inicial.
@@ -60,7 +68,9 @@ def run_and_save(seed_id: int, sensitivity: int, border_treatment: BorderTreatme
         directory: pasta onde os resultados são gravados.
         progress: função opcional chamada ao fim de cada passo com (passo, iterations).
         peso_id: número do peso somado à contagem de vizinhos; None roda o CA básico.
+        modo_peso: membro de ModoPeso, ou a string equivalente (só vale com peso).
     """
+    modo_peso = ModoPeso(modo_peso)
     border_treatment = BorderTreatment(border_treatment)
     directory = Path(directory)
     directory.mkdir(parents=True, exist_ok=True)
@@ -68,10 +78,10 @@ def run_and_save(seed_id: int, sensitivity: int, border_treatment: BorderTreatme
     inicial = load_seed_matrix(seed_id)
     peso = load_peso_matrix(peso_id) if peso_id is not None else None
     final, historico, viraram_1, viraram_0 = cellular_automata(
-        inicial, sensitivity, border_treatment, iterations, progress, peso)
+        inicial, sensitivity, border_treatment, iterations, progress, peso, modo_peso)
 
     # Resultados do CA básico não levam peso_id, como as seeds sorteadas não levam origem.
-    extras = {"peso_id": peso_id} if peso_id is not None else {}
+    extras = {"peso_id": peso_id, "modo_peso": modo_peso.value} if peso_id is not None else {}
 
     result_id = next_result_id(directory)
     np.savez_compressed(
@@ -110,6 +120,9 @@ def load_result_info(result_id: int, directory: Path = RESULTS_DIR) -> dict:
         # Só resultados rodados com peso trazem o peso_id.
         if "peso_id" in arquivo.files:
             info["peso_id"] = int(arquivo["peso_id"])
+            # Resultados com peso gravados antes do modo existir usavam o peso completo.
+            info["modo_peso"] = (str(arquivo["modo_peso"]) if "modo_peso" in arquivo.files
+                                 else ModoPeso.COMPLETO.value)
 
         return info
 

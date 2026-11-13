@@ -16,16 +16,23 @@ import numpy as np
 
 from cavegen.generators.cellular_automata.generator import (
     BorderTreatment,
+    ModoPeso,
     aplicar_peso,
     cellular_automata,
     iterate,
     neighbor_counts,
+    preparar_peso,
 )
 from cavegen.generators.cellular_automata.pesos import (
     importar_sdf,
     load_peso_info,
     load_peso_matrix,
     used_peso_ids,
+)
+from cavegen.generators.cellular_automata.results import (
+    config_do_run,
+    load_result_info,
+    result_path,
 )
 from cavegen.sdf.manipulacao import comprimir_log
 
@@ -79,6 +86,59 @@ class PesoTests(unittest.TestCase):
 
         with self.assertRaises(ValueError):
             aplicar_peso(vizinhos, np.zeros((4, 4, 5), dtype=np.float32))
+
+
+class ModoPesoTests(unittest.TestCase):
+    def test_so_negativo_e_o_peso_com_o_positivo_zerado(self) -> None:
+        matriz = matriz_aleatoria((8, 8, 8), seed=5)
+        peso = np.random.default_rng(6).uniform(-5, 5, size=matriz.shape).astype(np.float32)
+        cortado = np.minimum(peso, 0)
+
+        for borda in (BorderTreatment.ZEROS, BorderTreatment.NEAREST):
+            np.testing.assert_array_equal(
+                iterate(matriz, 12, borda, peso, ModoPeso.SO_NEGATIVO),
+                iterate(matriz, 12, borda, cortado))
+            esperado = cellular_automata(matriz, 12, borda, 4, peso=cortado)
+            obtido = cellular_automata(matriz, 12, borda, 4, peso=peso, modo_peso="so_negativo")
+            for a, b in zip(esperado, obtido):
+                np.testing.assert_array_equal(a, b)
+
+    def test_padrao_continua_sendo_o_peso_completo(self) -> None:
+        matriz = matriz_aleatoria((8, 8, 8), seed=7)
+        peso = np.full(matriz.shape, 3.0, dtype=np.float32)
+
+        np.testing.assert_array_equal(iterate(matriz, 12, BorderTreatment.ZEROS, peso),
+                                      iterate(matriz, 12, BorderTreatment.ZEROS, peso, "completo"))
+        # Peso só positivo: no modo só negativo vira o CA básico.
+        np.testing.assert_array_equal(
+            iterate(matriz, 12, BorderTreatment.ZEROS, peso, ModoPeso.SO_NEGATIVO),
+            iterate(matriz, 12, BorderTreatment.ZEROS))
+
+    def test_preparar_peso_nao_altera_o_original(self) -> None:
+        peso = np.array([-2.0, 0.0, 3.0], dtype=np.float32)
+        self.assertIsNone(preparar_peso(None, ModoPeso.SO_NEGATIVO))
+        np.testing.assert_array_equal(preparar_peso(peso, "so_negativo"), [-2.0, 0.0, 0.0])
+        np.testing.assert_array_equal(peso, [-2.0, 0.0, 3.0])
+        with self.assertRaises(ValueError):
+            preparar_peso(peso, "positivo")
+
+    def test_resultado_antigo_com_peso_le_como_completo(self) -> None:
+        with tempfile.TemporaryDirectory() as pasta:
+            np.savez_compressed(result_path(1, pasta), matrix=np.zeros((2, 2, 2)), result_id=1,
+                                seed_id=1, size=2, sensitivity=13, border_treatment="zeros",
+                                iterations=3, peso_id=1)
+            np.savez_compressed(result_path(2, pasta), matrix=np.zeros((2, 2, 2)), result_id=2,
+                                seed_id=1, size=2, sensitivity=13, border_treatment="zeros",
+                                iterations=3, peso_id=1, modo_peso="so_negativo")
+            self.assertEqual(load_result_info(1, pasta)["modo_peso"], "completo")
+            self.assertEqual(load_result_info(2, pasta)["modo_peso"], "so_negativo")
+
+    def test_rotulo_da_planilha_separa_os_modos(self) -> None:
+        base = {"seed_id": 1, "sensitivity": 13, "border_treatment": "nearest",
+                "iterations": 5, "peso_id": 2}
+        self.assertEqual(config_do_run(base), "seed001 s13 nearest it5 peso002")
+        self.assertEqual(config_do_run({**base, "modo_peso": "so_negativo"}),
+                         "seed001 s13 nearest it5 peso002 so_negativo")
 
 
 class ArmazenamentoDePesoTests(unittest.TestCase):

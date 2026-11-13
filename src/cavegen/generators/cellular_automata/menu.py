@@ -8,7 +8,7 @@ aceita o valor X.
     uv run python -m cavegen.generators.cellular_automata.menu
 """
 
-from cavegen.generators.cellular_automata.generator import BorderTreatment
+from cavegen.generators.cellular_automata.generator import BorderTreatment, ModoPeso
 from cavegen.generators.cellular_automata.pesos import load_peso_info, used_peso_ids
 from cavegen.generators.cellular_automata.plot import (
     MODOS_COR,
@@ -137,6 +137,8 @@ def escolher_resultado():
     for numero in sorted(disponiveis):
         info = load_result_info(numero)
         peso = f"  peso {info['peso_id']:03d}" if "peso_id" in info else ""
+        if info.get("modo_peso") == ModoPeso.SO_NEGATIVO.value:
+            peso += " so_negativo"
         print(f"    {numero:03d}  {info['size']}^3  seed {info['seed_id']:03d}  "
             f"s={info['sensitivity']}  b={info['border_treatment']}  it={info['iterations']}{peso}")
 
@@ -180,6 +182,17 @@ def escolher_peso(lado: int):
             return escolha
 
         print("    numero fora da lista acima.")
+
+def escolher_modo_peso() -> ModoPeso:
+    """Pergunta se o peso entra inteiro ou só a parte negativa."""
+    explicar(
+        "Modo do peso",
+        ("1 completo: soma o peso inteiro, positivo e negativo.",
+        "2 so negativo: zera o positivo. Fora da forma o vazio custa a nascer;",
+        "dentro dela o CA segue a regra dele sem ajuda, como o CA basico."),
+    )
+    escolha = perguntar("modo", 1, int, minimo=1, maximo=2)
+    return ModoPeso.COMPLETO if escolha == 1 else ModoPeso.SO_NEGATIVO
 
 EXPLICACAO_MODOS = {
     "altura": "cor pela altura da celula, como sempre foi",
@@ -266,6 +279,7 @@ def rodar_ca():
 
     lado = load_seed_info(seed_id)["size"]
     peso_id = escolher_peso(lado)
+    modo_peso = escolher_modo_peso() if peso_id is not None else ModoPeso.COMPLETO
 
     explicar(
         "Sensibilidade",
@@ -298,7 +312,7 @@ def rodar_ca():
         print(f"    passo {passo}/{total} concluido")
 
     destino = run_and_save(seed_id, sensibilidade, borda, iteracoes, progress=mostrar_passo,
-                           peso_id=peso_id)
+                           peso_id=peso_id, modo_peso=modo_peso)
     resumir_resultado(destino)
 
 def resumir_resultado(destino):
