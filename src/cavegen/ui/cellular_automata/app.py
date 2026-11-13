@@ -14,7 +14,11 @@ nada da interface.
 import numpy as np
 import streamlit as st
 
-from cavegen.generators.cellular_automata.generator import BorderTreatment
+from cavegen.generators.cellular_automata.generator import (
+    BorderTreatment,
+    ModoPeso,
+    preparar_peso,
+)
 from cavegen.generators.cellular_automata.menu import (
     EXPLICACAO_BORDAS,
     ITERACOES_PADRAO,
@@ -71,6 +75,13 @@ AJUDA_ITERACOES = ("Quantas vezes o passo se repete. Cada passo suaviza as pared
                    "volume costuma estabilizar entre 3 e 5.")
 AJUDA_PESO = ("Matriz somada à contagem de vizinhos antes da sensibilidade. Negativo "
               "(fora da caverna) tira vizinhos, positivo (dentro) dá vizinhos.")
+AJUDA_MODO_PESO = ("Completo soma o peso inteiro. Só negativo zera a parte positiva: fora "
+                   "da forma o vazio custa a nascer, dentro dela o CA segue a regra dele "
+                   "sem ajuda, como o CA básico.")
+EXPLICACAO_MODOS_PESO = {
+    ModoPeso.COMPLETO: "positivo e negativo",
+    ModoPeso.SO_NEGATIVO: "zera o positivo",
+}
 AJUDA_SUPERFICIE = ("Desenha só as células vivas que encostam em rocha ou na borda. As "
                     "do miolo ficam escondidas de qualquer jeito, e tirá-las alivia o navegador.")
 
@@ -117,9 +128,15 @@ def rotulo_peso(peso_id) -> str:
     return f"{peso_id:03d} · {info['origem']}{escala}"
 
 
+def sufixo_modo_peso(modo_peso) -> str:
+    # O modo completo é o de sempre: só o só negativo aparece no rótulo.
+    return " (só negativo)" if modo_peso == ModoPeso.SO_NEGATIVO.value else ""
+
+
 def rotulo_resultado(result_id: int) -> str:
     info = load_result_info(result_id)
-    peso = f" · peso {info['peso_id']:03d}" if "peso_id" in info else ""
+    peso = (f" · peso {info['peso_id']:03d}{sufixo_modo_peso(info['modo_peso'])}"
+            if "peso_id" in info else "")
     return (f"{result_id:03d} · {info['size']}³ · seed {info['seed_id']:03d} · "
             f"s={info['sensitivity']} · {info['border_treatment']} · "
             f"it={info['iterations']}{peso}")
@@ -130,7 +147,8 @@ def descricao(execucao: Execucao) -> str:
         seed = f"seed sorteada (p={execucao.one_probability})"
     else:
         seed = f"seed {execucao.seed_id:03d}"
-    peso = f" · peso {execucao.peso_id:03d}" if execucao.peso_id is not None else ""
+    peso = (f" · peso {execucao.peso_id:03d}{sufixo_modo_peso(execucao.modo_peso)}"
+            if execucao.peso_id is not None else "")
     return (f"{execucao.lado}³ · {seed} · sensibilidade {execucao.sensitivity} · "
             f"borda {execucao.border_treatment} · {execucao.iterations} iterações{peso}")
 
@@ -154,6 +172,7 @@ def rodar(config: dict) -> None:
         seed, config["sensibilidade"], config["borda"], config["iteracoes"], peso,
         progress=lambda passo, total: barra.progress(passo / total,
                                                      text=f"passo {passo}/{total}"),
+        modo_peso=config["modo_peso"],
     )
     barra.empty()
 
@@ -162,7 +181,7 @@ def rodar(config: dict) -> None:
         sensitivity=config["sensibilidade"], border_treatment=config["borda"].value,
         iterations=config["iteracoes"], passos=passos, seed_id=config["seed_id"],
         one_probability=config["probabilidade"], peso_id=config["peso_id"],
-        segundos=segundos,
+        modo_peso=config["modo_peso"].value, segundos=segundos,
     ))
 
 
@@ -182,7 +201,8 @@ def abrir_gravado(result_id: int) -> None:
         sensitivity=dados["sensitivity"], border_treatment=dados["border_treatment"],
         iterations=dados["iterations"], seed_id=seed_id,
         one_probability=load_seed_info(seed_id)["one_probability"] if tem_seed else None,
-        peso_id=dados.get("peso_id"), result_id=result_id,
+        peso_id=dados.get("peso_id"),
+        modo_peso=dados.get("modo_peso", ModoPeso.COMPLETO.value), result_id=result_id,
     ))
 
 
@@ -218,6 +238,13 @@ def barra_lateral() -> None:
                                help=AJUDA_PESO, label_visibility="collapsed")
         if not compativeis:
             st.caption(f"nenhum peso {lado}³ gravado.")
+        if peso_id is not None:
+            modos_peso = list(ModoPeso)
+            modo_peso = st.radio("modo do peso", modos_peso, horizontal=True,
+                                 format_func=lambda m: m.value, help=AJUDA_MODO_PESO,
+                                 captions=[EXPLICACAO_MODOS_PESO[m] for m in modos_peso])
+        else:
+            modo_peso = ModoPeso.COMPLETO
 
         st.subheader("3. Autômato")
         sensibilidade = st.slider("sensibilidade", 0, MAX_VIZINHOS, SENSIBILIDADE_PADRAO,
@@ -250,7 +277,8 @@ def barra_lateral() -> None:
 
     if clicou_rodar:
         rodar(dict(seed_id=seed_id, lado=int(lado), probabilidade=float(probabilidade),
-                   peso_id=peso_id, sensibilidade=int(sensibilidade), borda=borda,
+                   peso_id=peso_id, modo_peso=modo_peso,
+                   sensibilidade=int(sensibilidade), borda=borda,
                    iteracoes=int(iteracoes)))
     if clicou_salvar:
         seed_id_gravada, result_id = salvar(execucao)
@@ -336,8 +364,10 @@ def aba_cortes(execucao: Execucao) -> None:
     paineis.append((f"resultado (passo {execucao.iterations})",
                     fatia(execucao.final, eixo, indice), "binario"))
     if execucao.peso_id is not None:
-        paineis.append((f"peso {execucao.peso_id:03d}",
-                        fatia(carregar_peso(execucao.peso_id), eixo, indice), "peso"))
+        # O corte mostra o peso como ele entrou na contagem, já com o modo aplicado.
+        peso = preparar_peso(carregar_peso(execucao.peso_id), execucao.modo_peso)
+        paineis.append((f"peso {execucao.peso_id:03d}{sufixo_modo_peso(execucao.modo_peso)}",
+                        fatia(peso, eixo, indice), "peso"))
 
     st.plotly_chart(figura_cortes(paineis, eixo), width="stretch")
     st.caption("verde = vazio (caverna), cinza = rocha. No peso, azul é dentro da "
