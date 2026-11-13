@@ -383,10 +383,14 @@ def aba_evolucao(execucao: Execucao) -> None:
                    "novo pela barra lateral para navegar pelos passos.")
         return
 
-    passo = st.slider("passo", 0, execucao.iterations, execucao.iterations)
-    st.plotly_chart(figura_evolucao(execucao.historico, execucao.total_celulas, passo),
-                    width="stretch")
-    st.plotly_chart(figura_do_passo(execucao, passo), width="stretch", key="nuvem_passo")
+    # Linha à esquerda e nuvem à direita: o passo destacado e o volume ficam lado a lado.
+    coluna_linha, coluna_nuvem = st.columns([2, 3], vertical_alignment="center")
+    with coluna_linha:
+        passo = st.slider("passo", 0, execucao.iterations, execucao.iterations)
+        st.plotly_chart(figura_evolucao(execucao.historico, execucao.total_celulas, passo),
+                        width="stretch")
+    with coluna_nuvem:
+        st.plotly_chart(figura_do_passo(execucao, passo), width="stretch", key="nuvem_passo")
 
 
 def main() -> None:
