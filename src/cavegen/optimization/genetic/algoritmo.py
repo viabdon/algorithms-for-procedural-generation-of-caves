@@ -40,16 +40,25 @@ class Gene:
             raise ValueError(f"O gene {self.nome} precisa de limites finitos.")
         if self.minimo >= self.maximo:
             raise ValueError(f"O gene {self.nome} tem mínimo {self.minimo} >= máximo {self.maximo}.")
+        if self.inteiro and math.ceil(self.minimo) > math.floor(self.maximo):
+            raise ValueError(f"O gene inteiro {self.nome} não tem nenhum inteiro na faixa.")
+
+    def faixa_inteira(self) -> tuple[int, int]:
+        """Menor e maior inteiro dentro da faixa (para limites fracionários)."""
+        return math.ceil(self.minimo), math.floor(self.maximo)
 
     def corrigir(self, valor: float) -> float | int:
-        """Leva o valor para dentro da faixa e, se o gene for inteiro, arredonda."""
-        valor = min(max(float(valor), self.minimo), self.maximo)
-        return round(valor) if self.inteiro else valor
+        """Leva o valor para dentro da faixa; gene inteiro arredonda antes de limitar."""
+        if self.inteiro:
+            menor, maior = self.faixa_inteira()
+            return min(max(round(float(valor)), menor), maior)
+        return min(max(float(valor), self.minimo), self.maximo)
 
     def sortear(self, rng: np.random.Generator) -> float | int:
         """Valor uniforme dentro da faixa."""
         if self.inteiro:
-            return int(rng.integers(int(self.minimo), int(self.maximo) + 1))
+            menor, maior = self.faixa_inteira()
+            return int(rng.integers(menor, maior + 1))
         return float(rng.uniform(self.minimo, self.maximo))
 
     def como_dict(self) -> dict:

@@ -110,10 +110,14 @@ def nota_do_passo(vazio: np.ndarray, alvo: Alvo, cortes: Cortes) -> float:
         return NOTA_MINIMA
     return alvo.nota(vazio)
 
-def nota_da_copia_pura(peso: np.ndarray, alvo: Alvo) -> float:
+def nota_da_copia_pura(peso: np.ndarray, alvo: Alvo, limiar: float = 0.0) -> float:
     """
-        Controle: a nota do próprio peso binarizado (peso > 0 vira vazio), sem
-        rodar o CA e sem passar pelos cortes. O que o CA acrescenta ao peso é a
-        diferença entre a nota dele e esta.
+        Nota do próprio peso binarizado (peso > limiar vira vazio), sem rodar o
+        CA e sem passar pelos cortes.
+        Com limiar 0 é a cópia pura do SDF base. Com o limiar do alvo é o teto
+        trivial: como o alvo é o próprio SDF base deslocado, esse corte acerta a
+        região positiva inteira e dá 1. As duas servem de referência para ler a
+        nota do CA, que mede aderência ao campo e não ganho gerativo: chegar
+        perto de 1 pode ser só o CA aprendendo a deslocar o limiar do peso.
     """
-    return alvo.nota(np.asarray(peso) > 0)
+    return alvo.nota(np.asarray(peso) > limiar)

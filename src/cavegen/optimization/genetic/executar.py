@@ -17,10 +17,15 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
+import platform
+import subprocess
+import sys
 from dataclasses import asdict
 from pathlib import Path
 
 import numpy as np
+import scipy
 
 from cavegen.generators.cellular_automata.pesos import RAIZ_DO_PROJETO, SDF_ELAPHES, caminho_legivel
 from cavegen.generators.cellular_automata.storage import build_path, next_id
@@ -53,20 +58,35 @@ def carregar_campo(caminho: Path) -> tuple[np.ndarray, dict]:
                                if "escala_log" in arquivo.files else None)}
     return campo, info
 
+def ambiente() -> dict:
+    """Máquina, versões e commit, para o resultado dizer onde e com que código rodou."""
+    try:
+        commit = subprocess.run(["git", "rev-parse", "HEAD"], cwd=RAIZ_DO_PROJETO,
+                                capture_output=True, text=True, check=True).stdout.strip()
+        sujo = bool(subprocess.run(["git", "status", "--porcelain", "--", "src"],
+                                   cwd=RAIZ_DO_PROJETO, capture_output=True, text=True,
+                                   check=True).stdout.strip())
+    except (OSError, subprocess.CalledProcessError):
+        commit, sujo = "", None
+    return {"commit": commit, "src_com_mudancas": sujo, "python": sys.version.split()[0],
+            "numpy": np.__version__, "scipy": scipy.__version__,
+            "plataforma": platform.platform(), "processador": platform.processor(),
+            "cpus": os.cpu_count()}
+
 def rotulo(argumentos: dict) -> str:
-    return (f"{argumentos['metodo']} orcamento={argumentos['config'].orcamento} "
-            f"seed={argumentos['seed']}")
+    # O nome do arquivo no rótulo liga a linha da planilha de recursos ao npz.
+    return (f"{argumentos['execucao']} {argumentos['metodo']} "
+            f"orcamento={argumentos['config'].orcamento} seed={argumentos['seed']}")
 
 @track_resources(label=rotulo)
-def buscar(metodo: str, avaliador: AvaliadorCA, config: ConfiguracaoGA, seed: int) -> ResultadoBusca:
+def buscar(metodo: str, avaliador: AvaliadorCA, config: ConfiguracaoGA, seed: int,
+           execucao: str = "") -> ResultadoBusca:
     if metodo == "genetico":
         return evoluir(GENES_CA, avaliador, config, seed)
     return busca_aleatoria(GENES_CA, avaliador, config.orcamento, seed)
 
-def gravar(resultado: ResultadoBusca, extras: dict, directory: Path = RESULTS_DIR) -> Path:
-    directory = Path(directory)
-    directory.mkdir(parents=True, exist_ok=True)
-    destino = build_path(directory, PREFIXO, next_id(directory, PREFIXO))
+def gravar(resultado: ResultadoBusca, extras: dict, destino: Path) -> Path:
+    Path(destino).parent.mkdir(parents=True, exist_ok=True)
     nomes = [gene.nome for gene in GENES_CA]
     avaliacoes = resultado.avaliacoes
     np.savez_compressed(
@@ -79,6 +99,7 @@ def gravar(resultado: ResultadoBusca, extras: dict, directory: Path = RESULTS_DI
         geracao=np.array([a.geracao for a in avaliacoes]),
         melhor_acumulado=resultado.melhor_acumulado(),
         reaproveitadas=resultado.reaproveitadas,
+        detalhes=np.array(json.dumps([a.detalhes for a in avaliacoes])),
         **{nome: np.array(json.dumps(valor, ensure_ascii=False)) for nome, valor in extras.items()},
     )
     return destino
@@ -105,11 +126,13 @@ def main(argv=None) -> Path:
     config = ConfiguracaoGA(tamanho_populacao=args.populacao, orcamento=args.orcamento)
     avaliador = AvaliadorCA(sdf_base, alvo, SEMENTES_AJUSTE, MAX_ITERACOES, cortes)
 
-    resultado = buscar(args.metodo, avaliador, config, args.seed)
+    destino = build_path(args.saida, PREFIXO, next_id(args.saida, PREFIXO))
+    resultado = buscar(args.metodo, avaliador, config, args.seed, execucao=destino.stem)
     campeao = resultado.melhor
     reservadas = avaliador.nota_com_iteracoes(campeao.genes, campeao.detalhes["iteracoes"],
                                               SEMENTES_RESERVADAS)
     copia = nota_da_copia_pura(sdf_base, alvo)
+    teto = nota_da_copia_pura(sdf_base, alvo, limiar=info_alvo["limiar"])
 
     extras = {
         "config": asdict(config), "seed": args.seed,
@@ -122,15 +145,16 @@ def main(argv=None) -> Path:
         "campeao": {"genes": campeao.genes, "nota_ajuste": campeao.nota,
                     "iteracoes": campeao.detalhes["iteracoes"], "ordem": campeao.ordem},
         "notas_reservadas": reservadas.tolist(), "nota_reservada_media": float(reservadas.mean()),
-        "nota_copia_pura": copia,
+        "nota_copia_pura": copia, "nota_teto_trivial": teto,
+        "forma": list(sdf_base.shape), "ambiente": ambiente(),
     }
-    destino = gravar(resultado, extras, args.saida)
+    gravar(resultado, extras, destino)
 
     print(f"{resultado.metodo}: {len(resultado.avaliacoes)} avaliações "
           f"({resultado.reaproveitadas} repetidas, sem refazer o CA)")
     print(f"campeão {campeao.genes} com {campeao.detalhes['iteracoes']} iterações")
     print(f"nota nas sementes de ajuste {campeao.nota:+.3f}, nas reservadas "
-          f"{reservadas.mean():+.3f} (mín {reservadas.min():+.3f}); cópia pura {copia:+.3f}")
+          f"{reservadas.mean():+.3f} (mín {reservadas.min():+.3f}); cópia pura {copia:+.3f}; teto trivial {teto:+.3f}")
     print(f"gravado em {caminho_legivel(destino)}")
     return destino
 

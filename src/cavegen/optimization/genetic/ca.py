@@ -136,6 +136,11 @@ class AvaliadorCA:
             "paradas": [t.parada for t in trajetorias],
             "motivos": [t.motivo or "maximo" for t in trajetorias],
             "notas_por_semente": por_semente[:, melhor].tolist(),
+            # Por passo e por semente. viraram_1 - viraram_0 é a variação do
+            # vazio e viraram_1 + viraram_0 são as mudanças, então os dois saem
+            # destas listas.
+            "vazios": [t.vazios for t in trajetorias],
+            "mudancas": [t.mudancas for t in trajetorias],
         }
 
     def nota_com_iteracoes(self, genes: dict, iteracoes: int,

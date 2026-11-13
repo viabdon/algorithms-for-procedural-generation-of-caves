@@ -4,6 +4,7 @@
 """
 import contextlib
 import io
+import json
 import tempfile
 import unittest
 from pathlib import Path
@@ -240,8 +241,15 @@ class ExecutarTests(unittest.TestCase):
                 self.assertEqual(r["genes"].shape, (6, 3))
                 self.assertEqual(r["notas"].shape, (6,))
                 for campo in ("campeao", "notas_reservadas", "nota_copia_pura", "cortes",
-                              "sementes_reservadas", "alvo", "genes_limites"):
+                              "sementes_reservadas", "alvo", "genes_limites", "detalhes",
+                              "nota_teto_trivial", "forma", "ambiente"):
                     self.assertIn(campo, r.files)
+                # O alvo é o peso deslocado em 3: cortar o peso em -3 acerta tudo.
+                self.assertEqual(json.loads(str(r["nota_teto_trivial"])), 1.0)
+                detalhes = json.loads(str(r["detalhes"]))
+                self.assertEqual(len(detalhes), 6)
+                self.assertEqual(len(detalhes[0]["vazios"]), 3)  # uma lista por semente
+                self.assertEqual(json.loads(str(r["forma"])), [16, 16, 16])
 
 if __name__ == "__main__":
     unittest.main()
