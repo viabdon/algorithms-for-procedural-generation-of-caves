@@ -166,6 +166,16 @@ class FigurasTests(unittest.TestCase):
                 figura = figura_3d(np.zeros((6, 6, 6), dtype=bool), "zeros", modo=modo)
                 self.assertEqual(figura.layout.uirevision, "cubo")
 
+    def test_figura_3d_sem_escala_nao_desenha_a_barra(self) -> None:
+        matriz = seed_aleatoria(8).astype(bool)
+        com = figura_3d(matriz, "zeros")
+        sem = figura_3d(matriz, "zeros", com_escala=False)
+
+        self.assertTrue(any(trace.marker.showscale for trace in com.data
+                            if trace.type == "scatter3d"))
+        self.assertFalse(any(trace.marker.showscale for trace in sem.data
+                             if trace.type == "scatter3d"))
+
     def test_corte_do_peso_usa_o_minimo_e_o_maximo_e_nao_espelha_o_zero(self) -> None:
         # Peso só negativo: com zmid=0 a escala iria de -6 a +6.
         corte = np.array([[-6.0, -2.0], [-1.0, 0.0]])

@@ -105,12 +105,12 @@ def carregar_resultado(result_id: int) -> dict:
 
 @st.cache_resource(max_entries=16, show_spinner="montando a nuvem 3D...")
 def nuvem_3d(chave: int, passo: int, _matriz, borda: str, modo: str, paleta: str,
-             so_superficie: bool):
+             so_superficie: bool, com_escala: bool = True):
     """
         figura_3d guardada por (execução, passo, visual). O underscore em _matriz
         tira a matriz do hash: quem identifica o volume é a chave da execução.
     """
-    return figura_3d(_matriz, borda, modo, paleta, so_superficie)
+    return figura_3d(_matriz, borda, modo, paleta, so_superficie, com_escala=com_escala)
 
 
 # --- rótulos -----------------------------------------------------------------
@@ -342,11 +342,11 @@ def aba_3d(execucao: Execucao) -> None:
                                         else -1), width="stretch", key="nuvem_final")
 
 
-def figura_do_passo(execucao: Execucao, passo: int):
+def figura_do_passo(execucao: Execucao, passo: int, com_escala: bool = True):
     matriz = execucao.final if passo < 0 else execucao.passos[passo]
     return nuvem_3d(st.session_state.chave, passo, matriz, execucao.border_treatment,
                     st.session_state.modo, st.session_state.paleta,
-                    st.session_state.superficie)
+                    st.session_state.superficie, com_escala)
 
 
 @st.fragment
@@ -391,7 +391,9 @@ def aba_evolucao(execucao: Execucao) -> None:
         st.plotly_chart(figura_evolucao(execucao.historico, execucao.total_celulas, passo),
                         width="stretch")
     with coluna_nuvem:
-        st.plotly_chart(figura_do_passo(execucao, passo), width="stretch", key="nuvem_passo")
+        # A barra de vizinhos já aparece na aba 3D; aqui ela só tiraria largura do cubo.
+        st.plotly_chart(figura_do_passo(execucao, passo, com_escala=False), width="stretch",
+                        key="nuvem_passo")
 
 
 def main() -> None:

@@ -47,7 +47,8 @@ def celulas_visiveis(matriz: np.ndarray) -> np.ndarray:
 
 
 def figura_3d(matriz: np.ndarray, border_treatment: str, modo: str = "vizinhos",
-              paleta: str = "Purp", so_superficie: bool = True, titulo: str = "") -> go.Figure:
+              paleta: str = "Purp", so_superficie: bool = True, titulo: str = "",
+              com_escala: bool = True) -> go.Figure:
     """
         Nuvem 3D de um passo do CA, nos modos de cor do plot.py.
         matriz: matriz binária do passo.
@@ -56,6 +57,7 @@ def figura_3d(matriz: np.ndarray, border_treatment: str, modo: str = "vizinhos",
         paleta: uma das PALETAS do plot.py.
         so_superficie: desenha só as células visíveis (ver celulas_visiveis).
         titulo: texto no topo da figura.
+        com_escala: desenha a barra de cores à esquerda do cubo.
     """
     vivas = np.asarray(matriz, dtype=bool)
     desenhadas = celulas_visiveis(vivas) if so_superficie else vivas
@@ -81,9 +83,12 @@ def figura_3d(matriz: np.ndarray, border_treatment: str, modo: str = "vizinhos",
         paleta=paleta,
         opacidades=opacidades,
     )
+    if not com_escala:
+        # Sem a barra, a margem esquerda que ela ocupava volta para o cubo.
+        figura.update_traces(marker_showscale=False, selector=dict(type="scatter3d"))
     # uirevision fixo: o plotly mantém a câmera do usuário entre redesenhos.
     figura.update_layout(width=None, height=ALTURA_3D, uirevision="cubo",
-                         margin=dict(l=60, r=0, t=40, b=0))
+                         margin=dict(l=60 if com_escala else 0, r=0, t=40, b=0))
     return figura
 
 
