@@ -21,7 +21,7 @@ from cavegen.generators.cellular_automata.generator import (
     contar_transicoes,
     iterate,
 )
-from cavegen.generators.cellular_automata.pesos import comprimir_log, importar_sdf
+from cavegen.generators.cellular_automata.pesos import importar_sdf
 from cavegen.generators.cellular_automata.plot import (
     ETAPA_PESO,
     adicionar_controle_do_peso,
@@ -34,6 +34,7 @@ from cavegen.generators.cellular_automata.plot import (
 )
 from cavegen.generators.cellular_automata.results import load_result, result_path, run_and_save
 from cavegen.generators.random_walk.plot import figura_classificacao
+from cavegen.sdf.manipulacao import comprimir_log
 from cavegen.ui.cellular_automata.dados import Execucao, rodar_passo_a_passo, salvar
 from cavegen.ui.cellular_automata.figuras import figura_3d
 

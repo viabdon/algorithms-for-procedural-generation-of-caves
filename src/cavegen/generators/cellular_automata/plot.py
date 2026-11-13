@@ -30,12 +30,12 @@ from plotly.subplots import make_subplots
 from cavegen.generators.cellular_automata.generator import neighbor_counts
 from cavegen.generators.cellular_automata.pesos import (
     PESOS_DIR,
-    comprimir_log,
     load_peso_info,
     load_peso_matrix,
 )
 from cavegen.generators.cellular_automata.results import RESULTS_DIR, load_result
 from cavegen.generators.cellular_automata.storage import storage_dir
+from cavegen.sdf.manipulacao import comprimir_log
 
 # Figuras ficam no pacote, nao no temp do sistema: o caminho e estavel e curto,
 # da para abrir pelo explorador de arquivos e colar no navegador.

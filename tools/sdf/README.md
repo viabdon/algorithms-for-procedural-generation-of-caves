@@ -107,10 +107,10 @@ aplica duas transformações, **sempre nesta ordem**, sem recalcular a distânci
    | fora, a 4 voxels | −4 | 0 (neutro) |
    | fora, a 10 voxels | −10 | −6 |
 
-2. **Log** (`--log E`): o `comprimir_log` do CA
-   (`E · sinal(x) · ln(1 + |x|)`), importado de
-   `cavegen.generators.cellular_automata.pesos` para a conta ser uma só nos
-   dois usos. Vem depois do limiar para o zero continuar em `L`: o log leva 0 em
+2. **Log** (`--log E`): `comprimir_log` (`E · sinal(x) · ln(1 + |x|)`).
+   As duas transformações ficam em `src/cavegen/sdf/manipulacao.py`, porque
+   são do SDF e o CA (peso) e o GA (peso e alvo) também as usam; o pacote
+   não importa de `tools/`, então este script importa de lá. Vem depois do limiar para o zero continuar em `L`: o log leva 0 em
    0. Na ordem inversa, o zero sairia do lugar.
 
 As duas transformações só crescem, então a ordem dos voxels não muda: o corte

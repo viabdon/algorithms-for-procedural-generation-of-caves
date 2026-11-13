@@ -23,7 +23,6 @@ from dataclasses import dataclass
 import numpy as np
 
 from cavegen.generators.cellular_automata.generator import BorderTreatment, iterate
-from cavegen.generators.cellular_automata.pesos import comprimir_log
 from cavegen.generators.cellular_automata.seeds import generate_seed_matrix
 from cavegen.optimization.genetic.algoritmo import Gene
 from cavegen.optimization.genetic.aptidao import (
@@ -33,6 +32,7 @@ from cavegen.optimization.genetic.aptidao import (
     motivo_da_parada,
     nota_do_passo,
 )
+from cavegen.sdf.manipulacao import comprimir_log
 
 GENES_CA = (
     Gene("chance_inicial", 0.3, 0.7),

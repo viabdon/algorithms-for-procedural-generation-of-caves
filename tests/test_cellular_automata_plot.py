@@ -14,7 +14,7 @@ from pathlib import Path
 import numpy as np
 
 from cavegen.generators.cellular_automata.generator import neighbor_counts
-from cavegen.generators.cellular_automata.pesos import comprimir_log, importar_sdf
+from cavegen.generators.cellular_automata.pesos import importar_sdf
 from cavegen.generators.cellular_automata.plot import (
     CONTRASTE_MINIMO_LINHA,
     CORTE_PESO_VOXELS,
@@ -38,6 +38,7 @@ from cavegen.generators.cellular_automata.plot import (
     vizinhos_das_vivas,
 )
 from cavegen.generators.cellular_automata.results import load_result, result_path
+from cavegen.sdf.manipulacao import comprimir_log
 
 
 class PlotTests(unittest.TestCase):

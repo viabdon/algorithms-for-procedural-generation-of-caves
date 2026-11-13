@@ -2,8 +2,8 @@
 
 Um peso é uma cópia do SDF guardada ao lado das seeds, com a origem e a
 convenção de sinal anotadas. O SDF original continua onde foi calculado. A cópia
-pode ser comprimida com um logaritmo (ver comprimir_log), para o peso crescer
-menos à medida que a célula se afasta da superfície.
+pode ser comprimida com um logaritmo (comprimir_log, de cavegen.sdf.manipulacao),
+para o peso crescer menos à medida que a célula se afasta da superfície.
 
     uv run python -m cavegen.generators.cellular_automata.pesos [caminho_do_sdf.npz] [escala_log]
 """
@@ -13,6 +13,7 @@ from pathlib import Path
 import numpy as np
 
 from cavegen.generators.cellular_automata.storage import build_path, next_id, storage_dir, used_ids
+from cavegen.sdf.manipulacao import comprimir_log
 
 # Pasta onde os pesos do CA sao gravados, ao lado deste arquivo.
 PESOS_DIR = storage_dir("pesos")
@@ -48,24 +49,6 @@ def caminho_legivel(caminho: Path) -> str:
         return caminho.relative_to(RAIZ_DO_PROJETO).as_posix()
     except ValueError:
         return caminho.as_posix()
-
-def comprimir_log(sdf: np.ndarray, escala: float) -> np.ndarray:
-    """
-        Aplica escala * sinal(d) * ln(1 + |d|) ao SDF pronto. O 1 + |d| evita o
-        infinito negativo em d = 0, e o sinal mantém o externo negativo, porque o
-        logaritmo sozinho só enxerga a distância.
-        A escala é o que mantém o guia funcionando: os vizinhos vão só até 27,
-        então com escala 1 o peso mais forte do volume mal passa de -4 e a célula
-        nasce em qualquer lugar. Com escala 2 o peso quase não muda até 3 voxels
-        da superfície e cresce bem menos depois disso.
-        sdf: campo com sinal, em voxels.
-        escala: multiplicador do logaritmo, finito e maior que 0.
-    """
-    # NaN passaria por um "escala <= 0" e zeraria o volume do CA sem nenhum erro.
-    if not np.isfinite(escala) or escala <= 0:
-        raise ValueError(f"A escala do logaritmo precisa ser finita e maior que 0, veio {escala}.")
-
-    return (escala * np.sign(sdf) * np.log1p(np.abs(sdf))).astype(np.float32)
 
 def importar_sdf(origem: Path = SDF_ELAPHES, directory: Path = PESOS_DIR,
                  escala_log: float | None = None) -> Path:

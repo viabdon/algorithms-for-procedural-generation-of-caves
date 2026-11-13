@@ -9,12 +9,12 @@ from pathlib import Path
 import numpy as np
 
 from cavegen.generators.cellular_automata.pesos import (
-    comprimir_log,
     load_peso_info,
     load_peso_matrix,
 )
 from cavegen.generators.random_walk.voxelizacao import classificar
 from cavegen.metrics.connectivity import connected_components
+from cavegen.sdf.manipulacao import comprimir_log
 from tools.random_walk_points.generator import (
     DESCIDA,
     INICIAL,

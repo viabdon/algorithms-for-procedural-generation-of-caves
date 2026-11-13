@@ -22,12 +22,12 @@ from cavegen.generators.cellular_automata.generator import (
     neighbor_counts,
 )
 from cavegen.generators.cellular_automata.pesos import (
-    comprimir_log,
     importar_sdf,
     load_peso_info,
     load_peso_matrix,
     used_peso_ids,
 )
+from cavegen.sdf.manipulacao import comprimir_log
 
 
 def matriz_aleatoria(formato: tuple[int, int, int], seed: int) -> np.ndarray:

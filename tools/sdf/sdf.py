@@ -24,13 +24,14 @@
     docs/architecture.md usa o inverso (SDF < 0 no VOID), por isso o sinal
     fica em SINAL_INTERNO, para inverter fácil.
 
-    Manipulação (manipular_sdf), sempre nesta ordem, sem recalcular a distância:
+    Manipulação (manipular_sdf, de cavegen.sdf.manipulacao, onde o CA e o GA
+    também a usam), sempre nesta ordem, sem recalcular a distância:
     1. Limiar: o zero passa para d = limiar. Com limiar -4, o voxel a 4 voxels
        do lado de fora vira 0 (neutro), a borda vira +4 e o interno sobe junto;
        além dos 4 voxels o campo continua negativo. É só somar uma constante,
        porque a distância até a borda não muda. Do lado de fora, o campo
        deslocado é a distância até a superfície empurrada 4 voxels para fora.
-    2. Logaritmo: o comprimir_log do CA (escala * sinal * ln(1 + |x|)), aplicado
+    2. Logaritmo: comprimir_log (escala * sinal * ln(1 + |x|)), aplicado
        ao campo já deslocado, para o zero continuar no limiar.
     O limiar e a escala ficam gravados no npz. Sem os dois, o campo é o SDF base.
 
@@ -52,12 +53,12 @@ import numpy as np
 import plotly.graph_objects as go
 from scipy.ndimage import distance_transform_edt
 
-from cavegen.generators.cellular_automata.pesos import comprimir_log
 from cavegen.generators.cellular_automata.plot import (
     caixa_wireframe,
     camera_isometrica,
     gizmo_eixos,
 )
+from cavegen.sdf.manipulacao import manipular_sdf
 from tools.flood_fill.inundacao import (
     BORDA,
     INTERNO,
@@ -107,34 +108,6 @@ def aplicar_sinal(distancia: np.ndarray, interno: np.ndarray) -> np.ndarray:
     # A borda não é interno, então sem isso sairia -0.0 (distância 0 vezes o sinal de fora).
     sdf[distancia == 0] = 0
     return sdf.astype(np.float32)
-
-def deslocar_zero(sdf: np.ndarray, limiar: float) -> np.ndarray:
-    """
-        Passa o zero do campo para d = limiar: campo = d - limiar. Com limiar
-        negativo o zero vai para fora da borda e tudo de dentro ganha |limiar|;
-        com limiar positivo o zero entra na caverna. 0 devolve o mesmo campo.
-        sdf: campo com sinal, em voxels.
-        limiar: valor do SDF onde o zero passa a ficar, finito.
-    """
-    # NaN ou infinito passariam pela conta e estragariam o campo inteiro sem erro.
-    if not np.isfinite(limiar):
-        raise ValueError(f"O limiar precisa ser finito, veio {limiar}.")
-
-    return (sdf - np.float32(limiar)).astype(np.float32)
-
-def manipular_sdf(sdf: np.ndarray, limiar: float = 0.0,
-                  escala_log: float | None = None) -> np.ndarray:
-    """
-        Aplica o limiar e depois o logaritmo, nesta ordem fixa. Deslocar antes
-        mantém o zero exatamente no limiar, porque o log leva 0 em 0.
-        sdf: campo com sinal, em voxels (o SDF base).
-        limiar: valor do SDF onde o zero passa a ficar; 0 não desloca.
-        escala_log: escala do comprimir_log; None não comprime.
-    """
-    campo = deslocar_zero(sdf, limiar)
-    if escala_log is not None:
-        campo = comprimir_log(campo, escala_log)
-    return campo
 
 def convencao_do_campo(limiar: float = 0.0, escala_log: float | None = None) -> str:
     """

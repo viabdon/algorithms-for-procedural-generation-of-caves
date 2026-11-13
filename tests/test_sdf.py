@@ -9,17 +9,15 @@ from pathlib import Path
 import numpy as np
 
 from cavegen.generators.cellular_automata.pesos import (
-    comprimir_log,
     importar_sdf,
     load_peso_info,
     load_peso_matrix,
 )
+from cavegen.sdf.manipulacao import comprimir_log, deslocar_zero, manipular_sdf
 from tools.sdf.sdf import (
     CORTE_NEGATIVO,
     corte_do_campo,
-    deslocar_zero,
     gravar_campo,
-    manipular_sdf,
     nome_do_campo,
     sdf_da_superficie,
 )
