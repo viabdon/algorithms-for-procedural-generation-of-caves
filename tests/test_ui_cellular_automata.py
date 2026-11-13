@@ -29,7 +29,12 @@ from cavegen.ui.cellular_automata.dados import (
     rodar_passo_a_passo,
     salvar,
 )
-from cavegen.ui.cellular_automata.figuras import celulas_visiveis, fatia, figura_3d
+from cavegen.ui.cellular_automata.figuras import (
+    celulas_visiveis,
+    fatia,
+    figura_3d,
+    figura_cortes,
+)
 
 APP = Path(__file__).resolve().parents[1] / "src" / "cavegen" / "ui" / "cellular_automata" / "app.py"
 
@@ -160,6 +165,15 @@ class FigurasTests(unittest.TestCase):
             with self.subTest(modo=modo):
                 figura = figura_3d(np.zeros((6, 6, 6), dtype=bool), "zeros", modo=modo)
                 self.assertEqual(figura.layout.uirevision, "cubo")
+
+    def test_corte_do_peso_usa_o_minimo_e_o_maximo_e_nao_espelha_o_zero(self) -> None:
+        # Peso só negativo: com zmid=0 a escala iria de -6 a +6.
+        corte = np.array([[-6.0, -2.0], [-1.0, 0.0]])
+        figura = figura_cortes([("peso", corte, "peso")], "altura")
+        heatmap = figura.data[0]
+
+        self.assertIsNone(heatmap.zmid)
+        self.assertNotEqual(heatmap.zauto, False)
 
 
 @unittest.skipIf(importlib.util.find_spec("streamlit") is None, "extra ui não instalado")

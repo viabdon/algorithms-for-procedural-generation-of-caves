@@ -370,8 +370,9 @@ def aba_cortes(execucao: Execucao) -> None:
                         fatia(peso, eixo, indice), "peso"))
 
     st.plotly_chart(figura_cortes(paineis, eixo), width="stretch")
-    st.caption("verde = vazio (caverna), cinza = rocha. No peso, azul é dentro da "
-               "caverna de referência e vermelho é fora.")
+    st.caption("verde = vazio (caverna), cinza = rocha. No peso, a cor vai do menor valor "
+               "do corte (vermelho, fora da caverna de referência) ao maior (azul); o "
+               "branco fica no meio da faixa, não no zero.")
 
 
 @st.fragment

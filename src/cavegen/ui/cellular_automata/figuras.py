@@ -118,9 +118,11 @@ def figura_cortes(paineis: list, eixo: str) -> go.Figure:
                 hovertemplate="x=%{x} y=%{y}<br>%{z}<extra></extra>",
             )
         else:
-            # SDF: interno positivo (azul), externo negativo (vermelho), zero no meio.
+            # A paleta vai do mínimo (vermelho) ao máximo (azul) do corte. Com zmid=0 o
+            # plotly espelhava o extremo mais longe do zero e gastava metade da escala
+            # num lado sem valores, como o positivo de um peso só negativo.
             trace = go.Heatmap(
-                z=corte, colorscale="RdBu", zmid=0,
+                z=corte, colorscale="RdBu",
                 colorbar=dict(title="peso", thickness=12, len=0.8),
                 hovertemplate="x=%{x} y=%{y}<br>peso=%{z:.2f}<extra></extra>",
             )
