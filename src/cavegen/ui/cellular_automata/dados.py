@@ -38,6 +38,8 @@ class Execucao:
         final: matriz depois da última iteração.
         historico: células vivas em cada passo, do 0 (seed) ao último.
         passos: matriz de cada passo; None quando o volume veio de um arquivo.
+        viraram_1, viraram_0: células que mudaram em cada iteração; None num
+                              resultado gravado antes das transições existirem.
         seed_id: None enquanto a seed sorteada na hora não foi gravada.
         one_probability: chance de 1 da seed, quando conhecida.
         modo_peso: valor de ModoPeso; só tem efeito quando há peso_id.
@@ -51,6 +53,8 @@ class Execucao:
     border_treatment: str
     iterations: int
     passos: list | None = None
+    viraram_1: np.ndarray | None = None
+    viraram_0: np.ndarray | None = None
     seed_id: int | None = None
     one_probability: float | None = None
     peso_id: int | None = None

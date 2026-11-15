@@ -49,6 +49,7 @@ from cavegen.ui.cellular_automata.dados import (
     historico_dos_passos,
     rodar_passo_a_passo,
     salvar,
+    transicoes_dos_passos,
 )
 from cavegen.ui.cellular_automata.figuras import (
     EIXOS_CORTE,
@@ -176,8 +177,10 @@ def rodar(config: dict) -> None:
     )
     barra.empty()
 
+    viraram_1, viraram_0 = transicoes_dos_passos(passos)
     abrir(Execucao(
         seed=passos[0], final=passos[-1], historico=historico_dos_passos(passos),
+        viraram_1=viraram_1, viraram_0=viraram_0,
         sensitivity=config["sensibilidade"], border_treatment=config["borda"].value,
         iterations=config["iteracoes"], passos=passos, seed_id=config["seed_id"],
         one_probability=config["probabilidade"], peso_id=config["peso_id"],
@@ -198,6 +201,7 @@ def abrir_gravado(result_id: int) -> None:
     abrir(Execucao(
         seed=carregar_seed(seed_id).astype(bool) if tem_seed else None,
         final=final, historico=np.asarray(historico),
+        viraram_1=dados["viraram_1_history"], viraram_0=dados["viraram_0_history"],
         sensitivity=dados["sensitivity"], border_treatment=dados["border_treatment"],
         iterations=dados["iterations"], seed_id=seed_id,
         one_probability=load_seed_info(seed_id)["one_probability"] if tem_seed else None,
@@ -377,8 +381,10 @@ def aba_cortes(execucao: Execucao) -> None:
 
 @st.fragment
 def aba_evolucao(execucao: Execucao) -> None:
+    linhas = dict(viraram_1=execucao.viraram_1, viraram_0=execucao.viraram_0,
+                  paleta=st.session_state.paleta)
     if execucao.passos is None:
-        st.plotly_chart(figura_evolucao(execucao.historico, execucao.total_celulas),
+        st.plotly_chart(figura_evolucao(execucao.historico, execucao.total_celulas, **linhas),
                         width="stretch")
         st.caption("Resultado lido de arquivo: só o passo final está gravado. Rode de "
                    "novo pela barra lateral para navegar pelos passos.")
@@ -388,8 +394,8 @@ def aba_evolucao(execucao: Execucao) -> None:
     coluna_linha, coluna_nuvem = st.columns([2, 3], vertical_alignment="center")
     with coluna_linha:
         passo = st.slider("passo", 0, execucao.iterations, execucao.iterations)
-        st.plotly_chart(figura_evolucao(execucao.historico, execucao.total_celulas, passo),
-                        width="stretch")
+        st.plotly_chart(figura_evolucao(execucao.historico, execucao.total_celulas, passo,
+                                        **linhas), width="stretch")
     with coluna_nuvem:
         # A barra de vizinhos já aparece na aba 3D; aqui ela só tiraria largura do cubo.
         st.plotly_chart(figura_do_passo(execucao, passo, com_escala=False), width="stretch",

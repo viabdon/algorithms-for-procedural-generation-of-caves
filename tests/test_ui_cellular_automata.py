@@ -34,6 +34,7 @@ from cavegen.ui.cellular_automata.figuras import (
     fatia,
     figura_3d,
     figura_cortes,
+    figura_evolucao,
 )
 
 APP = Path(__file__).resolve().parents[1] / "src" / "cavegen" / "ui" / "cellular_automata" / "app.py"
@@ -175,6 +176,23 @@ class FigurasTests(unittest.TestCase):
                             if trace.type == "scatter3d"))
         self.assertFalse(any(trace.marker.showscale for trace in sem.data
                              if trace.type == "scatter3d"))
+
+    def test_evolucao_mostra_as_transicoes_como_o_plot_do_ca(self) -> None:
+        execucao = execucao_de(seed_aleatoria())
+        para_1, para_0 = transicoes_dos_passos(execucao.passos)
+        figura = figura_evolucao(execucao.historico, execucao.total_celulas, 2, para_1, para_0)
+
+        linhas = {trace.name: trace for trace in figura.data if trace.name}
+        self.assertEqual(set(linhas), {"celulas vivas", "viraram 1", "viraram 0"})
+        np.testing.assert_array_equal(linhas["celulas vivas"].x, [0, 1, 2, 3])
+        # A primeira transição é entre o passo 0 e o 1.
+        np.testing.assert_array_equal(linhas["viraram 1"].x, [1, 2, 3])
+        np.testing.assert_array_equal(linhas["viraram 1"].y, para_1)
+        np.testing.assert_array_equal(linhas["viraram 0"].y, para_0)
+
+    def test_evolucao_sem_transicoes_fica_so_com_as_vivas(self) -> None:
+        figura = figura_evolucao(np.array([10, 12]), 27)
+        self.assertEqual([trace.name for trace in figura.data], ["celulas vivas"])
 
     def test_corte_do_peso_usa_o_minimo_e_o_maximo_e_nao_espelha_o_zero(self) -> None:
         # Peso só negativo: com zmid=0 a escala iria de -6 a +6.
