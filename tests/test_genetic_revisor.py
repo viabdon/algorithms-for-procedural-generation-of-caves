@@ -97,8 +97,7 @@ class GeneRevisorTests(unittest.TestCase):
     def test_genes_do_ca_batem_com_a_decisao(self):
         limites = {g.nome: (g.minimo, g.maximo, g.inteiro) for g in GENES_CA}
         self.assertEqual(limites, {"chance_inicial": (0.3, 0.7, False),
-                                   "sensibilidade": (1, 20, True),
-                                   "escala_log_peso": (0.25, 12.0, False)})
+                                   "sensibilidade": (1, 20, True)})
         self.assertEqual(MAX_ITERACOES, 50)
         self.assertIs(modulo_ca.BORDA, BorderTreatment.NEAREST)
 
@@ -117,8 +116,8 @@ class GeneRevisorTests(unittest.TestCase):
     def test_ga_nos_genes_do_ca_respeita_limites_e_tipos_mesmo_empurrado_para_a_borda(self):
         # Aptidão que premia os extremos: a mutação é jogada contra os limites.
         def extremos(genes):
-            return (abs(genes["chance_inicial"] - 0.5) + abs(genes["sensibilidade"] - 10.5)
-                    + abs(genes["escala_log_peso"] - 6.0)), {"iteracoes": 1}
+            return (abs(genes["chance_inicial"] - 0.5)
+                    + abs(genes["sensibilidade"] - 10.5)), {"iteracoes": 1}
 
         config = ConfiguracaoGA(orcamento=400, passo_mutacao=0.5, taxa_mutacao=1.0)
         for resultado in (evoluir(GENES_CA, extremos, config, seed=3),
@@ -129,7 +128,6 @@ class GeneRevisorTests(unittest.TestCase):
                     self.assertTrue(gene.minimo <= valor <= gene.maximo, (gene.nome, valor))
                 self.assertIs(type(a.genes["sensibilidade"]), int)
                 self.assertIs(type(a.genes["chance_inicial"]), float)
-                self.assertIs(type(a.genes["escala_log_peso"]), float)
 
 
 class OrcamentoRevisorTests(unittest.TestCase):
@@ -207,12 +205,12 @@ class ConsistenciaIteracoesRevisorTests(unittest.TestCase):
     """A nota que a busca vê na iteração N tem de ser a que a regra 'até N' dá."""
 
     GENES = (
-        {"chance_inicial": 0.5, "sensibilidade": 8, "escala_log_peso": 4.0},
-        {"chance_inicial": 0.3, "sensibilidade": 14, "escala_log_peso": 2.0},
-        {"chance_inicial": 0.7, "sensibilidade": 1, "escala_log_peso": 0.25},
-        {"chance_inicial": 0.45, "sensibilidade": 20, "escala_log_peso": 12.0},
-        {"chance_inicial": 0.6, "sensibilidade": 12, "escala_log_peso": 1.0},
-        {"chance_inicial": 0.4, "sensibilidade": 17, "escala_log_peso": 6.0},
+        {"chance_inicial": 0.5, "sensibilidade": 8},
+        {"chance_inicial": 0.3, "sensibilidade": 14},
+        {"chance_inicial": 0.7, "sensibilidade": 1},
+        {"chance_inicial": 0.45, "sensibilidade": 20},
+        {"chance_inicial": 0.6, "sensibilidade": 12},
+        {"chance_inicial": 0.4, "sensibilidade": 17},
     )
 
     def test_padding_bate_com_nota_com_iteracoes_em_todo_n(self):
@@ -253,7 +251,7 @@ class ConsistenciaIteracoesRevisorTests(unittest.TestCase):
         sdf = np.zeros((8, 8, 10), dtype=np.float32)
         sdf[3:5, 3:5, 3:7] = 1
         with self.assertRaises(ValueError):
-            rodar_ca({"chance_inicial": 0.5, "sensibilidade": 8, "escala_log_peso": 1.0},
+            rodar_ca({"chance_inicial": 0.5, "sensibilidade": 8},
                      sdf, Alvo(sdf), semente=1)
 
 

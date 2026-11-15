@@ -12,6 +12,7 @@ from unittest import mock
 
 import numpy as np
 
+from cavegen.optimization.genetic import ca as modulo_ca
 from cavegen.optimization.genetic.algoritmo import (
     ConfiguracaoGA,
     Gene,
@@ -28,7 +29,8 @@ from cavegen.optimization.genetic.aptidao import (
     nota_da_copia_pura,
     nota_do_passo,
 )
-from cavegen.optimization.genetic.ca import AvaliadorCA, rodar_ca
+from cavegen.optimization.genetic.ca import GENES_CA, AvaliadorCA, rodar_ca
+from cavegen.sdf.manipulacao import comprimir_log
 
 GENES = (Gene("x", 0.0, 1.0), Gene("n", 1, 20, inteiro=True))
 
@@ -174,7 +176,7 @@ class AvaliadorCATests(unittest.TestCase):
     def setUp(self):
         self.sdf = esfera_sdf()
         self.alvo = Alvo(self.sdf + 3)
-        self.genes = {"chance_inicial": 0.5, "sensibilidade": 8, "escala_log_peso": 4.0}
+        self.genes = {"chance_inicial": 0.5, "sensibilidade": 10}
 
     def test_rodar_ca_e_reproduzivel_e_completa_as_notas(self):
         a = rodar_ca(self.genes, self.sdf, self.alvo, semente=3, max_iteracoes=30)
@@ -209,10 +211,40 @@ class AvaliadorCATests(unittest.TestCase):
 
     def test_candidato_que_morre_recebe_a_nota_minima(self):
         avaliador = AvaliadorCA(self.sdf, self.alvo, (1,), max_iteracoes=10)
-        nota, detalhes = avaliador({**self.genes, "sensibilidade": 27, "escala_log_peso": 0.25})
+        nota, detalhes = avaliador({**self.genes, "sensibilidade": 27})
 
         self.assertEqual(nota, NOTA_MINIMA)
         self.assertEqual(detalhes["motivos"], ["vazio_de_menos"])
+
+    def test_cromossomo_nao_tem_escala_do_peso(self):
+        self.assertEqual([g.nome for g in GENES_CA], ["chance_inicial", "sensibilidade"])
+
+    def test_peso_chega_ao_ca_identico_ao_carregado(self):
+        # Contrato: nada multiplica, comprime ou corta o peso entre o arquivo e o CA.
+        peso = comprimir_log(self.sdf, 1.0)
+        recebidos = []
+        original = modulo_ca.iterate
+
+        def espiar(matriz, sensibilidade, borda, peso_recebido=None, *args, **kwargs):
+            recebidos.append(peso_recebido)
+            return original(matriz, sensibilidade, borda, peso_recebido, *args, **kwargs)
+
+        avaliador = AvaliadorCA(peso, self.alvo, (1, 2), max_iteracoes=5)
+        with mock.patch.object(modulo_ca, "iterate", side_effect=espiar):
+            avaliador(self.genes)
+            avaliador.nota_com_iteracoes(self.genes, 3, (101,))
+        self.assertTrue(recebidos)
+        for recebido in recebidos:
+            self.assertTrue(np.array_equal(recebido, peso))
+            self.assertEqual(recebido.dtype, peso.dtype)
+
+    def test_avaliador_guarda_copia_do_peso(self):
+        peso = comprimir_log(self.sdf, 1.0)
+        avaliador = AvaliadorCA(peso, self.alvo, (1,), max_iteracoes=3)
+        antes = avaliador(self.genes)[0]
+        peso *= 10  # mexer no original não muda o que o avaliador usa
+        self.assertEqual(avaliador(self.genes)[0], antes)
+        self.assertFalse(avaliador.peso.flags.writeable)
 
     def test_peso_e_alvo_precisam_do_mesmo_cubo(self):
         with self.assertRaises(ValueError):
@@ -238,7 +270,7 @@ class ExecutarTests(unittest.TestCase):
                                          "--saida", str(pasta / "results")])
             with np.load(destino) as r:
                 self.assertEqual(str(r["metodo"]), "genetico")
-                self.assertEqual(r["genes"].shape, (6, 3))
+                self.assertEqual(r["genes"].shape, (6, 2))
                 self.assertEqual(r["notas"].shape, (6,))
                 for campo in ("campeao", "notas_reservadas", "nota_copia_pura", "cortes",
                               "sementes_reservadas", "alvo", "genes_limites", "detalhes",
@@ -250,6 +282,37 @@ class ExecutarTests(unittest.TestCase):
                 self.assertEqual(len(detalhes), 6)
                 self.assertEqual(len(detalhes[0]["vazios"]), 3)  # uma lista por semente
                 self.assertEqual(json.loads(str(r["forma"])), [16, 16, 16])
+                ambiente = json.loads(str(r["ambiente"]))
+                self.assertTrue(ambiente["arquivo_peso"].endswith("peso.npz"))
+                self.assertEqual(len(ambiente["sha256_peso"]), 64)
+
+    def test_teto_trivial_com_peso_comprimido_por_log(self):
+        # O padrão do GA é o peso com log: o teto converte o limiar do alvo
+        # para a unidade do peso e continua acertando tudo.
+        from cavegen.optimization.genetic import executar
+
+        with tempfile.TemporaryDirectory() as pasta:
+            pasta = Path(pasta)
+            sdf = esfera_sdf()
+            np.savez_compressed(pasta / "peso.npz", sdf=comprimir_log(sdf, 1.0),
+                                convencao=np.array("log"), limiar=0.0, escala_log=1.0)
+            np.savez_compressed(pasta / "alvo.npz", sdf=sdf + 3, convencao=np.array("alvo"),
+                                limiar=-3.0, escala_log=1.0)
+            with (mock.patch("cavegen.profiling.resource_tracker.registrar_execucao"),
+                  contextlib.redirect_stdout(io.StringIO())):
+                destino = executar.main(["--orcamento", "3", "--populacao", "3",
+                                         "--peso", str(pasta / "peso.npz"),
+                                         "--alvo", str(pasta / "alvo.npz"),
+                                         "--saida", str(pasta / "results")])
+            with np.load(destino) as r:
+                self.assertEqual(json.loads(str(r["nota_teto_trivial"])), 1.0)
+                self.assertEqual(json.loads(str(r["peso"]))["escala_log"], 1.0)
+
+    def test_peso_padrao_e_o_sdf_com_log_1(self):
+        from cavegen.optimization.genetic import executar
+
+        self.assertEqual(executar.PESO_ELAPHES.name, "elaphes_surface_64_sdf_log1.npz")
+        self.assertIn("--log 1", executar.COMANDO_PESO)
 
 if __name__ == "__main__":
     unittest.main()

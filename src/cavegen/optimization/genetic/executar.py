@@ -4,9 +4,13 @@
     uv run python -m cavegen.optimization.genetic.executar --metodo aleatoria
     uv run python -m cavegen.optimization.genetic.executar --orcamento 100 --seed 2
 
-Antes, gere o alvo com a ferramenta do SDF (uma vez):
+Antes, gere o peso e o alvo com a ferramenta do SDF (uma vez):
 
-    uv run python -m tools.sdf.sdf --limiar -3 --log 1
+    uv run python -m tools.sdf.sdf --log 1                 # peso: SDF com ln(1 + |d|)
+    uv run python -m tools.sdf.sdf --limiar -3 --log 1     # alvo
+
+O peso entra no CA exatamente como está no arquivo, sem escala: o arquivo de
+onde ele veio fica gravado no resultado (`peso` e `ambiente`).
 
 Cada execução grava results/ga_NNN.npz ao lado deste arquivo, com a
 configuração inteira, todas as avaliações, a nota do campeão nas sementes de
@@ -16,6 +20,7 @@ inteira vai para a planilha do track_resources.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import platform
@@ -27,7 +32,7 @@ from pathlib import Path
 import numpy as np
 import scipy
 
-from cavegen.generators.cellular_automata.pesos import RAIZ_DO_PROJETO, SDF_ELAPHES, caminho_legivel
+from cavegen.generators.cellular_automata.pesos import RAIZ_DO_PROJETO, caminho_legivel
 from cavegen.generators.cellular_automata.storage import build_path, next_id
 from cavegen.optimization.genetic.algoritmo import (
     ConfiguracaoGA,
@@ -38,9 +43,13 @@ from cavegen.optimization.genetic.algoritmo import (
 from cavegen.optimization.genetic.aptidao import Alvo, Cortes, nota_da_copia_pura
 from cavegen.optimization.genetic.ca import BORDA, GENES_CA, MAX_ITERACOES, AvaliadorCA
 from cavegen.profiling.resource_tracker import track_resources
+from cavegen.sdf.manipulacao import manipular_sdf
 
-ALVO_ELAPHES = (RAIZ_DO_PROJETO / "tools" / "sdf" / "npz"
-                / "elaphes_surface_64_sdf_limiar-3_log1.npz")
+NPZ_SDF = RAIZ_DO_PROJETO / "tools" / "sdf" / "npz"
+PESO_ELAPHES = NPZ_SDF / "elaphes_surface_64_sdf_log1.npz"
+ALVO_ELAPHES = NPZ_SDF / "elaphes_surface_64_sdf_limiar-3_log1.npz"
+COMANDO_PESO = "uv run python -m tools.sdf.sdf --log 1"
+COMANDO_ALVO = "uv run python -m tools.sdf.sdf --limiar -3 --log 1"
 RESULTS_DIR = Path(__file__).resolve().parent / "results"
 PREFIXO = "ga"
 # Sementes de ajuste (a busca vê) e reservadas (só o campeão, no fim).
@@ -48,10 +57,15 @@ SEMENTES_AJUSTE = (1, 2, 3)
 SEMENTES_RESERVADAS = tuple(range(101, 111))
 
 def carregar_campo(caminho: Path) -> tuple[np.ndarray, dict]:
-    """Lê o 'sdf' de um npz do tools/sdf e os campos que descrevem a manipulação."""
+    """
+        Lê o 'sdf' de um npz do tools/sdf e os campos que descrevem a
+        manipulação que a ferramenta fez nele (limiar e log), mais o sha256 do
+        arquivo para saber depois exatamente qual campo entrou.
+    """
     with np.load(caminho) as arquivo:
         campo = arquivo["sdf"].astype(np.float32)
         info = {"origem": caminho_legivel(Path(caminho)),
+                "sha256": hashlib.sha256(Path(caminho).read_bytes()).hexdigest(),
                 "convencao": str(arquivo["convencao"]) if "convencao" in arquivo.files else "",
                 "limiar": float(arquivo["limiar"]) if "limiar" in arquivo.files else 0.0,
                 "escala_log": (float(arquivo["escala_log"])
@@ -72,6 +86,16 @@ def ambiente() -> dict:
             "numpy": np.__version__, "scipy": scipy.__version__,
             "plataforma": platform.platform(), "processador": platform.processor(),
             "cpus": os.cpu_count()}
+
+def limiar_do_alvo_no_peso(info_peso: dict, info_alvo: dict) -> float:
+    """
+        O limiar do alvo (em voxels do SDF) escrito na unidade do peso, para o
+        teto trivial. O peso pode ter limiar e log próprios, e as duas
+        manipulações só crescem, então "SDF > limiar do alvo" é o mesmo que
+        "peso > este valor".
+    """
+    corte = np.array([info_alvo["limiar"]], dtype=np.float32)
+    return float(manipular_sdf(corte, info_peso["limiar"], info_peso["escala_log"])[0])
 
 def rotulo(argumentos: dict) -> str:
     # O nome do arquivo no rótulo liga a linha da planilha de recursos ao npz.
@@ -110,29 +134,29 @@ def main(argv=None) -> Path:
     parser.add_argument("--orcamento", type=int, default=ConfiguracaoGA.orcamento)
     parser.add_argument("--populacao", type=int, default=ConfiguracaoGA.tamanho_populacao)
     parser.add_argument("--seed", type=int, default=0, help="semente da busca (não do CA)")
-    parser.add_argument("--peso", type=Path, default=SDF_ELAPHES)
+    parser.add_argument("--peso", type=Path, default=PESO_ELAPHES,
+                        help="npz do tools/sdf usado como peso, sem nenhuma escala")
     parser.add_argument("--alvo", type=Path, default=ALVO_ELAPHES)
     parser.add_argument("--saida", type=Path, default=RESULTS_DIR)
     args = parser.parse_args(argv)
 
-    for caminho, comando in ((args.peso, "uv run python -m tools.sdf.sdf"),
-                             (args.alvo, "uv run python -m tools.sdf.sdf --limiar -3 --log 1")):
+    for caminho, comando in ((args.peso, COMANDO_PESO), (args.alvo, COMANDO_ALVO)):
         if not Path(caminho).exists():
             parser.error(f"{caminho} não existe. Gere com: {comando}")
 
-    sdf_base, info_peso = carregar_campo(args.peso)
+    peso, info_peso = carregar_campo(args.peso)
     campo_alvo, info_alvo = carregar_campo(args.alvo)
     alvo, cortes = Alvo(campo_alvo), Cortes()
     config = ConfiguracaoGA(tamanho_populacao=args.populacao, orcamento=args.orcamento)
-    avaliador = AvaliadorCA(sdf_base, alvo, SEMENTES_AJUSTE, MAX_ITERACOES, cortes)
+    avaliador = AvaliadorCA(peso, alvo, SEMENTES_AJUSTE, MAX_ITERACOES, cortes)
 
     destino = build_path(args.saida, PREFIXO, next_id(args.saida, PREFIXO))
     resultado = buscar(args.metodo, avaliador, config, args.seed, execucao=destino.stem)
     campeao = resultado.melhor
     reservadas = avaliador.nota_com_iteracoes(campeao.genes, campeao.detalhes["iteracoes"],
                                               SEMENTES_RESERVADAS)
-    copia = nota_da_copia_pura(sdf_base, alvo)
-    teto = nota_da_copia_pura(sdf_base, alvo, limiar=info_alvo["limiar"])
+    copia = nota_da_copia_pura(peso, alvo)
+    teto = nota_da_copia_pura(peso, alvo, limiar=limiar_do_alvo_no_peso(info_peso, info_alvo))
 
     extras = {
         "config": asdict(config), "seed": args.seed,
@@ -146,7 +170,9 @@ def main(argv=None) -> Path:
                     "iteracoes": campeao.detalhes["iteracoes"], "ordem": campeao.ordem},
         "notas_reservadas": reservadas.tolist(), "nota_reservada_media": float(reservadas.mean()),
         "nota_copia_pura": copia, "nota_teto_trivial": teto,
-        "forma": list(sdf_base.shape), "ambiente": ambiente(),
+        "forma": list(peso.shape),
+        "ambiente": {**ambiente(), "arquivo_peso": info_peso["origem"],
+                     "sha256_peso": info_peso["sha256"]},
     }
     gravar(resultado, extras, destino)
 

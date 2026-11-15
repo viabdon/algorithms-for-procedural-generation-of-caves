@@ -4,10 +4,12 @@ Genes (limites medidos no Elaphes 64³ em 12/11/2026, com folga em volta das
 melhores notas; ver docs/methodology-adjustments.md):
     chance_inicial   [0,3; 0,7]   chance de cada célula da semente nascer vazia
     sensibilidade    [1, 20]      inteiro; de 18 para cima a caverna sempre morria
-    escala_log_peso  [0,25; 12]   escala do log aplicado ao SDF base antes de
-                                  virar peso; as notas saturavam de 4 a 8
 
 Fora do cromossomo, fixos:
+    peso: o campo carregado entra no CA como está, sem escala nem outro
+          multiplicador. O SDF é uma dica para o CA, não a resposta: com a
+          escala como gene, o GA a subia até o peso passar dos 27 vizinhos
+          possíveis e o CA virava um limiar sobre o SDF (o decalque).
     iterações: o CA roda até MAX_ITERACOES, com a nota calculada em todo passo;
                a melhor iteração (pela média das seeds) sai junto com a nota.
     borda: sempre NEAREST (não fecha nem abre a beirada da grade).
@@ -32,12 +34,10 @@ from cavegen.optimization.genetic.aptidao import (
     motivo_da_parada,
     nota_do_passo,
 )
-from cavegen.sdf.manipulacao import comprimir_log
 
 GENES_CA = (
     Gene("chance_inicial", 0.3, 0.7),
     Gene("sensibilidade", 1, 20, inteiro=True),
-    Gene("escala_log_peso", 0.25, 12.0),
 )
 MAX_ITERACOES = 50
 BORDA = BorderTreatment.NEAREST
@@ -62,25 +62,22 @@ class Trajetoria:
     motivo: str | None
     final: np.ndarray
 
-def peso_do_cromossomo(sdf_base: np.ndarray, genes: dict) -> np.ndarray:
-    return comprimir_log(sdf_base, genes["escala_log_peso"])
-
-def rodar_ca(genes: dict, sdf_base: np.ndarray, alvo: Alvo, semente: int,
+def rodar_ca(genes: dict, peso: np.ndarray, alvo: Alvo, semente: int,
              max_iteracoes: int = MAX_ITERACOES, cortes: Cortes = CORTES_PADRAO) -> Trajetoria:
     """
         Roda o CA de um cromossomo numa semente, até max_iteracoes ou até a
         parada antecipada.
-        sdf_base: SDF base do peso (interno +, borda 0, externo -), cúbico.
+        peso: campo somado aos vizinhos, cúbico, usado como está (o padrão do
+              GA é o SDF comprimido com ln(1 + |d|)).
         alvo: campo da nota, do mesmo formato.
         semente: semente da matriz inicial (numpy_rng).
     """
     if max_iteracoes < 1:
         raise ValueError("O CA precisa de pelo menos 1 iteração.")
-    lado = sdf_base.shape[0]
-    if sdf_base.shape != (lado, lado, lado) or alvo.shape != sdf_base.shape:
-        raise ValueError(f"Peso {sdf_base.shape} e alvo {alvo.shape} precisam ser o mesmo cubo.")
+    lado = peso.shape[0]
+    if peso.shape != (lado, lado, lado) or alvo.shape != peso.shape:
+        raise ValueError(f"Peso {peso.shape} e alvo {alvo.shape} precisam ser o mesmo cubo.")
 
-    peso = peso_do_cromossomo(sdf_base, genes)
     matriz = generate_seed_matrix(lado, genes["chance_inicial"], seed=semente)
     vazios_antes = int(matriz.sum())
     notas, vazios, mudancas, motivo = [], [], [], None
@@ -109,11 +106,17 @@ class AvaliadorCA:
         Uma semente cortada entra na média com NOTA_MINIMA, então o candidato
         que falha em qualquer semente perde.
     """
-    def __init__(self, sdf_base: np.ndarray, alvo: Alvo, sementes: tuple[int, ...],
+    def __init__(self, peso: np.ndarray, alvo: Alvo, sementes: tuple[int, ...],
                  max_iteracoes: int = MAX_ITERACOES, cortes: Cortes = CORTES_PADRAO):
         if not sementes:
             raise ValueError("Precisa de pelo menos uma semente de ajuste.")
-        self.sdf_base = np.asarray(sdf_base, dtype=np.float32)
+        # Cópia somente leitura com os mesmos valores e o mesmo tipo: o CA recebe
+        # exatamente o campo carregado, e a busca não consegue mexer nele.
+        peso = np.array(peso, copy=True)
+        if not np.all(np.isfinite(peso)):
+            raise ValueError("O peso tem valores não finitos.")
+        peso.setflags(write=False)
+        self.peso = peso
         self.alvo = alvo
         self.sementes = tuple(int(s) for s in sementes)
         self.max_iteracoes = max_iteracoes
@@ -122,7 +125,7 @@ class AvaliadorCA:
     def trajetorias(self, genes: dict, sementes=None, max_iteracoes=None) -> list[Trajetoria]:
         sementes = self.sementes if sementes is None else sementes
         max_iteracoes = self.max_iteracoes if max_iteracoes is None else max_iteracoes
-        return [rodar_ca(genes, self.sdf_base, self.alvo, s, max_iteracoes, self.cortes)
+        return [rodar_ca(genes, self.peso, self.alvo, s, max_iteracoes, self.cortes)
                 for s in sementes]
 
     def __call__(self, genes: dict) -> tuple[float, dict]:
@@ -152,5 +155,5 @@ class AvaliadorCA:
         """
         return np.array([t.notas[-1] for t in self.trajetorias(genes, sementes, iteracoes)])
 
-__all__ = ["BORDA", "CORTES_PADRAO", "GENES_CA", "MAX_ITERACOES", "NOTA_MINIMA", "AvaliadorCA", "Trajetoria",
-           "peso_do_cromossomo", "rodar_ca"]
+__all__ = ["BORDA", "CORTES_PADRAO", "GENES_CA", "MAX_ITERACOES", "NOTA_MINIMA", "AvaliadorCA",
+           "Trajetoria", "rodar_ca"]

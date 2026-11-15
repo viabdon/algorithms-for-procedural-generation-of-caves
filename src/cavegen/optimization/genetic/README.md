@@ -8,11 +8,11 @@ aleatória** com o mesmo orçamento: ela é o controle que diz se o GA ganhou
 alguma coisa com seleção e herança, ou se só sortear daria o mesmo.
 
 ```
-SDF base do Elaphes ──log(escala)──> peso do CA ─┐
-                                                 ├─> CA (até 50 passos) ─> caverna
-semente (chance_inicial, seed) ──────────────────┘          │
-                                                            v
-SDF do Elaphes com limiar -3 e log ───────────────> nota da caverna ─> GA escolhe os próximos
+SDF do Elaphes com log (como está) ──> peso do CA ┐
+                                                  ├─> CA (até 50 passos) ─> caverna
+semente (chance_inicial, seed) ───────────────────┘          │
+                                                             v
+SDF do Elaphes com limiar -3 e log ────────────────> nota da caverna ─> GA escolhe os próximos
 ```
 
 ## Arquivos
@@ -70,9 +70,13 @@ Definido em `GENES_CA` (`ca.py`). As faixas foram medidas no Elaphes 64³ em
 |---|---|---|
 | `chance_inicial` | 0,3 a 0,7 | chance de cada célula da semente nascer vazia |
 | `sensibilidade` | 1 a 20, inteiro | mínimo de vizinhos (com o peso somado) para a célula ficar vazia; de 18 para cima a caverna sempre morria |
-| `escala_log_peso` | 0,25 a 12 | escala do log aplicado ao SDF base antes de virar peso; as notas saturavam de 4 a 8 |
 
 Ficam **fora** do cromossomo, fixos:
+
+- **peso**: o campo do arquivo entra no CA **como está**. Nada o multiplica,
+  comprime ou corta: se o peso de um voxel é 4, o CA recebe 4. Até 15/11/2026
+  havia um terceiro gene, `escala_log_peso`, que multiplicava o log do SDF. Ele
+  saiu e não virou constante (ver "O decalque e a retirada da escala");
 
 - **borda**: sempre `NEAREST`, que repete a beirada da grade. `ZEROS` fecharia
   e `ONES` abriria a caverna onde ela toca a borda, e `RANDOM` depende da sorte;
@@ -88,15 +92,20 @@ Os dois vêm do SDF da mesma caverna. Sem o peso, o CA só gera "geodos" sem
 relação com o Elaphes, então guiar e pontuar com a mesma caverna é inevitável.
 A diferença está no que cada um usa:
 
-- **peso** (guia o CA): o SDF base (interno +, borda 0, externo −) com
-  `comprimir_log(sdf, escala_log_peso)`. A escala é gene, então o GA decide o
-  quanto o peso manda.
+- **peso** (guia o CA): o SDF (interno +, borda 0, externo −) comprimido
+  com `ln(1 + |d|)`, mantendo o sinal, gravado pela ferramenta do SDF com
+  `--log 1`. No Elaphes ele vai de −4,16 a +1,10. A contagem de vizinhos vai de
+  0 a 27, então o peso é uma **dica**: empurra a célula, mas os vizinhos ainda
+  decidem. O avaliador guarda uma cópia somente leitura e passa ao CA
+  exatamente esses valores.
 - **alvo** (dá a nota): o SDF com o zero deslocado 3 voxels para fora e
   comprimido com log de escala 1. São 5.201 voxels positivos, a "caverna"
   que vale a pena acertar. Ele fica fixo durante toda a busca e é guardado
   somente leitura.
 
-O alvo sai da ferramenta do SDF: `tools/sdf/npz/elaphes_surface_64_sdf_limiar-3_log1.npz`.
+Os dois saem da ferramenta do SDF, em `tools/sdf/npz/`:
+`elaphes_surface_64_sdf_log1.npz` (peso) e
+`elaphes_surface_64_sdf_limiar-3_log1.npz` (alvo).
 
 ## A nota
 
@@ -146,21 +155,22 @@ mede se ele generaliza para seeds que a busca nunca viu.
 Junto com o campeão saem duas notas que não passam pelo CA nem pelos cortes,
 para ler a nota do CA com contexto:
 
-- **cópia pura**: o SDF base binarizado (positivo = vazio). No Elaphes dá
-  0,10, porque o interno tem só 292 voxels;
-- **teto trivial**: o SDF base binarizado no limiar do alvo (> −3). Dá
-  exatamente 1, porque o alvo é o próprio SDF deslocado.
+- **cópia pura**: o peso binarizado (positivo = vazio; o log não muda o
+  sinal). No Elaphes dá 0,10, porque o interno tem só 292 voxels;
+- **teto trivial**: o peso binarizado no limiar do alvo (SDF > −3, que no
+  peso com log é > −ln 4 ≈ −1,39). Dá exatamente 1, porque o alvo é o próprio
+  SDF deslocado.
 
 Ou seja, a nota mede **aderência ao campo**, não ganho gerativo. Chegar perto
 de 1 pode ser só o CA aprendendo a deslocar o limiar do peso.
 
 ## Como usar
 
-O alvo é gerado uma vez com a ferramenta do SDF. O peso é o SDF base, que a
-mesma ferramenta grava sem argumentos.
+O peso e o alvo são gerados uma vez com a ferramenta do SDF. Se algum faltar,
+o `executar.py` para e diz o comando.
 
 ```bash
-uv run python -m tools.sdf.sdf                          # peso: SDF base
+uv run python -m tools.sdf.sdf --log 1                  # peso: SDF com ln(1 + |d|)
 uv run python -m tools.sdf.sdf --limiar -3 --log 1      # alvo
 ```
 
@@ -178,7 +188,7 @@ uv run python -m cavegen.optimization.genetic.executar --orcamento 200 --seed 2
 | `--orcamento` | 400 | candidatos avaliados, contando repetidos |
 | `--populacao` | 20 | cromossomos por geração (só no GA) |
 | `--seed` | 0 | semente da **busca**, não do CA |
-| `--peso` | SDF base do Elaphes | npz do `tools/sdf` usado como peso |
+| `--peso` | SDF com log 1 do Elaphes | npz do `tools/sdf` usado como peso, sem nenhuma escala |
 | `--alvo` | SDF com limiar −3 e log 1 | npz do `tools/sdf` usado como alvo |
 | `--saida` | `results/` desta pasta | onde gravar o `ga_NNN.npz` |
 
@@ -188,7 +198,7 @@ reservadas e as notas de referência. O consumo de tempo e memória da busca
 inteira vai para a planilha do `track_resources`, com o nome do `ga_NNN` no
 rótulo para ligar a linha ao arquivo.
 
-Com orçamento 200 a busca levou uns 40 s nesta máquina.
+Com orçamento 100 o GA levou 15 s e a busca aleatória 11 s nesta máquina.
 
 ### O que fica no `ga_NNN.npz`
 
@@ -201,7 +211,8 @@ Com orçamento 200 a busca levou uns 40 s nesta máquina.
 | `detalhes` | JSON por avaliação: paradas, motivos, nota por seed, vazio e mudanças por passo |
 | `campeao`, `notas_reservadas`, `nota_reservada_media` | o vencedor e como ele foi nas seeds reservadas |
 | `nota_copia_pura`, `nota_teto_trivial` | as notas de referência |
-| `config`, `genes_limites`, `cortes`, `faixa_vazio`, `sementes_*`, `peso`, `alvo`, `ambiente` | tudo o que é preciso para refazer a execução (inclui o commit) |
+| `config`, `genes_limites`, `cortes`, `faixa_vazio`, `sementes_*`, `alvo`, `ambiente` | tudo o que é preciso para refazer a execução (inclui o commit) |
+| `peso`, `ambiente.arquivo_peso`, `ambiente.sha256_peso` | de qual arquivo veio o peso, com o limiar e o log que a ferramenta aplicou e o hash do arquivo |
 
 Os campos extras são strings JSON:
 
@@ -209,7 +220,7 @@ Os campos extras são strings JSON:
 import json
 import numpy as np
 
-with np.load("src/cavegen/optimization/genetic/results/ga_001.npz") as r:
+with np.load("src/cavegen/optimization/genetic/results/ga_003.npz") as r:
     campeao = json.loads(str(r["campeao"]))
     curva = r["melhor_acumulado"]
 print(campeao["genes"], campeao["iteracoes"], curva[-1])
@@ -222,16 +233,20 @@ from cavegen.optimization.genetic.algoritmo import ConfiguracaoGA, evoluir
 from cavegen.optimization.genetic.aptidao import Alvo
 from cavegen.optimization.genetic.ca import GENES_CA, AvaliadorCA
 
-avaliador = AvaliadorCA(sdf_base, Alvo(campo_alvo), sementes=(1, 2, 3))
-nota, detalhes = avaliador({"chance_inicial": 0.5, "sensibilidade": 12,
-                            "escala_log_peso": 2.0})
+from cavegen.optimization.genetic.executar import ALVO_ELAPHES, PESO_ELAPHES, carregar_campo
+
+peso, _ = carregar_campo(PESO_ELAPHES)
+campo_alvo, _ = carregar_campo(ALVO_ELAPHES)
+avaliador = AvaliadorCA(peso, Alvo(campo_alvo), sementes=(1, 2, 3))
+nota, detalhes = avaliador({"chance_inicial": 0.5, "sensibilidade": 13})
 resultado = evoluir(GENES_CA, avaliador, ConfiguracaoGA(orcamento=100), seed=0)
 print(resultado.melhor.genes, resultado.melhor.nota)
 ```
 
-## Primeiro resultado e o problema do decalque
+## O decalque e a retirada da escala
 
-Execuções com orçamento 200 e seed 0 (`ga_001` e `ga_002`):
+As primeiras execuções (`ga_001` e `ga_002`, orçamento 200, seed 0) tinham a
+escala do log como gene:
 
 | método | campeão | nota ajuste | nota reservada |
 |---|---|---|---|
@@ -239,17 +254,33 @@ Execuções com orçamento 200 e seed 0 (`ga_001` e `ga_002`):
 | aleatória | chance 0,51, sensibilidade 1, escala 9,19, 6 iterações | 0,975 | 0,979 |
 
 As duas buscas foram parar na sensibilidade 1 com escala alta. É o
-**decalque**: com peso forte e sensibilidade mínima, o CA só pinta a região do
-alvo, e seeds diferentes dão quase a mesma caverna (IoU entre as seeds de cerca
-de 0,92 a 0,96). A nota fica perto do teto trivial sem o CA gerar nada. O log
-não impede isso enquanto a escala for um gene livre, porque o GA aumenta a
-escala. Um CA "de verdade" (chance 0,65, sensibilidade 14, escala 2) tira por
-volta de 0,7, com IoU entre seeds de 0,51.
+**decalque**: com a escala alta, o peso passa dos 27 vizinhos possíveis, os
+vizinhos deixam de importar e a regra do CA vira um limiar sobre o SDF. O CA só
+pinta a região do alvo, e seeds diferentes dão quase a mesma caverna (IoU entre
+as seeds de 0,92 a 0,96). A nota fica perto do teto trivial sem o CA gerar
+nada.
 
-A correção ainda está em aberto. A proposta é multiplicar a nota pela
-diversidade entre as seeds de ajuste: `nota × (1 − IoU médio entre as
-cavernas)`. Com ela, o decalque cairia para cerca de 0,08 e o CA real ficaria
-com cerca de 0,35. Ela ainda não está implementada.
+O papel do SDF aqui é dar uma dica ao CA, não a resposta. Por isso a escala
+saiu do cromossomo e não virou constante: o peso entra com os valores que o
+arquivo tem. **`ga_001` e `ga_002` foram gerados com a escala como gene e não
+são comparáveis com as execuções a partir de `ga_003`.**
+
+Sem a escala (`ga_003` e `ga_004`, orçamento 100, seed 0):
+
+| método | campeão | nota ajuste | nota reservada | IoU entre seeds |
+|---|---|---|---|---|
+| GA | chance 0,56, sensibilidade 13, 23 iterações | 0,637 | 0,656 | 0,52 |
+| aleatória | chance 0,42, sensibilidade 11, 20 iterações | 0,617 | 0,639 | 0,46 |
+
+O decalque sumiu. Com sensibilidade de 1 a 8, a grade enche quase toda já no
+primeiro passo e o candidato é cortado (`vazio_demais`); as notas válidas
+começam na sensibilidade 9. Os campeões formam caverna e variam com a seed
+(IoU 0,46 a 0,52, contra 0,92 a 0,96 no decalque). O GA ficou só 0,02 acima
+da busca aleatória, com uma seed de busca para cada um, o que ainda não mostra
+que o GA ganha do sorteio.
+
+A penalização por diversidade (`nota × (1 − IoU médio entre as cavernas das
+seeds)`) segue como proposta em aberto, separada desta mudança.
 
 ## Testes
 
