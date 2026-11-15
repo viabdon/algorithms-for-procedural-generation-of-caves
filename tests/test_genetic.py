@@ -114,6 +114,32 @@ class MotorTests(unittest.TestCase):
         self.assertTrue(np.all(np.diff(acumulado) >= 0))
         self.assertEqual(acumulado[-1], resultado.melhor.nota)
 
+    def test_melhores_sem_repetir_em_ordem_e_sem_cortados(self):
+        def com_cortes(genes):
+            nota, detalhes = sintetica(genes)
+            return (NOTA_MINIMA if genes["n"] > 15 else nota), detalhes
+
+        resultado = evoluir(GENES, com_cortes, ConfiguracaoGA(orcamento=200), seed=2)
+        self.assertGreater(resultado.reaproveitadas, 0)  # o teste só vale com repetidos
+        melhores = resultado.melhores(10)
+        chaves = [tuple(sorted(a.genes.items())) for a in melhores]
+        notas = [a.nota for a in melhores]
+
+        self.assertEqual(len(chaves), len(set(chaves)))
+        self.assertEqual(notas, sorted(notas, reverse=True))
+        self.assertTrue(all(np.isfinite(notas)))
+        self.assertIs(melhores[0], resultado.melhor)
+        # Cada um aparece na sua primeira avaliação.
+        for a in melhores:
+            primeira = next(x for x in resultado.avaliacoes if x.genes == a.genes)
+            self.assertIs(a, primeira)
+        # Pedir mais do que existe devolve só os válidos.
+        unicos_validos = {tuple(sorted(a.genes.items())) for a in resultado.avaliacoes
+                          if np.isfinite(a.nota)}
+        self.assertEqual(len(resultado.melhores(10_000)), len(unicos_validos))
+        with self.assertRaises(ValueError):
+            resultado.melhores(0)
+
 class AptidaoTests(unittest.TestCase):
     def setUp(self):
         self.campo = np.array([[[3.0, 1.0, 0.0, -1.0, -4.0]]], dtype=np.float32)
@@ -285,6 +311,45 @@ class ExecutarTests(unittest.TestCase):
                 ambiente = json.loads(str(r["ambiente"]))
                 self.assertTrue(ambiente["arquivo_peso"].endswith("peso.npz"))
                 self.assertEqual(len(ambiente["sha256_peso"]), 64)
+                melhores = json.loads(str(r["melhores"]))
+                campeao = json.loads(str(r["campeao"]))
+                self.assertTrue(1 <= len(melhores) <= 6)
+                self.assertEqual([m["posicao"] for m in melhores],
+                                 list(range(1, len(melhores) + 1)))
+                self.assertEqual(melhores[0]["genes"], campeao["genes"])
+                self.assertEqual(melhores[0]["nota_reservada_media"],
+                                 json.loads(str(r["nota_reservada_media"])))
+
+    def test_top_limita_a_lista_e_cada_item_se_reproduz(self):
+        from cavegen.optimization.genetic import executar
+
+        with tempfile.TemporaryDirectory() as pasta:
+            pasta = Path(pasta)
+            sdf = esfera_sdf()
+            np.savez_compressed(pasta / "peso.npz", sdf=sdf, convencao=np.array("base"),
+                                limiar=0.0)
+            np.savez_compressed(pasta / "alvo.npz", sdf=sdf + 3, convencao=np.array("alvo"),
+                                limiar=-3.0, escala_log=1.0)
+            with (mock.patch("cavegen.profiling.resource_tracker.registrar_execucao"),
+                  contextlib.redirect_stdout(io.StringIO())):
+                destino = executar.main(["--metodo", "aleatoria", "--orcamento", "12",
+                                         "--populacao", "3", "--top", "3",
+                                         "--peso", str(pasta / "peso.npz"),
+                                         "--alvo", str(pasta / "alvo.npz"),
+                                         "--saida", str(pasta / "results")])
+            with np.load(destino) as r:
+                melhores = json.loads(str(r["melhores"]))
+        self.assertLessEqual(len(melhores), 3)
+        self.assertGreater(len(melhores), 0)
+        avaliador = AvaliadorCA(sdf, Alvo(sdf + 3), executar.SEMENTES_AJUSTE)
+        for item in melhores:
+            ajuste = avaliador.nota_com_iteracoes(item["genes"], item["iteracoes"],
+                                                  executar.SEMENTES_AJUSTE)
+            reservadas = avaliador.nota_com_iteracoes(item["genes"], item["iteracoes"],
+                                                      executar.SEMENTES_RESERVADAS)
+            self.assertEqual(float(ajuste.mean()), item["nota_ajuste"])
+            self.assertEqual(float(reservadas.mean()), item["nota_reservada_media"])
+            self.assertEqual(float(reservadas.min()), item["nota_reservada_min"])
 
     def test_teto_trivial_com_peso_comprimido_por_log(self):
         # O padrão do GA é o peso com log: o teto converte o limiar do alvo

@@ -262,7 +262,7 @@ class ExecutarRevisorTests(unittest.TestCase):
         self.assertFalse(set(executar.SEMENTES_AJUSTE) & set(executar.SEMENTES_RESERVADAS))
         self.assertEqual(len(executar.SEMENTES_RESERVADAS), 10)
 
-    def test_busca_so_usa_sementes_de_ajuste_e_reservadas_so_no_campeao(self):
+    def test_busca_so_usa_sementes_de_ajuste_e_reservadas_so_depois(self):
         from cavegen.optimization.genetic import executar
 
         usadas = []
@@ -277,10 +277,13 @@ class ExecutarRevisorTests(unittest.TestCase):
             destino = rodar_executar(Path(pasta), "--orcamento", "6", "--populacao", "3")
             with np.load(destino) as r:
                 unicas = 6 - int(r["reaproveitadas"])
-        na_busca, no_fim = usadas[:-10], usadas[-10:]
-        self.assertEqual(len(na_busca), 3 * unicas)
+                listados = len(json.loads(str(r["melhores"])))
+        # A busca só vê as de ajuste; as reservadas rodam depois, uma vez para
+        # cada parâmetro da lista dos melhores.
+        na_busca, no_fim = usadas[:3 * unicas], usadas[3 * unicas:]
         self.assertTrue(set(na_busca) <= set(executar.SEMENTES_AJUSTE), set(na_busca))
-        self.assertEqual(no_fim, list(executar.SEMENTES_RESERVADAS))
+        self.assertGreater(listados, 0)
+        self.assertEqual(no_fim, list(executar.SEMENTES_RESERVADAS) * listados)
 
     def test_ga_e_aleatoria_gravam_o_mesmo_protocolo_e_se_reproduzem(self):
         with tempfile.TemporaryDirectory() as pasta:

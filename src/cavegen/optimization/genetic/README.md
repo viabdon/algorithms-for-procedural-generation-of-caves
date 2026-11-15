@@ -3,9 +3,13 @@
 Procura os hiperparâmetros do Cellular Automata guiado por SDF que fazem a
 caverna gerada cair em cima da caverna real do Elaphes (64³). O algoritmo
 genético (GA) propõe as combinações, o CA gera as cavernas e uma nota diz o
-quanto cada caverna acertou o campo-alvo. Ao lado do GA roda uma **busca
-aleatória** com o mesmo orçamento: ela é o controle que diz se o GA ganhou
-alguma coisa com seleção e herança, ou se só sortear daria o mesmo.
+quanto cada caverna acertou o campo-alvo. **No fim ele devolve a lista dos
+melhores parâmetros com as notas** (os 10 primeiros, por padrão).
+
+Existe também uma **busca aleatória** (`--metodo aleatoria`), que só sorteia
+parâmetros com o mesmo orçamento. Ela é opcional e serve de controle: se o GA
+não achar notas melhores que o sorteio, a seleção e a herança não estão
+ajudando.
 
 ```
 SDF do Elaphes com log (como está) ──> peso do CA ┐
@@ -146,9 +150,10 @@ o candidato precisa funcionar em todas.
 
 A regra de geração é "rodar até N iterações, parando antes se a parada
 antecipada disparar". Ela é determinística, então depois da parada a nota fica
-repetida até o fim. No final, o campeão roda nas **seeds reservadas** 101 a 110
-com o número de iterações já escolhido, sem escolher de novo. É a nota que
-mede se ele generaliza para seeds que a busca nunca viu.
+repetida até o fim. No final, cada parâmetro da lista dos melhores roda nas
+**seeds reservadas** 101 a 110 com o número de iterações já escolhido, sem
+escolher de novo. É a nota que mede se ele generaliza para seeds que a busca
+nunca viu.
 
 ### Notas de referência
 
@@ -191,10 +196,25 @@ uv run python -m cavegen.optimization.genetic.executar --orcamento 200 --seed 2
 | `--peso` | SDF com log 1 do Elaphes | npz do `tools/sdf` usado como peso, sem nenhuma escala |
 | `--alvo` | SDF com limiar −3 e log 1 | npz do `tools/sdf` usado como alvo |
 | `--saida` | `results/` desta pasta | onde gravar o `ga_NNN.npz` |
+| `--top` | 10 | quantos melhores parâmetros listar no fim |
 
-Para comparar GA e busca aleatória com justiça, use o mesmo `--orcamento`.
-No fim o terminal mostra o campeão, a nota nas seeds de ajuste e nas
-reservadas e as notas de referência. O consumo de tempo e memória da busca
+No fim o terminal mostra a lista dos melhores parâmetros, sem repetir
+combinação e sem os cortados, com a nota nas seeds de ajuste e a média e o
+mínimo nas reservadas:
+
+```
+10 melhores parâmetros (nota nas sementes de ajuste e média e mínimo nas 10 reservadas):
+  #  chance_inicial   sensibilidade iteracoes nota ajuste reservadas     mín
+  1          0.5589              13        23      +0.637     +0.656  +0.560
+  2          0.5467              13        15      +0.614     +0.639  +0.578
+  3             0.3               9        14      +0.577     +0.591  +0.409
+  4          0.5911              14        10      +0.497       -inf    -inf
+  ...
+```
+
+Um `-inf` nas reservadas quer dizer que o parâmetro passou nas 3 seeds de
+ajuste, mas foi cortado em pelo menos uma das reservadas: ele é frágil. Para
+comparar GA e busca aleatória com justiça, use o mesmo `--orcamento`. O consumo de tempo e memória da busca
 inteira vai para a planilha do `track_resources`, com o nome do `ga_NNN` no
 rótulo para ligar a linha ao arquivo.
 
@@ -209,7 +229,8 @@ Com orçamento 100 o GA levou 15 s e a busca aleatória 11 s nesta máquina.
 | `melhor_acumulado` | melhor nota vista até cada avaliação: a curva GA × aleatória |
 | `reaproveitadas` | candidatos repetidos que vieram do cache |
 | `detalhes` | JSON por avaliação: paradas, motivos, nota por seed, vazio e mudanças por passo |
-| `campeao`, `notas_reservadas`, `nota_reservada_media` | o vencedor e como ele foi nas seeds reservadas |
+| `melhores` | a lista dos melhores: posição, genes, iterações, nota de ajuste e nota por seed reservada (média, mínimo e cada uma) |
+| `campeao`, `notas_reservadas`, `nota_reservada_media` | o primeiro da lista e como ele foi nas seeds reservadas |
 | `nota_copia_pura`, `nota_teto_trivial` | as notas de referência |
 | `config`, `genes_limites`, `cortes`, `faixa_vazio`, `sementes_*`, `alvo`, `ambiente` | tudo o que é preciso para refazer a execução (inclui o commit) |
 | `peso`, `ambiente.arquivo_peso`, `ambiente.sha256_peso` | de qual arquivo veio o peso, com o limiar e o log que a ferramenta aplicou e o hash do arquivo |
@@ -220,10 +241,10 @@ Os campos extras são strings JSON:
 import json
 import numpy as np
 
-with np.load("src/cavegen/optimization/genetic/results/ga_003.npz") as r:
-    campeao = json.loads(str(r["campeao"]))
-    curva = r["melhor_acumulado"]
-print(campeao["genes"], campeao["iteracoes"], curva[-1])
+with np.load("src/cavegen/optimization/genetic/results/ga_005.npz") as r:
+    melhores = json.loads(str(r["melhores"]))
+for m in melhores:
+    print(m["posicao"], m["genes"], m["iteracoes"], m["nota_ajuste"], m["nota_reservada_media"])
 ```
 
 ### Usar em código
@@ -240,7 +261,8 @@ campo_alvo, _ = carregar_campo(ALVO_ELAPHES)
 avaliador = AvaliadorCA(peso, Alvo(campo_alvo), sementes=(1, 2, 3))
 nota, detalhes = avaliador({"chance_inicial": 0.5, "sensibilidade": 13})
 resultado = evoluir(GENES_CA, avaliador, ConfiguracaoGA(orcamento=100), seed=0)
-print(resultado.melhor.genes, resultado.melhor.nota)
+for a in resultado.melhores(10):  # sem repetidos e sem cortados, do melhor ao pior
+    print(a.genes, a.nota, a.detalhes["iteracoes"])
 ```
 
 ## O decalque e a retirada da escala

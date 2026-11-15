@@ -121,6 +121,20 @@ class ResultadoBusca:
         """Maior nota; no empate, a avaliada primeiro."""
         return max(self.avaliacoes, key=lambda a: (a.nota, -a.ordem))
 
+    def melhores(self, quantidade: int) -> list[Avaliacao]:
+        """
+            Os `quantidade` cromossomos de maior nota, cada um uma vez só (fica a
+            primeira avaliação dele) e sem os descartados (-inf). No empate, o
+            avaliado primeiro. Pode devolver menos, se a busca achou menos.
+        """
+        if quantidade < 1:
+            raise ValueError("A lista de melhores precisa de pelo menos 1 lugar.")
+        unicos = {}
+        for avaliacao in self.avaliacoes:
+            unicos.setdefault(chave(avaliacao.genes), avaliacao)
+        validos = [a for a in unicos.values() if math.isfinite(a.nota)]
+        return sorted(validos, key=lambda a: (-a.nota, a.ordem))[:quantidade]
+
     def melhor_acumulado(self) -> np.ndarray:
         """Melhor nota vista até cada avaliação: a curva que compara GA e busca aleatória."""
         return np.maximum.accumulate([a.nota for a in self.avaliacoes])

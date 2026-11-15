@@ -12,10 +12,12 @@ Antes, gere o peso e o alvo com a ferramenta do SDF (uma vez):
 O peso entra no CA exatamente como está no arquivo, sem escala: o arquivo de
 onde ele veio fica gravado no resultado (`peso` e `ambiente`).
 
-Cada execução grava results/ga_NNN.npz ao lado deste arquivo, com a
-configuração inteira, todas as avaliações, a nota do campeão nas sementes de
-ajuste e nas reservadas e a nota da cópia pura. O consumo de recursos da busca
-inteira vai para a planilha do track_resources.
+No fim, mostra e grava a lista dos melhores parâmetros (--top, padrão 10):
+cada combinação uma vez só, com a nota nas sementes de ajuste e nas
+reservadas. Cada execução grava results/ga_NNN.npz ao lado deste arquivo, com
+a configuração inteira, todas as avaliações, essa lista e a nota da cópia
+pura. O consumo de recursos da busca inteira vai para a planilha do
+track_resources.
 """
 from __future__ import annotations
 
@@ -52,9 +54,10 @@ COMANDO_PESO = "uv run python -m tools.sdf.sdf --log 1"
 COMANDO_ALVO = "uv run python -m tools.sdf.sdf --limiar -3 --log 1"
 RESULTS_DIR = Path(__file__).resolve().parent / "results"
 PREFIXO = "ga"
-# Sementes de ajuste (a busca vê) e reservadas (só o campeão, no fim).
+# Sementes de ajuste (a busca vê) e reservadas (só a lista dos melhores, no fim).
 SEMENTES_AJUSTE = (1, 2, 3)
 SEMENTES_RESERVADAS = tuple(range(101, 111))
+TOP_PADRAO = 10
 
 def carregar_campo(caminho: Path) -> tuple[np.ndarray, dict]:
     """
@@ -109,6 +112,35 @@ def buscar(metodo: str, avaliador: AvaliadorCA, config: ConfiguracaoGA, seed: in
         return evoluir(GENES_CA, avaliador, config, seed)
     return busca_aleatoria(GENES_CA, avaliador, config.orcamento, seed)
 
+def lista_dos_melhores(resultado: ResultadoBusca, avaliador: AvaliadorCA,
+                       quantidade: int) -> list[dict]:
+    """
+        Os melhores parâmetros da busca, do primeiro ao último, cada um rodado
+        também nas sementes reservadas com as iterações já escolhidas.
+    """
+    lista = []
+    for posicao, avaliacao in enumerate(resultado.melhores(quantidade), start=1):
+        iteracoes = avaliacao.detalhes["iteracoes"]
+        reservadas = avaliador.nota_com_iteracoes(avaliacao.genes, iteracoes,
+                                                  SEMENTES_RESERVADAS)
+        lista.append({"posicao": posicao, "genes": avaliacao.genes, "iteracoes": iteracoes,
+                      "nota_ajuste": avaliacao.nota,
+                      "nota_reservada_media": float(reservadas.mean()),
+                      "nota_reservada_min": float(reservadas.min()),
+                      "notas_reservadas": reservadas.tolist(),
+                      "ordem": avaliacao.ordem, "geracao": avaliacao.geracao})
+    return lista
+
+def mostrar_lista(lista: list[dict]) -> None:
+    nomes = [gene.nome for gene in GENES_CA]
+    print(f"{'#':>3} " + " ".join(f"{n:>15}" for n in nomes)
+          + f" {'iteracoes':>9} {'nota ajuste':>11} {'reservadas':>10} {'mín':>7}")
+    for item in lista:
+        valores = " ".join(f"{item['genes'][n]:>15.4g}" for n in nomes)
+        print(f"{item['posicao']:>3} {valores} {item['iteracoes']:>9} "
+              f"{item['nota_ajuste']:>+11.3f} {item['nota_reservada_media']:>+10.3f} "
+              f"{item['nota_reservada_min']:>+7.3f}")
+
 def gravar(resultado: ResultadoBusca, extras: dict, destino: Path) -> Path:
     Path(destino).parent.mkdir(parents=True, exist_ok=True)
     nomes = [gene.nome for gene in GENES_CA]
@@ -138,7 +170,11 @@ def main(argv=None) -> Path:
                         help="npz do tools/sdf usado como peso, sem nenhuma escala")
     parser.add_argument("--alvo", type=Path, default=ALVO_ELAPHES)
     parser.add_argument("--saida", type=Path, default=RESULTS_DIR)
+    parser.add_argument("--top", type=int, default=TOP_PADRAO,
+                        help="quantos melhores parâmetros listar no fim")
     args = parser.parse_args(argv)
+    if args.top < 1:
+        parser.error("--top precisa ser pelo menos 1.")
 
     for caminho, comando in ((args.peso, COMANDO_PESO), (args.alvo, COMANDO_ALVO)):
         if not Path(caminho).exists():
@@ -153,8 +189,13 @@ def main(argv=None) -> Path:
     destino = build_path(args.saida, PREFIXO, next_id(args.saida, PREFIXO))
     resultado = buscar(args.metodo, avaliador, config, args.seed, execucao=destino.stem)
     campeao = resultado.melhor
-    reservadas = avaliador.nota_com_iteracoes(campeao.genes, campeao.detalhes["iteracoes"],
-                                              SEMENTES_RESERVADAS)
+    melhores = lista_dos_melhores(resultado, avaliador, args.top)
+    # O primeiro da lista é o campeão; só se tudo foi cortado a lista vem vazia.
+    if melhores:
+        reservadas = np.array(melhores[0]["notas_reservadas"])
+    else:
+        reservadas = avaliador.nota_com_iteracoes(campeao.genes, campeao.detalhes["iteracoes"],
+                                                  SEMENTES_RESERVADAS)
     copia = nota_da_copia_pura(peso, alvo)
     teto = nota_da_copia_pura(peso, alvo, limiar=limiar_do_alvo_no_peso(info_peso, info_alvo))
 
@@ -169,6 +210,7 @@ def main(argv=None) -> Path:
         "campeao": {"genes": campeao.genes, "nota_ajuste": campeao.nota,
                     "iteracoes": campeao.detalhes["iteracoes"], "ordem": campeao.ordem},
         "notas_reservadas": reservadas.tolist(), "nota_reservada_media": float(reservadas.mean()),
+        "melhores": melhores,
         "nota_copia_pura": copia, "nota_teto_trivial": teto,
         "forma": list(peso.shape),
         "ambiente": {**ambiente(), "arquivo_peso": info_peso["origem"],
@@ -178,9 +220,15 @@ def main(argv=None) -> Path:
 
     print(f"{resultado.metodo}: {len(resultado.avaliacoes)} avaliações "
           f"({resultado.reaproveitadas} repetidas, sem refazer o CA)")
-    print(f"campeão {campeao.genes} com {campeao.detalhes['iteracoes']} iterações")
-    print(f"nota nas sementes de ajuste {campeao.nota:+.3f}, nas reservadas "
-          f"{reservadas.mean():+.3f} (mín {reservadas.min():+.3f}); cópia pura {copia:+.3f}; teto trivial {teto:+.3f}")
+    print()
+    print(f"{len(melhores)} melhores parâmetros (nota nas sementes de ajuste e média e "
+          f"mínimo nas {len(SEMENTES_RESERVADAS)} reservadas):")
+    if melhores:
+        mostrar_lista(melhores)
+    else:
+        print("  nenhum: todos os candidatos foram cortados")
+    print()
+    print(f"referências: cópia pura {copia:+.3f}; teto trivial {teto:+.3f}")
     print(f"gravado em {caminho_legivel(destino)}")
     return destino
 
