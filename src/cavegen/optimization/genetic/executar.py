@@ -44,6 +44,7 @@ from cavegen.optimization.genetic.algoritmo import (
 )
 from cavegen.optimization.genetic.aptidao import Alvo, Cortes, nota_da_copia_pura
 from cavegen.optimization.genetic.ca import BORDA, GENES_CA, MAX_ITERACOES, AvaliadorCA
+from cavegen.optimization.genetic.painel import Painel, formatar_genes, formatar_nota
 from cavegen.profiling.resource_tracker import track_resources
 from cavegen.sdf.manipulacao import manipular_sdf
 
@@ -107,19 +108,21 @@ def rotulo(argumentos: dict) -> str:
 
 @track_resources(label=rotulo)
 def buscar(metodo: str, avaliador: AvaliadorCA, config: ConfiguracaoGA, seed: int,
-           execucao: str = "") -> ResultadoBusca:
+           execucao: str = "", observar=None) -> ResultadoBusca:
     if metodo == "genetico":
-        return evoluir(GENES_CA, avaliador, config, seed)
-    return busca_aleatoria(GENES_CA, avaliador, config.orcamento, seed)
+        return evoluir(GENES_CA, avaliador, config, seed, observar)
+    return busca_aleatoria(GENES_CA, avaliador, config.orcamento, seed, observar)
 
 def lista_dos_melhores(resultado: ResultadoBusca, avaliador: AvaliadorCA,
-                       quantidade: int) -> list[dict]:
+                       quantidade: int, painel: Painel | None = None) -> list[dict]:
     """
         Os melhores parâmetros da busca, do primeiro ao último, cada um rodado
         também nas sementes reservadas com as iterações já escolhidas.
+        painel: se vier, mostra cada um conforme é conferido.
     """
     lista = []
-    for posicao, avaliacao in enumerate(resultado.melhores(quantidade), start=1):
+    escolhidos = resultado.melhores(quantidade)
+    for posicao, avaliacao in enumerate(escolhidos, start=1):
         iteracoes = avaliacao.detalhes["iteracoes"]
         reservadas = avaliador.nota_com_iteracoes(avaliacao.genes, iteracoes,
                                                   SEMENTES_RESERVADAS)
@@ -129,6 +132,11 @@ def lista_dos_melhores(resultado: ResultadoBusca, avaliador: AvaliadorCA,
                       "nota_reservada_min": float(reservadas.min()),
                       "notas_reservadas": reservadas.tolist(),
                       "ordem": avaliacao.ordem, "geracao": avaliacao.geracao})
+        if painel is not None:
+            painel.escrever(f"  {posicao:>2}/{len(escolhidos)} {formatar_genes(avaliacao.genes)}: "
+                            f"ajuste {formatar_nota(avaliacao.nota)}, reservadas "
+                            f"{formatar_nota(float(reservadas.mean()))} "
+                            f"(mín {formatar_nota(float(reservadas.min()))})")
     return lista
 
 def mostrar_lista(lista: list[dict]) -> None:
@@ -180,16 +188,38 @@ def main(argv=None) -> Path:
         if not Path(caminho).exists():
             parser.error(f"{caminho} não existe. Gere com: {comando}")
 
+    config = ConfiguracaoGA(tamanho_populacao=args.populacao, orcamento=args.orcamento)
+    genetico = args.metodo == "genetico"
+    painel = Painel(config.orcamento, por_lote=not genetico,
+                    tamanho_lote=config.tamanho_populacao)
+
+    painel.etapa(1, 4, "Carregando o peso e o alvo")
     peso, info_peso = carregar_campo(args.peso)
     campo_alvo, info_alvo = carregar_campo(args.alvo)
     alvo, cortes = Alvo(campo_alvo), Cortes()
-    config = ConfiguracaoGA(tamanho_populacao=args.populacao, orcamento=args.orcamento)
     avaliador = AvaliadorCA(peso, alvo, SEMENTES_AJUSTE, MAX_ITERACOES, cortes)
+    minimo, maximo = alvo.faixa(cortes)
+    faixas = ", ".join(f"{g.nome} [{g.minimo:g}, {g.maximo:g}]" for g in GENES_CA)
+    painel.escrever(f"  peso  {info_peso['origem']} (de {peso.min():+.2f} a {peso.max():+.2f})")
+    painel.escrever(f"  alvo  {info_alvo['origem']} ({alvo.referencia} voxels positivos; "
+                    f"vazio aceito de {minimo:.0f} a {maximo:.0f})")
+    painel.escrever(f"  genes {faixas}; seeds de ajuste {list(SEMENTES_AJUSTE)}")
 
     destino = build_path(args.saida, PREFIXO, next_id(args.saida, PREFIXO))
-    resultado = buscar(args.metodo, avaliador, config, args.seed, execucao=destino.stem)
+    if genetico:
+        painel.etapa(2, 4, f"Busca genética: {config.orcamento} candidatos, população "
+                           f"{config.tamanho_populacao}, elite {config.elite}, seed {args.seed}")
+    else:
+        painel.etapa(2, 4, f"Busca aleatória: {config.orcamento} candidatos, seed {args.seed}")
+    resultado = buscar(args.metodo, avaliador, config, args.seed, execucao=destino.stem,
+                       observar=painel)
+    painel.escrever(f"  {len(resultado.avaliacoes)} avaliações ({resultado.reaproveitadas} "
+                    "repetidas, sem refazer o CA)")
     campeao = resultado.melhor
-    melhores = lista_dos_melhores(resultado, avaliador, args.top)
+
+    painel.etapa(3, 4, f"Conferindo os {args.top} melhores nas {len(SEMENTES_RESERVADAS)} "
+                       "seeds reservadas")
+    melhores = lista_dos_melhores(resultado, avaliador, args.top, painel)
     # O primeiro da lista é o campeão; só se tudo foi cortado a lista vem vazia.
     if melhores:
         reservadas = np.array(melhores[0]["notas_reservadas"])
@@ -216,10 +246,9 @@ def main(argv=None) -> Path:
         "ambiente": {**ambiente(), "arquivo_peso": info_peso["origem"],
                      "sha256_peso": info_peso["sha256"]},
     }
+    painel.etapa(4, 4, "Gravando o resultado")
     gravar(resultado, extras, destino)
 
-    print(f"{resultado.metodo}: {len(resultado.avaliacoes)} avaliações "
-          f"({resultado.reaproveitadas} repetidas, sem refazer o CA)")
     print()
     print(f"{len(melhores)} melhores parâmetros (nota nas sementes de ajuste e média e "
           f"mínimo nas {len(SEMENTES_RESERVADAS)} reservadas):")

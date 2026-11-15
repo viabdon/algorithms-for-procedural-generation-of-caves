@@ -27,6 +27,7 @@ SDF do Elaphes com limiar -3 e log ───────────────
 | `aptidao.py` | a nota (`Alvo`), os cortes de vazio e as regras de parada antecipada |
 | `ca.py` | o cromossomo do CA (`GENES_CA`) e o avaliador que roda o CA nas seeds |
 | `executar.py` | linha de comando: carrega os campos, roda a busca, grava o resultado |
+| `painel.py` | mostra o andamento no terminal (etapas, gerações, candidato atual) |
 | `results/` | um `ga_NNN.npz` por execução (fora do Git) |
 
 O motor (`algoritmo.py`) recebe só uma lista de genes e uma função de
@@ -179,13 +180,47 @@ uv run python -m tools.sdf.sdf --log 1                  # peso: SDF com ln(1 + |
 uv run python -m tools.sdf.sdf --limiar -3 --log 1      # alvo
 ```
 
-Depois:
+Depois, pelo atalho do Poe (as opções da tabela abaixo vão direto depois do
+nome):
 
 ```bash
-uv run python -m cavegen.optimization.genetic.executar                       # GA, orçamento 400
-uv run python -m cavegen.optimization.genetic.executar --metodo aleatoria    # controle
-uv run python -m cavegen.optimization.genetic.executar --orcamento 200 --seed 2
+uv run poe ga                                  # GA, orçamento 400
+uv run poe ga --orcamento 200 --seed 2 --top 5
+uv run poe ga-aleatoria --orcamento 200        # controle
 ```
+
+O atalho só chama `python -m cavegen.optimization.genetic.executar`, que
+também pode ser rodado direto.
+
+O terminal mostra as quatro etapas enquanto roda:
+
+```
+[1/4] Carregando o peso e o alvo
+  peso  tools/sdf/npz/elaphes_surface_64_sdf_log1.npz (de -4.16 a +1.10)
+  alvo  tools/sdf/npz/elaphes_surface_64_sdf_limiar-3_log1.npz (5201 voxels positivos; ...)
+
+[2/4] Busca genética: 60 candidatos, população 20, elite 2, seed 0
+  geração   0 | 20/60 | melhor +0.406 (chance_inicial=0.3113 sensibilidade=9) | válidos 6/20 | média -2.785 | 2.5 s
+  geração   1 | 38/60 | melhor +0.406 (...) | válidos 11/20 | média -0.720 | 1.7 s
+  candidato 47/60 · geração 2 · chance_inicial=0.559 sensibilidade=13 -> +0.612 (15 it) · melhor +0.406
+
+[3/4] Conferindo os 5 melhores nas 10 seeds reservadas
+   1/5 chance_inicial=0.3113 sensibilidade=9: ajuste +0.406, reservadas +0.412 (mín +0.176)
+
+[4/4] Gravando o resultado
+```
+
+- **geração**: uma linha por geração completa, com a melhor nota vista até
+  ali, quantos da população não foram cortados, a média deles e o tempo da
+  geração. Na busca aleatória, que não tem gerações, a linha sai a cada lote
+  de 20 candidatos.
+- **candidato**: a linha de baixo, reescrita no lugar a cada candidato, com os
+  genes e a nota (ou `cortado`, com o motivo, ou `[repetido]` quando veio do
+  cache). Ela só aparece num terminal de verdade, não quando a saída vai para
+  um arquivo.
+
+O painel só imprime: com ou sem ele, a busca dá exatamente os mesmos
+candidatos e notas.
 
 | opção | padrão | o que é |
 |---|---|---|
@@ -307,10 +342,11 @@ seeds)`) segue como proposta em aberto, separada desta mudança.
 ## Testes
 
 ```bash
-uv run python -m unittest tests/test_genetic.py tests/test_genetic_revisor.py -v
+uv run python -m unittest tests/test_genetic.py tests/test_genetic_revisor.py tests/test_genetic_painel.py -v
 ```
 
-`test_genetic.py` cobre o motor, a nota, os cortes, o avaliador e o executor.
+`test_genetic.py` cobre o motor, a nota, os cortes, o avaliador e o executor;
+`test_genetic_painel.py`, o observador e o painel.
 `test_genetic_revisor.py` tem os testes adversariais do revisor (gene inteiro
 com limite fracionário, orçamento exato, cache, tudo cortado sem NaN,
 seeds reservadas fora da busca, reprodutibilidade do campeão gravado).

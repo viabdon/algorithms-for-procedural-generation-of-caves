@@ -21,6 +21,13 @@ from cavegen.core.seed import numpy_rng
 # A função de avaliação devolve (nota, detalhes). Os detalhes são gravados junto
 # com a nota, mas o motor só olha a nota.
 Avaliador = Callable[[dict], tuple[float, dict]]
+# Observador opcional da busca, para mostrar o andamento. Recebe o nome do
+# evento e um dict:
+#   "candidato": {"avaliacao", "restante", "repetido"}, depois de cada candidato;
+#   "geracao": {"geracao", "populacao", "resultado"}, quando uma geração do GA
+#              fica completa (a 0 é a população inicial).
+# Ele só lê: nada que faça muda a busca.
+Observador = Callable[[str, dict], None]
 
 @dataclass(frozen=True)
 class Gene:
@@ -148,8 +155,10 @@ class _Orcamento:
         repetido gasta orçamento do mesmo jeito (a busca "pediu" aquele
         candidato), mas a avaliação não é refeita: a nota é determinística.
     """
-    def __init__(self, avaliar: Avaliador, orcamento: int, resultado: ResultadoBusca):
+    def __init__(self, avaliar: Avaliador, orcamento: int, resultado: ResultadoBusca,
+                 observar: Observador | None = None):
         self.avaliar = avaliar
+        self.observar = observar
         self.restante = orcamento
         self.resultado = resultado
         self.cache: dict[tuple, tuple[float, dict]] = {}
@@ -159,7 +168,8 @@ class _Orcamento:
             raise RuntimeError("Orçamento esgotado.")
         self.restante -= 1
         k = chave(genes)
-        if k in self.cache:
+        repetido = k in self.cache
+        if repetido:
             self.resultado.reaproveitadas += 1
         else:
             nota, detalhes = self.avaliar(dict(genes))
@@ -167,6 +177,9 @@ class _Orcamento:
         nota, detalhes = self.cache[k]
         avaliacao = Avaliacao(dict(genes), nota, detalhes, geracao, len(self.resultado.avaliacoes))
         self.resultado.avaliacoes.append(avaliacao)
+        if self.observar is not None:
+            self.observar("candidato", {"avaliacao": avaliacao, "restante": self.restante,
+                                        "repetido": repetido})
         return avaliacao
 
 def sortear_cromossomo(genes: tuple[Gene, ...], rng: np.random.Generator) -> dict:
@@ -196,7 +209,7 @@ def mutar(cromossomo: dict, genes: tuple[Gene, ...], taxa: float, passo: float,
     return mutado
 
 def evoluir(genes: tuple[Gene, ...], avaliar: Avaliador, config: ConfiguracaoGA,
-            seed: int) -> ResultadoBusca:
+            seed: int, observar: Observador | None = None) -> ResultadoBusca:
     """
         Roda o algoritmo genético até gastar o orçamento.
         1. população inicial sorteada dentro dos limites;
@@ -204,13 +217,20 @@ def evoluir(genes: tuple[Gene, ...], avaliar: Avaliador, config: ConfiguracaoGA,
            trocado por filhos: dois pais por torneio, cruzamento, mutação;
         3. a última geração pode ficar incompleta, para não passar do orçamento.
         A mesma seed reproduz a mesma sequência de candidatos.
+        observar: recebe o andamento (ver Observador); não muda a busca.
     """
     rng = numpy_rng(seed)
     resultado = ResultadoBusca("genetico")
-    gastar = _Orcamento(avaliar, config.orcamento, resultado)
+    gastar = _Orcamento(avaliar, config.orcamento, resultado, observar)
+
+    def avisar_geracao(numero: int, populacao: list[Avaliacao]):
+        if observar is not None:
+            observar("geracao", {"geracao": numero, "populacao": list(populacao),
+                                 "resultado": resultado})
 
     populacao = [gastar(sortear_cromossomo(genes, rng), 0)
                  for _ in range(config.tamanho_populacao)]
+    avisar_geracao(0, populacao)
     geracao = 0
     while gastar.restante > 0:
         geracao += 1
@@ -226,11 +246,12 @@ def evoluir(genes: tuple[Gene, ...], avaliar: Avaliador, config: ConfiguracaoGA,
             filho = mutar(filho, genes, config.taxa_mutacao, config.passo_mutacao, rng)
             filhos.append(gastar(filho, geracao))
         populacao = ordenada[:config.elite] + filhos
+        avisar_geracao(geracao, populacao)
 
     return resultado
 
 def busca_aleatoria(genes: tuple[Gene, ...], avaliar: Avaliador, orcamento: int,
-                    seed: int) -> ResultadoBusca:
+                    seed: int, observar: Observador | None = None) -> ResultadoBusca:
     """
         Controle do GA: sorteia `orcamento` cromossomos dentro dos mesmos
         limites e avalia todos. Mesmo orçamento e mesma avaliação que o GA, sem
@@ -238,7 +259,7 @@ def busca_aleatoria(genes: tuple[Gene, ...], avaliar: Avaliador, orcamento: int,
     """
     rng = numpy_rng(seed)
     resultado = ResultadoBusca("aleatoria")
-    gastar = _Orcamento(avaliar, orcamento, resultado)
+    gastar = _Orcamento(avaliar, orcamento, resultado, observar)
     for _ in range(orcamento):
         gastar(sortear_cromossomo(genes, rng), 0)
     return resultado
