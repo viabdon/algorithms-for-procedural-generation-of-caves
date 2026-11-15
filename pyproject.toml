@@ -58,4 +58,6 @@ test = { cmd = "python tests/rodar.py", help = "Roda a suite completa com relato
 test-um = { cmd = "python tests/rodar.py --detalhe", help = "Roda um modulo: poe test-um tests/test_volume.py" }
 menu-ca = { cmd = "python -m cavegen.generators.cellular_automata.menu", help = "Abre o menu do CA" }
 menu-rw = { cmd = "python -m cavegen.generators.random_walk.menu", help = "Abre o menu do Random Walk" }
-ui = { cmd = "uv run --extra ui streamlit run src/cavegen/ui/cellular_automata/app.py", help = "Abre a bancada Streamlit do CA" }
+ga = { cmd = "python -m cavegen.optimization.genetic.executar", help = "Roda o algoritmo genetico do CA mostrando as etapas (aceita --orcamento, --top, --seed...)" }
+ga-aleatoria = { cmd = "python -m cavegen.optimization.genetic.executar --metodo aleatoria", help = "Roda a busca aleatoria de controle do GA (mesmas opcoes)" }
+ui = { cmd ="uv run --extra ui streamlit run src/cavegen/ui/cellular_automata/app.py", help = "Abre a bancada Streamlit do CA" }
