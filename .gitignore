@@ -3,6 +3,9 @@ __pycache__/
 *.py[cod]
 *.egg-info/
 .venv/
+.venv-gan/
+.pytest_cache/
+/tmp/
 .env
 
 # Notebooks
@@ -16,7 +19,8 @@ __pycache__/
 !/data/processed/README.md
 !/data/processed/manifest.json
 /data/external/*
-/data/references/*
+# Caminho legado substituído por data/processed/references.
+/data/references/
 
 # Resultados gerados e busca de parâmetros do CA
 /results/csv/*

@@ -1,6 +1,6 @@
 # Tarefas de Pablo — redes neurais e protocolo compartilhado
 
-Atualizado em 06/11/2026. Pablo inicia GAN, PCGRL e PCGARL em paralelo ao
+Atualizado em 17/11/2026. Pablo conduz GAN, PCGRL e PCGARL em paralelo ao
 trabalho de Felipe nos clássicos, coleta e tabela. O
 [plano neural](plano-redes-neurais.md) detalha contratos, testes, recompensa,
 limites, referências e critérios de aceitação. Ver também
@@ -14,8 +14,12 @@ limites, referências e critérios de aceitação. Ver também
   orçamento e distinção entre término e truncamento; validar episódio aleatório.
 - [ ] Definir e verificar a recompensa de conectividade e ocupação contra casos
   conhecidos e soluções degeneradas. Separar retorno de métricas independentes.
-- [ ] Auditar conjuntos de treino da GAN e separação por caverna/grafo, além de
-  origem, semântica, licença, resolução, hardware e memória disponível.
+- [x] Auditar os nove NPZ disponíveis, origem, semântica, licenças e resolução;
+  definir folds por caverna. Os quatro interiores não passaram a triagem.
+- [x] Preparar a GAN de ocupação/SDF e notebook Colab, com testes em máscaras
+  artificiais, checkpoints e avaliação por seeds. Sem treino nas referências.
+- [ ] Implementar e validar o [piloto de recortes](planejamento-recortes-voxelizacao.md):
+  seleção em lotes com contexto, precisão local, seções, tampas e margens.
 - [ ] Acordar o que PCGARL significa no projeto e a referência adversarial; testar
   alcançabilidade e custos do solucionador antes de acoplar os agentes.
 - [ ] Implementar provas pequenas e só então treinar, versionar checkpoints,
@@ -30,7 +34,12 @@ limites, referências e critérios de aceitação. Ver também
 - [ ] Não usar superfície do Elaphes como vazio real, IoU volumétrica ou dado
   de treino de ar sem reconstrução e validação adequadas.
 - [ ] Inventariar fontes externas e estado das extrações antes de qualquer novo
-  parser. A leitura de point clouds deve continuar incremental e em `float32`.
+  parser. Manter leitura incremental; no novo preparo de recortes LAS, remover
+  a origem com precisão suficiente antes de converter coordenadas para float32.
+- [ ] Separar dados por caverna antes dos recortes, guardar limites/transformações
+  e revisar os contornos. Bounds menores no CLI atual não filtram a nuvem.
+- [ ] Conferir tampas dentro da grade, contexto dos cortes, resolução física e
+  incerteza antes de produzir novas referências ou liberar um ensaio de treino.
 - [ ] Atualizar o texto do TCC para refletir o rollback: documentos externos,
   inclusive os intitulados atualizados, não representam o escopo vigente.
 

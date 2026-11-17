@@ -6,6 +6,27 @@ interior por flood fill. Os arquivos brutos são lidos diretamente, inclusive de
 um HD externo. O processamento é determinístico para uma mesma entrada,
 configuração e implementação; não há seed aleatória nesta preparação.
 
+## Planejamento de recortes de galerias — 17/11/2026
+
+A preparação atual usa a nuvem fornecida inteira. A próxima etapa será
+selecionar trechos menores, reconstruir seções sucessivas e fechar apenas as
+extremidades dos recortes com tampas computacionais. O
+[planejamento dos recortes](planejamento-recortes-voxelizacao.md) especifica
+separação por caverna, seleção incremental, contexto, planos de corte, margens
+e registro dos limites; o [plano de reconstrução](plano-reconstrucao-secoes.md)
+descreve a validação.
+
+**Fornecer bounds menores ao CLI/menu atual não extrai um trecho.** O leitor
+continua percorrendo a nuvem e o normalizador rejeita pontos fora desses
+bounds. Será necessário implementar um filtro antes da voxelização, preservando
+coordenadas locais com precisão adequada. Caixa de seleção, planos das tampas
+e caixa da grade têm funções distintas.
+
+Cada recorte registrará origem, transformação, tamanho físico do voxel,
+limites, máscaras e revisão. Todas as versões/recortes de uma caverna
+continuarão na mesma partição do fold. Nenhum desses volumes foi produzido
+nesta revisão e o treino permanece pendente de referências validadas.
+
 ## Ambiente e menu
 
 Na raiz de uma cópia do projeto, prepare o ambiente conforme a seção de

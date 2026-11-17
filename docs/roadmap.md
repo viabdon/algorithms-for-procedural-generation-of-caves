@@ -1,6 +1,6 @@
 # Roadmap do TCC
 
-**Atualizado em 06/11/2026.** A `feat/neural-models` incorporou a `main` até
+**Atualizado em 17/11/2026.** A `feat/neural-models` incorporou a `main` até
 `a7dd1e7`. Felipe se aproxima do fim dos clássicos e passa à coleta de métricas
 e consolidação da tabela comparativa; Pablo inicia GAN, PCGRL e PCGARL em
 paralelo. As tarefas neurais estão detalhadas no [plano neural](plano-redes-neurais.md).
@@ -32,8 +32,14 @@ registram os limites e os experimentos preservados.
   testes do menu e dos registros são os afetados. Felipe conduz a correção.
 - [ ] Substituir a referência obsoleta do peso 002 do CA ao SDF removido com
   `random_walk_temp/`, se essa extensão voltar ao escopo.
-- [ ] Gerar e avaliar GAN, PCGRL e PCGARL: os dois primeiros só têm interfaces
-  e rotinas de treino placeholder; o terceiro ainda não foi implementado.
+- [x] Preparar a infraestrutura GAN: auditoria, folds por caverna, variantes
+  ocupação/SDF, treino/checkpoints, inferência, avaliação e notebook Colab.
+  Testes usam fixtures artificiais; não há treino nas referências.
+- [ ] Corrigir os dados da GAN: interiores globais atuais têm 2, 1, 98 e 5
+  voxels de ar e não passam a triagem. O [plano de recortes](planejamento-recortes-voxelizacao.md)
+  define seleção em lotes, contexto, limites da grade e tampas a implementar.
+- [ ] Gerar e avaliar os modelos neurais após validar seus dados/ambientes.
+  PCGRL ainda tem placeholders; PCGARL continua sem implementação.
 
 ## Frente de Felipe — clássicos, métricas e tabela
 
@@ -60,8 +66,12 @@ registram os limites e os experimentos preservados.
 
 - [ ] Definir estado, ações, transições, recompensa, término e orçamento do
   PCGRL; validar ambiente pequeno e política aleatória antes do treinamento.
-- [ ] Auditar dados de GAN, origem, independência e divisão por fonte, limites
-  de memória, resolução e pós-processamento antes de interpretar resultados.
+- [x] Auditar os dados atuais de GAN e definir folds por caverna, registrando
+  origem, hashes, resolução e limitações. Isso não aprovou os interiores.
+- [ ] Implementar o piloto de recortes: origem local antes de float32, seleção
+  dos pontos com contexto, seções e tampas separadas da borda da grade.
+- [ ] Validar detalhes, continuidade e limites em grades comparáveis; registrar
+  máscaras, revisão e novos manifestos antes de treinar e medir VRAM no Colab.
 - [ ] Confirmar o significado de PCGARL e definir gerador, adversário, objetivo,
   avaliação de alcançabilidade e custo antes de implementá-lo.
 - [ ] Produzir volumes sob o contrato comum, registrar checkpoints e avaliar

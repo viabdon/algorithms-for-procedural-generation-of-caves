@@ -34,8 +34,9 @@ relatórios; esta organização não altera sua validade científica.
 Para novos volumes, use `generated/<algoritmo>/<configuracao>/`.
 As pastas `baseline_32` e `baseline_64` correspondem aos experimentos em
 `configs/experiments/`, com os parâmetros da respectiva entrada em
-`algorithms`. Estão vazias, reservadas para volumes futuros. GAN e PCGRL
-ainda não têm uma configuração experimental definida.
+`algorithms`. Estão vazias, reservadas para volumes futuros. A GAN tem
+configurações propostas em `configs/gan` e código preparado para Colab, sem
+treino nas referências; PCGRL continua em planejamento.
 
 Dentro de cada configuração, separe execuções por `seed_<N>/` (ou por um
 identificador de execução se houver repetições). Salve o volume junto de uma
@@ -57,3 +58,18 @@ de ser aceito como ar da caverna. Os comandos, metadados e o protocolo de
 reprodução estão no [guia de preparação de volumes](../../docs/preparacao-volumes.md).
 A pasta antiga `data/references/`, que continha apenas um marcador versionado,
 foi substituída na estrutura por `data/processed/references/`.
+
+## Recortes de referência planejados
+
+A organização proposta para o piloto é
+`reference_sections/<caverna>/<levantamento>/<recorte>/<resolucao>/`, separada
+dos volumes globais. Cada recorte registrará seleção de pontos, contexto,
+seções inicial/final, tampas, bounds da grade, transformação local e tamanho
+físico do voxel, além de máscaras de incerteza.
+
+A caixa de seleção não representa uma parede, e as tampas não coincidem
+obrigatoriamente com a borda da grade. O
+[planejamento dos recortes](../../docs/planejamento-recortes-voxelizacao.md)
+define essas diferenças e os campos do manifesto. São saídas futuras, ainda
+não produzidas pelo menu. Manter recortes da mesma caverna na mesma partição
+e não sobrescrever os NPZ da auditoria atual.

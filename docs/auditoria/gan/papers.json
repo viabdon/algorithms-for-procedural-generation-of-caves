@@ -1,0 +1,49 @@
+{
+  "consulted_on": "2026-11-15",
+  "local_directory": "C:\\Users\\Vinícius Abdon\\OneDrive - Associacao Cultural e Educacional do Para\\TCC\\Docs\\References",
+  "local_pdfs_consulted": [
+    {
+      "filename": "Compressing and Comparing the Generative Spaces.pdf",
+      "size_bytes": 4864053,
+      "sha256": "fe47d4f0af8df471a83112567b568b9a373cc6e086c00acef7b31bf379057112",
+      "pages": 8
+    },
+    {
+      "filename": "Deep learning for procedural content generation.pdf",
+      "size_bytes": 2088560,
+      "sha256": "2a87150a7a54402211f9c2c89325313aa17883c115f0b514c6d14e4fa4488316",
+      "pages": 19
+    },
+    {
+      "filename": "KarstConduitCatalogue_a_dataset_of_LiDAR_derived_p.pdf",
+      "size_bytes": 19411617,
+      "sha256": "63415c737489dfa3ca02f5c76e1ee2411bc013161ed77a65f428f198afaae165",
+      "pages": 28
+    },
+    {
+      "filename": "On the Evaluation of Procedural Level Generation Systems.pdf",
+      "size_bytes": 582817,
+      "sha256": "d013e81c680db569a2ac029377721c739f64819cf99dea18f5c1dcc8d554ff81",
+      "pages": 10
+    },
+    {
+      "filename": "Procedural Content Generation via Machine Learning.pdf",
+      "size_bytes": 1977044,
+      "sha256": "eabf3464a17adda6500f9e7770a6ca69a964599c3e010944e9853317056f5b72",
+      "pages": 15
+    },
+    {
+      "filename": "Speleogenesis geometry and topology of caves A quantitative study of 3D karst conduits.pdf",
+      "size_bytes": 1263521,
+      "sha256": "555663ea8138385ed6993407c86451e76685aa3b6dcaafc9f9da3e2bbba4ea24",
+      "pages": 76
+    },
+    {
+      "filename": "World-GAN_ a Generative Model for Minecraft Worlds.pdf",
+      "size_bytes": 17002051,
+      "sha256": "0696d025aab02478ac1360fa871869abb096f8f881fbd41edd745cb53469d6ae",
+      "pages": 8
+    }
+  ],
+  "note": "KarstConduitCatalogue local copy is a 2025-05-26 preprint; final version checked online; PDFs are not redistributed"
+}

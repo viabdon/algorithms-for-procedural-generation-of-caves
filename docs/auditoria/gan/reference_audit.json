@@ -1,0 +1,2766 @@
+{
+  "schema": "gan-reference-audit-v1",
+  "records": [
+    {
+      "path": "Archamps_PreEtroiture_sampled_2mm_PCV_normals_classified_georef/64x64x64/interior.npz",
+      "group": "archamps",
+      "sha256": "a9f179b88b8fbe6d5c28744545f1f31b6baaa141e767a82074f76765fba669fc",
+      "voxel_sha256": "7b5c89eff584628a0f27a966b850d2362b69753e6825d1f504fdd68a17cc485e",
+      "kind": "candidate_cave_void",
+      "semantic": "true_means_enclosed_unobserved_voxel",
+      "metadata": {
+        "kind": "candidate_cave_void",
+        "semantic": "true_means_enclosed_unobserved_voxel",
+        "source_path": "/run/media/midnavi/Pablo/TCC/DATA/RAW/data/Archamps/PreEtroiture/pointclouds/Archamps_PreEtroiture_sampled_2mm_PCV_normals_classified_georef.las",
+        "source_format": "las",
+        "las_header": {
+          "version": "1.2",
+          "point_format_id": 2,
+          "point_count": 398972868,
+          "scales_xyz": [
+            1e-05,
+            1e-05,
+            1e-05
+          ],
+          "offsets_xyz": [
+            939800.0,
+            6562000.0,
+            1100.0
+          ],
+          "coordinate_decoding": "raw_integer * scale + offset",
+          "reprojection_applied": false
+        },
+        "bounds_path": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/Archamps_PreEtroiture_sampled_2mm_PCV_normals_classified_georef/64x64x64/surface.bounds.json",
+        "min_xyz": [
+          943775.0,
+          6561973.5,
+          1039.2669677734375
+        ],
+        "max_xyz": [
+          943873.875,
+          6562090.0,
+          1117.5369873046875
+        ],
+        "volume_shape_zyx": [
+          64,
+          64,
+          64
+        ],
+        "normalization": {
+          "source_coordinate_order": "XYZ",
+          "grid_index_order": "ZYX",
+          "shared_scale_preserves_proportions": true,
+          "symmetric_padding": true,
+          "degenerate_axes": "placed_at_grid_center"
+        },
+        "processing": {
+          "batch_size": 65536,
+          "progress_every": 1000000,
+          "bounds_mode": "computed",
+          "flood_fill_requested": true
+        },
+        "validation_status": "candidate_requires_geometric_validation",
+        "surface_path": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/Archamps_PreEtroiture_sampled_2mm_PCV_normals_classified_georef/64x64x64/surface.npz",
+        "interior_inference": {
+          "method": "exterior_flood_fill",
+          "connectivity": 6,
+          "outside_grid": "exterior",
+          "observed_surface_included_in_void": false,
+          "automatic_closure": false
+        }
+      },
+      "shape_zyx": [
+        64,
+        64,
+        64
+      ],
+      "axis_order": "ZYX",
+      "dtype_on_load": "bool",
+      "true_voxels": 2,
+      "true_ratio": 7.62939453125e-06,
+      "preprocessing_seed": null,
+      "candidate": true,
+      "verified_air": false,
+      "eligible_proxy": true,
+      "issues": [
+        "proxy_air_requires_geometric_validation",
+        "insufficient_resolved_interior_geometry"
+      ],
+      "origin": [
+        {
+          "id_arquivo": "archamps_preetroiture_sampled_2mm_pcv_normals_classified_georef",
+          "id_caverna": "archamps",
+          "grupo_independencia": "archamps",
+          "nome_caverna": "Grotte d'Archamps",
+          "trecho": "PreEtroiture",
+          "variante": "amostragem_2mm",
+          "dataset": "KarstConduitCatalogue",
+          "doi_dataset": "10.60544/gxkd-1r73",
+          "versao_dataset": "1.0",
+          "fonte_url": "https://doi.org/10.60544/gxkd-1r73",
+          "credito": "Racine, T., Trunz, C., Straubhaar, J. A., & Renard, P. (2025). Archamps (Version 1.0) [Data set]. UNINE data service. https://doi.org/10.60544/gxkd-1r73",
+          "pais": "France",
+          "localidade": "Archamps",
+          "data_aquisicao": "2024-02-25",
+          "unidade_coordenadas": "m",
+          "crs": "EPSG:5698",
+          "semantica": "pontos_de_superficie_observada; nao_e_mascara_de_ar",
+          "arquivo_relativo": "data/Archamps/PreEtroiture/pointclouds/Archamps_PreEtroiture_sampled_2mm_PCV_normals_classified_georef.las",
+          "raiz_local": "/run/media/midnavi/Pablo/TCC/DATA/RAW",
+          "formato": "las",
+          "tamanho_bytes": "23140427393",
+          "quantidade_pontos": "398972868",
+          "metodo_contagem_pontos": "cabecalho_LAS_sem_leitura_de_pontos",
+          "licenca_declarada": "CC-BY-SA-4.0 (descritor); CC-BY-NC-4.0 (README)",
+          "evidencia_licenca": "/run/media/midnavi/Pablo/.Trash-1000/files/swissubase_3065_1_0/metadata.yaml: dataset_version.usage_license; documents/README.md: Copyright and license",
+          "status_licenca": "divergencia_documental_a_esclarecer",
+          "status_identificacao": "confirmada_por_metadados_locais_e_declaracao_do_usuario",
+          "evidencia_local": "data/Archamps/cave.yaml; data/Archamps/PreEtroiture/scan.yaml; /run/media/midnavi/Pablo/.Trash-1000/files/swissubase_3065_1_0/metadata.yaml",
+          "observacoes": "Duas resolucoes da mesma passagem; nao sao fontes independentes. DOI individual; catalogo: 10.60544/sbjr-z851 PreEtroiture e PostEtroiture pertencem a mesma caverna. Descritor consultado em embalagem descartada; nuvem ativa fora da lixeira.",
+          "pendencias": "Esclarecer divergencia da licenca; preservar origem local ao usar float32 georreferenciado; calcular hash; validar interior.",
+          "data_consulta_fontes": "2026-11-07",
+          "sha256": "",
+          "status_sha256": "pendente_sem_leitura_integral",
+          "particao": "nao_definida",
+          "aprovacao_gan": "pendente_validacao_geometrica"
+        }
+      ],
+      "sidecars": {
+        "run.json": {
+          "sha256": "fa9255f4cac598c93f7383a2ead099939c4adf764c7a4bea4718f2eac7eb7614",
+          "content": {
+            "schema": "reference-voxelization-run-v1",
+            "status": "completed",
+            "started_at_utc": "2026-11-08T02:07:16.093164+00:00",
+            "elapsed_seconds": 1316.1631207239989,
+            "working_directory": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves",
+            "command_argv": [
+              "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/.venv/bin/python3",
+              "-u",
+              "-m",
+              "cavegen.datastream.run_reference_voxelization",
+              "--input",
+              "/run/media/midnavi/Pablo/TCC/DATA/RAW/data/Archamps/PreEtroiture/pointclouds/Archamps_PreEtroiture_sampled_2mm_PCV_normals_classified_georef.las",
+              "--bounds",
+              "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/Archamps_PreEtroiture_sampled_2mm_PCV_normals_classified_georef/64x64x64/surface.bounds.json",
+              "--shape",
+              "64",
+              "64",
+              "64",
+              "--batch-size",
+              "65536",
+              "--progress-every",
+              "1000000",
+              "--output",
+              "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/Archamps_PreEtroiture_sampled_2mm_PCV_normals_classified_georef/64x64x64/surface.npz",
+              "--interior-output",
+              "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/Archamps_PreEtroiture_sampled_2mm_PCV_normals_classified_georef/64x64x64/interior.npz"
+            ],
+            "requested_argv": [
+              "--input",
+              "/run/media/midnavi/Pablo/TCC/DATA/RAW/data/Archamps/PreEtroiture/pointclouds/Archamps_PreEtroiture_sampled_2mm_PCV_normals_classified_georef.las",
+              "--shape",
+              "64",
+              "64",
+              "64",
+              "--batch-size",
+              "65536",
+              "--progress-every",
+              "1000000",
+              "--output",
+              "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/Archamps_PreEtroiture_sampled_2mm_PCV_normals_classified_georef/64x64x64/surface.npz",
+              "--interior-output",
+              "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/Archamps_PreEtroiture_sampled_2mm_PCV_normals_classified_georef/64x64x64/interior.npz"
+            ],
+            "command_shell": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/.venv/bin/python3 -u -m cavegen.datastream.run_reference_voxelization --input /run/media/midnavi/Pablo/TCC/DATA/RAW/data/Archamps/PreEtroiture/pointclouds/Archamps_PreEtroiture_sampled_2mm_PCV_normals_classified_georef.las --bounds /home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/Archamps_PreEtroiture_sampled_2mm_PCV_normals_classified_georef/64x64x64/surface.bounds.json --shape 64 64 64 --batch-size 65536 --progress-every 1000000 --output /home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/Archamps_PreEtroiture_sampled_2mm_PCV_normals_classified_georef/64x64x64/surface.npz --interior-output /home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/Archamps_PreEtroiture_sampled_2mm_PCV_normals_classified_georef/64x64x64/interior.npz",
+            "source": {
+              "path": "/run/media/midnavi/Pablo/TCC/DATA/RAW/data/Archamps/PreEtroiture/pointclouds/Archamps_PreEtroiture_sampled_2mm_PCV_normals_classified_georef.las",
+              "size_bytes": 23140427393,
+              "mtime_ns": 1738239817714860000,
+              "identity_kind": "path_size_mtime_not_content_hash"
+            },
+            "surface_output": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/Archamps_PreEtroiture_sampled_2mm_PCV_normals_classified_georef/64x64x64/surface.npz",
+            "interior_output": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/Archamps_PreEtroiture_sampled_2mm_PCV_normals_classified_georef/64x64x64/interior.npz",
+            "bounds_path": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/Archamps_PreEtroiture_sampled_2mm_PCV_normals_classified_georef/64x64x64/surface.bounds.json",
+            "bounds_sha256": "766199b1efabdcfa23789c8413ae4743ce53cc6b84016320f8496f549a2c0dd8",
+            "surface_metadata": {
+              "kind": "surface_voxels",
+              "semantic": "true_means_observed_surface",
+              "source_path": "/run/media/midnavi/Pablo/TCC/DATA/RAW/data/Archamps/PreEtroiture/pointclouds/Archamps_PreEtroiture_sampled_2mm_PCV_normals_classified_georef.las",
+              "source_format": "las",
+              "las_header": {
+                "version": "1.2",
+                "point_format_id": 2,
+                "point_count": 398972868,
+                "scales_xyz": [
+                  1e-05,
+                  1e-05,
+                  1e-05
+                ],
+                "offsets_xyz": [
+                  939800.0,
+                  6562000.0,
+                  1100.0
+                ],
+                "coordinate_decoding": "raw_integer * scale + offset",
+                "reprojection_applied": false
+              },
+              "bounds_path": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/Archamps_PreEtroiture_sampled_2mm_PCV_normals_classified_georef/64x64x64/surface.bounds.json",
+              "min_xyz": [
+                943775.0,
+                6561973.5,
+                1039.2669677734375
+              ],
+              "max_xyz": [
+                943873.875,
+                6562090.0,
+                1117.5369873046875
+              ],
+              "volume_shape_zyx": [
+                64,
+                64,
+                64
+              ],
+              "normalization": {
+                "source_coordinate_order": "XYZ",
+                "grid_index_order": "ZYX",
+                "shared_scale_preserves_proportions": true,
+                "symmetric_padding": true,
+                "degenerate_axes": "placed_at_grid_center"
+              }
+            },
+            "processing": {
+              "batch_size": 65536,
+              "progress_every": 1000000,
+              "bounds_mode": "computed",
+              "flood_fill_requested": true
+            },
+            "software": {
+              "python": "3.14.8",
+              "numpy": "2.5.0",
+              "scipy": "1.18.0",
+              "laspy": "2.7.0",
+              "git_commit": "4680c1453ea7c261db0321a0f0cbe5875ba49291",
+              "git_dirty": true
+            }
+          }
+        },
+        "command.json": {
+          "sha256": "a1e8eda579b02ca663e198cfa5285b03ba4c631ffa42e68a21d5e748e952767d",
+          "content": {
+            "command_argv": [
+              "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/.venv/bin/python3",
+              "-u",
+              "-m",
+              "cavegen.datastream.run_reference_voxelization",
+              "--input",
+              "/run/media/midnavi/Pablo/TCC/DATA/RAW/data/Archamps/PreEtroiture/pointclouds/Archamps_PreEtroiture_sampled_2mm_PCV_normals_classified_georef.las",
+              "--shape",
+              "64",
+              "64",
+              "64",
+              "--batch-size",
+              "65536",
+              "--progress-every",
+              "1000000",
+              "--output",
+              "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/Archamps_PreEtroiture_sampled_2mm_PCV_normals_classified_georef/64x64x64/surface.npz",
+              "--interior-output",
+              "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/Archamps_PreEtroiture_sampled_2mm_PCV_normals_classified_georef/64x64x64/interior.npz"
+            ],
+            "command_shell": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/.venv/bin/python3 -u -m cavegen.datastream.run_reference_voxelization --input /run/media/midnavi/Pablo/TCC/DATA/RAW/data/Archamps/PreEtroiture/pointclouds/Archamps_PreEtroiture_sampled_2mm_PCV_normals_classified_georef.las --shape 64 64 64 --batch-size 65536 --progress-every 1000000 --output /home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/Archamps_PreEtroiture_sampled_2mm_PCV_normals_classified_georef/64x64x64/surface.npz --interior-output /home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/Archamps_PreEtroiture_sampled_2mm_PCV_normals_classified_georef/64x64x64/interior.npz",
+            "working_directory": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves",
+            "execution_mode": "1"
+          }
+        },
+        "bounds.json": {
+          "sha256": "766199b1efabdcfa23789c8413ae4743ce53cc6b84016320f8496f549a2c0dd8",
+          "content": {
+            "source_path": "/run/media/midnavi/Pablo/TCC/DATA/RAW/data/Archamps/PreEtroiture/pointclouds/Archamps_PreEtroiture_sampled_2mm_PCV_normals_classified_georef.las",
+            "min_xyz": [
+              943775.0,
+              6561973.5,
+              1039.2669677734375
+            ],
+            "max_xyz": [
+              943873.875,
+              6562090.0,
+              1117.5369873046875
+            ]
+          }
+        }
+      },
+      "estimated_grid_spacing_source_units": 1.849206349206349,
+      "structure": {
+        "structural_schema_version": "structural-v1",
+        "axis_order": "ZYX",
+        "shape_depth": 64,
+        "shape_height": 64,
+        "shape_width": 64,
+        "spacing_z": 1.0,
+        "spacing_y": 1.0,
+        "spacing_x": 1.0,
+        "distance_unit": "voxel",
+        "exterior_policy": "solid",
+        "distance_reference": "voxel_centers",
+        "connectivity": 6,
+        "total_voxels": 262144,
+        "open_voxels": 2,
+        "open_ratio": 7.62939453125e-06,
+        "component_count": 2,
+        "largest_component_voxels": 1,
+        "largest_component_ratio": 0.5,
+        "dt_mean": 1.0,
+        "dt_median": 1.0,
+        "dt_max": 1.0,
+        "is_degenerate": false,
+        "degenerate_reason": null
+      },
+      "air_bbox_shape_zyx": [
+        2,
+        2,
+        1
+      ],
+      "surface_overlap_voxels": 0,
+      "flood_fill_reproduced": true,
+      "surface_metadata_matches": true,
+      "geometry_screen_passed": false,
+      "resolution_diagnostics": [
+        {
+          "resolution": 16,
+          "structural_schema_version": "structural-v1",
+          "axis_order": "ZYX",
+          "shape_depth": 16,
+          "shape_height": 16,
+          "shape_width": 16,
+          "spacing_z": 1.0,
+          "spacing_y": 1.0,
+          "spacing_x": 1.0,
+          "distance_unit": "voxel",
+          "exterior_policy": "solid",
+          "distance_reference": "voxel_centers",
+          "connectivity": 6,
+          "total_voxels": 4096,
+          "open_voxels": 0,
+          "open_ratio": 0.0,
+          "component_count": 0,
+          "largest_component_voxels": 0,
+          "largest_component_ratio": 0.0,
+          "dt_mean": null,
+          "dt_median": null,
+          "dt_max": null,
+          "is_degenerate": true,
+          "degenerate_reason": "no_open_voxels",
+          "roundtrip_air_recall": 0.0,
+          "roundtrip_iou": 0.0
+        },
+        {
+          "resolution": 32,
+          "structural_schema_version": "structural-v1",
+          "axis_order": "ZYX",
+          "shape_depth": 32,
+          "shape_height": 32,
+          "shape_width": 32,
+          "spacing_z": 1.0,
+          "spacing_y": 1.0,
+          "spacing_x": 1.0,
+          "distance_unit": "voxel",
+          "exterior_policy": "solid",
+          "distance_reference": "voxel_centers",
+          "connectivity": 6,
+          "total_voxels": 32768,
+          "open_voxels": 1,
+          "open_ratio": 3.0517578125e-05,
+          "component_count": 1,
+          "largest_component_voxels": 1,
+          "largest_component_ratio": 1.0,
+          "dt_mean": 1.0,
+          "dt_median": 1.0,
+          "dt_max": 1.0,
+          "is_degenerate": false,
+          "degenerate_reason": null,
+          "roundtrip_air_recall": 0.5,
+          "roundtrip_iou": 0.1111111111111111
+        },
+        {
+          "resolution": 64,
+          "structural_schema_version": "structural-v1",
+          "axis_order": "ZYX",
+          "shape_depth": 64,
+          "shape_height": 64,
+          "shape_width": 64,
+          "spacing_z": 1.0,
+          "spacing_y": 1.0,
+          "spacing_x": 1.0,
+          "distance_unit": "voxel",
+          "exterior_policy": "solid",
+          "distance_reference": "voxel_centers",
+          "connectivity": 6,
+          "total_voxels": 262144,
+          "open_voxels": 2,
+          "open_ratio": 7.62939453125e-06,
+          "component_count": 2,
+          "largest_component_voxels": 1,
+          "largest_component_ratio": 0.5,
+          "dt_mean": 1.0,
+          "dt_median": 1.0,
+          "dt_max": 1.0,
+          "is_degenerate": false,
+          "degenerate_reason": null,
+          "roundtrip_air_recall": 1.0,
+          "roundtrip_iou": 1.0
+        }
+      ]
+    },
+    {
+      "path": "Archamps_PreEtroiture_sampled_2mm_PCV_normals_classified_georef/64x64x64/surface.npz",
+      "group": "archamps",
+      "sha256": "ff2fb26bf3db9aae6c2996d3259a1ddd44621ccffb337d493f3bbe5692549111",
+      "voxel_sha256": "2822242652ea52a37551f467dd70041ab6117a26ebc53e0e386cd2fef8194095",
+      "kind": "surface_voxels",
+      "semantic": "true_means_observed_surface",
+      "metadata": {
+        "kind": "surface_voxels",
+        "semantic": "true_means_observed_surface",
+        "source_path": "/run/media/midnavi/Pablo/TCC/DATA/RAW/data/Archamps/PreEtroiture/pointclouds/Archamps_PreEtroiture_sampled_2mm_PCV_normals_classified_georef.las",
+        "source_format": "las",
+        "las_header": {
+          "version": "1.2",
+          "point_format_id": 2,
+          "point_count": 398972868,
+          "scales_xyz": [
+            1e-05,
+            1e-05,
+            1e-05
+          ],
+          "offsets_xyz": [
+            939800.0,
+            6562000.0,
+            1100.0
+          ],
+          "coordinate_decoding": "raw_integer * scale + offset",
+          "reprojection_applied": false
+        },
+        "bounds_path": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/Archamps_PreEtroiture_sampled_2mm_PCV_normals_classified_georef/64x64x64/surface.bounds.json",
+        "min_xyz": [
+          943775.0,
+          6561973.5,
+          1039.2669677734375
+        ],
+        "max_xyz": [
+          943873.875,
+          6562090.0,
+          1117.5369873046875
+        ],
+        "volume_shape_zyx": [
+          64,
+          64,
+          64
+        ],
+        "normalization": {
+          "source_coordinate_order": "XYZ",
+          "grid_index_order": "ZYX",
+          "shared_scale_preserves_proportions": true,
+          "symmetric_padding": true,
+          "degenerate_axes": "placed_at_grid_center"
+        },
+        "processing": {
+          "batch_size": 65536,
+          "progress_every": 1000000,
+          "bounds_mode": "computed",
+          "flood_fill_requested": true
+        }
+      },
+      "shape_zyx": [
+        64,
+        64,
+        64
+      ],
+      "axis_order": "ZYX",
+      "dtype_on_load": "bool",
+      "true_voxels": 1002,
+      "true_ratio": 0.00382232666015625,
+      "preprocessing_seed": null,
+      "candidate": false,
+      "verified_air": false,
+      "eligible_proxy": false,
+      "issues": [
+        "observed_surface_is_not_cave_air"
+      ],
+      "origin": [
+        {
+          "id_arquivo": "archamps_preetroiture_sampled_2mm_pcv_normals_classified_georef",
+          "id_caverna": "archamps",
+          "grupo_independencia": "archamps",
+          "nome_caverna": "Grotte d'Archamps",
+          "trecho": "PreEtroiture",
+          "variante": "amostragem_2mm",
+          "dataset": "KarstConduitCatalogue",
+          "doi_dataset": "10.60544/gxkd-1r73",
+          "versao_dataset": "1.0",
+          "fonte_url": "https://doi.org/10.60544/gxkd-1r73",
+          "credito": "Racine, T., Trunz, C., Straubhaar, J. A., & Renard, P. (2025). Archamps (Version 1.0) [Data set]. UNINE data service. https://doi.org/10.60544/gxkd-1r73",
+          "pais": "France",
+          "localidade": "Archamps",
+          "data_aquisicao": "2024-02-25",
+          "unidade_coordenadas": "m",
+          "crs": "EPSG:5698",
+          "semantica": "pontos_de_superficie_observada; nao_e_mascara_de_ar",
+          "arquivo_relativo": "data/Archamps/PreEtroiture/pointclouds/Archamps_PreEtroiture_sampled_2mm_PCV_normals_classified_georef.las",
+          "raiz_local": "/run/media/midnavi/Pablo/TCC/DATA/RAW",
+          "formato": "las",
+          "tamanho_bytes": "23140427393",
+          "quantidade_pontos": "398972868",
+          "metodo_contagem_pontos": "cabecalho_LAS_sem_leitura_de_pontos",
+          "licenca_declarada": "CC-BY-SA-4.0 (descritor); CC-BY-NC-4.0 (README)",
+          "evidencia_licenca": "/run/media/midnavi/Pablo/.Trash-1000/files/swissubase_3065_1_0/metadata.yaml: dataset_version.usage_license; documents/README.md: Copyright and license",
+          "status_licenca": "divergencia_documental_a_esclarecer",
+          "status_identificacao": "confirmada_por_metadados_locais_e_declaracao_do_usuario",
+          "evidencia_local": "data/Archamps/cave.yaml; data/Archamps/PreEtroiture/scan.yaml; /run/media/midnavi/Pablo/.Trash-1000/files/swissubase_3065_1_0/metadata.yaml",
+          "observacoes": "Duas resolucoes da mesma passagem; nao sao fontes independentes. DOI individual; catalogo: 10.60544/sbjr-z851 PreEtroiture e PostEtroiture pertencem a mesma caverna. Descritor consultado em embalagem descartada; nuvem ativa fora da lixeira.",
+          "pendencias": "Esclarecer divergencia da licenca; preservar origem local ao usar float32 georreferenciado; calcular hash; validar interior.",
+          "data_consulta_fontes": "2026-11-07",
+          "sha256": "",
+          "status_sha256": "pendente_sem_leitura_integral",
+          "particao": "nao_definida",
+          "aprovacao_gan": "pendente_validacao_geometrica"
+        }
+      ],
+      "sidecars": {
+        "run.json": {
+          "sha256": "fa9255f4cac598c93f7383a2ead099939c4adf764c7a4bea4718f2eac7eb7614",
+          "content": {
+            "schema": "reference-voxelization-run-v1",
+            "status": "completed",
+            "started_at_utc": "2026-11-08T02:07:16.093164+00:00",
+            "elapsed_seconds": 1316.1631207239989,
+            "working_directory": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves",
+            "command_argv": [
+              "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/.venv/bin/python3",
+              "-u",
+              "-m",
+              "cavegen.datastream.run_reference_voxelization",
+              "--input",
+              "/run/media/midnavi/Pablo/TCC/DATA/RAW/data/Archamps/PreEtroiture/pointclouds/Archamps_PreEtroiture_sampled_2mm_PCV_normals_classified_georef.las",
+              "--bounds",
+              "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/Archamps_PreEtroiture_sampled_2mm_PCV_normals_classified_georef/64x64x64/surface.bounds.json",
+              "--shape",
+              "64",
+              "64",
+              "64",
+              "--batch-size",
+              "65536",
+              "--progress-every",
+              "1000000",
+              "--output",
+              "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/Archamps_PreEtroiture_sampled_2mm_PCV_normals_classified_georef/64x64x64/surface.npz",
+              "--interior-output",
+              "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/Archamps_PreEtroiture_sampled_2mm_PCV_normals_classified_georef/64x64x64/interior.npz"
+            ],
+            "requested_argv": [
+              "--input",
+              "/run/media/midnavi/Pablo/TCC/DATA/RAW/data/Archamps/PreEtroiture/pointclouds/Archamps_PreEtroiture_sampled_2mm_PCV_normals_classified_georef.las",
+              "--shape",
+              "64",
+              "64",
+              "64",
+              "--batch-size",
+              "65536",
+              "--progress-every",
+              "1000000",
+              "--output",
+              "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/Archamps_PreEtroiture_sampled_2mm_PCV_normals_classified_georef/64x64x64/surface.npz",
+              "--interior-output",
+              "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/Archamps_PreEtroiture_sampled_2mm_PCV_normals_classified_georef/64x64x64/interior.npz"
+            ],
+            "command_shell": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/.venv/bin/python3 -u -m cavegen.datastream.run_reference_voxelization --input /run/media/midnavi/Pablo/TCC/DATA/RAW/data/Archamps/PreEtroiture/pointclouds/Archamps_PreEtroiture_sampled_2mm_PCV_normals_classified_georef.las --bounds /home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/Archamps_PreEtroiture_sampled_2mm_PCV_normals_classified_georef/64x64x64/surface.bounds.json --shape 64 64 64 --batch-size 65536 --progress-every 1000000 --output /home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/Archamps_PreEtroiture_sampled_2mm_PCV_normals_classified_georef/64x64x64/surface.npz --interior-output /home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/Archamps_PreEtroiture_sampled_2mm_PCV_normals_classified_georef/64x64x64/interior.npz",
+            "source": {
+              "path": "/run/media/midnavi/Pablo/TCC/DATA/RAW/data/Archamps/PreEtroiture/pointclouds/Archamps_PreEtroiture_sampled_2mm_PCV_normals_classified_georef.las",
+              "size_bytes": 23140427393,
+              "mtime_ns": 1738239817714860000,
+              "identity_kind": "path_size_mtime_not_content_hash"
+            },
+            "surface_output": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/Archamps_PreEtroiture_sampled_2mm_PCV_normals_classified_georef/64x64x64/surface.npz",
+            "interior_output": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/Archamps_PreEtroiture_sampled_2mm_PCV_normals_classified_georef/64x64x64/interior.npz",
+            "bounds_path": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/Archamps_PreEtroiture_sampled_2mm_PCV_normals_classified_georef/64x64x64/surface.bounds.json",
+            "bounds_sha256": "766199b1efabdcfa23789c8413ae4743ce53cc6b84016320f8496f549a2c0dd8",
+            "surface_metadata": {
+              "kind": "surface_voxels",
+              "semantic": "true_means_observed_surface",
+              "source_path": "/run/media/midnavi/Pablo/TCC/DATA/RAW/data/Archamps/PreEtroiture/pointclouds/Archamps_PreEtroiture_sampled_2mm_PCV_normals_classified_georef.las",
+              "source_format": "las",
+              "las_header": {
+                "version": "1.2",
+                "point_format_id": 2,
+                "point_count": 398972868,
+                "scales_xyz": [
+                  1e-05,
+                  1e-05,
+                  1e-05
+                ],
+                "offsets_xyz": [
+                  939800.0,
+                  6562000.0,
+                  1100.0
+                ],
+                "coordinate_decoding": "raw_integer * scale + offset",
+                "reprojection_applied": false
+              },
+              "bounds_path": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/Archamps_PreEtroiture_sampled_2mm_PCV_normals_classified_georef/64x64x64/surface.bounds.json",
+              "min_xyz": [
+                943775.0,
+                6561973.5,
+                1039.2669677734375
+              ],
+              "max_xyz": [
+                943873.875,
+                6562090.0,
+                1117.5369873046875
+              ],
+              "volume_shape_zyx": [
+                64,
+                64,
+                64
+              ],
+              "normalization": {
+                "source_coordinate_order": "XYZ",
+                "grid_index_order": "ZYX",
+                "shared_scale_preserves_proportions": true,
+                "symmetric_padding": true,
+                "degenerate_axes": "placed_at_grid_center"
+              }
+            },
+            "processing": {
+              "batch_size": 65536,
+              "progress_every": 1000000,
+              "bounds_mode": "computed",
+              "flood_fill_requested": true
+            },
+            "software": {
+              "python": "3.14.8",
+              "numpy": "2.5.0",
+              "scipy": "1.18.0",
+              "laspy": "2.7.0",
+              "git_commit": "4680c1453ea7c261db0321a0f0cbe5875ba49291",
+              "git_dirty": true
+            }
+          }
+        },
+        "command.json": {
+          "sha256": "a1e8eda579b02ca663e198cfa5285b03ba4c631ffa42e68a21d5e748e952767d",
+          "content": {
+            "command_argv": [
+              "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/.venv/bin/python3",
+              "-u",
+              "-m",
+              "cavegen.datastream.run_reference_voxelization",
+              "--input",
+              "/run/media/midnavi/Pablo/TCC/DATA/RAW/data/Archamps/PreEtroiture/pointclouds/Archamps_PreEtroiture_sampled_2mm_PCV_normals_classified_georef.las",
+              "--shape",
+              "64",
+              "64",
+              "64",
+              "--batch-size",
+              "65536",
+              "--progress-every",
+              "1000000",
+              "--output",
+              "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/Archamps_PreEtroiture_sampled_2mm_PCV_normals_classified_georef/64x64x64/surface.npz",
+              "--interior-output",
+              "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/Archamps_PreEtroiture_sampled_2mm_PCV_normals_classified_georef/64x64x64/interior.npz"
+            ],
+            "command_shell": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/.venv/bin/python3 -u -m cavegen.datastream.run_reference_voxelization --input /run/media/midnavi/Pablo/TCC/DATA/RAW/data/Archamps/PreEtroiture/pointclouds/Archamps_PreEtroiture_sampled_2mm_PCV_normals_classified_georef.las --shape 64 64 64 --batch-size 65536 --progress-every 1000000 --output /home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/Archamps_PreEtroiture_sampled_2mm_PCV_normals_classified_georef/64x64x64/surface.npz --interior-output /home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/Archamps_PreEtroiture_sampled_2mm_PCV_normals_classified_georef/64x64x64/interior.npz",
+            "working_directory": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves",
+            "execution_mode": "1"
+          }
+        },
+        "bounds.json": {
+          "sha256": "766199b1efabdcfa23789c8413ae4743ce53cc6b84016320f8496f549a2c0dd8",
+          "content": {
+            "source_path": "/run/media/midnavi/Pablo/TCC/DATA/RAW/data/Archamps/PreEtroiture/pointclouds/Archamps_PreEtroiture_sampled_2mm_PCV_normals_classified_georef.las",
+            "min_xyz": [
+              943775.0,
+              6561973.5,
+              1039.2669677734375
+            ],
+            "max_xyz": [
+              943873.875,
+              6562090.0,
+              1117.5369873046875
+            ]
+          }
+        }
+      },
+      "estimated_grid_spacing_source_units": 1.849206349206349
+    },
+    {
+      "path": "CascadeDeMotiers_MainGallery_sampled_2mm_PCV_normals_classified_georef/64x64x64/interior.npz",
+      "group": "cascadedemotiers",
+      "sha256": "5233480977f1d6e50850c2b37ca97ebf18c9d30f1786aa0bc2686d078ad6fd48",
+      "voxel_sha256": "e39c62319e14aa017af0b004e2ed519314d1ddf43b68b4e79f6638de534496cc",
+      "kind": "candidate_cave_void",
+      "semantic": "true_means_enclosed_unobserved_voxel",
+      "metadata": {
+        "kind": "candidate_cave_void",
+        "semantic": "true_means_enclosed_unobserved_voxel",
+        "source_path": "/run/media/midnavi/Pablo/TCC/DATA/RAW/data/CascadeDeMotiers/MainGallery/pointclouds/CascadeDeMotiers_MainGallery_sampled_2mm_PCV_normals_classified_georef.las",
+        "source_format": "las",
+        "las_header": {
+          "version": "1.2",
+          "point_format_id": 2,
+          "point_count": 945646439,
+          "scales_xyz": [
+            1e-06,
+            1e-06,
+            1e-06
+          ],
+          "offsets_xyz": [
+            2537000.0,
+            1195000.0,
+            -0.0
+          ],
+          "coordinate_decoding": "raw_integer * scale + offset",
+          "reprojection_applied": false
+        },
+        "bounds_path": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/CascadeDeMotiers_MainGallery_sampled_2mm_PCV_normals_classified_georef/64x64x64/surface.bounds.json",
+        "min_xyz": [
+          2537624.5,
+          1195170.625,
+          750.7210083007812
+        ],
+        "max_xyz": [
+          2537883.75,
+          1195284.0,
+          793.18798828125
+        ],
+        "volume_shape_zyx": [
+          64,
+          64,
+          64
+        ],
+        "normalization": {
+          "source_coordinate_order": "XYZ",
+          "grid_index_order": "ZYX",
+          "shared_scale_preserves_proportions": true,
+          "symmetric_padding": true,
+          "degenerate_axes": "placed_at_grid_center"
+        },
+        "processing": {
+          "batch_size": 65536,
+          "progress_every": 1000000,
+          "bounds_mode": "computed",
+          "flood_fill_requested": true
+        },
+        "validation_status": "candidate_requires_geometric_validation",
+        "surface_path": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/CascadeDeMotiers_MainGallery_sampled_2mm_PCV_normals_classified_georef/64x64x64/surface.npz",
+        "interior_inference": {
+          "method": "exterior_flood_fill",
+          "connectivity": 6,
+          "outside_grid": "exterior",
+          "observed_surface_included_in_void": false,
+          "automatic_closure": false
+        }
+      },
+      "shape_zyx": [
+        64,
+        64,
+        64
+      ],
+      "axis_order": "ZYX",
+      "dtype_on_load": "bool",
+      "true_voxels": 1,
+      "true_ratio": 3.814697265625e-06,
+      "preprocessing_seed": null,
+      "candidate": true,
+      "verified_air": false,
+      "eligible_proxy": true,
+      "issues": [
+        "proxy_air_requires_geometric_validation",
+        "insufficient_resolved_interior_geometry"
+      ],
+      "origin": [
+        {
+          "id_arquivo": "cascadedemotiers_maingallery_sampled_2mm_pcv_normals_classified_georef",
+          "id_caverna": "cascadedemotiers",
+          "grupo_independencia": "cascadedemotiers",
+          "nome_caverna": "Grotte de la Cascade de Motiers",
+          "trecho": "MainGallery",
+          "variante": "amostragem_2mm",
+          "dataset": "KarstConduitCatalogue",
+          "doi_dataset": "10.60544/7e8y-yh95",
+          "versao_dataset": "1.0",
+          "fonte_url": "https://doi.org/10.60544/7e8y-yh95",
+          "credito": "Racine, T., Trunz, C., Straubhaar, J. A., & Renard, P. (2025). CascadeDeMotiers (Version 1.0) [Data set]. UNINE data service. https://doi.org/10.60544/7e8y-yh95",
+          "pais": "Switzerland",
+          "localidade": "Môtiers, under Côte de Riau",
+          "data_aquisicao": "2023-07-20",
+          "unidade_coordenadas": "m",
+          "crs": "EPSG:2056",
+          "semantica": "pontos_de_superficie_observada; nao_e_mascara_de_ar",
+          "arquivo_relativo": "data/CascadeDeMotiers/MainGallery/pointclouds/CascadeDeMotiers_MainGallery_sampled_2mm_PCV_normals_classified_georef.las",
+          "raiz_local": "/run/media/midnavi/Pablo/TCC/DATA/RAW",
+          "formato": "las",
+          "tamanho_bytes": "54847494511",
+          "quantidade_pontos": "945646439",
+          "metodo_contagem_pontos": "cabecalho_LAS_sem_leitura_de_pontos",
+          "licenca_declarada": "CC-BY-SA-4.0 (descritor); CC-BY-NC-4.0 (README)",
+          "evidencia_licenca": "/run/media/midnavi/Pablo/TCC/DATA/RAW/metadata.yaml: dataset_version.usage_license; documents/README.md: Copyright and license",
+          "status_licenca": "divergencia_documental_a_esclarecer",
+          "status_identificacao": "confirmada_por_metadados_locais_e_declaracao_do_usuario",
+          "evidencia_local": "data/CascadeDeMotiers/cave.yaml; data/CascadeDeMotiers/MainGallery/scan.yaml; /run/media/midnavi/Pablo/TCC/DATA/RAW/metadata.yaml",
+          "observacoes": "Duas resolucoes da mesma passagem; nao sao fontes independentes. DOI individual; catalogo: 10.60544/sbjr-z851",
+          "pendencias": "Esclarecer divergencia da licenca; preservar origem local ao usar float32 georreferenciado; calcular hash; validar interior.",
+          "data_consulta_fontes": "2026-11-07",
+          "sha256": "",
+          "status_sha256": "pendente_sem_leitura_integral",
+          "particao": "nao_definida",
+          "aprovacao_gan": "pendente_validacao_geometrica"
+        }
+      ],
+      "sidecars": {
+        "run.json": {
+          "sha256": "c6413114b4318bdd467005d464123789059585fecc2730c89bb2588b3998c690",
+          "content": {
+            "schema": "reference-voxelization-run-v1",
+            "status": "completed",
+            "started_at_utc": "2026-11-08T02:46:09.321978+00:00",
+            "elapsed_seconds": 3118.7344218280014,
+            "working_directory": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves",
+            "command_argv": [
+              "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/.venv/bin/python3",
+              "-u",
+              "-m",
+              "cavegen.datastream.run_reference_voxelization",
+              "--input",
+              "/run/media/midnavi/Pablo/TCC/DATA/RAW/data/CascadeDeMotiers/MainGallery/pointclouds/CascadeDeMotiers_MainGallery_sampled_2mm_PCV_normals_classified_georef.las",
+              "--bounds",
+              "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/CascadeDeMotiers_MainGallery_sampled_2mm_PCV_normals_classified_georef/64x64x64/surface.bounds.json",
+              "--shape",
+              "64",
+              "64",
+              "64",
+              "--batch-size",
+              "65536",
+              "--progress-every",
+              "1000000",
+              "--output",
+              "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/CascadeDeMotiers_MainGallery_sampled_2mm_PCV_normals_classified_georef/64x64x64/surface.npz",
+              "--interior-output",
+              "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/CascadeDeMotiers_MainGallery_sampled_2mm_PCV_normals_classified_georef/64x64x64/interior.npz"
+            ],
+            "requested_argv": [
+              "--input",
+              "/run/media/midnavi/Pablo/TCC/DATA/RAW/data/CascadeDeMotiers/MainGallery/pointclouds/CascadeDeMotiers_MainGallery_sampled_2mm_PCV_normals_classified_georef.las",
+              "--shape",
+              "64",
+              "64",
+              "64",
+              "--batch-size",
+              "65536",
+              "--progress-every",
+              "1000000",
+              "--output",
+              "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/CascadeDeMotiers_MainGallery_sampled_2mm_PCV_normals_classified_georef/64x64x64/surface.npz",
+              "--interior-output",
+              "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/CascadeDeMotiers_MainGallery_sampled_2mm_PCV_normals_classified_georef/64x64x64/interior.npz"
+            ],
+            "command_shell": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/.venv/bin/python3 -u -m cavegen.datastream.run_reference_voxelization --input /run/media/midnavi/Pablo/TCC/DATA/RAW/data/CascadeDeMotiers/MainGallery/pointclouds/CascadeDeMotiers_MainGallery_sampled_2mm_PCV_normals_classified_georef.las --bounds /home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/CascadeDeMotiers_MainGallery_sampled_2mm_PCV_normals_classified_georef/64x64x64/surface.bounds.json --shape 64 64 64 --batch-size 65536 --progress-every 1000000 --output /home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/CascadeDeMotiers_MainGallery_sampled_2mm_PCV_normals_classified_georef/64x64x64/surface.npz --interior-output /home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/CascadeDeMotiers_MainGallery_sampled_2mm_PCV_normals_classified_georef/64x64x64/interior.npz",
+            "source": {
+              "path": "/run/media/midnavi/Pablo/TCC/DATA/RAW/data/CascadeDeMotiers/MainGallery/pointclouds/CascadeDeMotiers_MainGallery_sampled_2mm_PCV_normals_classified_georef.las",
+              "size_bytes": 54847494511,
+              "mtime_ns": 1738256450000000000,
+              "identity_kind": "path_size_mtime_not_content_hash"
+            },
+            "surface_output": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/CascadeDeMotiers_MainGallery_sampled_2mm_PCV_normals_classified_georef/64x64x64/surface.npz",
+            "interior_output": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/CascadeDeMotiers_MainGallery_sampled_2mm_PCV_normals_classified_georef/64x64x64/interior.npz",
+            "bounds_path": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/CascadeDeMotiers_MainGallery_sampled_2mm_PCV_normals_classified_georef/64x64x64/surface.bounds.json",
+            "bounds_sha256": "2a44d9f7f4c1e5a1d075bb1d322dc649e8b76ffeeb5101a70d2bf27de41ef75c",
+            "surface_metadata": {
+              "kind": "surface_voxels",
+              "semantic": "true_means_observed_surface",
+              "source_path": "/run/media/midnavi/Pablo/TCC/DATA/RAW/data/CascadeDeMotiers/MainGallery/pointclouds/CascadeDeMotiers_MainGallery_sampled_2mm_PCV_normals_classified_georef.las",
+              "source_format": "las",
+              "las_header": {
+                "version": "1.2",
+                "point_format_id": 2,
+                "point_count": 945646439,
+                "scales_xyz": [
+                  1e-06,
+                  1e-06,
+                  1e-06
+                ],
+                "offsets_xyz": [
+                  2537000.0,
+                  1195000.0,
+                  -0.0
+                ],
+                "coordinate_decoding": "raw_integer * scale + offset",
+                "reprojection_applied": false
+              },
+              "bounds_path": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/CascadeDeMotiers_MainGallery_sampled_2mm_PCV_normals_classified_georef/64x64x64/surface.bounds.json",
+              "min_xyz": [
+                2537624.5,
+                1195170.625,
+                750.7210083007812
+              ],
+              "max_xyz": [
+                2537883.75,
+                1195284.0,
+                793.18798828125
+              ],
+              "volume_shape_zyx": [
+                64,
+                64,
+                64
+              ],
+              "normalization": {
+                "source_coordinate_order": "XYZ",
+                "grid_index_order": "ZYX",
+                "shared_scale_preserves_proportions": true,
+                "symmetric_padding": true,
+                "degenerate_axes": "placed_at_grid_center"
+              }
+            },
+            "processing": {
+              "batch_size": 65536,
+              "progress_every": 1000000,
+              "bounds_mode": "computed",
+              "flood_fill_requested": true
+            },
+            "software": {
+              "python": "3.14.8",
+              "numpy": "2.5.0",
+              "scipy": "1.18.0",
+              "laspy": "2.7.0",
+              "git_commit": "4680c1453ea7c261db0321a0f0cbe5875ba49291",
+              "git_dirty": true
+            }
+          }
+        },
+        "command.json": {
+          "sha256": "763da2793bf1744cc7403ae58d7fc95edd8623915fbc21735bf41b41e947ea00",
+          "content": {
+            "command_argv": [
+              "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/.venv/bin/python3",
+              "-u",
+              "-m",
+              "cavegen.datastream.run_reference_voxelization",
+              "--input",
+              "/run/media/midnavi/Pablo/TCC/DATA/RAW/data/CascadeDeMotiers/MainGallery/pointclouds/CascadeDeMotiers_MainGallery_sampled_2mm_PCV_normals_classified_georef.las",
+              "--shape",
+              "64",
+              "64",
+              "64",
+              "--batch-size",
+              "65536",
+              "--progress-every",
+              "1000000",
+              "--output",
+              "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/CascadeDeMotiers_MainGallery_sampled_2mm_PCV_normals_classified_georef/64x64x64/surface.npz",
+              "--interior-output",
+              "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/CascadeDeMotiers_MainGallery_sampled_2mm_PCV_normals_classified_georef/64x64x64/interior.npz"
+            ],
+            "command_shell": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/.venv/bin/python3 -u -m cavegen.datastream.run_reference_voxelization --input /run/media/midnavi/Pablo/TCC/DATA/RAW/data/CascadeDeMotiers/MainGallery/pointclouds/CascadeDeMotiers_MainGallery_sampled_2mm_PCV_normals_classified_georef.las --shape 64 64 64 --batch-size 65536 --progress-every 1000000 --output /home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/CascadeDeMotiers_MainGallery_sampled_2mm_PCV_normals_classified_georef/64x64x64/surface.npz --interior-output /home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/CascadeDeMotiers_MainGallery_sampled_2mm_PCV_normals_classified_georef/64x64x64/interior.npz",
+            "working_directory": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves",
+            "execution_mode": "1"
+          }
+        },
+        "bounds.json": {
+          "sha256": "2a44d9f7f4c1e5a1d075bb1d322dc649e8b76ffeeb5101a70d2bf27de41ef75c",
+          "content": {
+            "source_path": "/run/media/midnavi/Pablo/TCC/DATA/RAW/data/CascadeDeMotiers/MainGallery/pointclouds/CascadeDeMotiers_MainGallery_sampled_2mm_PCV_normals_classified_georef.las",
+            "min_xyz": [
+              2537624.5,
+              1195170.625,
+              750.7210083007812
+            ],
+            "max_xyz": [
+              2537883.75,
+              1195284.0,
+              793.18798828125
+            ]
+          }
+        }
+      },
+      "estimated_grid_spacing_source_units": 4.115079365079365,
+      "structure": {
+        "structural_schema_version": "structural-v1",
+        "axis_order": "ZYX",
+        "shape_depth": 64,
+        "shape_height": 64,
+        "shape_width": 64,
+        "spacing_z": 1.0,
+        "spacing_y": 1.0,
+        "spacing_x": 1.0,
+        "distance_unit": "voxel",
+        "exterior_policy": "solid",
+        "distance_reference": "voxel_centers",
+        "connectivity": 6,
+        "total_voxels": 262144,
+        "open_voxels": 1,
+        "open_ratio": 3.814697265625e-06,
+        "component_count": 1,
+        "largest_component_voxels": 1,
+        "largest_component_ratio": 1.0,
+        "dt_mean": 1.0,
+        "dt_median": 1.0,
+        "dt_max": 1.0,
+        "is_degenerate": false,
+        "degenerate_reason": null
+      },
+      "air_bbox_shape_zyx": [
+        1,
+        1,
+        1
+      ],
+      "surface_overlap_voxels": 0,
+      "flood_fill_reproduced": true,
+      "surface_metadata_matches": true,
+      "geometry_screen_passed": false,
+      "resolution_diagnostics": [
+        {
+          "resolution": 16,
+          "structural_schema_version": "structural-v1",
+          "axis_order": "ZYX",
+          "shape_depth": 16,
+          "shape_height": 16,
+          "shape_width": 16,
+          "spacing_z": 1.0,
+          "spacing_y": 1.0,
+          "spacing_x": 1.0,
+          "distance_unit": "voxel",
+          "exterior_policy": "solid",
+          "distance_reference": "voxel_centers",
+          "connectivity": 6,
+          "total_voxels": 4096,
+          "open_voxels": 0,
+          "open_ratio": 0.0,
+          "component_count": 0,
+          "largest_component_voxels": 0,
+          "largest_component_ratio": 0.0,
+          "dt_mean": null,
+          "dt_median": null,
+          "dt_max": null,
+          "is_degenerate": true,
+          "degenerate_reason": "no_open_voxels",
+          "roundtrip_air_recall": 0.0,
+          "roundtrip_iou": 0.0
+        },
+        {
+          "resolution": 32,
+          "structural_schema_version": "structural-v1",
+          "axis_order": "ZYX",
+          "shape_depth": 32,
+          "shape_height": 32,
+          "shape_width": 32,
+          "spacing_z": 1.0,
+          "spacing_y": 1.0,
+          "spacing_x": 1.0,
+          "distance_unit": "voxel",
+          "exterior_policy": "solid",
+          "distance_reference": "voxel_centers",
+          "connectivity": 6,
+          "total_voxels": 32768,
+          "open_voxels": 0,
+          "open_ratio": 0.0,
+          "component_count": 0,
+          "largest_component_voxels": 0,
+          "largest_component_ratio": 0.0,
+          "dt_mean": null,
+          "dt_median": null,
+          "dt_max": null,
+          "is_degenerate": true,
+          "degenerate_reason": "no_open_voxels",
+          "roundtrip_air_recall": 0.0,
+          "roundtrip_iou": 0.0
+        },
+        {
+          "resolution": 64,
+          "structural_schema_version": "structural-v1",
+          "axis_order": "ZYX",
+          "shape_depth": 64,
+          "shape_height": 64,
+          "shape_width": 64,
+          "spacing_z": 1.0,
+          "spacing_y": 1.0,
+          "spacing_x": 1.0,
+          "distance_unit": "voxel",
+          "exterior_policy": "solid",
+          "distance_reference": "voxel_centers",
+          "connectivity": 6,
+          "total_voxels": 262144,
+          "open_voxels": 1,
+          "open_ratio": 3.814697265625e-06,
+          "component_count": 1,
+          "largest_component_voxels": 1,
+          "largest_component_ratio": 1.0,
+          "dt_mean": 1.0,
+          "dt_median": 1.0,
+          "dt_max": 1.0,
+          "is_degenerate": false,
+          "degenerate_reason": null,
+          "roundtrip_air_recall": 1.0,
+          "roundtrip_iou": 1.0
+        }
+      ]
+    },
+    {
+      "path": "CascadeDeMotiers_MainGallery_sampled_2mm_PCV_normals_classified_georef/64x64x64/surface.npz",
+      "group": "cascadedemotiers",
+      "sha256": "0c14d82776d41e49389c5466dfc0509a80b2b62c11a58533a460b8f761c16287",
+      "voxel_sha256": "19e6a08615f5cfa60ceab634d9187f31e3ebe074143a3f416fdb2db29ce70ad6",
+      "kind": "surface_voxels",
+      "semantic": "true_means_observed_surface",
+      "metadata": {
+        "kind": "surface_voxels",
+        "semantic": "true_means_observed_surface",
+        "source_path": "/run/media/midnavi/Pablo/TCC/DATA/RAW/data/CascadeDeMotiers/MainGallery/pointclouds/CascadeDeMotiers_MainGallery_sampled_2mm_PCV_normals_classified_georef.las",
+        "source_format": "las",
+        "las_header": {
+          "version": "1.2",
+          "point_format_id": 2,
+          "point_count": 945646439,
+          "scales_xyz": [
+            1e-06,
+            1e-06,
+            1e-06
+          ],
+          "offsets_xyz": [
+            2537000.0,
+            1195000.0,
+            -0.0
+          ],
+          "coordinate_decoding": "raw_integer * scale + offset",
+          "reprojection_applied": false
+        },
+        "bounds_path": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/CascadeDeMotiers_MainGallery_sampled_2mm_PCV_normals_classified_georef/64x64x64/surface.bounds.json",
+        "min_xyz": [
+          2537624.5,
+          1195170.625,
+          750.7210083007812
+        ],
+        "max_xyz": [
+          2537883.75,
+          1195284.0,
+          793.18798828125
+        ],
+        "volume_shape_zyx": [
+          64,
+          64,
+          64
+        ],
+        "normalization": {
+          "source_coordinate_order": "XYZ",
+          "grid_index_order": "ZYX",
+          "shared_scale_preserves_proportions": true,
+          "symmetric_padding": true,
+          "degenerate_axes": "placed_at_grid_center"
+        },
+        "processing": {
+          "batch_size": 65536,
+          "progress_every": 1000000,
+          "bounds_mode": "computed",
+          "flood_fill_requested": true
+        }
+      },
+      "shape_zyx": [
+        64,
+        64,
+        64
+      ],
+      "axis_order": "ZYX",
+      "dtype_on_load": "bool",
+      "true_voxels": 761,
+      "true_ratio": 0.002902984619140625,
+      "preprocessing_seed": null,
+      "candidate": false,
+      "verified_air": false,
+      "eligible_proxy": false,
+      "issues": [
+        "observed_surface_is_not_cave_air"
+      ],
+      "origin": [
+        {
+          "id_arquivo": "cascadedemotiers_maingallery_sampled_2mm_pcv_normals_classified_georef",
+          "id_caverna": "cascadedemotiers",
+          "grupo_independencia": "cascadedemotiers",
+          "nome_caverna": "Grotte de la Cascade de Motiers",
+          "trecho": "MainGallery",
+          "variante": "amostragem_2mm",
+          "dataset": "KarstConduitCatalogue",
+          "doi_dataset": "10.60544/7e8y-yh95",
+          "versao_dataset": "1.0",
+          "fonte_url": "https://doi.org/10.60544/7e8y-yh95",
+          "credito": "Racine, T., Trunz, C., Straubhaar, J. A., & Renard, P. (2025). CascadeDeMotiers (Version 1.0) [Data set]. UNINE data service. https://doi.org/10.60544/7e8y-yh95",
+          "pais": "Switzerland",
+          "localidade": "Môtiers, under Côte de Riau",
+          "data_aquisicao": "2023-07-20",
+          "unidade_coordenadas": "m",
+          "crs": "EPSG:2056",
+          "semantica": "pontos_de_superficie_observada; nao_e_mascara_de_ar",
+          "arquivo_relativo": "data/CascadeDeMotiers/MainGallery/pointclouds/CascadeDeMotiers_MainGallery_sampled_2mm_PCV_normals_classified_georef.las",
+          "raiz_local": "/run/media/midnavi/Pablo/TCC/DATA/RAW",
+          "formato": "las",
+          "tamanho_bytes": "54847494511",
+          "quantidade_pontos": "945646439",
+          "metodo_contagem_pontos": "cabecalho_LAS_sem_leitura_de_pontos",
+          "licenca_declarada": "CC-BY-SA-4.0 (descritor); CC-BY-NC-4.0 (README)",
+          "evidencia_licenca": "/run/media/midnavi/Pablo/TCC/DATA/RAW/metadata.yaml: dataset_version.usage_license; documents/README.md: Copyright and license",
+          "status_licenca": "divergencia_documental_a_esclarecer",
+          "status_identificacao": "confirmada_por_metadados_locais_e_declaracao_do_usuario",
+          "evidencia_local": "data/CascadeDeMotiers/cave.yaml; data/CascadeDeMotiers/MainGallery/scan.yaml; /run/media/midnavi/Pablo/TCC/DATA/RAW/metadata.yaml",
+          "observacoes": "Duas resolucoes da mesma passagem; nao sao fontes independentes. DOI individual; catalogo: 10.60544/sbjr-z851",
+          "pendencias": "Esclarecer divergencia da licenca; preservar origem local ao usar float32 georreferenciado; calcular hash; validar interior.",
+          "data_consulta_fontes": "2026-11-07",
+          "sha256": "",
+          "status_sha256": "pendente_sem_leitura_integral",
+          "particao": "nao_definida",
+          "aprovacao_gan": "pendente_validacao_geometrica"
+        }
+      ],
+      "sidecars": {
+        "run.json": {
+          "sha256": "c6413114b4318bdd467005d464123789059585fecc2730c89bb2588b3998c690",
+          "content": {
+            "schema": "reference-voxelization-run-v1",
+            "status": "completed",
+            "started_at_utc": "2026-11-08T02:46:09.321978+00:00",
+            "elapsed_seconds": 3118.7344218280014,
+            "working_directory": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves",
+            "command_argv": [
+              "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/.venv/bin/python3",
+              "-u",
+              "-m",
+              "cavegen.datastream.run_reference_voxelization",
+              "--input",
+              "/run/media/midnavi/Pablo/TCC/DATA/RAW/data/CascadeDeMotiers/MainGallery/pointclouds/CascadeDeMotiers_MainGallery_sampled_2mm_PCV_normals_classified_georef.las",
+              "--bounds",
+              "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/CascadeDeMotiers_MainGallery_sampled_2mm_PCV_normals_classified_georef/64x64x64/surface.bounds.json",
+              "--shape",
+              "64",
+              "64",
+              "64",
+              "--batch-size",
+              "65536",
+              "--progress-every",
+              "1000000",
+              "--output",
+              "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/CascadeDeMotiers_MainGallery_sampled_2mm_PCV_normals_classified_georef/64x64x64/surface.npz",
+              "--interior-output",
+              "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/CascadeDeMotiers_MainGallery_sampled_2mm_PCV_normals_classified_georef/64x64x64/interior.npz"
+            ],
+            "requested_argv": [
+              "--input",
+              "/run/media/midnavi/Pablo/TCC/DATA/RAW/data/CascadeDeMotiers/MainGallery/pointclouds/CascadeDeMotiers_MainGallery_sampled_2mm_PCV_normals_classified_georef.las",
+              "--shape",
+              "64",
+              "64",
+              "64",
+              "--batch-size",
+              "65536",
+              "--progress-every",
+              "1000000",
+              "--output",
+              "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/CascadeDeMotiers_MainGallery_sampled_2mm_PCV_normals_classified_georef/64x64x64/surface.npz",
+              "--interior-output",
+              "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/CascadeDeMotiers_MainGallery_sampled_2mm_PCV_normals_classified_georef/64x64x64/interior.npz"
+            ],
+            "command_shell": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/.venv/bin/python3 -u -m cavegen.datastream.run_reference_voxelization --input /run/media/midnavi/Pablo/TCC/DATA/RAW/data/CascadeDeMotiers/MainGallery/pointclouds/CascadeDeMotiers_MainGallery_sampled_2mm_PCV_normals_classified_georef.las --bounds /home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/CascadeDeMotiers_MainGallery_sampled_2mm_PCV_normals_classified_georef/64x64x64/surface.bounds.json --shape 64 64 64 --batch-size 65536 --progress-every 1000000 --output /home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/CascadeDeMotiers_MainGallery_sampled_2mm_PCV_normals_classified_georef/64x64x64/surface.npz --interior-output /home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/CascadeDeMotiers_MainGallery_sampled_2mm_PCV_normals_classified_georef/64x64x64/interior.npz",
+            "source": {
+              "path": "/run/media/midnavi/Pablo/TCC/DATA/RAW/data/CascadeDeMotiers/MainGallery/pointclouds/CascadeDeMotiers_MainGallery_sampled_2mm_PCV_normals_classified_georef.las",
+              "size_bytes": 54847494511,
+              "mtime_ns": 1738256450000000000,
+              "identity_kind": "path_size_mtime_not_content_hash"
+            },
+            "surface_output": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/CascadeDeMotiers_MainGallery_sampled_2mm_PCV_normals_classified_georef/64x64x64/surface.npz",
+            "interior_output": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/CascadeDeMotiers_MainGallery_sampled_2mm_PCV_normals_classified_georef/64x64x64/interior.npz",
+            "bounds_path": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/CascadeDeMotiers_MainGallery_sampled_2mm_PCV_normals_classified_georef/64x64x64/surface.bounds.json",
+            "bounds_sha256": "2a44d9f7f4c1e5a1d075bb1d322dc649e8b76ffeeb5101a70d2bf27de41ef75c",
+            "surface_metadata": {
+              "kind": "surface_voxels",
+              "semantic": "true_means_observed_surface",
+              "source_path": "/run/media/midnavi/Pablo/TCC/DATA/RAW/data/CascadeDeMotiers/MainGallery/pointclouds/CascadeDeMotiers_MainGallery_sampled_2mm_PCV_normals_classified_georef.las",
+              "source_format": "las",
+              "las_header": {
+                "version": "1.2",
+                "point_format_id": 2,
+                "point_count": 945646439,
+                "scales_xyz": [
+                  1e-06,
+                  1e-06,
+                  1e-06
+                ],
+                "offsets_xyz": [
+                  2537000.0,
+                  1195000.0,
+                  -0.0
+                ],
+                "coordinate_decoding": "raw_integer * scale + offset",
+                "reprojection_applied": false
+              },
+              "bounds_path": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/CascadeDeMotiers_MainGallery_sampled_2mm_PCV_normals_classified_georef/64x64x64/surface.bounds.json",
+              "min_xyz": [
+                2537624.5,
+                1195170.625,
+                750.7210083007812
+              ],
+              "max_xyz": [
+                2537883.75,
+                1195284.0,
+                793.18798828125
+              ],
+              "volume_shape_zyx": [
+                64,
+                64,
+                64
+              ],
+              "normalization": {
+                "source_coordinate_order": "XYZ",
+                "grid_index_order": "ZYX",
+                "shared_scale_preserves_proportions": true,
+                "symmetric_padding": true,
+                "degenerate_axes": "placed_at_grid_center"
+              }
+            },
+            "processing": {
+              "batch_size": 65536,
+              "progress_every": 1000000,
+              "bounds_mode": "computed",
+              "flood_fill_requested": true
+            },
+            "software": {
+              "python": "3.14.8",
+              "numpy": "2.5.0",
+              "scipy": "1.18.0",
+              "laspy": "2.7.0",
+              "git_commit": "4680c1453ea7c261db0321a0f0cbe5875ba49291",
+              "git_dirty": true
+            }
+          }
+        },
+        "command.json": {
+          "sha256": "763da2793bf1744cc7403ae58d7fc95edd8623915fbc21735bf41b41e947ea00",
+          "content": {
+            "command_argv": [
+              "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/.venv/bin/python3",
+              "-u",
+              "-m",
+              "cavegen.datastream.run_reference_voxelization",
+              "--input",
+              "/run/media/midnavi/Pablo/TCC/DATA/RAW/data/CascadeDeMotiers/MainGallery/pointclouds/CascadeDeMotiers_MainGallery_sampled_2mm_PCV_normals_classified_georef.las",
+              "--shape",
+              "64",
+              "64",
+              "64",
+              "--batch-size",
+              "65536",
+              "--progress-every",
+              "1000000",
+              "--output",
+              "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/CascadeDeMotiers_MainGallery_sampled_2mm_PCV_normals_classified_georef/64x64x64/surface.npz",
+              "--interior-output",
+              "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/CascadeDeMotiers_MainGallery_sampled_2mm_PCV_normals_classified_georef/64x64x64/interior.npz"
+            ],
+            "command_shell": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/.venv/bin/python3 -u -m cavegen.datastream.run_reference_voxelization --input /run/media/midnavi/Pablo/TCC/DATA/RAW/data/CascadeDeMotiers/MainGallery/pointclouds/CascadeDeMotiers_MainGallery_sampled_2mm_PCV_normals_classified_georef.las --shape 64 64 64 --batch-size 65536 --progress-every 1000000 --output /home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/CascadeDeMotiers_MainGallery_sampled_2mm_PCV_normals_classified_georef/64x64x64/surface.npz --interior-output /home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/CascadeDeMotiers_MainGallery_sampled_2mm_PCV_normals_classified_georef/64x64x64/interior.npz",
+            "working_directory": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves",
+            "execution_mode": "1"
+          }
+        },
+        "bounds.json": {
+          "sha256": "2a44d9f7f4c1e5a1d075bb1d322dc649e8b76ffeeb5101a70d2bf27de41ef75c",
+          "content": {
+            "source_path": "/run/media/midnavi/Pablo/TCC/DATA/RAW/data/CascadeDeMotiers/MainGallery/pointclouds/CascadeDeMotiers_MainGallery_sampled_2mm_PCV_normals_classified_georef.las",
+            "min_xyz": [
+              2537624.5,
+              1195170.625,
+              750.7210083007812
+            ],
+            "max_xyz": [
+              2537883.75,
+              1195284.0,
+              793.18798828125
+            ]
+          }
+        }
+      },
+      "estimated_grid_spacing_source_units": 4.115079365079365
+    },
+    {
+      "path": "elaphes_surface_32.npz",
+      "group": "elaphes",
+      "sha256": "4bc89e7a4fe7604b009ee51331c92b67ebf24587d9e6e9f77764c30375104120",
+      "voxel_sha256": "f396d185e24940bb8598582f9ec1412612919d5202604a2e1a96c88a73fe4758",
+      "kind": "surface_voxels",
+      "semantic": "true_means_observed_surface",
+      "metadata": {
+        "kind": "surface_voxels",
+        "semantic": "true_means_observed_surface",
+        "source_ply": "C:\\Projects-Local\\algorithms-for-procedural-generation-of-caves\\data\\raw\\elaphes\\elaphes_cave.ply",
+        "bounds_path": "data/params/elaphes_xyz_bounds.json",
+        "min_xyz": [
+          -9.93910026550293,
+          -3.2372701168060303,
+          -6.963339805603027
+        ],
+        "max_xyz": [
+          73.72450256347656,
+          12.9576997756958,
+          69.78089904785156
+        ],
+        "volume_shape_zyx": [
+          32,
+          32,
+          32
+        ],
+        "normalization": {
+          "source_coordinate_order": "XYZ",
+          "grid_index_order": "ZYX",
+          "shared_scale_preserves_proportions": true,
+          "symmetric_padding": true,
+          "degenerate_axes": "placed_at_grid_center"
+        }
+      },
+      "shape_zyx": [
+        32,
+        32,
+        32
+      ],
+      "axis_order": "ZYX",
+      "dtype_on_load": "bool",
+      "true_voxels": 245,
+      "true_ratio": 0.007476806640625,
+      "preprocessing_seed": null,
+      "candidate": false,
+      "verified_air": false,
+      "eligible_proxy": false,
+      "issues": [
+        "observed_surface_is_not_cave_air",
+        "origin_not_matched"
+      ],
+      "origin": [],
+      "sidecars": {},
+      "estimated_grid_spacing_source_units": 2.698825897709016
+    },
+    {
+      "path": "IndianTunnel_full_1x/64x64x64/interior.npz",
+      "group": "indian_tunnel",
+      "sha256": "a84436611d9cd571092f876f1f7eb4018835d945926e572a12cd08b32be48aab",
+      "voxel_sha256": "18c9b71356a0b6f427e228d5cdca0c68cab0b74c68fc01a365feb9559a18397d",
+      "kind": "candidate_cave_void",
+      "semantic": "true_means_enclosed_unobserved_voxel",
+      "metadata": {
+        "kind": "candidate_cave_void",
+        "semantic": "true_means_enclosed_unobserved_voxel",
+        "source_path": "/run/media/midnavi/Pablo/TCC/DATA/RAW/IndianTunnel_cave/Full/IndianTunnel_full_1x.f32",
+        "source_format": "f32",
+        "bounds_path": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/IndianTunnel_full_1x/64x64x64/surface.bounds.json",
+        "min_xyz": [
+          -63.62174987792969,
+          -65.01918029785156,
+          -2.3868234157562256
+        ],
+        "max_xyz": [
+          12.838187217712402,
+          105.42890167236328,
+          13.038862228393555
+        ],
+        "volume_shape_zyx": [
+          64,
+          64,
+          64
+        ],
+        "normalization": {
+          "source_coordinate_order": "XYZ",
+          "grid_index_order": "ZYX",
+          "shared_scale_preserves_proportions": true,
+          "symmetric_padding": true,
+          "degenerate_axes": "placed_at_grid_center"
+        },
+        "processing": {
+          "batch_size": 65536,
+          "progress_every": 1000000,
+          "bounds_mode": "computed",
+          "flood_fill_requested": true
+        },
+        "validation_status": "candidate_requires_geometric_validation",
+        "surface_path": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/IndianTunnel_full_1x/64x64x64/surface.npz",
+        "interior_inference": {
+          "method": "exterior_flood_fill",
+          "connectivity": 6,
+          "outside_grid": "exterior",
+          "observed_surface_included_in_void": false,
+          "automatic_closure": false
+        }
+      },
+      "shape_zyx": [
+        64,
+        64,
+        64
+      ],
+      "axis_order": "ZYX",
+      "dtype_on_load": "bool",
+      "true_voxels": 98,
+      "true_ratio": 0.00037384033203125,
+      "preprocessing_seed": null,
+      "candidate": true,
+      "verified_air": false,
+      "eligible_proxy": true,
+      "issues": [
+        "proxy_air_requires_geometric_validation",
+        "insufficient_resolved_interior_geometry"
+      ],
+      "origin": [
+        {
+          "id_arquivo": "indiantunnel_full_1x",
+          "id_caverna": "indian_tunnel",
+          "grupo_independencia": "indian_tunnel",
+          "nome_caverna": "Indian Tunnel",
+          "trecho": "Full",
+          "variante": "IndianTunnel_full_1x",
+          "dataset": "NASA Planetary Pits and Caves Analog Dataset",
+          "doi_dataset": "",
+          "versao_dataset": "",
+          "fonte_url": "https://ti.arc.nasa.gov/dataset/caves/",
+          "credito": "Uland Wong; Warren Whittaker; Heather Jones; Red Whittaker (2014). NASA Planetary Pits and Caves Analog Dataset.",
+          "pais": "United States",
+          "localidade": "Craters of the Moon, Idaho",
+          "data_aquisicao": "2014-08",
+          "unidade_coordenadas": "m",
+          "crs": "nao_confirmado_para_o_arquivo",
+          "semantica": "pontos_de_superficie_observada; nao_e_mascara_de_ar",
+          "arquivo_relativo": "data/IndianTunnel/IndianTunnel_cave/Full/IndianTunnel_full_1x.f32",
+          "raiz_local": "/run/media/midnavi/Pablo/TCC/DATA/RAW",
+          "formato": "f32",
+          "tamanho_bytes": "3253750976",
+          "quantidade_pontos": "116205392",
+          "metodo_contagem_pontos": "tamanho_dividido_por_28_bytes; conteudo_nao_relido",
+          "licenca_declarada": "Termos NASA/CMU: pesquisa e uso academico",
+          "evidencia_licenca": "https://ti.arc.nasa.gov/dataset/caves/ (secao Attribution)",
+          "status_licenca": "termos_especificos_publicados",
+          "status_identificacao": "fonte_declarada_pelo_usuario_e_nomes_compativeis",
+          "evidencia_local": "data/IndianTunnel/IndianTunnel_cave/Full/IndianTunnel_full_1x.f32",
+          "observacoes": "Mesmo levantamento: Full, Section1, Section2, Wall e Surface nao sao cavernas independentes. Uso comercial e incorporacao em base para distribuicao publica requerem consentimento escrito dos autores (Attribution).",
+          "pendencias": "Confirmar CRS por arquivo e correspondencia ao download; registrar data do download; calcular hash; validar interior.",
+          "data_consulta_fontes": "2026-11-07",
+          "sha256": "",
+          "status_sha256": "pendente_sem_leitura_integral",
+          "particao": "nao_definida",
+          "aprovacao_gan": "pendente_validacao_geometrica"
+        }
+      ],
+      "sidecars": {
+        "run.json": {
+          "sha256": "bd59c81a2a3a1d2bba326c1ca7c0b9613a80a809afab8db683cec6be0aa6a095",
+          "content": {
+            "schema": "reference-voxelization-run-v1",
+            "status": "completed",
+            "started_at_utc": "2026-11-08T00:03:10.579317+00:00",
+            "elapsed_seconds": 44.44549132599968,
+            "working_directory": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves",
+            "command_argv": [
+              "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/.venv/bin/python3",
+              "-u",
+              "-m",
+              "cavegen.datastream.run_reference_voxelization",
+              "--input",
+              "/run/media/midnavi/Pablo/TCC/DATA/RAW/IndianTunnel_cave/Full/IndianTunnel_full_1x.f32",
+              "--bounds",
+              "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/IndianTunnel_full_1x/64x64x64/surface.bounds.json",
+              "--shape",
+              "64",
+              "64",
+              "64",
+              "--batch-size",
+              "65536",
+              "--progress-every",
+              "1000000",
+              "--output",
+              "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/IndianTunnel_full_1x/64x64x64/surface.npz",
+              "--interior-output",
+              "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/IndianTunnel_full_1x/64x64x64/interior.npz"
+            ],
+            "requested_argv": [
+              "--input",
+              "/run/media/midnavi/Pablo/TCC/DATA/RAW/IndianTunnel_cave/Full/IndianTunnel_full_1x.f32",
+              "--shape",
+              "64",
+              "64",
+              "64",
+              "--batch-size",
+              "65536",
+              "--progress-every",
+              "1000000",
+              "--output",
+              "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/IndianTunnel_full_1x/64x64x64/surface.npz",
+              "--interior-output",
+              "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/IndianTunnel_full_1x/64x64x64/interior.npz"
+            ],
+            "command_shell": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/.venv/bin/python3 -u -m cavegen.datastream.run_reference_voxelization --input /run/media/midnavi/Pablo/TCC/DATA/RAW/IndianTunnel_cave/Full/IndianTunnel_full_1x.f32 --bounds /home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/IndianTunnel_full_1x/64x64x64/surface.bounds.json --shape 64 64 64 --batch-size 65536 --progress-every 1000000 --output /home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/IndianTunnel_full_1x/64x64x64/surface.npz --interior-output /home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/IndianTunnel_full_1x/64x64x64/interior.npz",
+            "source": {
+              "path": "/run/media/midnavi/Pablo/TCC/DATA/RAW/IndianTunnel_cave/Full/IndianTunnel_full_1x.f32",
+              "size_bytes": 3253750976,
+              "mtime_ns": 1793202140955263000,
+              "identity_kind": "path_size_mtime_not_content_hash"
+            },
+            "surface_output": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/IndianTunnel_full_1x/64x64x64/surface.npz",
+            "interior_output": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/IndianTunnel_full_1x/64x64x64/interior.npz",
+            "bounds_path": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/IndianTunnel_full_1x/64x64x64/surface.bounds.json",
+            "bounds_sha256": "374366ffbd704f590cc24b497c5ab21b4bcc95c2468ff38de8326484b0d03128",
+            "surface_metadata": {
+              "kind": "surface_voxels",
+              "semantic": "true_means_observed_surface",
+              "source_path": "/run/media/midnavi/Pablo/TCC/DATA/RAW/IndianTunnel_cave/Full/IndianTunnel_full_1x.f32",
+              "source_format": "f32",
+              "bounds_path": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/IndianTunnel_full_1x/64x64x64/surface.bounds.json",
+              "min_xyz": [
+                -63.62174987792969,
+                -65.01918029785156,
+                -2.3868234157562256
+              ],
+              "max_xyz": [
+                12.838187217712402,
+                105.42890167236328,
+                13.038862228393555
+              ],
+              "volume_shape_zyx": [
+                64,
+                64,
+                64
+              ],
+              "normalization": {
+                "source_coordinate_order": "XYZ",
+                "grid_index_order": "ZYX",
+                "shared_scale_preserves_proportions": true,
+                "symmetric_padding": true,
+                "degenerate_axes": "placed_at_grid_center"
+              }
+            },
+            "processing": {
+              "batch_size": 65536,
+              "progress_every": 1000000,
+              "bounds_mode": "computed",
+              "flood_fill_requested": true
+            },
+            "software": {
+              "python": "3.14.8",
+              "numpy": "2.5.0",
+              "scipy": "1.18.0",
+              "git_commit": "25cab5844bbd013a630361721f12abf635679955",
+              "git_dirty": true
+            }
+          }
+        },
+        "command.json": {
+          "sha256": "4443198a251933c66d01d71eb913a25165de685c62f30e3d86d069c70733e321",
+          "content": {
+            "command_argv": [
+              "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/.venv/bin/python3",
+              "-u",
+              "-m",
+              "cavegen.datastream.run_reference_voxelization",
+              "--input",
+              "/run/media/midnavi/Pablo/TCC/DATA/RAW/IndianTunnel_cave/Full/IndianTunnel_full_1x.f32",
+              "--shape",
+              "64",
+              "64",
+              "64",
+              "--batch-size",
+              "65536",
+              "--progress-every",
+              "1000000",
+              "--output",
+              "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/IndianTunnel_full_1x/64x64x64/surface.npz",
+              "--interior-output",
+              "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/IndianTunnel_full_1x/64x64x64/interior.npz"
+            ],
+            "command_shell": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/.venv/bin/python3 -u -m cavegen.datastream.run_reference_voxelization --input /run/media/midnavi/Pablo/TCC/DATA/RAW/IndianTunnel_cave/Full/IndianTunnel_full_1x.f32 --shape 64 64 64 --batch-size 65536 --progress-every 1000000 --output /home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/IndianTunnel_full_1x/64x64x64/surface.npz --interior-output /home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/IndianTunnel_full_1x/64x64x64/interior.npz",
+            "working_directory": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves",
+            "execution_mode": "1"
+          }
+        },
+        "bounds.json": {
+          "sha256": "374366ffbd704f590cc24b497c5ab21b4bcc95c2468ff38de8326484b0d03128",
+          "content": {
+            "source_path": "/run/media/midnavi/Pablo/TCC/DATA/RAW/IndianTunnel_cave/Full/IndianTunnel_full_1x.f32",
+            "min_xyz": [
+              -63.62174987792969,
+              -65.01918029785156,
+              -2.3868234157562256
+            ],
+            "max_xyz": [
+              12.838187217712402,
+              105.42890167236328,
+              13.038862228393555
+            ]
+          }
+        }
+      },
+      "estimated_grid_spacing_source_units": 2.7055251106383307,
+      "structure": {
+        "structural_schema_version": "structural-v1",
+        "axis_order": "ZYX",
+        "shape_depth": 64,
+        "shape_height": 64,
+        "shape_width": 64,
+        "spacing_z": 1.0,
+        "spacing_y": 1.0,
+        "spacing_x": 1.0,
+        "distance_unit": "voxel",
+        "exterior_policy": "solid",
+        "distance_reference": "voxel_centers",
+        "connectivity": 6,
+        "total_voxels": 262144,
+        "open_voxels": 98,
+        "open_ratio": 0.00037384033203125,
+        "component_count": 5,
+        "largest_component_voxels": 92,
+        "largest_component_ratio": 0.9387755102040817,
+        "dt_mean": 1.0211333450190354,
+        "dt_median": 1.0,
+        "dt_max": 1.4142135623730951,
+        "is_degenerate": false,
+        "degenerate_reason": null
+      },
+      "air_bbox_shape_zyx": [
+        3,
+        19,
+        10
+      ],
+      "surface_overlap_voxels": 0,
+      "flood_fill_reproduced": true,
+      "surface_metadata_matches": true,
+      "geometry_screen_passed": false,
+      "resolution_diagnostics": [
+        {
+          "resolution": 16,
+          "structural_schema_version": "structural-v1",
+          "axis_order": "ZYX",
+          "shape_depth": 16,
+          "shape_height": 16,
+          "shape_width": 16,
+          "spacing_z": 1.0,
+          "spacing_y": 1.0,
+          "spacing_x": 1.0,
+          "distance_unit": "voxel",
+          "exterior_policy": "solid",
+          "distance_reference": "voxel_centers",
+          "connectivity": 6,
+          "total_voxels": 4096,
+          "open_voxels": 0,
+          "open_ratio": 0.0,
+          "component_count": 0,
+          "largest_component_voxels": 0,
+          "largest_component_ratio": 0.0,
+          "dt_mean": null,
+          "dt_median": null,
+          "dt_max": null,
+          "is_degenerate": true,
+          "degenerate_reason": "no_open_voxels",
+          "roundtrip_air_recall": 0.0,
+          "roundtrip_iou": 0.0
+        },
+        {
+          "resolution": 32,
+          "structural_schema_version": "structural-v1",
+          "axis_order": "ZYX",
+          "shape_depth": 32,
+          "shape_height": 32,
+          "shape_width": 32,
+          "spacing_z": 1.0,
+          "spacing_y": 1.0,
+          "spacing_x": 1.0,
+          "distance_unit": "voxel",
+          "exterior_policy": "solid",
+          "distance_reference": "voxel_centers",
+          "connectivity": 6,
+          "total_voxels": 32768,
+          "open_voxels": 14,
+          "open_ratio": 0.00042724609375,
+          "component_count": 2,
+          "largest_component_voxels": 13,
+          "largest_component_ratio": 0.9285714285714286,
+          "dt_mean": 1.0,
+          "dt_median": 1.0,
+          "dt_max": 1.0,
+          "is_degenerate": false,
+          "degenerate_reason": null,
+          "roundtrip_air_recall": 0.7448979591836735,
+          "roundtrip_iou": 0.5328467153284672
+        },
+        {
+          "resolution": 64,
+          "structural_schema_version": "structural-v1",
+          "axis_order": "ZYX",
+          "shape_depth": 64,
+          "shape_height": 64,
+          "shape_width": 64,
+          "spacing_z": 1.0,
+          "spacing_y": 1.0,
+          "spacing_x": 1.0,
+          "distance_unit": "voxel",
+          "exterior_policy": "solid",
+          "distance_reference": "voxel_centers",
+          "connectivity": 6,
+          "total_voxels": 262144,
+          "open_voxels": 98,
+          "open_ratio": 0.00037384033203125,
+          "component_count": 5,
+          "largest_component_voxels": 92,
+          "largest_component_ratio": 0.9387755102040817,
+          "dt_mean": 1.0211333450190354,
+          "dt_median": 1.0,
+          "dt_max": 1.4142135623730951,
+          "is_degenerate": false,
+          "degenerate_reason": null,
+          "roundtrip_air_recall": 1.0,
+          "roundtrip_iou": 1.0
+        }
+      ]
+    },
+    {
+      "path": "IndianTunnel_full_1x/64x64x64/surface.npz",
+      "group": "indian_tunnel",
+      "sha256": "449e658956c1671a5c2e5d6f7a853c6e6f70d0c5893bdea5f78b0ce6f54a57b3",
+      "voxel_sha256": "f07e2b238fb970c937c1939ba771ad22cd235e643ed5c8159d9c3c4f2e570540",
+      "kind": "surface_voxels",
+      "semantic": "true_means_observed_surface",
+      "metadata": {
+        "kind": "surface_voxels",
+        "semantic": "true_means_observed_surface",
+        "source_path": "/run/media/midnavi/Pablo/TCC/DATA/RAW/IndianTunnel_cave/Full/IndianTunnel_full_1x.f32",
+        "source_format": "f32",
+        "bounds_path": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/IndianTunnel_full_1x/64x64x64/surface.bounds.json",
+        "min_xyz": [
+          -63.62174987792969,
+          -65.01918029785156,
+          -2.3868234157562256
+        ],
+        "max_xyz": [
+          12.838187217712402,
+          105.42890167236328,
+          13.038862228393555
+        ],
+        "volume_shape_zyx": [
+          64,
+          64,
+          64
+        ],
+        "normalization": {
+          "source_coordinate_order": "XYZ",
+          "grid_index_order": "ZYX",
+          "shared_scale_preserves_proportions": true,
+          "symmetric_padding": true,
+          "degenerate_axes": "placed_at_grid_center"
+        },
+        "processing": {
+          "batch_size": 65536,
+          "progress_every": 1000000,
+          "bounds_mode": "computed",
+          "flood_fill_requested": true
+        }
+      },
+      "shape_zyx": [
+        64,
+        64,
+        64
+      ],
+      "axis_order": "ZYX",
+      "dtype_on_load": "bool",
+      "true_voxels": 1147,
+      "true_ratio": 0.004375457763671875,
+      "preprocessing_seed": null,
+      "candidate": false,
+      "verified_air": false,
+      "eligible_proxy": false,
+      "issues": [
+        "observed_surface_is_not_cave_air"
+      ],
+      "origin": [
+        {
+          "id_arquivo": "indiantunnel_full_1x",
+          "id_caverna": "indian_tunnel",
+          "grupo_independencia": "indian_tunnel",
+          "nome_caverna": "Indian Tunnel",
+          "trecho": "Full",
+          "variante": "IndianTunnel_full_1x",
+          "dataset": "NASA Planetary Pits and Caves Analog Dataset",
+          "doi_dataset": "",
+          "versao_dataset": "",
+          "fonte_url": "https://ti.arc.nasa.gov/dataset/caves/",
+          "credito": "Uland Wong; Warren Whittaker; Heather Jones; Red Whittaker (2014). NASA Planetary Pits and Caves Analog Dataset.",
+          "pais": "United States",
+          "localidade": "Craters of the Moon, Idaho",
+          "data_aquisicao": "2014-08",
+          "unidade_coordenadas": "m",
+          "crs": "nao_confirmado_para_o_arquivo",
+          "semantica": "pontos_de_superficie_observada; nao_e_mascara_de_ar",
+          "arquivo_relativo": "data/IndianTunnel/IndianTunnel_cave/Full/IndianTunnel_full_1x.f32",
+          "raiz_local": "/run/media/midnavi/Pablo/TCC/DATA/RAW",
+          "formato": "f32",
+          "tamanho_bytes": "3253750976",
+          "quantidade_pontos": "116205392",
+          "metodo_contagem_pontos": "tamanho_dividido_por_28_bytes; conteudo_nao_relido",
+          "licenca_declarada": "Termos NASA/CMU: pesquisa e uso academico",
+          "evidencia_licenca": "https://ti.arc.nasa.gov/dataset/caves/ (secao Attribution)",
+          "status_licenca": "termos_especificos_publicados",
+          "status_identificacao": "fonte_declarada_pelo_usuario_e_nomes_compativeis",
+          "evidencia_local": "data/IndianTunnel/IndianTunnel_cave/Full/IndianTunnel_full_1x.f32",
+          "observacoes": "Mesmo levantamento: Full, Section1, Section2, Wall e Surface nao sao cavernas independentes. Uso comercial e incorporacao em base para distribuicao publica requerem consentimento escrito dos autores (Attribution).",
+          "pendencias": "Confirmar CRS por arquivo e correspondencia ao download; registrar data do download; calcular hash; validar interior.",
+          "data_consulta_fontes": "2026-11-07",
+          "sha256": "",
+          "status_sha256": "pendente_sem_leitura_integral",
+          "particao": "nao_definida",
+          "aprovacao_gan": "pendente_validacao_geometrica"
+        }
+      ],
+      "sidecars": {
+        "run.json": {
+          "sha256": "bd59c81a2a3a1d2bba326c1ca7c0b9613a80a809afab8db683cec6be0aa6a095",
+          "content": {
+            "schema": "reference-voxelization-run-v1",
+            "status": "completed",
+            "started_at_utc": "2026-11-08T00:03:10.579317+00:00",
+            "elapsed_seconds": 44.44549132599968,
+            "working_directory": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves",
+            "command_argv": [
+              "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/.venv/bin/python3",
+              "-u",
+              "-m",
+              "cavegen.datastream.run_reference_voxelization",
+              "--input",
+              "/run/media/midnavi/Pablo/TCC/DATA/RAW/IndianTunnel_cave/Full/IndianTunnel_full_1x.f32",
+              "--bounds",
+              "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/IndianTunnel_full_1x/64x64x64/surface.bounds.json",
+              "--shape",
+              "64",
+              "64",
+              "64",
+              "--batch-size",
+              "65536",
+              "--progress-every",
+              "1000000",
+              "--output",
+              "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/IndianTunnel_full_1x/64x64x64/surface.npz",
+              "--interior-output",
+              "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/IndianTunnel_full_1x/64x64x64/interior.npz"
+            ],
+            "requested_argv": [
+              "--input",
+              "/run/media/midnavi/Pablo/TCC/DATA/RAW/IndianTunnel_cave/Full/IndianTunnel_full_1x.f32",
+              "--shape",
+              "64",
+              "64",
+              "64",
+              "--batch-size",
+              "65536",
+              "--progress-every",
+              "1000000",
+              "--output",
+              "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/IndianTunnel_full_1x/64x64x64/surface.npz",
+              "--interior-output",
+              "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/IndianTunnel_full_1x/64x64x64/interior.npz"
+            ],
+            "command_shell": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/.venv/bin/python3 -u -m cavegen.datastream.run_reference_voxelization --input /run/media/midnavi/Pablo/TCC/DATA/RAW/IndianTunnel_cave/Full/IndianTunnel_full_1x.f32 --bounds /home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/IndianTunnel_full_1x/64x64x64/surface.bounds.json --shape 64 64 64 --batch-size 65536 --progress-every 1000000 --output /home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/IndianTunnel_full_1x/64x64x64/surface.npz --interior-output /home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/IndianTunnel_full_1x/64x64x64/interior.npz",
+            "source": {
+              "path": "/run/media/midnavi/Pablo/TCC/DATA/RAW/IndianTunnel_cave/Full/IndianTunnel_full_1x.f32",
+              "size_bytes": 3253750976,
+              "mtime_ns": 1793202140955263000,
+              "identity_kind": "path_size_mtime_not_content_hash"
+            },
+            "surface_output": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/IndianTunnel_full_1x/64x64x64/surface.npz",
+            "interior_output": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/IndianTunnel_full_1x/64x64x64/interior.npz",
+            "bounds_path": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/IndianTunnel_full_1x/64x64x64/surface.bounds.json",
+            "bounds_sha256": "374366ffbd704f590cc24b497c5ab21b4bcc95c2468ff38de8326484b0d03128",
+            "surface_metadata": {
+              "kind": "surface_voxels",
+              "semantic": "true_means_observed_surface",
+              "source_path": "/run/media/midnavi/Pablo/TCC/DATA/RAW/IndianTunnel_cave/Full/IndianTunnel_full_1x.f32",
+              "source_format": "f32",
+              "bounds_path": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/IndianTunnel_full_1x/64x64x64/surface.bounds.json",
+              "min_xyz": [
+                -63.62174987792969,
+                -65.01918029785156,
+                -2.3868234157562256
+              ],
+              "max_xyz": [
+                12.838187217712402,
+                105.42890167236328,
+                13.038862228393555
+              ],
+              "volume_shape_zyx": [
+                64,
+                64,
+                64
+              ],
+              "normalization": {
+                "source_coordinate_order": "XYZ",
+                "grid_index_order": "ZYX",
+                "shared_scale_preserves_proportions": true,
+                "symmetric_padding": true,
+                "degenerate_axes": "placed_at_grid_center"
+              }
+            },
+            "processing": {
+              "batch_size": 65536,
+              "progress_every": 1000000,
+              "bounds_mode": "computed",
+              "flood_fill_requested": true
+            },
+            "software": {
+              "python": "3.14.8",
+              "numpy": "2.5.0",
+              "scipy": "1.18.0",
+              "git_commit": "25cab5844bbd013a630361721f12abf635679955",
+              "git_dirty": true
+            }
+          }
+        },
+        "command.json": {
+          "sha256": "4443198a251933c66d01d71eb913a25165de685c62f30e3d86d069c70733e321",
+          "content": {
+            "command_argv": [
+              "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/.venv/bin/python3",
+              "-u",
+              "-m",
+              "cavegen.datastream.run_reference_voxelization",
+              "--input",
+              "/run/media/midnavi/Pablo/TCC/DATA/RAW/IndianTunnel_cave/Full/IndianTunnel_full_1x.f32",
+              "--shape",
+              "64",
+              "64",
+              "64",
+              "--batch-size",
+              "65536",
+              "--progress-every",
+              "1000000",
+              "--output",
+              "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/IndianTunnel_full_1x/64x64x64/surface.npz",
+              "--interior-output",
+              "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/IndianTunnel_full_1x/64x64x64/interior.npz"
+            ],
+            "command_shell": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/.venv/bin/python3 -u -m cavegen.datastream.run_reference_voxelization --input /run/media/midnavi/Pablo/TCC/DATA/RAW/IndianTunnel_cave/Full/IndianTunnel_full_1x.f32 --shape 64 64 64 --batch-size 65536 --progress-every 1000000 --output /home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/IndianTunnel_full_1x/64x64x64/surface.npz --interior-output /home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/IndianTunnel_full_1x/64x64x64/interior.npz",
+            "working_directory": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves",
+            "execution_mode": "1"
+          }
+        },
+        "bounds.json": {
+          "sha256": "374366ffbd704f590cc24b497c5ab21b4bcc95c2468ff38de8326484b0d03128",
+          "content": {
+            "source_path": "/run/media/midnavi/Pablo/TCC/DATA/RAW/IndianTunnel_cave/Full/IndianTunnel_full_1x.f32",
+            "min_xyz": [
+              -63.62174987792969,
+              -65.01918029785156,
+              -2.3868234157562256
+            ],
+            "max_xyz": [
+              12.838187217712402,
+              105.42890167236328,
+              13.038862228393555
+            ]
+          }
+        }
+      },
+      "estimated_grid_spacing_source_units": 2.7055251106383307
+    },
+    {
+      "path": "MarkovSpodmol_MainGallery_sampled_2mm_PCV_normals_classified_georef/64x64x64/interior.npz",
+      "group": "markovspodmol",
+      "sha256": "88883b0b48d1ec78e610229edece105cd885a7d69a01ba04b7769806e025ca51",
+      "voxel_sha256": "433e646bc1021d937eff80879f966e415f87c0b2396378d24f75dfca2000e15d",
+      "kind": "candidate_cave_void",
+      "semantic": "true_means_enclosed_unobserved_voxel",
+      "metadata": {
+        "kind": "candidate_cave_void",
+        "semantic": "true_means_enclosed_unobserved_voxel",
+        "source_path": "/run/media/midnavi/Pablo/TCC/DATA/RAW/data/MarkovSpodmol/MainGallery/pointclouds/MarkovSpodmol_MainGallery_sampled_2mm_PCV_normals_classified_georef.las",
+        "source_format": "las",
+        "las_header": {
+          "version": "1.2",
+          "point_format_id": 2,
+          "point_count": 1142526542,
+          "scales_xyz": [
+            0.001,
+            0.001,
+            0.001
+          ],
+          "offsets_xyz": [
+            430000.0,
+            65000.0,
+            -0.0
+          ],
+          "coordinate_decoding": "raw_integer * scale + offset",
+          "reprojection_applied": false
+        },
+        "bounds_path": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/MarkovSpodmol_MainGallery_sampled_2mm_PCV_normals_classified_georef/64x64x64/surface.bounds.json",
+        "min_xyz": [
+          430725.5,
+          65762.5625,
+          542.468994140625
+        ],
+        "max_xyz": [
+          430910.875,
+          66009.4453125,
+          569.614990234375
+        ],
+        "volume_shape_zyx": [
+          64,
+          64,
+          64
+        ],
+        "normalization": {
+          "source_coordinate_order": "XYZ",
+          "grid_index_order": "ZYX",
+          "shared_scale_preserves_proportions": true,
+          "symmetric_padding": true,
+          "degenerate_axes": "placed_at_grid_center"
+        },
+        "processing": {
+          "batch_size": 65536,
+          "progress_every": 1000000,
+          "bounds_mode": "computed",
+          "flood_fill_requested": true
+        },
+        "validation_status": "candidate_requires_geometric_validation",
+        "surface_path": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/MarkovSpodmol_MainGallery_sampled_2mm_PCV_normals_classified_georef/64x64x64/surface.npz",
+        "interior_inference": {
+          "method": "exterior_flood_fill",
+          "connectivity": 6,
+          "outside_grid": "exterior",
+          "observed_surface_included_in_void": false,
+          "automatic_closure": false
+        }
+      },
+      "shape_zyx": [
+        64,
+        64,
+        64
+      ],
+      "axis_order": "ZYX",
+      "dtype_on_load": "bool",
+      "true_voxels": 5,
+      "true_ratio": 1.9073486328125e-05,
+      "preprocessing_seed": null,
+      "candidate": true,
+      "verified_air": false,
+      "eligible_proxy": true,
+      "issues": [
+        "proxy_air_requires_geometric_validation",
+        "insufficient_resolved_interior_geometry"
+      ],
+      "origin": [
+        {
+          "id_arquivo": "markovspodmol_maingallery_sampled_2mm_pcv_normals_classified_georef",
+          "id_caverna": "markovspodmol",
+          "grupo_independencia": "markovspodmol",
+          "nome_caverna": "Markov Spodmol",
+          "trecho": "MainGallery",
+          "variante": "amostragem_2mm",
+          "dataset": "KarstConduitCatalogue",
+          "doi_dataset": "10.60544/8jsy-w511",
+          "versao_dataset": "1.0",
+          "fonte_url": "https://doi.org/10.60544/8jsy-w511",
+          "credito": "Racine, T., Trunz, C., Straubhaar, J. A., & Renard, P. (2025). MarkovSpodmol (Version 1.0) [Data set]. UNINE data service. https://doi.org/10.60544/8jsy-w511",
+          "pais": "Slovenia",
+          "localidade": "Sajevče",
+          "data_aquisicao": "2024-05-02",
+          "unidade_coordenadas": "m",
+          "crs": "EPSG:3912",
+          "semantica": "pontos_de_superficie_observada; nao_e_mascara_de_ar",
+          "arquivo_relativo": "data/MarkovSpodmol/MainGallery/pointclouds/MarkovSpodmol_MainGallery_sampled_2mm_PCV_normals_classified_georef.las",
+          "raiz_local": "/run/media/midnavi/Pablo/TCC/DATA/RAW",
+          "formato": "las",
+          "tamanho_bytes": "66266540485",
+          "quantidade_pontos": "1142526542",
+          "metodo_contagem_pontos": "cabecalho_LAS_sem_leitura_de_pontos",
+          "licenca_declarada": "CC-BY-SA-4.0 (descritor); CC-BY-NC-4.0 (README)",
+          "evidencia_licenca": "/run/media/midnavi/Pablo/.Trash-1000/files/swissubase_3070_1_0/metadata.yaml: dataset_version.usage_license; documents/README.md: Copyright and license",
+          "status_licenca": "divergencia_documental_a_esclarecer",
+          "status_identificacao": "confirmada_por_metadados_locais_e_declaracao_do_usuario",
+          "evidencia_local": "data/MarkovSpodmol/cave.yaml; data/MarkovSpodmol/MainGallery/scan.yaml; /run/media/midnavi/Pablo/.Trash-1000/files/swissubase_3070_1_0/metadata.yaml",
+          "observacoes": "Duas resolucoes da mesma passagem; nao sao fontes independentes. DOI individual; catalogo: 10.60544/sbjr-z851 Descritor consultado em embalagem descartada; nuvem ativa fora da lixeira.",
+          "pendencias": "Esclarecer divergencia da licenca; preservar origem local ao usar float32 georreferenciado; calcular hash; validar interior.",
+          "data_consulta_fontes": "2026-11-07",
+          "sha256": "",
+          "status_sha256": "pendente_sem_leitura_integral",
+          "particao": "nao_definida",
+          "aprovacao_gan": "pendente_validacao_geometrica"
+        }
+      ],
+      "sidecars": {
+        "run.json": {
+          "sha256": "a0b54fbf768c68b2cbf0f52b33661871c01cee64ec62949f5921abaed08d6540",
+          "content": {
+            "schema": "reference-voxelization-run-v1",
+            "status": "completed",
+            "started_at_utc": "2026-11-08T00:43:03.414184+00:00",
+            "elapsed_seconds": 3767.6814493420006,
+            "working_directory": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves",
+            "command_argv": [
+              "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/.venv/bin/python3",
+              "-u",
+              "-m",
+              "cavegen.datastream.run_reference_voxelization",
+              "--input",
+              "/run/media/midnavi/Pablo/TCC/DATA/RAW/data/MarkovSpodmol/MainGallery/pointclouds/MarkovSpodmol_MainGallery_sampled_2mm_PCV_normals_classified_georef.las",
+              "--bounds",
+              "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/MarkovSpodmol_MainGallery_sampled_2mm_PCV_normals_classified_georef/64x64x64/surface.bounds.json",
+              "--shape",
+              "64",
+              "64",
+              "64",
+              "--batch-size",
+              "65536",
+              "--progress-every",
+              "1000000",
+              "--output",
+              "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/MarkovSpodmol_MainGallery_sampled_2mm_PCV_normals_classified_georef/64x64x64/surface.npz",
+              "--interior-output",
+              "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/MarkovSpodmol_MainGallery_sampled_2mm_PCV_normals_classified_georef/64x64x64/interior.npz"
+            ],
+            "requested_argv": [
+              "--input",
+              "/run/media/midnavi/Pablo/TCC/DATA/RAW/data/MarkovSpodmol/MainGallery/pointclouds/MarkovSpodmol_MainGallery_sampled_2mm_PCV_normals_classified_georef.las",
+              "--shape",
+              "64",
+              "64",
+              "64",
+              "--batch-size",
+              "65536",
+              "--progress-every",
+              "1000000",
+              "--output",
+              "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/MarkovSpodmol_MainGallery_sampled_2mm_PCV_normals_classified_georef/64x64x64/surface.npz",
+              "--interior-output",
+              "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/MarkovSpodmol_MainGallery_sampled_2mm_PCV_normals_classified_georef/64x64x64/interior.npz"
+            ],
+            "command_shell": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/.venv/bin/python3 -u -m cavegen.datastream.run_reference_voxelization --input /run/media/midnavi/Pablo/TCC/DATA/RAW/data/MarkovSpodmol/MainGallery/pointclouds/MarkovSpodmol_MainGallery_sampled_2mm_PCV_normals_classified_georef.las --bounds /home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/MarkovSpodmol_MainGallery_sampled_2mm_PCV_normals_classified_georef/64x64x64/surface.bounds.json --shape 64 64 64 --batch-size 65536 --progress-every 1000000 --output /home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/MarkovSpodmol_MainGallery_sampled_2mm_PCV_normals_classified_georef/64x64x64/surface.npz --interior-output /home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/MarkovSpodmol_MainGallery_sampled_2mm_PCV_normals_classified_georef/64x64x64/interior.npz",
+            "source": {
+              "path": "/run/media/midnavi/Pablo/TCC/DATA/RAW/data/MarkovSpodmol/MainGallery/pointclouds/MarkovSpodmol_MainGallery_sampled_2mm_PCV_normals_classified_georef.las",
+              "size_bytes": 66266540485,
+              "mtime_ns": 1738079840616395100,
+              "identity_kind": "path_size_mtime_not_content_hash"
+            },
+            "surface_output": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/MarkovSpodmol_MainGallery_sampled_2mm_PCV_normals_classified_georef/64x64x64/surface.npz",
+            "interior_output": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/MarkovSpodmol_MainGallery_sampled_2mm_PCV_normals_classified_georef/64x64x64/interior.npz",
+            "bounds_path": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/MarkovSpodmol_MainGallery_sampled_2mm_PCV_normals_classified_georef/64x64x64/surface.bounds.json",
+            "bounds_sha256": "a4a6e712b6d5081cbd86bbb6c2f64768b89dc926085be210bc91c12dbb148329",
+            "surface_metadata": {
+              "kind": "surface_voxels",
+              "semantic": "true_means_observed_surface",
+              "source_path": "/run/media/midnavi/Pablo/TCC/DATA/RAW/data/MarkovSpodmol/MainGallery/pointclouds/MarkovSpodmol_MainGallery_sampled_2mm_PCV_normals_classified_georef.las",
+              "source_format": "las",
+              "las_header": {
+                "version": "1.2",
+                "point_format_id": 2,
+                "point_count": 1142526542,
+                "scales_xyz": [
+                  0.001,
+                  0.001,
+                  0.001
+                ],
+                "offsets_xyz": [
+                  430000.0,
+                  65000.0,
+                  -0.0
+                ],
+                "coordinate_decoding": "raw_integer * scale + offset",
+                "reprojection_applied": false
+              },
+              "bounds_path": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/MarkovSpodmol_MainGallery_sampled_2mm_PCV_normals_classified_georef/64x64x64/surface.bounds.json",
+              "min_xyz": [
+                430725.5,
+                65762.5625,
+                542.468994140625
+              ],
+              "max_xyz": [
+                430910.875,
+                66009.4453125,
+                569.614990234375
+              ],
+              "volume_shape_zyx": [
+                64,
+                64,
+                64
+              ],
+              "normalization": {
+                "source_coordinate_order": "XYZ",
+                "grid_index_order": "ZYX",
+                "shared_scale_preserves_proportions": true,
+                "symmetric_padding": true,
+                "degenerate_axes": "placed_at_grid_center"
+              }
+            },
+            "processing": {
+              "batch_size": 65536,
+              "progress_every": 1000000,
+              "bounds_mode": "computed",
+              "flood_fill_requested": true
+            },
+            "software": {
+              "python": "3.14.8",
+              "numpy": "2.5.0",
+              "scipy": "1.18.0",
+              "laspy": "2.7.0",
+              "git_commit": "4680c1453ea7c261db0321a0f0cbe5875ba49291",
+              "git_dirty": true
+            }
+          }
+        },
+        "command.json": {
+          "sha256": "39abfded12dad2bc42f33deb78ba5f4c831df29424478b89232f5bce753bf5e0",
+          "content": {
+            "command_argv": [
+              "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/.venv/bin/python3",
+              "-u",
+              "-m",
+              "cavegen.datastream.run_reference_voxelization",
+              "--input",
+              "/run/media/midnavi/Pablo/TCC/DATA/RAW/data/MarkovSpodmol/MainGallery/pointclouds/MarkovSpodmol_MainGallery_sampled_2mm_PCV_normals_classified_georef.las",
+              "--shape",
+              "64",
+              "64",
+              "64",
+              "--batch-size",
+              "65536",
+              "--progress-every",
+              "1000000",
+              "--output",
+              "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/MarkovSpodmol_MainGallery_sampled_2mm_PCV_normals_classified_georef/64x64x64/surface.npz",
+              "--interior-output",
+              "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/MarkovSpodmol_MainGallery_sampled_2mm_PCV_normals_classified_georef/64x64x64/interior.npz"
+            ],
+            "command_shell": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/.venv/bin/python3 -u -m cavegen.datastream.run_reference_voxelization --input /run/media/midnavi/Pablo/TCC/DATA/RAW/data/MarkovSpodmol/MainGallery/pointclouds/MarkovSpodmol_MainGallery_sampled_2mm_PCV_normals_classified_georef.las --shape 64 64 64 --batch-size 65536 --progress-every 1000000 --output /home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/MarkovSpodmol_MainGallery_sampled_2mm_PCV_normals_classified_georef/64x64x64/surface.npz --interior-output /home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/MarkovSpodmol_MainGallery_sampled_2mm_PCV_normals_classified_georef/64x64x64/interior.npz",
+            "working_directory": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves",
+            "execution_mode": "1"
+          }
+        },
+        "bounds.json": {
+          "sha256": "a4a6e712b6d5081cbd86bbb6c2f64768b89dc926085be210bc91c12dbb148329",
+          "content": {
+            "source_path": "/run/media/midnavi/Pablo/TCC/DATA/RAW/data/MarkovSpodmol/MainGallery/pointclouds/MarkovSpodmol_MainGallery_sampled_2mm_PCV_normals_classified_georef.las",
+            "min_xyz": [
+              430725.5,
+              65762.5625,
+              542.468994140625
+            ],
+            "max_xyz": [
+              430910.875,
+              66009.4453125,
+              569.614990234375
+            ]
+          }
+        }
+      },
+      "estimated_grid_spacing_source_units": 3.9187748015873014,
+      "structure": {
+        "structural_schema_version": "structural-v1",
+        "axis_order": "ZYX",
+        "shape_depth": 64,
+        "shape_height": 64,
+        "shape_width": 64,
+        "spacing_z": 1.0,
+        "spacing_y": 1.0,
+        "spacing_x": 1.0,
+        "distance_unit": "voxel",
+        "exterior_policy": "solid",
+        "distance_reference": "voxel_centers",
+        "connectivity": 6,
+        "total_voxels": 262144,
+        "open_voxels": 5,
+        "open_ratio": 1.9073486328125e-05,
+        "component_count": 5,
+        "largest_component_voxels": 1,
+        "largest_component_ratio": 0.2,
+        "dt_mean": 1.0,
+        "dt_median": 1.0,
+        "dt_max": 1.0,
+        "is_degenerate": false,
+        "degenerate_reason": null
+      },
+      "air_bbox_shape_zyx": [
+        2,
+        8,
+        7
+      ],
+      "surface_overlap_voxels": 0,
+      "flood_fill_reproduced": true,
+      "surface_metadata_matches": true,
+      "geometry_screen_passed": false,
+      "resolution_diagnostics": [
+        {
+          "resolution": 16,
+          "structural_schema_version": "structural-v1",
+          "axis_order": "ZYX",
+          "shape_depth": 16,
+          "shape_height": 16,
+          "shape_width": 16,
+          "spacing_z": 1.0,
+          "spacing_y": 1.0,
+          "spacing_x": 1.0,
+          "distance_unit": "voxel",
+          "exterior_policy": "solid",
+          "distance_reference": "voxel_centers",
+          "connectivity": 6,
+          "total_voxels": 4096,
+          "open_voxels": 0,
+          "open_ratio": 0.0,
+          "component_count": 0,
+          "largest_component_voxels": 0,
+          "largest_component_ratio": 0.0,
+          "dt_mean": null,
+          "dt_median": null,
+          "dt_max": null,
+          "is_degenerate": true,
+          "degenerate_reason": "no_open_voxels",
+          "roundtrip_air_recall": 0.0,
+          "roundtrip_iou": 0.0
+        },
+        {
+          "resolution": 32,
+          "structural_schema_version": "structural-v1",
+          "axis_order": "ZYX",
+          "shape_depth": 32,
+          "shape_height": 32,
+          "shape_width": 32,
+          "spacing_z": 1.0,
+          "spacing_y": 1.0,
+          "spacing_x": 1.0,
+          "distance_unit": "voxel",
+          "exterior_policy": "solid",
+          "distance_reference": "voxel_centers",
+          "connectivity": 6,
+          "total_voxels": 32768,
+          "open_voxels": 0,
+          "open_ratio": 0.0,
+          "component_count": 0,
+          "largest_component_voxels": 0,
+          "largest_component_ratio": 0.0,
+          "dt_mean": null,
+          "dt_median": null,
+          "dt_max": null,
+          "is_degenerate": true,
+          "degenerate_reason": "no_open_voxels",
+          "roundtrip_air_recall": 0.0,
+          "roundtrip_iou": 0.0
+        },
+        {
+          "resolution": 64,
+          "structural_schema_version": "structural-v1",
+          "axis_order": "ZYX",
+          "shape_depth": 64,
+          "shape_height": 64,
+          "shape_width": 64,
+          "spacing_z": 1.0,
+          "spacing_y": 1.0,
+          "spacing_x": 1.0,
+          "distance_unit": "voxel",
+          "exterior_policy": "solid",
+          "distance_reference": "voxel_centers",
+          "connectivity": 6,
+          "total_voxels": 262144,
+          "open_voxels": 5,
+          "open_ratio": 1.9073486328125e-05,
+          "component_count": 5,
+          "largest_component_voxels": 1,
+          "largest_component_ratio": 0.2,
+          "dt_mean": 1.0,
+          "dt_median": 1.0,
+          "dt_max": 1.0,
+          "is_degenerate": false,
+          "degenerate_reason": null,
+          "roundtrip_air_recall": 1.0,
+          "roundtrip_iou": 1.0
+        }
+      ]
+    },
+    {
+      "path": "MarkovSpodmol_MainGallery_sampled_2mm_PCV_normals_classified_georef/64x64x64/surface.npz",
+      "group": "markovspodmol",
+      "sha256": "b6deed8a5413838b63037449978c578550d7ef16124d91903d81e639b25dfe55",
+      "voxel_sha256": "7d892da94214e6213d432f94af29483cb67ef4f717be21076de583cc629bbe54",
+      "kind": "surface_voxels",
+      "semantic": "true_means_observed_surface",
+      "metadata": {
+        "kind": "surface_voxels",
+        "semantic": "true_means_observed_surface",
+        "source_path": "/run/media/midnavi/Pablo/TCC/DATA/RAW/data/MarkovSpodmol/MainGallery/pointclouds/MarkovSpodmol_MainGallery_sampled_2mm_PCV_normals_classified_georef.las",
+        "source_format": "las",
+        "las_header": {
+          "version": "1.2",
+          "point_format_id": 2,
+          "point_count": 1142526542,
+          "scales_xyz": [
+            0.001,
+            0.001,
+            0.001
+          ],
+          "offsets_xyz": [
+            430000.0,
+            65000.0,
+            -0.0
+          ],
+          "coordinate_decoding": "raw_integer * scale + offset",
+          "reprojection_applied": false
+        },
+        "bounds_path": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/MarkovSpodmol_MainGallery_sampled_2mm_PCV_normals_classified_georef/64x64x64/surface.bounds.json",
+        "min_xyz": [
+          430725.5,
+          65762.5625,
+          542.468994140625
+        ],
+        "max_xyz": [
+          430910.875,
+          66009.4453125,
+          569.614990234375
+        ],
+        "volume_shape_zyx": [
+          64,
+          64,
+          64
+        ],
+        "normalization": {
+          "source_coordinate_order": "XYZ",
+          "grid_index_order": "ZYX",
+          "shared_scale_preserves_proportions": true,
+          "symmetric_padding": true,
+          "degenerate_axes": "placed_at_grid_center"
+        },
+        "processing": {
+          "batch_size": 65536,
+          "progress_every": 1000000,
+          "bounds_mode": "computed",
+          "flood_fill_requested": true
+        }
+      },
+      "shape_zyx": [
+        64,
+        64,
+        64
+      ],
+      "axis_order": "ZYX",
+      "dtype_on_load": "bool",
+      "true_voxels": 1198,
+      "true_ratio": 0.00457000732421875,
+      "preprocessing_seed": null,
+      "candidate": false,
+      "verified_air": false,
+      "eligible_proxy": false,
+      "issues": [
+        "observed_surface_is_not_cave_air"
+      ],
+      "origin": [
+        {
+          "id_arquivo": "markovspodmol_maingallery_sampled_2mm_pcv_normals_classified_georef",
+          "id_caverna": "markovspodmol",
+          "grupo_independencia": "markovspodmol",
+          "nome_caverna": "Markov Spodmol",
+          "trecho": "MainGallery",
+          "variante": "amostragem_2mm",
+          "dataset": "KarstConduitCatalogue",
+          "doi_dataset": "10.60544/8jsy-w511",
+          "versao_dataset": "1.0",
+          "fonte_url": "https://doi.org/10.60544/8jsy-w511",
+          "credito": "Racine, T., Trunz, C., Straubhaar, J. A., & Renard, P. (2025). MarkovSpodmol (Version 1.0) [Data set]. UNINE data service. https://doi.org/10.60544/8jsy-w511",
+          "pais": "Slovenia",
+          "localidade": "Sajevče",
+          "data_aquisicao": "2024-05-02",
+          "unidade_coordenadas": "m",
+          "crs": "EPSG:3912",
+          "semantica": "pontos_de_superficie_observada; nao_e_mascara_de_ar",
+          "arquivo_relativo": "data/MarkovSpodmol/MainGallery/pointclouds/MarkovSpodmol_MainGallery_sampled_2mm_PCV_normals_classified_georef.las",
+          "raiz_local": "/run/media/midnavi/Pablo/TCC/DATA/RAW",
+          "formato": "las",
+          "tamanho_bytes": "66266540485",
+          "quantidade_pontos": "1142526542",
+          "metodo_contagem_pontos": "cabecalho_LAS_sem_leitura_de_pontos",
+          "licenca_declarada": "CC-BY-SA-4.0 (descritor); CC-BY-NC-4.0 (README)",
+          "evidencia_licenca": "/run/media/midnavi/Pablo/.Trash-1000/files/swissubase_3070_1_0/metadata.yaml: dataset_version.usage_license; documents/README.md: Copyright and license",
+          "status_licenca": "divergencia_documental_a_esclarecer",
+          "status_identificacao": "confirmada_por_metadados_locais_e_declaracao_do_usuario",
+          "evidencia_local": "data/MarkovSpodmol/cave.yaml; data/MarkovSpodmol/MainGallery/scan.yaml; /run/media/midnavi/Pablo/.Trash-1000/files/swissubase_3070_1_0/metadata.yaml",
+          "observacoes": "Duas resolucoes da mesma passagem; nao sao fontes independentes. DOI individual; catalogo: 10.60544/sbjr-z851 Descritor consultado em embalagem descartada; nuvem ativa fora da lixeira.",
+          "pendencias": "Esclarecer divergencia da licenca; preservar origem local ao usar float32 georreferenciado; calcular hash; validar interior.",
+          "data_consulta_fontes": "2026-11-07",
+          "sha256": "",
+          "status_sha256": "pendente_sem_leitura_integral",
+          "particao": "nao_definida",
+          "aprovacao_gan": "pendente_validacao_geometrica"
+        }
+      ],
+      "sidecars": {
+        "run.json": {
+          "sha256": "a0b54fbf768c68b2cbf0f52b33661871c01cee64ec62949f5921abaed08d6540",
+          "content": {
+            "schema": "reference-voxelization-run-v1",
+            "status": "completed",
+            "started_at_utc": "2026-11-08T00:43:03.414184+00:00",
+            "elapsed_seconds": 3767.6814493420006,
+            "working_directory": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves",
+            "command_argv": [
+              "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/.venv/bin/python3",
+              "-u",
+              "-m",
+              "cavegen.datastream.run_reference_voxelization",
+              "--input",
+              "/run/media/midnavi/Pablo/TCC/DATA/RAW/data/MarkovSpodmol/MainGallery/pointclouds/MarkovSpodmol_MainGallery_sampled_2mm_PCV_normals_classified_georef.las",
+              "--bounds",
+              "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/MarkovSpodmol_MainGallery_sampled_2mm_PCV_normals_classified_georef/64x64x64/surface.bounds.json",
+              "--shape",
+              "64",
+              "64",
+              "64",
+              "--batch-size",
+              "65536",
+              "--progress-every",
+              "1000000",
+              "--output",
+              "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/MarkovSpodmol_MainGallery_sampled_2mm_PCV_normals_classified_georef/64x64x64/surface.npz",
+              "--interior-output",
+              "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/MarkovSpodmol_MainGallery_sampled_2mm_PCV_normals_classified_georef/64x64x64/interior.npz"
+            ],
+            "requested_argv": [
+              "--input",
+              "/run/media/midnavi/Pablo/TCC/DATA/RAW/data/MarkovSpodmol/MainGallery/pointclouds/MarkovSpodmol_MainGallery_sampled_2mm_PCV_normals_classified_georef.las",
+              "--shape",
+              "64",
+              "64",
+              "64",
+              "--batch-size",
+              "65536",
+              "--progress-every",
+              "1000000",
+              "--output",
+              "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/MarkovSpodmol_MainGallery_sampled_2mm_PCV_normals_classified_georef/64x64x64/surface.npz",
+              "--interior-output",
+              "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/MarkovSpodmol_MainGallery_sampled_2mm_PCV_normals_classified_georef/64x64x64/interior.npz"
+            ],
+            "command_shell": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/.venv/bin/python3 -u -m cavegen.datastream.run_reference_voxelization --input /run/media/midnavi/Pablo/TCC/DATA/RAW/data/MarkovSpodmol/MainGallery/pointclouds/MarkovSpodmol_MainGallery_sampled_2mm_PCV_normals_classified_georef.las --bounds /home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/MarkovSpodmol_MainGallery_sampled_2mm_PCV_normals_classified_georef/64x64x64/surface.bounds.json --shape 64 64 64 --batch-size 65536 --progress-every 1000000 --output /home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/MarkovSpodmol_MainGallery_sampled_2mm_PCV_normals_classified_georef/64x64x64/surface.npz --interior-output /home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/MarkovSpodmol_MainGallery_sampled_2mm_PCV_normals_classified_georef/64x64x64/interior.npz",
+            "source": {
+              "path": "/run/media/midnavi/Pablo/TCC/DATA/RAW/data/MarkovSpodmol/MainGallery/pointclouds/MarkovSpodmol_MainGallery_sampled_2mm_PCV_normals_classified_georef.las",
+              "size_bytes": 66266540485,
+              "mtime_ns": 1738079840616395100,
+              "identity_kind": "path_size_mtime_not_content_hash"
+            },
+            "surface_output": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/MarkovSpodmol_MainGallery_sampled_2mm_PCV_normals_classified_georef/64x64x64/surface.npz",
+            "interior_output": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/MarkovSpodmol_MainGallery_sampled_2mm_PCV_normals_classified_georef/64x64x64/interior.npz",
+            "bounds_path": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/MarkovSpodmol_MainGallery_sampled_2mm_PCV_normals_classified_georef/64x64x64/surface.bounds.json",
+            "bounds_sha256": "a4a6e712b6d5081cbd86bbb6c2f64768b89dc926085be210bc91c12dbb148329",
+            "surface_metadata": {
+              "kind": "surface_voxels",
+              "semantic": "true_means_observed_surface",
+              "source_path": "/run/media/midnavi/Pablo/TCC/DATA/RAW/data/MarkovSpodmol/MainGallery/pointclouds/MarkovSpodmol_MainGallery_sampled_2mm_PCV_normals_classified_georef.las",
+              "source_format": "las",
+              "las_header": {
+                "version": "1.2",
+                "point_format_id": 2,
+                "point_count": 1142526542,
+                "scales_xyz": [
+                  0.001,
+                  0.001,
+                  0.001
+                ],
+                "offsets_xyz": [
+                  430000.0,
+                  65000.0,
+                  -0.0
+                ],
+                "coordinate_decoding": "raw_integer * scale + offset",
+                "reprojection_applied": false
+              },
+              "bounds_path": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/MarkovSpodmol_MainGallery_sampled_2mm_PCV_normals_classified_georef/64x64x64/surface.bounds.json",
+              "min_xyz": [
+                430725.5,
+                65762.5625,
+                542.468994140625
+              ],
+              "max_xyz": [
+                430910.875,
+                66009.4453125,
+                569.614990234375
+              ],
+              "volume_shape_zyx": [
+                64,
+                64,
+                64
+              ],
+              "normalization": {
+                "source_coordinate_order": "XYZ",
+                "grid_index_order": "ZYX",
+                "shared_scale_preserves_proportions": true,
+                "symmetric_padding": true,
+                "degenerate_axes": "placed_at_grid_center"
+              }
+            },
+            "processing": {
+              "batch_size": 65536,
+              "progress_every": 1000000,
+              "bounds_mode": "computed",
+              "flood_fill_requested": true
+            },
+            "software": {
+              "python": "3.14.8",
+              "numpy": "2.5.0",
+              "scipy": "1.18.0",
+              "laspy": "2.7.0",
+              "git_commit": "4680c1453ea7c261db0321a0f0cbe5875ba49291",
+              "git_dirty": true
+            }
+          }
+        },
+        "command.json": {
+          "sha256": "39abfded12dad2bc42f33deb78ba5f4c831df29424478b89232f5bce753bf5e0",
+          "content": {
+            "command_argv": [
+              "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/.venv/bin/python3",
+              "-u",
+              "-m",
+              "cavegen.datastream.run_reference_voxelization",
+              "--input",
+              "/run/media/midnavi/Pablo/TCC/DATA/RAW/data/MarkovSpodmol/MainGallery/pointclouds/MarkovSpodmol_MainGallery_sampled_2mm_PCV_normals_classified_georef.las",
+              "--shape",
+              "64",
+              "64",
+              "64",
+              "--batch-size",
+              "65536",
+              "--progress-every",
+              "1000000",
+              "--output",
+              "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/MarkovSpodmol_MainGallery_sampled_2mm_PCV_normals_classified_georef/64x64x64/surface.npz",
+              "--interior-output",
+              "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/MarkovSpodmol_MainGallery_sampled_2mm_PCV_normals_classified_georef/64x64x64/interior.npz"
+            ],
+            "command_shell": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/.venv/bin/python3 -u -m cavegen.datastream.run_reference_voxelization --input /run/media/midnavi/Pablo/TCC/DATA/RAW/data/MarkovSpodmol/MainGallery/pointclouds/MarkovSpodmol_MainGallery_sampled_2mm_PCV_normals_classified_georef.las --shape 64 64 64 --batch-size 65536 --progress-every 1000000 --output /home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/MarkovSpodmol_MainGallery_sampled_2mm_PCV_normals_classified_georef/64x64x64/surface.npz --interior-output /home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/references/MarkovSpodmol_MainGallery_sampled_2mm_PCV_normals_classified_georef/64x64x64/interior.npz",
+            "working_directory": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves",
+            "execution_mode": "1"
+          }
+        },
+        "bounds.json": {
+          "sha256": "a4a6e712b6d5081cbd86bbb6c2f64768b89dc926085be210bc91c12dbb148329",
+          "content": {
+            "source_path": "/run/media/midnavi/Pablo/TCC/DATA/RAW/data/MarkovSpodmol/MainGallery/pointclouds/MarkovSpodmol_MainGallery_sampled_2mm_PCV_normals_classified_georef.las",
+            "min_xyz": [
+              430725.5,
+              65762.5625,
+              542.468994140625
+            ],
+            "max_xyz": [
+              430910.875,
+              66009.4453125,
+              569.614990234375
+            ]
+          }
+        }
+      },
+      "estimated_grid_spacing_source_units": 3.9187748015873014
+    }
+  ],
+  "interpretation": "candidate interiors are proxies, not validated ground truth",
+  "geometry_screen": {
+    "min_largest_component_voxels": 64,
+    "min_dt_max_voxels": 2,
+    "meaning": "engineering minimum, not physical validation"
+  },
+  "audit_id": "bb4d835198c8c04eb6ae3d09ed7f74ee7c3b0ba506536abbee4fe5029caceb97"
+}

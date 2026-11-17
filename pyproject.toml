@@ -29,6 +29,12 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+gan = [
+  "torch>=2.2",
+]
+test = [
+  "pytest>=8.0",
+]
 ml = [
   "torch>=2.2",
   "stable-baselines3>=2.3",
