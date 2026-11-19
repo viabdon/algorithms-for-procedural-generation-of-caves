@@ -222,6 +222,15 @@ O terminal mostra as quatro etapas enquanto roda:
 O painel só imprime: com ou sem ele, a busca dá exatamente os mesmos
 candidatos e notas.
 
+Num terminal de verdade, o painel usa cores e emojis: notas positivas em
+verde, negativas em amarelo e cortadas em vermelho; `⭐ novo recorde` quando
+o melhor sobe numa geração; `⚠️ frágil` quando um parâmetro é cortado numa
+seed reservada; medalhas nos 3 primeiros da lista final. Fora do terminal
+(saída indo para arquivo) ou com a variável `NO_COLOR` definida, o texto sai
+puro, como nos exemplos acima (só o `novo recorde` e o `frágil` aparecem
+sem a estrela e o emoji). Se o console não imprime emoji (codificação
+sem Unicode), ficam só as cores.
+
 | opção | padrão | o que é |
 |---|---|---|
 | `--metodo` | `genetico` | `genetico` ou `aleatoria` |

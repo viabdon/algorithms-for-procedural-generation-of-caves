@@ -44,7 +44,7 @@ from cavegen.optimization.genetic.algoritmo import (
 )
 from cavegen.optimization.genetic.aptidao import Alvo, Cortes, nota_da_copia_pura
 from cavegen.optimization.genetic.ca import BORDA, GENES_CA, MAX_ITERACOES, AvaliadorCA
-from cavegen.optimization.genetic.painel import Painel, formatar_genes, formatar_nota
+from cavegen.optimization.genetic.painel import Painel
 from cavegen.profiling.resource_tracker import track_resources
 from cavegen.sdf.manipulacao import manipular_sdf
 
@@ -133,21 +133,9 @@ def lista_dos_melhores(resultado: ResultadoBusca, avaliador: AvaliadorCA,
                       "notas_reservadas": reservadas.tolist(),
                       "ordem": avaliacao.ordem, "geracao": avaliacao.geracao})
         if painel is not None:
-            painel.escrever(f"  {posicao:>2}/{len(escolhidos)} {formatar_genes(avaliacao.genes)}: "
-                            f"ajuste {formatar_nota(avaliacao.nota)}, reservadas "
-                            f"{formatar_nota(float(reservadas.mean()))} "
-                            f"(mín {formatar_nota(float(reservadas.min()))})")
+            painel.conferido(posicao, len(escolhidos), avaliacao.genes, avaliacao.nota,
+                             float(reservadas.mean()), float(reservadas.min()))
     return lista
-
-def mostrar_lista(lista: list[dict]) -> None:
-    nomes = [gene.nome for gene in GENES_CA]
-    print(f"{'#':>3} " + " ".join(f"{n:>15}" for n in nomes)
-          + f" {'iteracoes':>9} {'nota ajuste':>11} {'reservadas':>10} {'mín':>7}")
-    for item in lista:
-        valores = " ".join(f"{item['genes'][n]:>15.4g}" for n in nomes)
-        print(f"{item['posicao']:>3} {valores} {item['iteracoes']:>9} "
-              f"{item['nota_ajuste']:>+11.3f} {item['nota_reservada_media']:>+10.3f} "
-              f"{item['nota_reservada_min']:>+7.3f}")
 
 def gravar(resultado: ResultadoBusca, extras: dict, destino: Path) -> Path:
     Path(destino).parent.mkdir(parents=True, exist_ok=True)
@@ -193,7 +181,7 @@ def main(argv=None) -> Path:
     painel = Painel(config.orcamento, por_lote=not genetico,
                     tamanho_lote=config.tamanho_populacao)
 
-    painel.etapa(1, 4, "Carregando o peso e o alvo")
+    painel.etapa(1, 4, "Carregando o peso e o alvo", "📂")
     peso, info_peso = carregar_campo(args.peso)
     campo_alvo, info_alvo = carregar_campo(args.alvo)
     alvo, cortes = Alvo(campo_alvo), Cortes()
@@ -208,9 +196,11 @@ def main(argv=None) -> Path:
     destino = build_path(args.saida, PREFIXO, next_id(args.saida, PREFIXO))
     if genetico:
         painel.etapa(2, 4, f"Busca genética: {config.orcamento} candidatos, população "
-                           f"{config.tamanho_populacao}, elite {config.elite}, seed {args.seed}")
+                           f"{config.tamanho_populacao}, elite {config.elite}, seed {args.seed}",
+                     "🧬")
     else:
-        painel.etapa(2, 4, f"Busca aleatória: {config.orcamento} candidatos, seed {args.seed}")
+        painel.etapa(2, 4, f"Busca aleatória: {config.orcamento} candidatos, seed {args.seed}",
+                     "🎲")
     resultado = buscar(args.metodo, avaliador, config, args.seed, execucao=destino.stem,
                        observar=painel)
     painel.escrever(f"  {len(resultado.avaliacoes)} avaliações ({resultado.reaproveitadas} "
@@ -218,7 +208,7 @@ def main(argv=None) -> Path:
     campeao = resultado.melhor
 
     painel.etapa(3, 4, f"Conferindo os {args.top} melhores nas {len(SEMENTES_RESERVADAS)} "
-                       "seeds reservadas")
+                       "seeds reservadas", "🔍")
     melhores = lista_dos_melhores(resultado, avaliador, args.top, painel)
     # O primeiro da lista é o campeão; só se tudo foi cortado a lista vem vazia.
     if melhores:
@@ -246,19 +236,11 @@ def main(argv=None) -> Path:
         "ambiente": {**ambiente(), "arquivo_peso": info_peso["origem"],
                      "sha256_peso": info_peso["sha256"]},
     }
-    painel.etapa(4, 4, "Gravando o resultado")
+    painel.etapa(4, 4, "Gravando o resultado", "💾")
     gravar(resultado, extras, destino)
 
-    print()
-    print(f"{len(melhores)} melhores parâmetros (nota nas sementes de ajuste e média e "
-          f"mínimo nas {len(SEMENTES_RESERVADAS)} reservadas):")
-    if melhores:
-        mostrar_lista(melhores)
-    else:
-        print("  nenhum: todos os candidatos foram cortados")
-    print()
-    print(f"referências: cópia pura {copia:+.3f}; teto trivial {teto:+.3f}")
-    print(f"gravado em {caminho_legivel(destino)}")
+    painel.tabela_melhores(melhores, [gene.nome for gene in GENES_CA], len(SEMENTES_RESERVADAS))
+    painel.referencias(copia, teto, caminho_legivel(destino))
     return destino
 
 if __name__ == "__main__":
