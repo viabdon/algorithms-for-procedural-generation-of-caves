@@ -137,6 +137,10 @@ def lista_dos_melhores(resultado: ResultadoBusca, avaliador: AvaliadorCA,
                              float(reservadas.mean()), float(reservadas.min()))
     return lista
 
+def descrever_gene(gene) -> str:
+    passo = f", de {gene.passo:g} em {gene.passo:g}" if gene.passo is not None else ""
+    return f"{gene.nome} [{gene.minimo:g}, {gene.maximo:g}{passo}]"
+
 def gravar(resultado: ResultadoBusca, extras: dict, destino: Path) -> Path:
     Path(destino).parent.mkdir(parents=True, exist_ok=True)
     nomes = [gene.nome for gene in GENES_CA]
@@ -187,7 +191,7 @@ def main(argv=None) -> Path:
     alvo, cortes = Alvo(campo_alvo), Cortes()
     avaliador = AvaliadorCA(peso, alvo, SEMENTES_AJUSTE, MAX_ITERACOES, cortes)
     minimo, maximo = alvo.faixa(cortes)
-    faixas = ", ".join(f"{g.nome} [{g.minimo:g}, {g.maximo:g}]" for g in GENES_CA)
+    faixas = ", ".join(descrever_gene(g) for g in GENES_CA)
     painel.escrever(f"  peso  {info_peso['origem']} (de {peso.min():+.2f} a {peso.max():+.2f})")
     painel.escrever(f"  alvo  {info_alvo['origem']} ({alvo.referencia} voxels positivos; "
                     f"vazio aceito de {minimo:.0f} a {maximo:.0f})")

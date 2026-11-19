@@ -13,7 +13,7 @@ ajudando.
 
 ```
 SDF do Elaphes com log (como está) ──> peso do CA ┐
-                                                  ├─> CA (até 50 passos) ─> caverna
+                                                  ├─> CA (até 40 passos) ─> caverna
 semente (chance_inicial, seed) ───────────────────┘          │
                                                              v
 SDF do Elaphes com limiar -3 e log ────────────────> nota da caverna ─> GA escolhe os próximos
@@ -52,8 +52,9 @@ combinações já encontradas para propor as próximas.
    - **cruzamento uniforme** (chance 0,9): cada gene do filho vem do pai ou da
      mãe, meio a meio. Senão, o filho é cópia de um dos pais;
    - **mutação gaussiana** (chance 0,3 por gene): soma um desvio normal de 10%
-     da faixa do gene e devolve o valor para dentro da faixa. É o que permite
-     achar valores que nenhum pai tinha;
+     da faixa do gene e devolve o valor para dentro da faixa (e, se o gene tem
+     passo, para o ponto da grade mais perto). É o que permite achar valores
+     que nenhum pai tinha;
    - os 18 filhos e os 2 da elite formam a geração seguinte.
 5. Para quando o **orçamento** (total de candidatos avaliados, padrão 400)
    acaba. A última geração pode ficar incompleta.
@@ -69,12 +70,29 @@ não foram ajustados; uma análise de sensibilidade deles é trabalho futuro.
 ## O cromossomo do CA
 
 Definido em `GENES_CA` (`ca.py`). As faixas foram medidas no Elaphes 64³ em
-12/11/2026, com folga em volta das melhores notas.
+12/11/2026, com folga em volta das melhores notas; a da `chance_inicial` foi
+alargada para 0,2 a 0,8 em 19/11/2026.
 
 | gene | faixa | o que faz |
 |---|---|---|
-| `chance_inicial` | 0,3 a 0,7 | chance de cada célula da semente nascer vazia |
+| `chance_inicial` | 0,2 a 0,8, de 0,02 em 0,02 | chance de cada célula da semente nascer vazia |
 | `sensibilidade` | 1 a 20, inteiro | mínimo de vizinhos (com o peso somado) para a célula ficar vazia; de 18 para cima a caverna sempre morria |
+
+### Por que a chance inicial anda de 0,02 em 0,02
+
+A matriz inicial é `numpy_rng(seed).random(forma) < chance_inicial`: a seed
+sorteia um número para cada célula e a chance é o limiar. Com a mesma seed,
+duas chances próximas só diferem nas células cujo número caiu entre elas.
+Até 18/11/2026 o gene era contínuo, e a lista dos melhores saía cheia de
+chances como 0,5639 e 0,564, que mudam umas 26 células em 262.144: a mesma
+caverna, com diferença de nota do tamanho do ruído. Com o passo de 0,02
+(`Gene(..., passo=0.02)`), cada vizinho da grade muda cerca de 2% das células
+e a lista passa a mostrar diferenças reais. O sorteio escolhe um ponto da
+grade com chance igual, e a mutação soma o desvio normal e volta para o ponto
+mais perto.
+
+**As execuções até `ga_009` usaram a chance contínua de 0,3 a 0,7 e 50
+iterações; não são o mesmo espaço de busca das seguintes.**
 
 Ficam **fora** do cromossomo, fixos:
 
@@ -85,7 +103,7 @@ Ficam **fora** do cromossomo, fixos:
 
 - **borda**: sempre `NEAREST`, que repete a beirada da grade. `ZEROS` fecharia
   e `ONES` abriria a caverna onde ela toca a borda, e `RANDOM` depende da sorte;
-- **iterações**: o CA roda até `MAX_ITERACOES = 50`, calcula a nota em todo
+- **iterações**: o CA roda até `MAX_ITERACOES = 40`, calcula a nota em todo
   passo e a melhor iteração sai junto com a nota (ver abaixo);
 - **modo do peso**: sempre o completo. O modo "só negativo" existe no CA, mas
   ainda não entrou no GA. No Elaphes os dois deram o mesmo resultado, porque o
@@ -130,7 +148,7 @@ A quantidade de vazio aceita é relativa ao alvo, não à grade: de 0,5× a 5× 
 5.201 voxels positivos, ou seja, de 2.600 a 26.005 voxels vazios. Fora dessa
 faixa a nota do passo é `-inf` (`NOTA_MINIMA`), que nunca vence.
 
-Depois de cada passo, o CA para antes das 50 iterações se:
+Depois de cada passo, o CA para antes das 40 iterações se:
 
 | motivo | quando |
 |---|---|
@@ -200,12 +218,12 @@ O terminal mostra as quatro etapas enquanto roda:
   alvo  tools/sdf/npz/elaphes_surface_64_sdf_limiar-3_log1.npz (5201 voxels positivos; ...)
 
 [2/4] Busca genética: 60 candidatos, população 20, elite 2, seed 0
-  geração   0 | 20/60 | melhor +0.406 (chance_inicial=0.3113 sensibilidade=9) | válidos 6/20 | média -2.785 | 2.5 s
+  geração   0 | 20/60 | melhor +0.406 (chance_inicial=0.32 sensibilidade=9) | válidos 6/20 | média -2.785 | 2.5 s
   geração   1 | 38/60 | melhor +0.406 (...) | válidos 11/20 | média -0.720 | 1.7 s
-  candidato 47/60 · geração 2 · chance_inicial=0.559 sensibilidade=13 -> +0.612 (15 it) · melhor +0.406
+  candidato 47/60 · geração 2 · chance_inicial=0.56 sensibilidade=13 -> +0.612 (15 it) · melhor +0.406
 
 [3/4] Conferindo os 5 melhores nas 10 seeds reservadas
-   1/5 chance_inicial=0.3113 sensibilidade=9: ajuste +0.406, reservadas +0.412 (mín +0.176)
+   1/5 chance_inicial=0.32 sensibilidade=9: ajuste +0.406, reservadas +0.412 (mín +0.176)
 
 [4/4] Gravando o resultado
 ```

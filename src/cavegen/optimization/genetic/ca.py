@@ -2,7 +2,8 @@
 
 Genes (limites medidos no Elaphes 64³ em 12/11/2026, com folga em volta das
 melhores notas; ver docs/methodology-adjustments.md):
-    chance_inicial   [0,3; 0,7]   chance de cada célula da semente nascer vazia
+    chance_inicial   [0,2; 0,8]   chance de cada célula da semente nascer vazia, de 0,02
+                                  em 0,02 (por que o passo: ver o README do módulo)
     sensibilidade    [1, 20]      inteiro; de 18 para cima a caverna sempre morria
 
 Fora do cromossomo, fixos:
@@ -36,10 +37,10 @@ from cavegen.optimization.genetic.aptidao import (
 )
 
 GENES_CA = (
-    Gene("chance_inicial", 0.3, 0.7),
+    Gene("chance_inicial", 0.2, 0.8, passo=0.02),
     Gene("sensibilidade", 1, 20, inteiro=True),
 )
-MAX_ITERACOES = 50
+MAX_ITERACOES = 40
 BORDA = BorderTreatment.NEAREST
 CORTES_PADRAO = Cortes()
 

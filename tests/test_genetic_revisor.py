@@ -5,7 +5,9 @@
 import contextlib
 import io
 import json
+import re
 import tempfile
+import unicodedata
 import unittest
 import warnings
 from pathlib import Path
@@ -19,10 +21,13 @@ from cavegen.optimization.genetic.algoritmo import (
     ConfiguracaoGA,
     Gene,
     busca_aleatoria,
+    chave,
     evoluir,
+    mutar,
 )
 from cavegen.optimization.genetic.aptidao import NOTA_MINIMA, Alvo
 from cavegen.optimization.genetic.ca import GENES_CA, MAX_ITERACOES, AvaliadorCA, rodar_ca
+from cavegen.optimization.genetic.painel import Estilo, Painel
 
 # Funções do gerador global que não podem ser usadas no caminho do GA.
 GLOBAIS_PROIBIDAS = ("rand", "random", "random_sample", "randint", "uniform", "normal",
@@ -95,10 +100,10 @@ class BordaNearestRevisorTests(unittest.TestCase):
 
 class GeneRevisorTests(unittest.TestCase):
     def test_genes_do_ca_batem_com_a_decisao(self):
-        limites = {g.nome: (g.minimo, g.maximo, g.inteiro) for g in GENES_CA}
-        self.assertEqual(limites, {"chance_inicial": (0.3, 0.7, False),
-                                   "sensibilidade": (1, 20, True)})
-        self.assertEqual(MAX_ITERACOES, 50)
+        limites = {g.nome: (g.minimo, g.maximo, g.inteiro, g.passo) for g in GENES_CA}
+        self.assertEqual(limites, {"chance_inicial": (0.2, 0.8, False, 0.02),
+                                   "sensibilidade": (1, 20, True, None)})
+        self.assertEqual(MAX_ITERACOES, 40)
         self.assertIs(modulo_ca.BORDA, BorderTreatment.NEAREST)
 
     def test_gene_inteiro_com_limite_fracionario_fica_na_faixa(self):
@@ -317,6 +322,230 @@ class ExecutarRevisorTests(unittest.TestCase):
                                                   tuple(extras["sementes_reservadas"]))
         self.assertEqual(float(ajuste.mean()), campeao["nota_ajuste"])
         self.assertEqual(reservadas.tolist(), extras["notas_reservadas"])
+
+
+ANSI = re.compile(r"\033\[[0-9;]*m")
+CHANCE = GENES_CA[0]
+GRADE_CHANCE = [round(0.2 + k * 0.02, 10) for k in range(31)]
+
+
+class GradeRevisorTests(unittest.TestCase):
+    """O gene com passo (chance_inicial de 0,02 em 0,02) e as bordas da grade."""
+
+    def test_grade_da_chance_tem_31_pontos_fixos_que_sobrevivem_ao_json(self):
+        self.assertEqual(CHANCE.passos(), 30)
+        pontos = [CHANCE.corrigir(0.2 + k * 0.02) for k in range(31)]
+        self.assertEqual(pontos, GRADE_CHANCE)
+        self.assertEqual(len(set(pontos)), 31)
+        for ponto in pontos:
+            # corrigir é idempotente e o ponto volta igual do json (campeão no npz).
+            self.assertEqual(CHANCE.corrigir(ponto), ponto)
+            self.assertEqual(json.loads(json.dumps(ponto)), ponto)
+
+    def test_chances_vizinhas_viram_o_mesmo_candidato_e_a_grade_muda_a_semente(self):
+        # O motivo da mudança: 0,5639 e 0,564 eram a mesma caverna; agora são o
+        # mesmo candidato (mesma chave do cache).
+        a = {"chance_inicial": CHANCE.corrigir(0.5639), "sensibilidade": 9}
+        b = {"chance_inicial": CHANCE.corrigir(0.564), "sensibilidade": 9}
+        self.assertEqual(chave(a), chave(b))
+        vizinhos = (modulo_ca.generate_seed_matrix(16, 0.56, seed=1)
+                    != modulo_ca.generate_seed_matrix(16, 0.58, seed=1))
+        self.assertGreater(int(vizinhos.sum()), 16 ** 3 * 0.01)
+
+    def test_sortear_com_passo_e_uniforme_inclusive_nas_pontas(self):
+        # As pontas não podem ter metade do peso (o que um round sobre uniform daria).
+        rng = np.random.default_rng(0)
+        contagem = {p: 0 for p in GRADE_CHANCE}
+        for _ in range(31 * 1000):
+            contagem[CHANCE.sortear(rng)] += 1
+        self.assertEqual(set(contagem), set(GRADE_CHANCE))
+        self.assertTrue(all(850 <= n <= 1150 for n in contagem.values()), contagem)
+
+    def test_como_dict_reconstroi_o_mesmo_gene_e_aceita_o_formato_antigo(self):
+        for gene in GENES_CA:
+            self.assertEqual(Gene(**gene.como_dict()), gene)
+        antigo = {"nome": "chance_inicial", "minimo": 0.3, "maximo": 0.7, "inteiro": False}
+        self.assertIsNone(Gene(**antigo).passo)
+
+    def test_faixa_que_nao_fecha_com_o_passo_fica_na_faixa_e_na_grade(self):
+        rng = np.random.default_rng(1)
+        for gene in (Gene("a", 0.0, 1.0, passo=0.3), Gene("b", 0.2, 0.81, passo=0.02),
+                     Gene("c", -1.0, 0.5, passo=0.4), Gene("d", 0.0, 0.3, passo=0.1)):
+            with self.subTest(gene=gene):
+                grade = {gene.corrigir(gene.minimo + k * gene.passo)
+                         for k in range(gene.passos() + 1)}
+                valores = [gene.sortear(rng) for _ in range(300)]
+                valores += [gene.corrigir(v) for v in (-1e6, gene.minimo, gene.maximo, 1e6)]
+                valores += [mutar({gene.nome: v}, (gene,), 1.0, 2.0, rng)[gene.nome]
+                            for v in valores[:100]]
+                for v in valores:
+                    self.assertTrue(gene.minimo <= v <= gene.maximo, v)
+                    self.assertIn(v, grade)
+        self.assertEqual(Gene("d", 0.0, 0.3, passo=0.1).passos(), 3)  # 0,3 / 0,1 = 2,999...
+
+    def test_gene_com_passo_nao_sai_da_faixa_quando_o_limite_nao_cabe_em_10_casas(self):
+        # Contrato do Gene: limites fechados. O round(..., 10) de _na_grade e a
+        # folga de 1e-9 de passos() levam o valor para fora da faixa quando o
+        # limite tem mais casas que isso.
+        casos = (
+            (Gene("fino", 0.12345678901234, 0.5, passo=0.01), 0.0),  # dá 0,123456789 < mínimo
+            (Gene("quase", 0.0, 0.99999999999, passo=0.1), 1.0),     # dá 1,0 > máximo
+        )
+        for gene, valor in casos:
+            with self.subTest(gene=gene.nome):
+                corrigido = gene.corrigir(valor)
+                self.assertTrue(gene.minimo <= corrigido <= gene.maximo, corrigido)
+
+    def test_mutacao_com_passo_nao_fica_presa_no_mesmo_ponto(self):
+        # Desvio de 10% da faixa = 3 passos: no meio volta ao mesmo ponto ~13%
+        # das vezes; na ponta ~57% (metade dos desvios sai da faixa e é limitada).
+        rng = np.random.default_rng(2)
+        for inicio, teto in ((0.5, 0.2), (0.8, 0.65), (0.2, 0.65)):
+            with self.subTest(inicio=inicio):
+                filhos = [mutar({"chance_inicial": inicio}, (CHANCE,), 1.0, 0.1, rng)
+                          ["chance_inicial"] for _ in range(4000)]
+                self.assertLess(filhos.count(inicio) / len(filhos), teto)
+                self.assertGreater(len(set(filhos)), 8)
+
+
+class TerminalFalsoRevisor(io.StringIO):
+    def isatty(self):
+        return True
+
+
+def largura_na_tela(texto: str) -> int:
+    return sum(2 if unicodedata.east_asian_width(c) == "W" else 1 for c in texto)
+
+
+def melhores_falsos() -> list[dict]:
+    return [{"posicao": i,
+             "genes": {"chance_inicial": GRADE_CHANCE[10 + i], "sensibilidade": 9 + i},
+             "iteracoes": 10 + i, "nota_ajuste": 0.7 - i / 50,
+             "nota_reservada_media": NOTA_MINIMA if i == 5 else 0.6 - i / 50,
+             "nota_reservada_min": NOTA_MINIMA if i >= 4 else 0.5 - i / 50}
+            for i in range(1, 7)]
+
+
+def sessao_do_painel(painel: Painel):
+    """O que o executar.py mostra, do começo ao fim, com uma busca pequena."""
+    def nota(genes):
+        if genes["sensibilidade"] > 16:
+            return NOTA_MINIMA, {"iteracoes": 1, "motivos": ["vazio_demais"]}
+        return (-abs(genes["chance_inicial"] - 0.5) - genes["sensibilidade"] / 100,
+                {"iteracoes": 3, "motivos": ["convergiu"]})
+
+    painel.etapa(2, 4, "Busca genética", "🧬")
+    resultado = evoluir(GENES_CA, nota, ConfiguracaoGA(orcamento=60), seed=7, observar=painel)
+    painel.etapa(3, 4, "Conferindo", "🔍")
+    painel.conferido(1, 2, {"chance_inicial": 0.5, "sensibilidade": 3}, 0.6, 0.61, 0.5)
+    painel.conferido(2, 2, {"chance_inicial": 0.52, "sensibilidade": 3}, 0.6, NOTA_MINIMA,
+                     NOTA_MINIMA)
+    painel.tabela_melhores(melhores_falsos(), [g.nome for g in GENES_CA], 10)
+    painel.referencias(0.1, 1.0, "results/ga_001.npz")
+    return resultado
+
+
+class PainelRevisorTests(unittest.TestCase):
+    def test_painel_colorido_e_ao_vivo_nao_muda_a_busca(self):
+        sem = sessao_do_painel(Painel(60, saida=io.StringIO(), ao_vivo=False, estilo=Estilo()))
+        com = sessao_do_painel(Painel(60, saida=TerminalFalsoRevisor(), ao_vivo=True,
+                                      estilo=Estilo(cores=True, emojis=True)))
+        self.assertEqual([a.genes for a in sem.avaliacoes], [a.genes for a in com.avaliacoes])
+        self.assertEqual([a.nota for a in sem.avaliacoes], [a.nota for a in com.avaliacoes])
+        self.assertEqual(sem.reaproveitadas, com.reaproveitadas)
+
+    def test_cor_so_acrescenta_codigos_ao_texto_puro(self):
+        # Com emojis desligados, tirar os códigos ANSI tem de dar exatamente o
+        # texto puro, inclusive os espaços que apagam a linha viva.
+        for ao_vivo in (False, True):
+            with self.subTest(ao_vivo=ao_vivo):
+                puro, colorido = io.StringIO(), io.StringIO()
+                sessao_do_painel(Painel(60, saida=puro, ao_vivo=ao_vivo, estilo=Estilo()))
+                sessao_do_painel(Painel(60, saida=colorido, ao_vivo=ao_vivo,
+                                        estilo=Estilo(cores=True)))
+                self.assertNotIn("\033", puro.getvalue())
+                self.assertIn("\033[", colorido.getvalue())
+                self.assertEqual(ANSI.sub("", colorido.getvalue()), puro.getvalue())
+
+    def test_tabela_pura_igual_a_antiga_mostrar_lista_quando_as_notas_sao_finitas(self):
+        lista = [dict(item, nota_reservada_media=0.4, nota_reservada_min=0.3)
+                 for item in melhores_falsos()]
+        nomes = [g.nome for g in GENES_CA]
+        antiga = [f"{'#':>3} " + " ".join(f"{n:>15}" for n in nomes)
+                  + f" {'iteracoes':>9} {'nota ajuste':>11} {'reservadas':>10} {'mín':>7}"]
+        for item in lista:
+            valores = " ".join(f"{item['genes'][n]:>15.4g}" for n in nomes)
+            antiga.append(f"{item['posicao']:>3} {valores} {item['iteracoes']:>9} "
+                          f"{item['nota_ajuste']:>+11.3f} {item['nota_reservada_media']:>+10.3f} "
+                          f"{item['nota_reservada_min']:>+7.3f}")
+        saida = io.StringIO()
+        Painel(10, saida=saida, estilo=Estilo()).tabela_melhores(lista, nomes, 10)
+        self.assertEqual(saida.getvalue().splitlines()[2:], antiga)
+
+    def test_tabela_com_medalhas_fica_alinhada_na_tela(self):
+        saida = io.StringIO()
+        Painel(10, saida=saida, estilo=Estilo(cores=True, emojis=True)).tabela_melhores(
+            melhores_falsos(), [g.nome for g in GENES_CA], 10)
+        linhas = [ANSI.sub("", linha) for linha in saida.getvalue().splitlines()[2:]]
+        self.assertTrue(linhas[1].startswith("🥇 "), linhas[1])
+        self.assertEqual(len({largura_na_tela(linha) for linha in linhas}), 1, linhas)
+
+    def test_estilo_para_fora_do_terminal_nunca_liga_nem_chama_o_console(self):
+        with mock.patch("cavegen.optimization.genetic.painel._ativar_ansi") as ativar:
+            estilo = Estilo.para(io.StringIO())
+        self.assertFalse(estilo.cores or estilo.emojis)
+        ativar.assert_not_called()
+
+
+class ExecutarGradeRevisorTests(unittest.TestCase):
+    def test_executar_grava_o_passo_e_so_pontos_da_grade(self):
+        with tempfile.TemporaryDirectory() as pasta:
+            destino = rodar_executar(Path(pasta), "--orcamento", "8", "--populacao", "4")
+            extras = extras_gravados(destino)
+            with np.load(destino) as r:
+                nomes = list(r["genes_nomes"])
+                chances = r["genes"][:, nomes.index("chance_inicial")].tolist()
+                melhores = json.loads(str(r["melhores"]))
+        limites = {d["nome"]: d for d in extras["genes_limites"]}
+        self.assertEqual(limites["chance_inicial"]["passo"], 0.02)
+        self.assertIsNone(limites["sensibilidade"]["passo"])
+        self.assertEqual(extras["max_iteracoes"], 40)
+        self.assertTrue(set(chances) <= set(GRADE_CHANCE), chances)
+        self.assertIn(extras["campeao"]["genes"]["chance_inicial"], GRADE_CHANCE)
+        self.assertTrue(all(m["genes"]["chance_inicial"] in GRADE_CHANCE for m in melhores))
+
+    def test_executar_so_imprime_pelo_painel_e_sai_puro_fora_do_terminal(self):
+        from cavegen.optimization.genetic import executar
+
+        do_painel = io.StringIO()
+        original = executar.Painel
+
+        def painel_capturado(*args, **kwargs):
+            return original(*args, saida=do_painel, **kwargs)
+
+        with tempfile.TemporaryDirectory() as pasta:
+            pasta = Path(pasta)
+            sdf = esfera_sdf()
+            np.savez_compressed(pasta / "peso.npz", sdf=sdf, convencao=np.array("base"),
+                                limiar=0.0)
+            np.savez_compressed(pasta / "alvo.npz", sdf=sdf + 3, convencao=np.array("alvo"),
+                                limiar=-3.0, escala_log=1.0)
+            fora = io.StringIO()
+            with (mock.patch("cavegen.profiling.resource_tracker.registrar_execucao"),
+                  mock.patch.object(executar, "Painel", side_effect=painel_capturado),
+                  contextlib.redirect_stdout(fora)):
+                executar.main(["--peso", str(pasta / "peso.npz"),
+                               "--alvo", str(pasta / "alvo.npz"),
+                               "--saida", str(pasta / "results"), "--orcamento", "6",
+                               "--populacao", "3"])
+        texto = do_painel.getvalue()
+        self.assertEqual(fora.getvalue(), "")
+        self.assertNotIn("\033", texto)
+        self.assertNotIn("\r", texto)
+        for trecho in ("[1/4] Carregando", "chance_inicial [0.2, 0.8, de 0.02 em 0.02]",
+                       "[4/4] Gravando", "melhores parâmetros", "referências: cópia pura",
+                       "gravado em"):
+            self.assertIn(trecho, texto)
 
 
 if __name__ == "__main__":

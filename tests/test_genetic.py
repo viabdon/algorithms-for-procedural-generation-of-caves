@@ -84,6 +84,63 @@ class GeneTests(unittest.TestCase):
             self.assertTrue(0.0 <= filho["x"] <= 1.0)
             self.assertIn(filho["n"], range(1, 21))
 
+class GeneComPassoTests(unittest.TestCase):
+    """A chance inicial anda de 0,02 em 0,02: só pontos da grade entram no cromossomo."""
+    def setUp(self):
+        self.gene = Gene("c", 0.2, 0.8, passo=0.02)
+        self.grade = {round(0.2 + k * 0.02, 10) for k in range(31)}
+
+    def test_grade_vai_do_minimo_ao_maximo(self):
+        self.assertEqual(self.gene.passos(), 30)
+        self.assertEqual(self.gene.corrigir(0.2), 0.2)
+        self.assertEqual(self.gene.corrigir(0.8), 0.8)
+
+    def test_corrigir_vai_para_o_ponto_mais_perto(self):
+        self.assertEqual(self.gene.corrigir(0.5639), 0.56)
+        self.assertEqual(self.gene.corrigir(0.571), 0.58)
+        self.assertEqual(self.gene.corrigir(0.0), 0.2)
+        self.assertEqual(self.gene.corrigir(1.3), 0.8)
+        # O mesmo ponto sai sempre o mesmo float, para cair no cache.
+        self.assertEqual(self.gene.corrigir(0.3 + 13 * 0.02), 0.56)
+        self.assertEqual(repr(self.gene.corrigir(0.5600000000000001)), "0.56")
+
+    def test_sortear_e_mutar_so_dao_pontos_da_grade(self):
+        rng = np.random.default_rng(0)
+        sorteados = {self.gene.sortear(rng) for _ in range(2000)}
+        self.assertEqual(sorteados, self.grade)
+        genes = (self.gene,)
+        for _ in range(500):
+            filho = mutar({"c": 0.5}, genes, taxa=1.0, passo=0.1, rng=rng)
+            self.assertIn(filho["c"], self.grade)
+            self.assertIs(type(filho["c"]), float)
+
+    def test_passo_que_nao_fecha_a_faixa_nao_passa_do_maximo(self):
+        gene = Gene("c", 0.0, 1.0, passo=0.3)
+        self.assertEqual(gene.passos(), 3)
+        self.assertEqual(gene.corrigir(1.0), 0.9)
+
+    def test_passo_invalido(self):
+        for kwargs in ({"passo": 0}, {"passo": -0.1}, {"passo": float("nan")},
+                       {"passo": float("inf")}, {"passo": 1e-11}, {"passo": 1, "inteiro": True}):
+            with self.assertRaises(ValueError):
+                Gene("g", 0, 10, **kwargs)
+
+    def test_busca_com_passo_so_avalia_pontos_da_grade(self):
+        genes = (self.gene, Gene("n", 1, 20, inteiro=True))
+
+        def nota(g):
+            return -((g["c"] - 0.46) ** 2), {"iteracoes": 1}
+
+        for resultado in (evoluir(genes, nota, ConfiguracaoGA(orcamento=200), seed=3),
+                          busca_aleatoria(genes, nota, 100, seed=3)):
+            self.assertTrue(all(a.genes["c"] in self.grade for a in resultado.avaliacoes))
+        self.assertEqual(evoluir(genes, nota, ConfiguracaoGA(orcamento=200), seed=3)
+                         .melhor.genes["c"], 0.46)
+
+    def test_como_dict_grava_o_passo(self):
+        self.assertEqual(self.gene.como_dict()["passo"], 0.02)
+        self.assertIsNone(Gene("n", 1, 20, inteiro=True).como_dict()["passo"])
+
 class MotorTests(unittest.TestCase):
     def test_ga_se_aproxima_do_otimo_conhecido(self):
         resultado = evoluir(GENES, sintetica, ConfiguracaoGA(orcamento=300), seed=4)

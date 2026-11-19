@@ -36,11 +36,16 @@ class Gene:
         nome: chave do gene no cromossomo.
         minimo, maximo: limites fechados da faixa.
         inteiro: True para gene que só aceita inteiros (como a sensibilidade).
+        passo: se vier, o gene só aceita minimo + k * passo (uma grade). Serve
+               para gene contínuo em que diferenças menores que o passo não
+               mudam nada de verdade (a chance inicial anda de 0,02 em 0,02).
+               Gene inteiro já anda de 1 em 1 e não aceita passo.
     """
     nome: str
     minimo: float
     maximo: float
     inteiro: bool = False
+    passo: float | None = None
 
     def __post_init__(self):
         if not (math.isfinite(self.minimo) and math.isfinite(self.maximo)):
@@ -49,28 +54,62 @@ class Gene:
             raise ValueError(f"O gene {self.nome} tem mínimo {self.minimo} >= máximo {self.maximo}.")
         if self.inteiro and math.ceil(self.minimo) > math.floor(self.maximo):
             raise ValueError(f"O gene inteiro {self.nome} não tem nenhum inteiro na faixa.")
+        if self.passo is not None:
+            if self.inteiro:
+                raise ValueError(f"O gene inteiro {self.nome} já anda de 1 em 1: tire o passo.")
+            if not (math.isfinite(self.passo) and self.passo > 0):
+                raise ValueError(f"O gene {self.nome} precisa de passo finito e positivo.")
+            # Os pontos são arredondados a 10 casas: passo menor juntaria pontos vizinhos.
+            if self.passo < 1e-9:
+                raise ValueError(f"O passo do gene {self.nome} precisa ser pelo menos 1e-9.")
 
     def faixa_inteira(self) -> tuple[int, int]:
         """Menor e maior inteiro dentro da faixa (para limites fracionários)."""
         return math.ceil(self.minimo), math.floor(self.maximo)
 
+    def passos(self) -> int:
+        """Quantos passos cabem na faixa: a grade vai de minimo + 0 a minimo + passos * passo."""
+        # A folga absorve o erro do float (0,6 / 0,02 dá 29,999...); se ela aceitar
+        # um passo a mais, o último ponto passaria do máximo e sai.
+        bruto = (self.maximo - self.minimo) / self.passo
+        n = math.floor(bruto + 1e-9 * max(1.0, bruto))
+        return n - 1 if n > 0 and self._arredondado(n) > self.maximo else n
+
+    def _arredondado(self, k: int) -> float:
+        # Arredondar tira o resto do float (0,3 + 13 * 0,02 = 0,5600000000000001),
+        # para o mesmo ponto da grade ser sempre o mesmo float e cair no cache.
+        return round(self.minimo + k * self.passo, 10)
+
+    def _na_grade(self, k: int) -> float:
+        # O arredondamento pode cair um fio fora da faixa quando o limite tem mais
+        # de 10 casas; o ponto volta para o limite.
+        return min(max(self._arredondado(k), self.minimo), self.maximo)
+
     def corrigir(self, valor: float) -> float | int:
-        """Leva o valor para dentro da faixa; gene inteiro arredonda antes de limitar."""
+        """
+            Leva o valor para dentro da faixa. Gene inteiro arredonda antes de
+            limitar; gene com passo vai para o ponto da grade mais perto.
+        """
         if self.inteiro:
             menor, maior = self.faixa_inteira()
             return min(max(round(float(valor)), menor), maior)
+        if self.passo is not None:
+            k = round((float(valor) - self.minimo) / self.passo)
+            return self._na_grade(min(max(k, 0), self.passos()))
         return min(max(float(valor), self.minimo), self.maximo)
 
     def sortear(self, rng: np.random.Generator) -> float | int:
-        """Valor uniforme dentro da faixa."""
+        """Valor uniforme dentro da faixa (com passo, cada ponto da grade com a mesma chance)."""
         if self.inteiro:
             menor, maior = self.faixa_inteira()
             return int(rng.integers(menor, maior + 1))
+        if self.passo is not None:
+            return self._na_grade(int(rng.integers(0, self.passos() + 1)))
         return float(rng.uniform(self.minimo, self.maximo))
 
     def como_dict(self) -> dict:
         return {"nome": self.nome, "minimo": self.minimo, "maximo": self.maximo,
-                "inteiro": self.inteiro}
+                "inteiro": self.inteiro, "passo": self.passo}
 
 @dataclass(frozen=True)
 class ConfiguracaoGA:
