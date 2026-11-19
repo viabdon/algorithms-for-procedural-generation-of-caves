@@ -1,10 +1,12 @@
 """Exercise automatic crop planning, point export, and independent preview."""
 
 import json
+from pathlib import Path
 
 import numpy as np
 import pytest
 
+from cavegen.datastream.centreline import read_graph
 from cavegen.datastream.crop_planner import propose_crops
 from cavegen.datastream.gallery_crop import prepare_crop, process_crop
 from cavegen.datastream.menu import main
@@ -47,7 +49,7 @@ def test_racine_plan_builds_shared_caps_and_preview_is_a_separate_menu_action(tm
     split = tmp_path / "docs/auditoria/gan/splits.json"
     split.parent.mkdir(parents=True)
     split.write_text(json.dumps({"folds": [{"id": "try", "groups": {"pilot": "train"}}]}))
-    answers = iter(["2", "5", str(config), str(output), "0", "0"])
+    answers = iter(["2", "5", str(config), "", str(output), "0", "0"])
     monkeypatch.setattr("builtins.input", lambda _: next(answers))
     main()
     assert "Propostos 2 de 2" in capsys.readouterr().out
@@ -59,6 +61,7 @@ def test_racine_plan_builds_shared_caps_and_preview_is_a_separate_menu_action(tm
     assert first.config["proposal"]["section_bins_supported"] == [16, 16]
     assert first.config["shape_zyx"] == [64, 64, 64]
     assert first.config["proposal"]["status"] == "pending_review"
+    assert manifest["centreline_extraction"] is None
     assert read_ply_header(first.source).vertex_count == manifest["crops"][0]["retained_points"]
     assert not list(output.rglob("*.html"))
     assert not first.destination.exists()
@@ -70,6 +73,43 @@ def test_racine_plan_builds_shared_caps_and_preview_is_a_separate_menu_action(tm
     assert "Prévia para abrir" in capsys.readouterr().out
     assert '"type":"scatter3d"' in html.read_text()
     assert process_crop(first)["air_voxels"] > 0
+
+
+def test_menu_estimates_missing_centreline_and_namespaces_both_outputs(tmp_path, monkeypatch, capsys):
+    pytest.importorskip("robust_laplacian")
+    monkeypatch.chdir(tmp_path)
+    points = straight_cloud(24)
+    source = tmp_path / "tunnel.f32"
+    np.pad(points, ((0, 0), (0, 4))).astype(np.float32).tofile(source)
+    split = tmp_path / "docs/auditoria/gan/splits.json"
+    split.parent.mkdir(parents=True)
+    split.write_text(json.dumps({"folds": [{"id": "test-fold", "groups": {"indian_tunnel": "train"}}]}))
+    config = tmp_path / "pilot-f32.json"
+    config.write_text(json.dumps({
+        "source": str(source), "cave": "indian_tunnel", "survey": "full_1x",
+        "fold": "test-fold", "units": "m", "count": 2, "voxel_size": .25, "batch_size": 1300,
+    }))
+
+    answers = iter(["2", "5", str(config), "", "", "0", "0"])
+    monkeypatch.setattr("builtins.input", lambda _: next(answers))
+    main()
+    assert "Propostos 2 de 2" in capsys.readouterr().out
+    namespace = tmp_path / "data/processed/crop_plans/indian_tunnel/full_1x/test-fold/pilot-f32"
+    manifest = json.loads((namespace / "plan.json").read_text())
+    nodes, edges = read_graph(namespace / manifest["centreline"])
+    assert len(edges) == len(nodes) - 1
+    assert np.ptp(nodes[:, 0]) > 15
+    assert np.linalg.norm(nodes[:, 1:], axis=1).max() < .6
+    assert manifest["centreline_extraction"]["points_read"] == len(points)
+    assert manifest["centreline_extraction"]["status"] == "pending_review"
+    for record in manifest["crops"]:
+        crop = prepare_crop(namespace / record["crop_id"] / "crop.json")
+        assert crop.destination == (
+            Path("data/processed/reference_sections/indian_tunnel/full_1x/test-fold/pilot-f32")
+            / record["crop_id"] / "64x64x64"
+        )
+        assert record["retained_points"] > 0
+        assert "linha_central_estimada" in record["review_reasons"]
 
 
 def test_u_shape_uses_station_to_keep_the_opposite_arm_out(tmp_path):

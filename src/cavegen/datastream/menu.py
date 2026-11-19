@@ -82,7 +82,7 @@ def _prepare() -> tuple[list[str], Path]:
 
 def _crop_menu() -> None:
     from cavegen.datastream.gallery_crop import CROP_FORMATS, inspect_crop, prepare_crop, process_crop
-    from cavegen.datastream.crop_planner import propose_crops
+    from cavegen.datastream.crop_planner import default_plan_destination, propose_crops, read_plan_config
     from cavegen.datastream.crop_preview import write_crop_preview
 
     template = "configs/crops/gallery.template.json"
@@ -119,9 +119,13 @@ def _crop_menu() -> None:
                 if not plan:
                     continue
                 path = _path(plan)
-                target = _path(_ask("Pasta nova para os recortes", f"data/processed/crop_plans/{path.stem}"))
+                spec = read_plan_config(path)
+                line = _ask("Arquivo de linha central (Enter usa o JSON ou calcula se vazio)")
+                target = _path(_ask("Pasta nova para os recortes", str(default_plan_destination(spec))))
+                if not line and not spec["centreline"]:
+                    print("A linha central será estimada em CPU. O resultado ficará em revisão.")
                 manifest = propose_crops(
-                    path, target,
+                    path, target, centreline=_path(line) if line else None,
                     progress=lambda phase, count: print(f"{phase}: {count:,} pontos lidos", flush=True),
                 )
                 flagged = sum(bool(crop["review_reasons"]) for crop in manifest["crops"])

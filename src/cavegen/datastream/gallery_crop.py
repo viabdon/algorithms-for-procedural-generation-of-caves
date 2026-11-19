@@ -149,10 +149,16 @@ def prepare_crop(path: Path, *, repository: Path = Path(".")) -> GalleryCrop:
         raise ValueError("Caverna ou fold ausente no inventário de partições.")
 
     resolution = "x".join(map(str, shape))
-    destination = (
-        repository / "data/processed/reference_sections"
-        / spec["cave"] / spec["survey"] / spec["crop_id"] / resolution
-    )
+    destination = repository / "data/processed/reference_sections" / spec["cave"] / spec["survey"]
+    if "plan_id" in spec:
+        plan_id = spec["plan_id"]
+        if (
+            not isinstance(plan_id, str) or not plan_id.strip()
+            or plan_id in (".", "..") or "/" in plan_id or "\\" in plan_id
+        ):
+            raise ValueError("Informe plan_id como identificador simples.")
+        destination = destination / spec["fold"] / plan_id
+    destination = destination / spec["crop_id"] / resolution
     seed_zyx = tuple(int(i) for i in np.floor(seed[::-1] / size))
     return GalleryCrop(
         config=spec,

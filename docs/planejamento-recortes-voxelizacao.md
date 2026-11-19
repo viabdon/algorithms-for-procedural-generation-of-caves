@@ -4,7 +4,9 @@ O [piloto local](preparacao-volumes.md#piloto-local-de-recortes-por-galeria)
 propõe e extrai recortes pela linha central, com conformação das tampas e
 revisão dos trechos antes de voxelizar e aplicar flood fill em CPU. O menu
 também oferece configuração manual e prévia Plotly independente a partir do
-PLY. Os recortes reais ainda aguardam validação. O
+PLY. Quando o levantamento não fornece grafo, o menu pode estimá-lo no
+mesmo plano pela sequência de contração laplaciana e árvore geradora mínima
+do ensaio exploratório do Elaphes. Os recortes reais ainda aguardam validação. O
 [plano de seções sucessivas](plano-reconstrucao-secoes.md) descreve a reconstrução
 mais ampla, que inclui interpolação e regiões de incerteza.
 
@@ -137,7 +139,7 @@ cavidades não observadas.
 ## 5. Manifesto e organização
 
 O piloto identifica cada recorte pela caverna, levantamento, ID e resolução.
-Uma execução bem-sucedida apresenta esta estrutura:
+Uma execução manual bem-sucedida apresenta esta estrutura:
 
 ```text
 data/processed/reference_sections/<caverna>/<levantamento>/<recorte>/<resolucao>/
@@ -146,6 +148,10 @@ data/processed/reference_sections/<caverna>/<levantamento>/<recorte>/<resolucao>
     masks.npz         # máscaras das tampas
     run.json          # configuração efetiva, contagens e status pending_review
 ```
+
+Para recortes propostos, o caminho dos volumes também inclui o fold e o ID
+do plano entre o levantamento e o recorte. A nuvem extraída e o grafo gerado
+ficam no diretório do plano descrito no [guia do piloto](preparacao-volumes.md#propor-e-extrair-recortes-pela-linha-central).
 
 Para integrar o piloto ao treino, estender o manifesto para registrar:
 

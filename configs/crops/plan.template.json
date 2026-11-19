@@ -5,6 +5,15 @@
   "units": "m",
   "source": "",
   "centreline": "",
+  "centreline_extraction": {
+    "sample_spacing": 0.4,
+    "node_spacing": 0.5,
+    "max_samples": 12000,
+    "contraction": 0.05,
+    "attraction": 0.5,
+    "iterations": 5,
+    "graph_neighbours": 12
+  },
   "count": 6,
   "voxel_size": null,
   "batch_size": 65536,

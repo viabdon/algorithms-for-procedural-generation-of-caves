@@ -20,16 +20,18 @@ a pasta da execução.
 ### Propor e extrair recortes pela linha central
 
 1. Copie o [modelo de planejamento](../configs/crops/plan.template.json) e
-   informe a nuvem, a linha central no mesmo sistema de coordenadas, o número
-   desejado em `count` e o lado físico do voxel em `voxel_size`. Para Racine,
-   indique o arquivo `*_nodes_from_LBC.txt` com o `*_links_from_LBC.txt`
-   correspondente na mesma pasta. O NPZ experimental do Elaphes também é
-   aceito, com os campos `nodes_xyz` e `edges`. Os caminhos são absolutos
-   ou relativos ao JSON.
-2. Use a opção **5** e indique uma pasta nova. O planejador roda em CPU e
-   lê a nuvem em dois passes, compartilhados entre todos os trechos. A saída
-   contém `plan.json` e um subdiretório por proposta, com `cloud.ply` e
-   `crop.json` quando há pontos para extrair.
+   informe a nuvem, o número desejado em `count` e o lado físico do voxel
+   em `voxel_size`. Para usar a linha de Racine, indique o arquivo
+   `*_nodes_from_LBC.txt` com o `*_links_from_LBC.txt` correspondente na
+   mesma pasta. O NPZ experimental do Elaphes também é aceito, com os campos
+   `nodes_xyz` e `edges`. O grafo deve estar no mesmo sistema da nuvem.
+   Os caminhos no JSON são absolutos ou relativos ao próprio JSON.
+2. Use a opção **5**. O menu aceita um caminho de linha central para esta
+   execução. Se o campo e a resposta estiverem vazios, estima a linha em
+   CPU e salva `centreline.npz` no plano. Para esse modo, instale o extra
+   com `uv sync --locked --extra centreline`. Com grafo pronto, o planejador
+   percorre a nuvem duas vezes para estimar seções e extrair pontos. A
+   geração da linha central acrescenta uma leitura em lotes.
 3. Quando quiser visualizar, use a opção **6** sobre o `cloud.ply`. Ela
    salva um HTML interativo do Plotly com até 60.000 pontos espaçados
    uniformemente pelos registros do arquivo. Abra o HTML no navegador.
@@ -40,6 +42,25 @@ a pasta da execução.
    a etapa de recorte pode usar o grafo experimental no seu domínio de
    validade. A voxelização pelo menu exige que a caverna e o fold constem na
    auditoria.
+
+Por padrão, as propostas ficam em
+`data/processed/crop_plans/<caverna>/<levantamento>/<fold>/<plano>/`.
+O nome do JSON é usado como identificador do plano, ou pode ser substituído
+por `plan_id`. O diretório guarda `plan.json`, o grafo gerado quando
+aplicável e uma pasta por recorte com `crop.json` e o PLY quando há pontos.
+Os volumes gerados a partir desse plano ficam em
+`data/processed/reference_sections/<caverna>/<levantamento>/<fold>/<plano>/<recorte>/<resolucao>/`.
+Isso permite comparar planos ou folds sem sobrescrever recortes numerados
+da mesma forma.
+
+Os parâmetros em `centreline_extraction` vêm do ensaio exploratório do
+Elaphes. A contração usa o laplaciano robusto e uma solução esparsa em
+SciPy. O amostrador mantém o primeiro ponto por célula e dobra
+`sample_spacing` quando o total passa de `max_samples`. Depois da
+contração, `node_spacing` reduz os nós e uma árvore geradora mínima no
+grafo de vizinhos os conecta. O `plan.json` registra a escala amostral
+efetiva, versões e componentes. A geometria estimada continua candidata
+à revisão, especialmente se houver conexões longas ou contração excessiva.
 
 O planejamento distribui N por comprimento ao longo dos caminhos entre
 pontas e junções, evitando colocar planos no nó de bifurcação. Cada ponto é
@@ -100,7 +121,7 @@ enquanto recuperar pontos excluídos exige uma nova extração.
   frequência do aviso em pontos lidos, com `0` para desativar.
   A nuvem é percorrida uma vez por recorte.
 
-As saídas ficam em
+Para a configuração manual, as saídas ficam em
 `data/processed/reference_sections/<caverna>/<levantamento>/<recorte>/<resolucao>/`.
 `surface.npz` contém a parede observada, `masks.npz` as duas tampas,
 `interior.npz` o ar candidato em ZYX, e `run.json` a configuração,

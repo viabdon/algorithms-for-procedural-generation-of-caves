@@ -10,6 +10,11 @@ from tempfile import TemporaryDirectory
 import numpy as np
 
 from cavegen.datastream.centreline import CentrelineIndex, Passage, passages_from_graph, read_graph
+from cavegen.datastream.centreline_extraction import (
+    ExtractionSettings,
+    generate_centreline,
+    source_anchor,
+)
 from cavegen.datastream.crop_preview import ply_header
 from cavegen.datastream.gallery_crop import CROP_FORMATS
 from cavegen.datastream.point_cloud import iter_point_cloud_xyz
@@ -172,6 +177,7 @@ def _record_config(window, spec, path, size, source_origin):
         "cave": spec["cave"],
         "survey": spec["survey"],
         "crop_id": window.folder.name,
+        "plan_id": spec["plan_id"],
         "fold": spec["fold"],
         "branch": f"passagem_{window.owner + 1:03d}",
         "source": "cloud.ply",
@@ -188,19 +194,26 @@ def _record_config(window, spec, path, size, source_origin):
     }
 
 
-def propose_crops(
-    config: Path,
-    output: Path,
-    *,
-    progress: Callable[[str, int], None] | None = None,
-) -> dict:
-    """Scan twice and save proposed PLYs and voxelization JSONs, without plotting or flood fill."""
+def read_plan_config(config: Path) -> dict:
+    """Load the plan and fill defaults shared by the menu and planner."""
     spec = json.loads(config.read_text(encoding="utf-8"))
     if not isinstance(spec, dict):
         raise ValueError("A configuração do planejamento deve ser um objeto JSON.")
-    for key in ("source", "centreline", "cave", "survey", "fold", "units"):
+    for key in ("source", "units"):
         if not isinstance(spec.get(key), str) or not spec[key].strip():
             raise ValueError(f"Informe {key} no JSON do planejamento.")
+    spec.setdefault("plan_id", config.stem)
+    for key in ("cave", "survey", "fold", "plan_id"):
+        value = spec.get(key)
+        if (
+            not isinstance(value, str) or not value.strip()
+            or value in (".", "..") or "/" in value or "\\" in value
+        ):
+            raise ValueError(f"Informe {key} como identificador simples.")
+    line = spec.get("centreline")
+    if line is not None and not isinstance(line, str):
+        raise ValueError("centreline deve ser um caminho ou ficar em branco.")
+    spec["centreline"] = line.strip() if line else ""
     for key, default, minimum in (("count", 6, 1), ("batch_size", 65536, 1), ("padding_voxels", 2, 2)):
         value = spec.setdefault(key, default)
         if type(value) is not int or value < minimum:
@@ -208,28 +221,60 @@ def propose_crops(
     size = spec.get("voxel_size")
     if type(size) not in (int, float) or not np.isfinite(size) or size <= 0:
         raise ValueError("voxel_size deve ser positivo e finito.")
-    size = float(size)
+    return spec
+
+
+def default_plan_destination(spec: dict) -> Path:
+    return (
+        Path("data/processed/crop_plans") / spec["cave"] / spec["survey"]
+        / spec["fold"] / spec["plan_id"]
+    )
+
+
+def propose_crops(
+    config: Path,
+    output: Path | None = None,
+    *,
+    centreline: Path | None = None,
+    progress: Callable[[str, int], None] | None = None,
+) -> dict:
+    """Extract candidate PLYs, estimating and saving a centreline when absent."""
+    spec = read_plan_config(config)
+    size = float(spec["voxel_size"])
+    if output is None:
+        output = default_plan_destination(spec)
     source = (config.parent / Path(spec["source"]).expanduser()).resolve()
-    graph = (config.parent / Path(spec["centreline"]).expanduser()).resolve()
+    graph = centreline
+    if graph is None and spec["centreline"]:
+        graph = config.parent / Path(spec["centreline"]).expanduser()
     if not source.is_file() or source.suffix.lower() not in CROP_FORMATS:
         raise ValueError(f"Fonte XYZ, LAS, PLY ou F32 inválida: {source}")
     if output.exists():
         raise FileExistsError(f"Já existe uma execução em {output}.")
     before = source.stat()
 
-    nodes, edges = read_graph(graph)
-    origin = nodes[0].copy()
-    passages = passages_from_graph(nodes - origin, edges)
-    limits, allocation = _allocate(passages, spec["count"], size)
-    if not allocation.any():
-        raise ValueError("Nenhuma passagem comporta oito voxels de comprimento com essa escala.")
-    spacing = size / 2
-    index = CentrelineIndex(passages, spacing)
-    rng = np.random.default_rng(17)
-    groups = {}
     output.parent.mkdir(parents=True, exist_ok=True)
     with TemporaryDirectory(dir=output.parent) as staging:
         staged = Path(staging)
+        extraction = None
+        if graph is None:
+            settings = ExtractionSettings(**spec.get("centreline_extraction", {}))
+            anchor = source_anchor(source)
+            batches = _source_batches(source, anchor, spec["batch_size"], progress, "linha_central")
+            graph = staged / "centreline.npz"
+            extraction = generate_centreline(batches, anchor, graph, settings)
+        else:
+            graph = graph.expanduser().resolve()
+        nodes, edges = read_graph(graph)
+        origin = nodes[0].copy()
+        passages = passages_from_graph(nodes - origin, edges)
+        limits, allocation = _allocate(passages, spec["count"], size)
+        if not allocation.any():
+            raise ValueError("Nenhuma passagem comporta oito voxels de comprimento com essa escala.")
+        spacing = size / 2
+        index = CentrelineIndex(passages, spacing)
+        rng = np.random.default_rng(17)
+        groups = {}
         for owner in np.flatnonzero(allocation):
             boundaries = [_Boundary(s) for s in np.linspace(*limits[owner], allocation[owner] + 1)]
             windows = []
@@ -310,6 +355,8 @@ def propose_crops(
         records = []
         for owner, (_, windows) in groups.items():
             for window in windows:
+                if extraction is not None:
+                    window.reasons.append("linha_central_estimada")
                 if window.folder.exists():
                     with (window.folder / "cloud.ply").open("r+b") as stream:
                         stream.write(ply_header(window.count))
@@ -331,7 +378,10 @@ def propose_crops(
                 )
                 records.append(record)
         manifest = {
-            "source": str(source), "centreline": str(graph), "source_origin_xyz": origin.tolist(),
+            "source": str(source),
+            "centreline": graph.name if extraction is not None else str(graph),
+            "centreline_extraction": extraction,
+            "source_origin_xyz": origin.tolist(),
             "parameters": spec, "requested": spec["count"], "proposed": len(records), "crops": records,
         }
         (staged / "plan.json").write_text(
