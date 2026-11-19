@@ -1,8 +1,8 @@
 """Stream uncompressed LAS point clouds with their stored coordinate transform.
 
-Scaled coordinates are decoded before conversion to the pipeline's float32
-XYZ contract. No CRS reprojection, origin subtraction or classification filter
-is applied. RGB, intensity, returns and extra dimensions are ignored.
+Global coordinates follow the pipeline's float32 XYZ contract by default.
+An optional origin enables local float64 decoding for georeferenced crops.
+No CRS reprojection or classification filter is applied.
 """
 
 from collections.abc import Iterator
@@ -46,31 +46,44 @@ def read_las_metadata(path: str | Path) -> dict[str, object]:
         raise ValueError(f"Invalid LAS file {source}: {error}") from error
 
 
-def iter_las_xyz(path: str | Path, batch_size: int) -> Iterator[np.ndarray]:
-    """Yield independent finite float32 XYZ batches of at most batch_size points.
+def iter_las_xyz(
+    path: str | Path,
+    batch_size: int,
+    *,
+    origin_xyz: np.ndarray | None = None,
+) -> Iterator[np.ndarray]:
+    """Yield independent finite XYZ batches of at most batch_size points.
 
     LAS 1.0–1.4 point formats supported by laspy are read in chunks; only the
     current chunk is retained. Truncated point records and invalid transforms
-    are rejected. Global float32 coordinates may lose fine detail at large
-    georeferenced offsets; callers must explicitly prepare a local origin when
-    necessary, as with the other readers in this pipeline.
+    are rejected. When an origin is supplied, return local float64 coordinates
+    by subtracting it from the LAS offset before adding the scaled integers.
+    Otherwise return global float32 coordinates.
     """
     if (isinstance(batch_size, bool) or not isinstance(batch_size, (int, np.integer))
             or batch_size <= 0):
         raise ValueError("batch_size must be a positive integer.")
+    origin = None if origin_xyz is None else np.asarray(origin_xyz, dtype=np.float64)
+    if origin is not None and (origin.shape != (3,) or not np.isfinite(origin).all()):
+        raise ValueError("origin_xyz must contain three finite coordinates.")
     source = Path(path)
     total = 0
     try:
         with laspy.open(source, read_evlrs=False) as reader:
             _validate_header(reader.header, source)
             expected = reader.header.point_count
+            scale = reader.header.scales
+            local_offset = None if origin is None else reader.header.offsets - origin
             for points in reader.chunk_iterator(int(batch_size)):
-                # Lowercase x/y/z apply LAS scales and offsets; uppercase are integers.
                 with np.errstate(over="ignore", invalid="ignore"):
-                    xyz = np.column_stack((points.x, points.y, points.z)).astype(np.float32)
+                    if local_offset is None:
+                        xyz = np.column_stack((points.x, points.y, points.z)).astype(np.float32)
+                    else:
+                        raw = np.column_stack((points.X, points.Y, points.Z))
+                        xyz = raw * scale + local_offset
                 if not np.isfinite(xyz).all():
                     raise ValueError(
-                        f"LAS coordinates must be finite float32 values: {source}, "
+                        f"LAS coordinates must be finite {xyz.dtype} values: {source}, "
                         f"batch starting at point {total}"
                     )
                 total += len(xyz)

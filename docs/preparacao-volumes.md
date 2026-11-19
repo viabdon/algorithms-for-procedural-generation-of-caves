@@ -6,26 +6,108 @@ interior por flood fill. Os arquivos brutos são lidos diretamente, inclusive de
 um HD externo. O processamento é determinístico para uma mesma entrada,
 configuração e implementação; não há seed aleatória nesta preparação.
 
-## Planejamento de recortes de galerias — 17/11/2026
+## Piloto local de recortes por galeria
 
-A preparação atual usa a nuvem fornecida inteira. A próxima etapa será
-selecionar trechos menores, reconstruir seções sucessivas e fechar apenas as
-extremidades dos recortes com tampas computacionais. O
-[planejamento dos recortes](planejamento-recortes-voxelizacao.md) especifica
-separação por caverna, seleção incremental, contexto, planos de corte, margens
-e registro dos limites; o [plano de reconstrução](plano-reconstrucao-secoes.md)
-descreve a validação.
+Na raiz do repositório, abra `.venv/bin/python -m cavegen.datastream` e
+escolha **2 — Preparar recortes por galeria**. A opção **1** do submenu lista
+as nuvens do HD (a pasta pode ser alterada). Copie o
+[modelo JSON](../configs/crops/gallery.template.json) para um arquivo por
+trecho. A opção **2** confere a configuração e mostra o destino e a partição
+sem ler os pontos. A opção **3** roda o processamento em CPU após digitar
+`PROCESSAR`. A opção **4** abre três fatias ortogonais pela semente, usando
+a pasta da execução.
 
-**Fornecer bounds menores ao CLI/menu atual não extrai um trecho.** O leitor
-continua percorrendo a nuvem e o normalizador rejeita pontos fora desses
-bounds. Será necessário implementar um filtro antes da voxelização, preservando
-coordenadas locais com precisão adequada. Caixa de seleção, planos das tampas
-e caixa da grade têm funções distintas.
+### Propor e extrair recortes pela linha central
 
-Cada recorte registrará origem, transformação, tamanho físico do voxel,
-limites, máscaras e revisão. Todas as versões/recortes de uma caverna
-continuarão na mesma partição do fold. Nenhum desses volumes foi produzido
-nesta revisão e o treino permanece pendente de referências validadas.
+1. Copie o [modelo de planejamento](../configs/crops/plan.template.json) e
+   informe a nuvem, a linha central no mesmo sistema de coordenadas, o número
+   desejado em `count` e o lado físico do voxel em `voxel_size`. Para Racine,
+   indique o arquivo `*_nodes_from_LBC.txt` com o `*_links_from_LBC.txt`
+   correspondente na mesma pasta. O NPZ experimental do Elaphes também é
+   aceito, com os campos `nodes_xyz` e `edges`. Os caminhos são absolutos
+   ou relativos ao JSON.
+2. Use a opção **5** e indique uma pasta nova. O planejador roda em CPU e
+   lê a nuvem em dois passes, compartilhados entre todos os trechos. A saída
+   contém `plan.json` e um subdiretório por proposta, com `cloud.ply` e
+   `crop.json` quando há pontos para extrair.
+3. Quando quiser visualizar, use a opção **6** sobre o `cloud.ply`. Ela
+   salva um HTML interativo do Plotly com até 60.000 pontos espaçados
+   uniformemente pelos registros do arquivo. Abra o HTML no navegador.
+   A plotagem é independente e funciona com o PLY sozinho.
+4. Revise o PLY, os alertas, os contornos e a semente do `crop.json`.
+   Use a opção **2** para validar a configuração e, após a revisão, a
+   opção **3** para voxelizar e aplicar o flood fill ao PLY. No caso de Elaphes,
+   a etapa de recorte pode usar o grafo experimental no seu domínio de
+   validade. A voxelização pelo menu exige que a caverna e o fold constem na
+   auditoria.
+
+O planejamento distribui N por comprimento ao longo dos caminhos entre
+pontas e junções, evitando colocar planos no nó de bifurcação. Cada ponto é
+associado aproximadamente à linha central por uma busca espacial e uma
+projeção na aresta candidata. O recorte usa posição ao longo do percurso,
+distância transversal e os dois planos. A estimativa do raio de seleção
+usa o percentil 99 das distâncias observadas mais um voxel, com espaço
+para o contorno proposto. A proximidade de outra passagem ou de uma parte
+distante do mesmo caminho gera um alerta. É possível obter menos que N
+quando os caminhos são curtos para a escala escolhida.
+
+Para as tampas, o código compara três candidatos por posição de corte e
+mede a cobertura dos pontos projetados em faixas angulares. Lacunas
+relevantes deixam o contorno em branco para revisão. A margem
+`padding_voxels` se aplica à grade, separada do raio que seleciona pontos.
+Trechos que excedem 64 células em algum eixo na escala escolhida recebem
+um alerta. Revise todos os candidatos antes do flood fill.
+
+Os PLYs contêm apenas XYZ dos pontos retidos, em coordenadas locais, com
+24 bytes por ponto no corpo do arquivo.
+Some `source_origin_xyz` (gravado no plano e nos JSONs) para recuperar as
+coordenadas da fonte. A prévia usa uma amostra. A voxelização usa todos os
+pontos do PLY. Alterar os limites no JSON permite filtrar esse arquivo,
+enquanto recuperar pontos excluídos exige uma nova extração.
+
+### Configuração de um recorte
+
+- `source` aceita XYZ, PLY, F32 e LAS, com caminho absoluto ou relativo ao
+  JSON. `cave` e `fold` são os IDs da
+  [auditoria GAN](auditoria/gan/splits.json) e determinam a partição.
+  `survey`, `branch` e `crop_id` identificam o levantamento, o ramo
+  revisado e o trecho. Comece com uma passagem simples de treino. Por exemplo,
+  `archamps` é treino em `holdout_indian_tunnel`.
+- `selection_min_xyz` e `selection_max_xyz` delimitam a caixa candidata,
+  com mínimos inclusivos e máximos exclusivos. Inclua contexto além dos
+  planos. A seleção efetiva é a interseção da caixa com o lado interno de
+  cada plano. Revise se a caixa contém uma só passagem e se preserva paredes,
+  piso e teto. Os bounds globais em `data/params/` descrevem os levantamentos.
+- `sections` contém os dois cortes. `point_xyz` é a origem de cada plano,
+  `inward_normal_xyz` aponta para dentro do trecho e `u_xyz` orienta o
+  primeiro eixo do plano. O código projeta U no plano e o normaliza, depois
+  calcula **V = N × U** com a normal unitária N. Assim, U e V são
+  perpendiculares e dão dois eixos no próprio plano. Para um ponto P com
+  origem O, `u = (P − O) · U` e `v = (P − O) · V` dão as coordenadas
+  usadas para testar se o centro do voxel cai no `polygon_uv` revisado.
+  Informe os vértices do contorno em ordem. Se inverter N e conservar U,
+  V também inverte. Confira o sinal nas duas extremidades.
+- `origin_xyz`, `shape_zyx` e `voxel_size` definem a grade, com voxels
+  cúbicos e margem livre ao redor da barreira. Use o mesmo sistema de
+  coordenadas da fonte e registre a unidade em `units`. Para comparar
+  resoluções no mesmo domínio físico, dobre o shape e reduza o lado do
+  voxel à metade. A `plane_tolerance` deve ser pequena frente ao voxel.
+- `seed_xyz` marca um ponto revisado dentro da passagem. O flood fill
+  parte do exterior, com seis vizinhos por face. O ar candidato é a
+  componente confinada que contém a semente. Vazamento até a semente,
+  barreira na borda e tampas sem contato com a parede interrompem a execução.
+- `batch_size` limita o lote de leitura. `progress_every` define a
+  frequência do aviso em pontos lidos, com `0` para desativar.
+  A nuvem é percorrida uma vez por recorte.
+
+As saídas ficam em
+`data/processed/reference_sections/<caverna>/<levantamento>/<recorte>/<resolucao>/`.
+`surface.npz` contém a parede observada, `masks.npz` as duas tampas,
+`interior.npz` o ar candidato em ZYX, e `run.json` a configuração,
+partição, contagens e status `pending_review`. Revise se o interior se
+mantém contínuo e estável frente a pequenas mudanças de corte e resolução.
+O [planejamento dos recortes](planejamento-recortes-voxelizacao.md) descreve
+a metodologia e os critérios ainda pendentes antes de usar os volumes no treino.
 
 ## Ambiente e menu
 
@@ -38,7 +120,8 @@ dependências, execute `uv sync --locked`. O comando curto do menu é:
 ```
 
 O menu da datastream funciona independentemente do menu de benchmark e da
-integração dos geradores CA/Random Walk. Ele solicita:
+integração dos geradores CA/Random Walk. A opção **1** voxeliza a nuvem
+inteira e solicita:
 
 1. Caminho da nuvem, aceitando espaços e caminhos entre aspas.
 2. Resolução ZYX: um lado para grade cúbica, como `64`, ou três dimensões,

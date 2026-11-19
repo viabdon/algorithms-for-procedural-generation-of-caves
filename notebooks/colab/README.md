@@ -15,8 +15,9 @@ como exemplos de cavernas resolvidas. Reduzir para 16³ apaga todo o ar.
    `data/processed/gan_colab_bundle.zip`; o comando recusa sobrescrever um ZIP
    existente. Ele verifica as partições e inclui código, configurações,
    auditoria, notebook, voxels e recibos. Não inclui nuvens brutas ou artigos.
-   Inclui também os planos de reconstrução/recortes e o resumo do gargalo;
-   o pacote não implementa nem gera os recortes planejados.
+   Inclui também os planos de reconstrução/recortes e o resumo do gargalo.
+   A preparação do piloto usa o
+   [menu local em CPU](../../docs/preparacao-volumes.md#piloto-local-de-recortes-por-galeria).
    Os NPZ são ignorados pelo Git: um clone sozinho não contém os dados.
 3. Envie `01_gan_reference_volumes.ipynb` ao Colab, selecione uma VM com GPU e
    execute as células de instalação e upload. Envie o ZIP quando solicitado;

@@ -1,0 +1,12 @@
+{
+  "cave": "",
+  "survey": "",
+  "fold": "",
+  "units": "m",
+  "source": "",
+  "centreline": "",
+  "count": 6,
+  "voxel_size": null,
+  "batch_size": 65536,
+  "padding_voxels": 2
+}

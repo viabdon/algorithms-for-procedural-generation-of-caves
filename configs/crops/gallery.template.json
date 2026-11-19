@@ -1,0 +1,32 @@
+{
+  "cave": "",
+  "survey": "",
+  "crop_id": "",
+  "fold": "",
+  "branch": "",
+  "source": "",
+  "units": "",
+  "selection_min_xyz": null,
+  "selection_max_xyz": null,
+  "origin_xyz": null,
+  "shape_zyx": [64, 64, 64],
+  "voxel_size": null,
+  "sections": [
+    {
+      "point_xyz": null,
+      "inward_normal_xyz": null,
+      "u_xyz": null,
+      "polygon_uv": []
+    },
+    {
+      "point_xyz": null,
+      "inward_normal_xyz": null,
+      "u_xyz": null,
+      "polygon_uv": []
+    }
+  ],
+  "seed_xyz": null,
+  "plane_tolerance": 1e-8,
+  "batch_size": 65536,
+  "progress_every": 1000000
+}

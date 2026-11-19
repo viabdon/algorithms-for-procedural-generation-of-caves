@@ -21,14 +21,14 @@ seções transversais sucessivas, com tampas computacionais nas extremidades e
 validação de detalhe, continuidade e regiões inferidas antes do treino.
 O procedimento está no [plano de reconstrução por seções](plano-reconstrucao-secoes.md).
 O [resumo simplificado](resumo-gargalo-gan.md) explica o gargalo atual e por que
-treinar agora ensinaria a imitar referências inadequadas. O procedimento ainda
-será implementado; referências melhores não garantem o desempenho da GAN.
+treinar agora ensinaria a imitar referências inadequadas.
 
 Em 17/11/2026, o [planejamento dos recortes](planejamento-recortes-voxelizacao.md)
 detalhou a seleção dos pontos por galeria, contexto além dos cortes, planos
 das tampas, bounds da grade e metadados. O split continua por caverna antes
-da extração. Esse piloto ainda será implementado; os bounds do CLI atual não
-funcionam como filtro de trechos.
+da extração. O [piloto de recortes e tampas](preparacao-volumes.md#piloto-local-de-recortes-por-galeria)
+usa o menu local e aguarda validação em dados reais. A reconstrução por seções
+sucessivas e a inclusão dos recortes no treino continuam pendentes.
 
 ### 1. Resultado da auditoria e alcance científico
 

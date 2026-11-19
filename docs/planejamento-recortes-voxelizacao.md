@@ -1,10 +1,18 @@
 # Planejamento dos recortes para voxelizar galerias separadamente
 
-Atualizado em 17/11/2026. Este documento detalha a implementação futura do
-[plano de seções sucessivas](plano-reconstrucao-secoes.md). **Não há extração
-automática de recortes nem aplicação de tampas implementadas nesta revisão.**
-O objetivo é preparar galerias com mais detalhe, limites reproduzíveis e
-interior inferido revisável antes de treinar a GAN.
+O [piloto local](preparacao-volumes.md#piloto-local-de-recortes-por-galeria)
+propõe e extrai recortes pela linha central, com conformação das tampas e
+revisão dos trechos antes de voxelizar e aplicar flood fill em CPU. O menu
+também oferece configuração manual e prévia Plotly independente a partir do
+PLY. Os recortes reais ainda aguardam validação. O
+[plano de seções sucessivas](plano-reconstrucao-secoes.md) descreve a reconstrução
+mais ampla, que inclui interpolação e regiões de incerteza.
+
+O *Karst Conduit Catalogue* (DOI `10.5194/essd-2025-194`, §§2.3, 2.7 e 3.3)
+documenta limpeza, linhas centrais e identificação de ramos. O estudo
+*Speleogenesis geometry and topology of caves* (§3) descreve revisão manual da
+conectividade de levantamentos. O fechamento com tampas e a inferência de ar
+no piloto são adaptações experimentais do projeto.
 
 ## Separação dos dados antes dos recortes
 
@@ -34,11 +42,9 @@ depois por trecho, para uma fonte não dominar só por ter mais arquivos.
 | Seções inicial e final | Definir início/fim do trecho e posição das tampas | Não são necessariamente fins naturais |
 | Bounds da grade de saída | Acomodar paredes, ar, tampas e margem exterior | Não devem cortar a geometria ou substituir tampas |
 
-O JSON passado em `--bounds` ao CLI atual **não é um filtro de recorte**.
-O fluxo ainda lê a nuvem inteira e o normalizador rejeita pontos fora dos
-limites fornecidos. É necessário implementar a seleção antes da voxelização.
-Fornecer bounds menores ou acumular índices na borda não separa corretamente
-os dados. O menu atual não está pronto para executar este procedimento.
+O argumento `--bounds` da voxelização global define os limites para
+normalização da nuvem inteira. Use a opção **Preparar recortes por galeria**
+do menu para filtrar os pontos antes de voxelizar.
 
 ## 1. Definir o trecho pela galeria
 
@@ -83,18 +89,18 @@ mesmo parâmetro genérico de padding.
 
 ## 3. Coordenadas locais e grade explícita
 
-No LAS, decodificar coordenadas e retirar uma origem local mantendo precisão
-suficiente, antes de converter para `float32`. Guardar origem e eventual
+No LAS, o piloto decodifica coordenadas relativas à origem da grade em
+`float64`, preservando o detalhe local. Guardar origem e eventual
 rotação rígida invertível, sem esticar eixos. O recorte deve poder ser
 recolocado sobre a nuvem original; posições e normais dos planos usam a
 mesma transformação.
 
-Especificar a nova grade por origem local, shape ZYX e tamanho físico de
-voxel. A proposta é usar células com mínimo inclusivo, máximo exclusivo,
+O piloto especifica a grade por origem local, shape ZYX e tamanho físico de
+voxel. Usa células com mínimo inclusivo, máximo exclusivo,
 centro a meio voxel e índice por
 `floor((ponto - origem_da_grade) / tamanho_do_voxel)`, antes de trocar XYZ
-por ZYX. Essa convenção futura difere do encaixe por arredondamento e spans
-`N-1` do normalizador atual; não haverá troca silenciosa de contrato.
+por ZYX. A voxelização global continua usando o encaixe por arredondamento
+e spans `N-1` do normalizador.
 
 Pontos fora da região final serão filtrados, não acumulados artificialmente
 nas faces da grade. Registrar uma tolerância numérica para os planos, conforme
@@ -128,22 +134,20 @@ suporte suficiente permanecem incertas ou levam à rejeição. O exterior da
 galeria delimitada não comprova rocha em toda a região: podem existir outras
 cavidades não observadas.
 
-## 5. Manifesto e organização propostos
+## 5. Manifesto e organização
 
-Cada recorte terá identificador estável e configuração versionada. Estes
-nomes descrevem saídas futuras, ainda não implementadas:
+O piloto identifica cada recorte pela caverna, levantamento, ID e resolução.
+Uma execução bem-sucedida apresenta esta estrutura:
 
 ```text
 data/processed/reference_sections/<caverna>/<levantamento>/<recorte>/<resolucao>/
-    crop.json         # identidade, seleção, transformação e domínio da grade
-    sections.json     # planos, contornos, contexto e decisões de revisão
-    surface.npz       # superfície observada; True não significa ar
-    interior.npz      # ar inferido e revisado; True = ar, ZYX
-    masks.npz         # tampas, incerteza e suporte das observações
-    run.json          # parâmetros efetivos, versões, hashes e conclusão
+    surface.npz       # superfície observada
+    interior.npz      # ar candidato em ZYX
+    masks.npz         # máscaras das tampas
+    run.json          # configuração efetiva, contagens e status pending_review
 ```
 
-O manifesto deverá registrar:
+Para integrar o piloto ao treino, estender o manifesto para registrar:
 
 - Fonte/hash disponível, caverna/grupo de independência, levantamento, ramo,
   recorte e atribuição ao fold. Hash ausente permanece pendente.
@@ -161,11 +165,10 @@ auditoria e loader ao novo método, sem rotulá-lo como o flood fill anterior.
 
 ## 6. Verificações antes de preparar dados de treino
 
-No código futuro, testar seleção com pontos nas bordas, contexto e galerias
-próximas; precisão após translação; ida e volta da transformação; XYZ/ZYX;
-limites das células; e seleção idêntica para diferentes lotes de leitura.
-Testar fechamento com máscaras artificiais conhecidas antes de interpretar
-o interior de uma nuvem real.
+Os testes sintéticos verificam a seleção por limites, a estabilidade entre
+lotes, a precisão local do LAS, o fechamento pelas tampas e a detecção de
+vazamento. Nos próximos ensaios, conferir associação em galerias próximas e
+a reconstrução nas regiões que exigirem interpolação.
 
 Nos trechos reais, conferir contornos contra a nuvem, continuidade, gargalos,
 margem exterior e ausência de vazamentos nas tampas. Comparar pequenas
