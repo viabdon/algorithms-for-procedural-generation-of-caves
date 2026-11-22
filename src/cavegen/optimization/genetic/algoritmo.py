@@ -1,9 +1,9 @@
 """Motor genérico do algoritmo genético e a busca aleatória de mesmo orçamento.
 
-Nada aqui sabe o que é um CA: o motor recebe a lista de genes (nome e limites)
-e uma função que dá a nota de um cromossomo. Assim o mesmo motor serve depois
-para o Random Walk, e a busca aleatória, que é o controle do GA, usa a mesma
-contagem de orçamento.
+O motor não conhece o CA: recebe a lista de genes (nome e limites) e uma função
+que dá a nota de um cromossomo (a do CA fica em ca.py). A busca aleatória, que é
+o controle do GA (só sorteia, sem seleção nem cruzamento), usa a mesma contagem
+de orçamento.
 
 Um cromossomo é um dict {nome do gene: valor}. A nota é um float, e maior é
 melhor; -inf vale como "candidato descartado".

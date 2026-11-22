@@ -1,44 +1,58 @@
 # optimization/genetic — ajuste genético do CA guiado por SDF
 
 Procura os hiperparâmetros do Cellular Automata guiado por SDF que fazem a
-caverna gerada cair em cima da caverna real do Elaphes (64³). O algoritmo
-genético (GA) propõe as combinações, o CA gera as cavernas e uma nota diz o
-quanto cada caverna acertou o campo-alvo. **No fim ele devolve a lista dos
-melhores parâmetros com as notas** (os 10 primeiros, por padrão).
+caverna gerada cair em cima do campo de uma ou mais cavernas reais
+voxelizadas (por padrão, só o Elaphes 64³). O algoritmo genético (GA) propõe
+as combinações, o CA gera uma caverna para cada uma, em cada caverna real, e
+uma nota diz o quanto cada caverna gerada acertou o campo daquela caverna.
+**No fim ele devolve a lista dos melhores parâmetros com as notas** (os 10
+primeiros, por padrão).
 
-Existe também uma **busca aleatória** (`--metodo aleatoria`), que só sorteia
-parâmetros com o mesmo orçamento. Ela é opcional e serve de controle: se o GA
+Existe também uma **busca aleatória** (`--metodo aleatoria`, ou
+`uv run poe busca-aleatoria`). Ela **não é um algoritmo genético**: só sorteia
+parâmetros dentro das mesmas faixas, com o mesmo orçamento e o mesmo
+avaliador, sem seleção, cruzamento nem mutação. Serve de controle: se o GA
 não achar notas melhores que o sorteio, a seleção e a herança não estão
 ajudando.
 
 ```
-SDF do Elaphes com log (como está) ──> peso do CA ┐
-                                                  ├─> CA (até 40 passos) ─> caverna
-semente (chance_inicial, seed) ───────────────────┘          │
-                                                             v
-SDF do Elaphes com limiar -3 e log ────────────────> nota da caverna ─> GA escolhe os próximos
+SDF da caverna com ln(1 + |d|) ──┬──> peso do CA ──┐
+  (um campo por caverna)         │                 ├─> CA (sempre 40 passos) ─> caverna gerada
+semente (chance_inicial, seed) ──┼─────────────────┘                                │
+                                 └──> alvo da nota <────────────────────────────────┘
+                                          │
+              nota em cada caverna ─> média entre as cavernas ─> GA escolhe os próximos
 ```
+
+> **Execuções antigas não são comparáveis.** `ga_001` a `ga_010`, em
+> `results/`, usaram o alvo antigo (SDF do Elaphes com limiar −3 e log, 5.201
+> voxels positivos, vazio aceito de 2.600,5 a 26.005), 3 seeds de ajuste,
+> parada antecipada e só o Elaphes. A partir de 22/11/2026 o alvo é o próprio
+> campo do peso, as seeds de ajuste são 5, o CA roda sempre as 40 iterações e
+> pode haver várias cavernas (ver `docs/methodology-adjustments.md`). As
+> notas antigas e novas medem coisas diferentes e não devem ser postas lado a
+> lado. Os arquivos antigos ficam como estão, também com os campos antigos
+> (`peso`, `alvo`, `nota_teto_trivial`...).
 
 ## Arquivos
 
 | arquivo | o que tem |
 |---|---|
-| `algoritmo.py` | motor genérico do GA e a busca aleatória; não sabe o que é um CA |
-| `aptidao.py` | a nota (`Alvo`), os cortes de vazio e as regras de parada antecipada |
-| `ca.py` | o cromossomo do CA (`GENES_CA`) e o avaliador que roda o CA nas seeds |
-| `executar.py` | linha de comando: carrega os campos, roda a busca, grava o resultado |
-| `painel.py` | mostra o andamento no terminal (etapas, gerações, candidato atual) |
+| `algoritmo.py` | motor genérico do GA e a busca aleatória de controle; não conhece o CA |
+| `aptidao.py` | a nota (`Alvo`), a faixa de vazio aceita (`Cortes`), a cópia pura e o resumo entre cavernas |
+| `ca.py` | o cromossomo do CA (`GENES_CA`), a caverna (`Caverna`) e o avaliador que roda o CA nas cavernas e seeds |
+| `executar.py` | linha de comando: carrega as cavernas, roda a busca, confere nas seeds reservadas, grava o resultado |
+| `painel.py` | mostra o andamento no terminal (etapas, gerações, candidato atual, ranking) |
 | `results/` | um `ga_NNN.npz` por execução (fora do Git) |
 
 O motor (`algoritmo.py`) recebe só uma lista de genes e uma função de
-avaliação, então o mesmo motor serve depois para o Random Walk: basta escrever
-outro `ca.py` com os genes e o avaliador dele.
+avaliação; o que é específico do CA fica em `ca.py`.
 
 ## Como um algoritmo genético funciona
 
 É uma busca inspirada em seleção natural. Em vez de testar todas as
-combinações (impossível com genes contínuos) ou só sortear, ele usa as boas
-combinações já encontradas para propor as próximas.
+combinações ou só sortear, ele usa as boas combinações já encontradas para
+propor as próximas.
 
 1. **Cromossomo**: uma combinação de hiperparâmetros, aqui um dict
    `{nome do gene: valor}`. Cada gene tem uma faixa permitida.
@@ -71,7 +85,8 @@ não foram ajustados; uma análise de sensibilidade deles é trabalho futuro.
 
 Definido em `GENES_CA` (`ca.py`). As faixas foram medidas no Elaphes 64³ em
 12/11/2026, com folga em volta das melhores notas; a da `chance_inicial` foi
-alargada para 0,2 a 0,8 em 19/11/2026.
+alargada para 0,2 a 0,8 em 19/11/2026. **As duas medições usaram o alvo
+antigo (limiar −3)**; com o alvo de 22/11/2026 elas não foram refeitas.
 
 | gene | faixa | o que faz |
 |---|---|---|
@@ -94,136 +109,339 @@ mais perto.
 **As execuções até `ga_009` usaram a chance contínua de 0,3 a 0,7 e 50
 iterações; não são o mesmo espaço de busca das seguintes.**
 
-Ficam **fora** do cromossomo, fixos:
+### O que fica fora do cromossomo
 
-- **peso**: o campo do arquivo entra no CA **como está**. Nada o multiplica,
-  comprime ou corta: se o peso de um voxel é 4, o CA recebe 4. Até 15/11/2026
-  havia um terceiro gene, `escala_log_peso`, que multiplicava o log do SDF. Ele
-  saiu e não virou constante (ver "O decalque e a retirada da escala");
-
+- **campo**: cada caverna tem um campo só, o SDF dela com `ln(1 + |d|)` e
+  escala 1, que é ao mesmo tempo o peso do CA e o alvo da nota (ver abaixo).
+  Ele entra no CA **como está**: nada o multiplica, comprime ou corta. A
+  escala do log é **fixa em 1, por decisão metodológica**: até 15/11/2026 ela
+  era um gene, e o GA a subia até o peso dominar os vizinhos (ver "O decalque
+  e a retirada da escala");
 - **borda**: sempre `NEAREST`, que repete a beirada da grade. `ZEROS` fecharia
   e `ONES` abriria a caverna onde ela toca a borda, e `RANDOM` depende da sorte;
-- **iterações**: o CA roda até `MAX_ITERACOES = 40`, calcula a nota em todo
-  passo e a melhor iteração sai junto com a nota (ver abaixo);
-- **modo do peso**: sempre o completo. O modo "só negativo" existe no CA, mas
-  ainda não entrou no GA. No Elaphes os dois deram o mesmo resultado, porque o
-  peso positivo do SDF base é só a casca de 292 voxels.
+- **iterações**: o CA roda **sempre** `MAX_ITERACOES = 40`, sem nenhuma
+  parada antecipada, calcula a nota em todo passo e a melhor iteração sai
+  junto com a nota (ver abaixo);
+- **modo do peso**: sempre o completo (`MODO_PESO`, gravado no resultado). O
+  modo "só negativo" existe no CA, mas não entrou no ajuste. O modo do peso é
+  uma escolha **do CA**, independente do método de busca: o GA e a busca
+  aleatória usam o mesmo avaliador e, portanto, o mesmo modo. Trocar o modo
+  não cria outro método de busca, e trocar o método não muda o modo.
 
-## Peso e alvo
+## A matemática, passo a passo
 
-Os dois vêm do SDF da mesma caverna. Sem o peso, o CA só gera "geodos" sem
-relação com o Elaphes, então guiar e pontuar com a mesma caverna é inevitável.
-A diferença está no que cada um usa:
+### 1. O SDF: distância com sinal
 
-- **peso** (guia o CA): o SDF (interno +, borda 0, externo −) comprimido
-  com `ln(1 + |d|)`, mantendo o sinal, gravado pela ferramenta do SDF com
-  `--log 1`. No Elaphes ele vai de −4,16 a +1,10. A contagem de vizinhos vai de
-  0 a 27, então o peso é uma **dica**: empurra a célula, mas os vizinhos ainda
-  decidem. O avaliador guarda uma cópia somente leitura e passa ao CA
-  exatamente esses valores.
-- **alvo** (dá a nota): o SDF com o zero deslocado 3 voxels para fora e
-  comprimido com log de escala 1. São 5.201 voxels positivos, a "caverna"
-  que vale a pena acertar. Ele fica fixo durante toda a busca e é guardado
-  somente leitura.
+O SDF (*signed distance field*) dá a cada voxel a sua distância até a
+superfície da caverna, com um sinal que diz de que lado ele está. A
+ferramenta [`tools/sdf`](../../../../tools/sdf/README.md) faz isso em três
+passos, a partir da grade de superfície voxelizada (1 = parede observada):
 
-Os dois saem da ferramenta do SDF, em `tools/sdf/npz/`:
-`elaphes_surface_64_sdf_log1.npz` (peso) e
-`elaphes_surface_64_sdf_limiar-3_log1.npz` (alvo).
+1. **Inundação** ([`tools/flood_fill`](../../../../tools/flood_fill/README.md)):
+   a água entra pela beirada da grade e se espalha pelos voxels que não são
+   parede. O que ela alcança é **externo**; a parede é a **borda**; o que não
+   é parede e a água não alcança é **interno**.
+2. **Distância**: para cada voxel, a distância euclidiana (em voxels) até o
+   voxel de borda mais próximo. A borda fica com 0.
+3. **Sinal**: interno positivo, externo negativo. O sinal não vem da
+   distância (que é sempre positiva), e sim da inundação.
 
-## A nota
+Por que o interno é positivo: ele é "a caverna", o lugar onde a nota quer
+vazio, e positivo é o que soma. A borda é zero porque a distância dela até
+ela mesma é zero: ela é a fronteira entre os dois lados. O externo é negativo
+porque é o lado de fora: quanto mais longe da parede, mais negativo.
+
+**O que é o interno no Elaphes.** O PLY observa a parede, não o ar. Como a
+caverna tem entradas, o ar do túnel se liga ao lado de fora e a água o
+alcança: ele fica **externo** (negativo). O interno é a espessura da parede
+voxelizada (e buracos fechados), não o ar transitável. O
+`docs/methodology-adjustments.md` (seção 1) registra que esse campo não
+valida `VOID` real. No Elaphes 64³ são 292 voxels internos, 783 de borda e
+261.069 externos.
+
+### 2. O log: por que `sinal(d) · ln(1 + |d|)`
+
+O SDF cru vai de −63,16 a +2,00 no Elaphes. O CA soma o peso à contagem de
+vizinhos (de 0 a 27), e a nota soma o alvo nos voxels vazios. Com o SDF cru,
+um voxel a 63 voxels da parede pesaria 63 vezes mais que um voxel colado
+nela, e dominaria as duas contas. O logaritmo **comprime**: cresce rápido
+perto de zero e devagar depois, então a distância grande pesa só um pouco
+mais que a pequena.
+
+Mas `ln(d)` sozinho não serve, por dois motivos:
+
+- **não existe para d negativo**, e o externo inteiro é negativo. Por isso a
+  conta usa o valor absoluto `|d|` (só a distância) e devolve o sinal no fim,
+  multiplicando por `sinal(d)`;
+- **vai a menos infinito perto de zero** (`ln(0) = −∞`), e a borda é
+  exatamente zero. Somar 1 antes resolve: `ln(1 + 0) = ln(1) = 0`, então a
+  borda continua 0 e o campo continua finito.
+
+O resultado, `sinal(d) · ln(1 + |d|)`, mantém o zero na borda, o sinal de
+cada lado e a ordem dos voxels (quem estava mais longe continua mais longe),
+só que comprimida. Valores reais do Elaphes 64³, escala 1, sem limiar
+(`tools/sdf/npz/elaphes_surface_64_sdf_log1.npz`):
+
+| região | d (voxels) | `sinal(d) · ln(1 + \|d\|)` | voxels com esse d |
+|---|---|---|---|
+| interno, mais fundo | +2 | +1,0986 | 4 |
+| interno | +√3 ≈ +1,73 | +1,0051 | 4 |
+| interno | +√2 ≈ +1,41 | +0,8814 | 27 |
+| interno, colado na borda | +1 | +0,6931 | 257 |
+| borda | 0 | 0 | 783 |
+| externo, colado na borda | −1 | −0,6931 | 1.095 |
+| externo | −2 | −1,0986 | 624 |
+| externo | −3 | −1,3863 | 830 |
+| externo | −5 | −1,7918 | 652 |
+| externo | −10 | −2,3979 | 186 |
+| externo | −20 | −3,0445 | 77 |
+| o mais distante | −63,16 | −4,1614 | 1 |
+
+Sem o log, o voxel mais distante vale 63 vezes o de d = −1; com o log, 6
+vezes (4,16 / 0,69). O campo final vai de −4,16 a +1,10. Como a contagem de
+vizinhos vai de 0 a 27, o peso é uma **dica**: empurra a célula, mas os
+vizinhos ainda decidem.
+
+A ferramenta do SDF também desloca o zero (limiar) antes do log; o GA **não
+usa** o limiar desde 22/11/2026. A ordem limiar → log e o que acontece na
+ordem inversa estão no [README do `tools/sdf`](../../../../tools/sdf/README.md#3-manipulação-limiar-e-log).
+
+### 3. A nota de uma caverna
 
 ```
 nota = soma(alvo nos voxels vazios) / soma(alvo onde ele é positivo)
 ```
 
-Vazio onde o alvo é positivo soma, vazio onde ele é negativo tira. O máximo é
-1: vazio em todo o positivo e em nenhum negativo. A nota pode ser negativa.
-Multiplicar o alvo por uma constante não muda a nota, porque ela aparece em
-cima e embaixo da fração. Por isso a escala do log do alvo não importa, só se
-tem log ou não.
+- **O numerador** percorre os voxels que a caverna gerada deixou vazios e
+  soma o valor do alvo em cada um. Vazio no interno soma (+0,69 a +1,10),
+  vazio na borda não muda nada (0), vazio no externo **desconta** (−0,69 a
+  −4,16). Sem o desconto, encher a grade inteira acertaria todo o interno e
+  ganharia a nota máxima; com ele, encher a grade do Elaphes dá −4.033.
+- **O denominador** é o máximo que o numerador pode alcançar: vazio em todo
+  voxel positivo e em nenhum negativo. No Elaphes ele vale 210,35 (a soma
+  dos 292 internos); no Indian Tunnel, 191,63.
+- **Por que o teto é 1**: o numerador nunca passa do denominador, porque o
+  melhor que dá para fazer é somar todos os positivos sem descontar nada.
+  Dividir um pelo outro dá 1 nesse caso, 0 com a grade toda rocha (nenhum
+  vazio, nada somado) e um número negativo quando o vazio fora pesa mais que
+  o de dentro. Não há piso: a nota pode ser muito negativa.
+- **Por que a nota sai "quebrada"** (0,543 e não 10 mil pontos): ela é a
+  **fração do máximo possível**. 0,543 quer dizer que a caverna gerada somou
+  54,3% do que a caverna perfeita somaria, já descontado o vazio fora. A
+  soma crua dependeria do tamanho e da forma de cada caverna (210,35 no
+  Elaphes, 191,63 no Indian Tunnel) e não daria para comparar cavernas.
+  Dividindo, a nota fica na mesma régua em todas, e multiplicar o alvo por
+  qualquer constante não a muda (a constante aparece em cima e embaixo).
+- Um exemplo de equilíbrio: no Elaphes, um voxel vazio em d = −1 (−0,69)
+  cancela exatamente um voxel vazio em d = +1 (+0,69).
 
-### Cortes e parada antecipada
+### 4. A faixa de vazio aceita
 
-A quantidade de vazio aceita é relativa ao alvo, não à grade: de 0,5× a 5× os
-5.201 voxels positivos, ou seja, de 2.600 a 26.005 voxels vazios. Fora dessa
-faixa a nota do passo é `-inf` (`NOTA_MINIMA`), que nunca vence.
+Antes da nota, o vazio total da caverna gerada precisa estar numa faixa
+relativa ao **número de voxels positivos do alvo** (não à grade):
 
-Depois de cada passo, o CA para antes das 40 iterações se:
+```
+0,5 × positivos ≤ vazio ≤ 5 × positivos      (Cortes: fator_minimo, fator_maximo)
+```
 
-| motivo | quando |
-|---|---|
-| `vazio_demais` | acima do máximo e **não diminuiu** no passo |
-| `vazio_de_menos` | abaixo do mínimo e **não aumentou** no passo |
-| `convergiu` | menos de 0,01% da grade trocou de estado (26 células ou menos, em 64³) |
+Fora dela, a nota daquele passo é `-inf` (`NOTA_MINIMA`), que nunca vence.
 
-O "não diminuiu / não aumentou" existe porque o ruído inicial nasce com cerca
-de 45% de vazio, bem acima do máximo, e só encolhe com as iterações. Cortar
-logo no passo 0 mataria todo candidato.
+| caverna | voxels positivos | vazio aceito |
+|---|---|---|
+| Elaphes 64³ | 292 | de 146 a 1.460 |
+| Indian Tunnel 64³ | 265 | de 132,5 a 1.325 |
 
-### Seeds e escolha da iteração
+Por que existe: sem o mínimo, uma grade toda rocha (nota 0) venceria qualquer
+caverna que escavasse um pouco fora da forma (nota negativa). Sem o máximo,
+nada impediria cavernas muito maiores que a forma de competir. A caverna
+perfeita (interno + borda: 292 + 783 = 1.075 voxels no Elaphes) cabe na
+faixa. A faixa **não interrompe o CA**: ele roda as 40 iterações e a faixa só
+decide a nota de cada passo.
 
-Cada candidato roda nas **seeds de ajuste** 1, 2 e 3. A nota de cada passo é
-a média das três; a **melhor iteração** é o passo de maior média, e essa média
-é a nota do candidato. Se uma seed é cortada, a média do passo vira `-inf`:
-o candidato precisa funcionar em todas.
+> **Atenção (22/11/2026).** Com o alvo sem limiar, a faixa encolheu de
+> 2.600,5–26.005 para 146–1.460 voxels no Elaphes (de 1%–10% para
+> 0,06%–0,56% da grade). Na execução curta de validação, a maior parte dos
+> candidatos foi cortada: eles enchem a grade ou morrem, e só passam pela
+> faixa de forma transitória. Rever os fatores ou as faixas dos genes é
+> decisão pendente do Felipe.
 
-A regra de geração é "rodar até N iterações, parando antes se a parada
-antecipada disparar". Ela é determinística, então depois da parada a nota fica
-repetida até o fim. No final, cada parâmetro da lista dos melhores roda nas
-**seeds reservadas** 101 a 110 com o número de iterações já escolhido, sem
-escolher de novo. É a nota que mede se ele generaliza para seeds que a busca
-nunca viu.
+**Até 22/11/2026 havia parada antecipada**: o CA parava antes das 40
+iterações se o vazio estivesse acima do máximo sem diminuir, abaixo do mínimo
+sem aumentar, ou se menos de 0,01% da grade mudasse num passo
+(convergência). Ela saiu porque o GA é rápido e tem poucos genes: economizar
+tempo não importa, e é melhor que a nota de cada passo venha da grade de
+verdade. A parada por convergência também saiu: com o corte em 0,01% (26
+células em 64³), ela repetia a nota do passo em que parou mesmo quando ainda
+mudavam algumas células, e sem ela o código fica mais simples. A
+penalização continua igual: encher ou esvaziar a grade inteira dá `-inf` em
+todo passo.
 
-### Notas de referência
+### 5. Seeds, média e escolha da iteração
 
-Junto com o campeão saem duas notas que não passam pelo CA nem pelos cortes,
-para ler a nota do CA com contexto:
+**A seed é só o número que inicializa o sorteador** (`numpy_rng(seed)`) da
+matriz inicial. A **porcentagem** de vazio é outra coisa: é o gene
+`chance_inicial`. A mesma seed com a mesma chance dá sempre a mesma grade.
 
-- **cópia pura**: o peso binarizado (positivo = vazio; o log não muda o
-  sinal). No Elaphes dá 0,10, porque o interno tem só 292 voxels;
-- **teto trivial**: o peso binarizado no limiar do alvo (SDF > −3, que no
-  peso com log é > −ln 4 ≈ −1,39). Dá exatamente 1, porque o alvo é o próprio
-  SDF deslocado.
+Cada candidato roda nas **5 seeds de ajuste** (1 a 5), **com a mesma chance
+nas 5**: só o ruído muda de uma para outra. As seeds de ajuste são fixas, as
+mesmas para todos os candidatos, por três motivos: a comparação é justa
+(todos enfrentam as mesmas grades iniciais), a nota é determinística (o mesmo
+candidato dá sempre a mesma nota) e, por isso, o cache de repetidos funciona.
+Cinco seeds deixam a nota menos sujeita à sorte de uma grade só (até
+22/11/2026 eram 3).
 
-Ou seja, a nota mede **aderência ao campo**, não ganho gerativo. Chegar perto
-de 1 pode ser só o CA aprendendo a deslocar o limiar do peso.
+Para cada passo t de 1 a 40:
+
+1. em cada caverna, a nota do passo é a **média das 5 seeds**;
+2. a nota do passo do candidato é a **média dessas notas entre as cavernas**;
+3. a **melhor iteração** é o passo de maior média, **uma só para todas as
+   cavernas**, e essa média é a nota do candidato.
+
+Se uma seed é cortada num passo, a média da caverna naquele passo vira
+`-inf`, e a do candidato também: ele precisa ficar na faixa em todas as seeds
+de todas as cavernas ao mesmo tempo.
+
+No final, cada parâmetro da lista dos melhores roda nas **seeds reservadas**,
+em todas as cavernas, com o número de iterações já escolhido, sem escolher
+de novo. São **10 seeds**, que a busca nunca vê, sem nenhuma em comum com as
+de ajuste. Os números delas (101 a 110) são **só rótulos**, escolhidos para
+não coincidir com 1 a 5: são 10 grades, não 110. É a nota que mede se o
+parâmetro generaliza para grades que a busca nunca viu.
+
+Como nada interrompe o CA, rodar N iterações dá exatamente os N primeiros
+passos de uma execução de 40: a nota da iteração escolhida se reproduz bit a
+bit fora da busca.
+
+### 6. Várias cavernas: média, mínimo, máximo e desvio
+
+Com `--cavernas`, o mesmo candidato é avaliado em todas as cavernas. Cada
+uma tem o seu campo (peso e alvo) e a sua faixa de vazio, relativa aos
+positivos dela: cavernas de tamanhos diferentes têm faixas diferentes. Na
+iteração escolhida, o resumo entre as cavernas é:
+
+- **média**: o critério de ordenação do ranking (cada caverna pesa igual);
+- **mínimo e máximo**: a pior e a melhor caverna;
+- **desvio**: desvio padrão populacional das notas por caverna (0 com uma só,
+  `-` no painel e `NaN` no arquivo se alguma caverna foi cortada);
+- **a nota de cada caverna**, lado a lado.
+
+Por que mostrar mais que a média: uma média alta pode esconder uma caverna
+que encaixa perfeitamente e puxa a média para cima, enquanto as outras ficam
+medianas. O objetivo é qualidade proporcional entre as cavernas.
+
+**Não é teste de generalização.** Todas as cavernas de `--cavernas` entram na
+busca, e a conferência nas seeds reservadas usa as mesmas cavernas (só o
+ruído inicial muda). O resultado mede robustez entre as cavernas da busca;
+para dizer que os parâmetros generalizam para outra caverna, ela teria de
+ficar fora da busca e entrar só na conferência (pendente de decisão).
+
+Com poucas
+cavernas o desvio padrão é instável (com duas, ele é só metade da diferença
+entre elas), então o mínimo e as notas por caverna, lado a lado, são a
+leitura mais direta. O ranking continua ordenado só pela média; o resto é
+para ler.
+
+**Uma iteração para todas as cavernas.** O número de iterações escolhido é
+um só por candidato. Isso tem custo: uma caverna pode estar no seu melhor
+passo e outra não. Na validação, `chance_inicial=0,66, sensibilidade=15`
+tinha o melhor passo do Elaphes na iteração 23 (+0,172); com o Indian Tunnel
+junto, a iteração escolhida virou a 19, onde o Elaphes vale −0,972.
+
+**O que a caverna precisa ter.** O arquivo tem que ser o SDF com log de
+escala 1 e sem limiar, como o `tools/sdf` grava; outro limiar ou outro log
+param a execução dizendo qual caverna. O SDF precisa de pelo menos um voxel
+positivo (senão a nota dividiria por zero), e a grade precisa ser cúbica
+(a semente do CA é um cubo); nos dois casos o erro diz qual caverna e por
+quê. A mesma caverna duas vezes também é recusada, mesmo com outro nome
+(mesmo sha256), porque pesaria em dobro na média. Uma grade cúbica de outro lado (32³, por exemplo) roda, mas o painel
+avisa: o protocolo é 64³, e um voxel de 32³ é duas vezes maior por lado,
+então a mesma sensibilidade não quer dizer a mesma coisa nas duas.
+
+**Grades de superfície que já existem no projeto** (22/11/2026):
+
+| caverna | grade | onde | SDF com log 1 |
+|---|---|---|---|
+| Elaphes | 64³, 1.049 voxels de superfície | `data/processed/references/elaphes_surface_64.npz` | `tools/sdf/npz/elaphes_surface_64_sdf_log1.npz` |
+| Indian Tunnel (NASA) | 64³, 1.145 voxels de superfície | `indian_tunnel_temp/npz/indian_tunnel_surface_64.npz` | `tools/sdf/npz/indian_tunnel_surface_64_sdf_log1.npz` |
+| Elaphes (do Pablo) | 32³, 245 voxels de superfície | `data/processed/references/elaphes_surface_32_pablo.npz` | não gerado: é a mesma caverna em outra resolução |
+
+No Indian Tunnel, o interno tem 265 voxels, dos quais 98 são buracos fechados
+do oco do túnel (o túnel tem só 6 voxels de altura e o teto encosta no chão
+em partes; ver `indian_tunnel_temp/README.md`).
+
+Para pôr outra caverna: gere o SDF da grade de superfície dela com a
+ferramenta do SDF e passe o nome (ou o caminho) em `--cavernas`.
+
+### 7. Por que o alvo é o mesmo campo do peso
+
+Os dois vêm do SDF da mesma caverna. Sem o peso, o CA só gera "geodos" sem
+relação com a caverna, então guiar e pontuar com a mesma caverna é
+inevitável. Até 22/11/2026 o alvo era o SDF com o zero deslocado 3 voxels
+para fora (5.201 positivos no Elaphes); agora é **o próprio campo do peso**,
+sem deslocamento, para avaliar exatamente os voxels que o SDF define como
+caverna, sem a faixa extra de 3 voxels em volta. O que isso implica:
+
+- **A cópia pura vale 1.** O peso binarizado (positivo vira vazio) acerta
+  exatamente todos os positivos do alvo e nenhum negativo, que é a nota
+  máxima. É a única nota de referência (ver abaixo).
+- **A nota mede aderência ao campo, não ganho gerativo.** Uma nota perto de
+  1 quer dizer que o CA reproduziu o sinal do peso que ele mesmo recebeu, não
+  que gerou uma caverna nova parecida com a real.
+- **No Elaphes, o positivo é a espessura da parede, não o ar do túnel** (ver
+  a seção 1). A nota mede o quanto o CA acerta essa casca de 292 voxels, e não
+  semelhança com o vazio real do Elaphes.
+
+### 8. A referência: cópia pura
+
+Junto com o resultado sai, por caverna, a nota da **cópia pura**: o peso
+binarizado (`peso > 0` vira vazio), sem rodar o CA e sem passar pela faixa.
+Com o alvo igual ao peso ela dá exatamente 1 em toda caverna. Ela fica como
+conferência (se não der 1, peso e alvo não são o mesmo campo) e como régua:
+a nota do CA se lê contra o 1. Até 22/11/2026 havia também o "teto trivial"
+(o peso cortado no limiar do alvo); sem o limiar, ele é a mesma conta que a
+cópia pura e saiu.
 
 ## Como usar
 
-O peso e o alvo são gerados uma vez com a ferramenta do SDF. Se algum faltar,
-o `executar.py` para e diz o comando.
+O campo de cada caverna é gerado uma vez com a ferramenta do SDF. Se algum
+faltar, o `executar.py` para e diz o comando.
 
 ```bash
-uv run python -m tools.sdf.sdf --log 1                  # peso: SDF com ln(1 + |d|)
-uv run python -m tools.sdf.sdf --limiar -3 --log 1      # alvo
+uv run python -m tools.sdf.sdf --log 1                                    # Elaphes
+uv run python -m tools.sdf.sdf indian_tunnel_temp/npz/indian_tunnel_surface_64.npz --log 1
 ```
 
 Depois, pelo atalho do Poe (as opções da tabela abaixo vão direto depois do
 nome):
 
 ```bash
-uv run poe ga                                  # GA, orçamento 400
+uv run poe ga                                      # GA, orçamento 400, só o Elaphes
+uv run poe ga --cavernas elaphes indian_tunnel     # GA nas duas cavernas
 uv run poe ga --orcamento 200 --seed 2 --top 5
-uv run poe ga-aleatoria --orcamento 200        # controle
+uv run poe busca-aleatoria --orcamento 200         # controle, não é GA
 ```
 
 O atalho só chama `python -m cavegen.optimization.genetic.executar`, que
 também pode ser rodado direto.
 
-O terminal mostra as quatro etapas enquanto roda:
+O terminal mostra as quatro etapas enquanto roda (execução curta de
+validação, 22/11/2026):
 
 ```
-[1/4] Carregando o peso e o alvo
-  peso  tools/sdf/npz/elaphes_surface_64_sdf_log1.npz (de -4.16 a +1.10)
-  alvo  tools/sdf/npz/elaphes_surface_64_sdf_limiar-3_log1.npz (5201 voxels positivos; ...)
+[1/4] Carregando as cavernas (o campo de cada uma é o peso e o alvo dela)
+  elaphes  tools/sdf/npz/elaphes_surface_64_sdf_log1.npz
+      grade 64x64x64, campo de -4.16 a +1.10, 292 voxels positivos; vazio aceito de 146 a 1460; cópia pura +1.000
+  indian_tunnel  tools/sdf/npz/indian_tunnel_surface_64_sdf_log1.npz
+      grade 64x64x64, campo de -3.89 a +1.10, 265 voxels positivos; vazio aceito de 132 a 1325; cópia pura +1.000
+  genes chance_inicial [0.2, 0.8, de 0.02 em 0.02], sensibilidade [1, 20]
+  seeds de ajuste [1, 2, 3, 4, 5]; reservadas 101 a 110 (10 seeds); 40 iterações sempre
 
-[2/4] Busca genética: 60 candidatos, população 20, elite 2, seed 0
-  geração   0 | 20/60 | melhor +0.406 (chance_inicial=0.32 sensibilidade=9) | válidos 6/20 | média -2.785 | 2.5 s
-  geração   1 | 38/60 | melhor +0.406 (...) | válidos 11/20 | média -0.720 | 1.7 s
-  candidato 47/60 · geração 2 · chance_inicial=0.56 sensibilidade=13 -> +0.612 (15 it) · melhor +0.406
+[2/4] Busca genética: 40 candidatos, população 20, elite 2, seed 0
+  geração   0 | 20/40 | melhor -0.073 (chance_inicial=0.5 sensibilidade=13) | válidos 3/20 | média -3.098 | 123.1 s
+  candidato 23/40 · geração 1 · chance_inicial=0.68 sensibilidade=13 -> cortado (no fim: vazio_demais) · melhor -0.073
 
-[3/4] Conferindo os 5 melhores nas 10 seeds reservadas
-   1/5 chance_inicial=0.32 sensibilidade=9: ajuste +0.406, reservadas +0.412 (mín +0.176)
+[3/4] Conferindo os 10 melhores nas 10 seeds reservadas, em 2 caverna(s)
+   3/5 chance_inicial=0.66 sensibilidade=15: ajuste -0.577, reservadas -0.249 (elaphes -0.345, indian_tunnel -0.153), pior seed -2.184
 
 [4/4] Gravando o resultado
 ```
@@ -233,9 +451,9 @@ O terminal mostra as quatro etapas enquanto roda:
   geração. Na busca aleatória, que não tem gerações, a linha sai a cada lote
   de 20 candidatos.
 - **candidato**: a linha de baixo, reescrita no lugar a cada candidato, com os
-  genes e a nota (ou `cortado`, com o motivo, ou `[repetido]` quando veio do
-  cache). Ela só aparece num terminal de verdade, não quando a saída vai para
-  um arquivo.
+  genes e a nota (ou `cortado`, com onde o vazio terminou nas seeds que
+  acabaram fora da faixa, ou `[repetido]` quando veio do cache). Ela só
+  aparece num terminal de verdade, não quando a saída vai para um arquivo.
 
 O painel só imprime: com ou sem ele, a busca dá exatamente os mesmos
 candidatos e notas.
@@ -245,57 +463,75 @@ verde, negativas em amarelo e cortadas em vermelho; `⭐ novo recorde` quando
 o melhor sobe numa geração; `⚠️ frágil` quando um parâmetro é cortado numa
 seed reservada; medalhas nos 3 primeiros da lista final. Fora do terminal
 (saída indo para arquivo) ou com a variável `NO_COLOR` definida, o texto sai
-puro, como nos exemplos acima (só o `novo recorde` e o `frágil` aparecem
-sem a estrela e o emoji). Se o console não imprime emoji (codificação
-sem Unicode), ficam só as cores.
+puro, como nos exemplos (só o `novo recorde` e o `frágil` aparecem sem a
+estrela e o emoji). Se o console não imprime emoji (codificação sem
+Unicode), ficam só as cores.
 
 | opção | padrão | o que é |
 |---|---|---|
-| `--metodo` | `genetico` | `genetico` ou `aleatoria` |
+| `--metodo` | `genetico` | `genetico` (o GA) ou `aleatoria` (a busca aleatória de controle) |
+| `--cavernas` | `elaphes` | nomes ou caminhos `.npz`; um nome vira `tools/sdf/npz/<nome>_surface_64_sdf_log1.npz` |
 | `--orcamento` | 400 | candidatos avaliados, contando repetidos |
 | `--populacao` | 20 | cromossomos por geração (só no GA) |
 | `--seed` | 0 | semente da **busca**, não do CA |
-| `--peso` | SDF com log 1 do Elaphes | npz do `tools/sdf` usado como peso, sem nenhuma escala |
-| `--alvo` | SDF com limiar −3 e log 1 | npz do `tools/sdf` usado como alvo |
 | `--saida` | `results/` desta pasta | onde gravar o `ga_NNN.npz` |
 | `--top` | 10 | quantos melhores parâmetros listar no fim |
 
 No fim o terminal mostra a lista dos melhores parâmetros, sem repetir
-combinação e sem os cortados, com a nota nas seeds de ajuste e a média e o
-mínimo nas reservadas:
+combinação e sem os cortados. O título diz o critério da ordem. Com uma
+caverna:
 
 ```
-10 melhores parâmetros (nota nas sementes de ajuste e média e mínimo nas 10 reservadas):
-  #  chance_inicial   sensibilidade iteracoes nota ajuste reservadas     mín
-  1          0.5589              13        23      +0.637     +0.656  +0.560
-  2          0.5467              13        15      +0.614     +0.639  +0.578
-  3             0.3               9        14      +0.577     +0.591  +0.409
-  4          0.5911              14        10      +0.497       -inf    -inf
-  ...
+5 melhores parâmetros, ordenados pela nota de ajuste (média das 5 seeds de ajuste em elaphes):
+  reservadas: média nas 10 seeds reservadas; pior seed: a menor nota entre elas
+  #  chance_inicial   sensibilidade iteracoes nota ajuste reservadas pior seed
+  1            0.66              15        23      +0.172    cortado   cortado
+  4            0.66              17         4      -0.414     -0.461    -0.839
 ```
 
-Um `-inf` nas reservadas quer dizer que o parâmetro passou nas 3 seeds de
-ajuste, mas foi cortado em pelo menos uma das reservadas: ele é frágil. Para
-comparar GA e busca aleatória com justiça, use o mesmo `--orcamento`. O consumo de tempo e memória da busca
-inteira vai para a planilha do `track_resources`, com o nome do `ga_NNN` no
-rótulo para ligar a linha ao arquivo.
+Com várias, a nota de ajuste é a média entre as cavernas, seguida do mínimo,
+do máximo e do desvio entre elas e da nota de cada uma:
 
-Com orçamento 100 o GA levou 15 s e a busca aleatória 11 s nesta máquina.
+```
+5 melhores parâmetros, ordenados pela média entre as 2 cavernas nas 5 seeds de ajuste:
+  mín, máx e desvio: entre as cavernas; reservadas: média entre as cavernas nas 10 seeds reservadas; pior seed: a menor nota entre elas
+  #  chance_inicial   sensibilidade iteracoes média ajuste     mín     máx desvio elaphes indian_tunnel reservadas pior seed
+  1             0.5              13        18       -0.073  -0.173  +0.028  0.100  -0.173        +0.028    cortado   cortado
+  3            0.66              15        19       -0.577  -0.972  -0.182  0.395  -0.972        -0.182     -0.249    -2.184
+```
+
+`reservadas` é a média entre as cavernas nas 10 seeds reservadas; `pior seed`
+é a menor nota de todas as seeds reservadas em todas as cavernas. Um
+`cortado` nas reservadas quer dizer que o parâmetro passou nas 5 seeds de
+ajuste, mas foi cortado em pelo menos uma reservada: ele é frágil. Para
+comparar GA e busca aleatória com justiça, use o mesmo `--orcamento` e as
+mesmas `--cavernas`. O consumo de tempo e memória da busca inteira vai para a
+planilha do `track_resources`, com o nome do `ga_NNN` e as cavernas no
+rótulo.
+
+**Tempo.** Nesta máquina, cada candidato leva cerca de 3,1 s por caverna (5
+seeds × 40 iterações em 64³): 3,1 s com o Elaphes, 6,1 s com o Elaphes e o
+Indian Tunnel. No orçamento 400, o tempo depende de quantos candidatos se
+repetem (o cache não refaz o CA): as execuções antigas do GA tiveram de 93 a
+185 candidatos únicos, o que dá de 5 a 10 min por caverna; a busca aleatória
+repete menos (cerca de 300 únicos entre os 620 pontos da grade), cerca de 15
+min por caverna.
 
 ### O que fica no `ga_NNN.npz`
 
 | campo | conteúdo |
 |---|---|
 | `genes_nomes`, `genes` | cromossomo de cada avaliação, na ordem em que foi feita |
-| `notas`, `iteracoes`, `geracao` | nota, melhor iteração e geração de cada avaliação |
-| `melhor_acumulado` | melhor nota vista até cada avaliação: a curva GA × aleatória |
+| `notas`, `iteracoes`, `geracao` | nota (média entre as cavernas), melhor iteração e geração de cada avaliação |
+| `melhor_acumulado` | melhor nota vista até cada avaliação: a curva GA × busca aleatória |
 | `reaproveitadas` | candidatos repetidos que vieram do cache |
-| `detalhes` | JSON por avaliação: paradas, motivos, nota por seed, vazio e mudanças por passo |
-| `melhores` | a lista dos melhores: posição, genes, iterações, nota de ajuste e nota por seed reservada (média, mínimo e cada uma) |
-| `campeao`, `notas_reservadas`, `nota_reservada_media` | o primeiro da lista e como ele foi nas seeds reservadas |
-| `nota_copia_pura`, `nota_teto_trivial` | as notas de referência |
-| `config`, `genes_limites`, `cortes`, `faixa_vazio`, `sementes_*`, `alvo`, `ambiente` | tudo o que é preciso para refazer a execução (inclui o commit) |
-| `peso`, `ambiente.arquivo_peso`, `ambiente.sha256_peso` | de qual arquivo veio o peso, com o limiar e o log que a ferramenta aplicou e o hash do arquivo |
+| `detalhes` | JSON por avaliação: `entre_cavernas` (média, mínimo, máximo, desvio e a nota de cada caverna) e, em `cavernas`, por caverna: a nota de cada seed na iteração escolhida, `fim` (onde o vazio terminou em cada seed), e o vazio e as mudanças em cada passo |
+| `melhores` | a lista dos melhores: posição, genes, iterações, `nota_ajuste` (o critério), `ajuste` (o resumo entre as cavernas), `nota_reservada_media` e `reservadas` (o resumo nas reservadas, a pior seed e a nota de cada seed em cada caverna) |
+| `campeao`, `nota_reservada_media` | o primeiro da lista, com o resumo de ajuste e das reservadas |
+| `nota_copia_pura` | a cópia pura de cada caverna (1 quando o alvo é o peso) |
+| `cavernas` | por caverna: `nome`, arquivo (`origem`), `sha256`, `convencao`, `limiar`, `escala_log`, `forma`, `referencia_alvo` (voxels positivos) e `faixa_vazio` |
+| `criterio_ranking` | o critério da ordem, por extenso |
+| `config`, `genes_limites`, `cortes`, `max_iteracoes`, `borda`, `modo_peso`, `sementes_*`, `seed`, `ambiente` | tudo o que é preciso para refazer a execução (inclui o commit) |
 
 Os campos extras são strings JSON:
 
@@ -303,34 +539,38 @@ Os campos extras são strings JSON:
 import json
 import numpy as np
 
-with np.load("src/cavegen/optimization/genetic/results/ga_005.npz") as r:
+with np.load("src/cavegen/optimization/genetic/results/ga_011.npz") as r:
     melhores = json.loads(str(r["melhores"]))
 for m in melhores:
-    print(m["posicao"], m["genes"], m["iteracoes"], m["nota_ajuste"], m["nota_reservada_media"])
+    print(m["posicao"], m["genes"], m["iteracoes"], m["nota_ajuste"],
+          m["ajuste"]["por_caverna"], m["nota_reservada_media"])
 ```
 
 ### Usar em código
 
 ```python
 from cavegen.optimization.genetic.algoritmo import ConfiguracaoGA, evoluir
-from cavegen.optimization.genetic.aptidao import Alvo
 from cavegen.optimization.genetic.ca import GENES_CA, AvaliadorCA
+from cavegen.optimization.genetic.executar import (
+    SEMENTES_AJUSTE,
+    caminho_da_caverna,
+    carregar_caverna,
+)
 
-from cavegen.optimization.genetic.executar import ALVO_ELAPHES, PESO_ELAPHES, carregar_campo
-
-peso, _ = carregar_campo(PESO_ELAPHES)
-campo_alvo, _ = carregar_campo(ALVO_ELAPHES)
-avaliador = AvaliadorCA(peso, Alvo(campo_alvo), sementes=(1, 2, 3))
+cavernas = [carregar_caverna(caminho_da_caverna(nome))[0]
+            for nome in ("elaphes", "indian_tunnel")]
+avaliador = AvaliadorCA(cavernas, SEMENTES_AJUSTE)
 nota, detalhes = avaliador({"chance_inicial": 0.5, "sensibilidade": 13})
+print(nota, detalhes["iteracoes"], detalhes["entre_cavernas"])
 resultado = evoluir(GENES_CA, avaliador, ConfiguracaoGA(orcamento=100), seed=0)
 for a in resultado.melhores(10):  # sem repetidos e sem cortados, do melhor ao pior
-    print(a.genes, a.nota, a.detalhes["iteracoes"])
+    print(a.genes, a.nota, a.detalhes["iteracoes"], a.detalhes["entre_cavernas"]["por_caverna"])
 ```
 
 ## O decalque e a retirada da escala
 
-As primeiras execuções (`ga_001` e `ga_002`, orçamento 200, seed 0) tinham a
-escala do log como gene:
+As primeiras execuções (`ga_001` e `ga_002`, orçamento 200, seed 0, ainda com
+o alvo antigo) tinham a escala do log como gene:
 
 | método | campeão | nota ajuste | nota reservada |
 |---|---|---|---|
@@ -341,15 +581,15 @@ As duas buscas foram parar na sensibilidade 1 com escala alta. É o
 **decalque**: com a escala alta, o peso passa dos 27 vizinhos possíveis, os
 vizinhos deixam de importar e a regra do CA vira um limiar sobre o SDF. O CA só
 pinta a região do alvo, e seeds diferentes dão quase a mesma caverna (IoU entre
-as seeds de 0,92 a 0,96). A nota fica perto do teto trivial sem o CA gerar
+as seeds de 0,92 a 0,96). A nota fica perto do máximo (1) sem o CA gerar
 nada.
 
 O papel do SDF aqui é dar uma dica ao CA, não a resposta. Por isso a escala
-saiu do cromossomo e não virou constante: o peso entra com os valores que o
+saiu do cromossomo e ficou fixa em 1: o peso entra com os valores que o
 arquivo tem. **`ga_001` e `ga_002` foram gerados com a escala como gene e não
 são comparáveis com as execuções a partir de `ga_003`.**
 
-Sem a escala (`ga_003` e `ga_004`, orçamento 100, seed 0):
+Sem a escala (`ga_003` e `ga_004`, orçamento 100, seed 0, alvo antigo):
 
 | método | campeão | nota ajuste | nota reservada | IoU entre seeds |
 |---|---|---|---|---|
@@ -357,10 +597,10 @@ Sem a escala (`ga_003` e `ga_004`, orçamento 100, seed 0):
 | aleatória | chance 0,42, sensibilidade 11, 20 iterações | 0,617 | 0,639 | 0,46 |
 
 O decalque sumiu. Com sensibilidade de 1 a 8, a grade enche quase toda já no
-primeiro passo e o candidato é cortado (`vazio_demais`); as notas válidas
-começam na sensibilidade 9. Os campeões formam caverna e variam com a seed
-(IoU 0,46 a 0,52, contra 0,92 a 0,96 no decalque). O GA ficou só 0,02 acima
-da busca aleatória, com uma seed de busca para cada um, o que ainda não mostra
+primeiro passo e o candidato é cortado; as notas válidas começavam na
+sensibilidade 9. Os campeões formavam caverna e variavam com a seed (IoU
+0,46 a 0,52, contra 0,92 a 0,96 no decalque). O GA ficou só 0,02 acima da
+busca aleatória, com uma seed de busca para cada um, o que ainda não mostra
 que o GA ganha do sorteio.
 
 A penalização por diversidade (`nota × (1 − IoU médio entre as cavernas das
@@ -372,15 +612,17 @@ seeds)`) segue como proposta em aberto, separada desta mudança.
 uv run python -m unittest tests/test_genetic.py tests/test_genetic_revisor.py tests/test_genetic_painel.py -v
 ```
 
-`test_genetic.py` cobre o motor, a nota, os cortes, o avaliador e o executor;
-`test_genetic_painel.py`, o observador e o painel.
+`test_genetic.py` cobre o motor, a nota, a faixa de vazio, a cópia pura, o
+resumo entre cavernas, a caverna, o avaliador (sem parada antecipada, com a
+penalização preservada, várias cavernas) e o executor (5 seeds, `--cavernas`,
+erros por caverna); `test_genetic_painel.py`, o observador e o painel.
 `test_genetic_revisor.py` tem os testes adversariais do revisor (gene inteiro
 com limite fracionário, orçamento exato, cache, tudo cortado sem NaN,
 seeds reservadas fora da busca, reprodutibilidade do campeão gravado).
 
 ## Mais contexto
 
-- Decisões e justificativas: `docs/methodology-adjustments.md`, bloco "Ajuste
-  genético do CA".
+- Decisões e justificativas: `docs/methodology-adjustments.md`, blocos
+  "Ajuste genético do CA" e "Revisão do ajuste genético do CA".
 - Tarefas e critérios de aceite: `docs/tarefas-felipe-sdf-ca.md`.
-- O SDF, o limiar e o log: [`tools/sdf/README.md`](../../../../tools/sdf/README.md).
+- O SDF, o limiar, o log e a ordem entre eles: [`tools/sdf/README.md`](../../../../tools/sdf/README.md).
