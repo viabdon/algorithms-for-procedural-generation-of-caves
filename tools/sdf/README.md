@@ -64,6 +64,21 @@ zero cai no centro dele, sem correção de meio voxel. O interno é fino (a
 parede da caverna voxelizada tem poucos voxels de espessura), por isso o
 máximo positivo é só 2.
 
+**De onde vem cada parte.** A distância sozinha é sempre positiva: ela diz
+quão longe da borda o voxel está, não de que lado. O lado vem da inundação:
+a água entra pela beirada da grade e o que ela alcança é externo; o que não é
+parede e ela não alcança é interno. O interno fica positivo porque é a
+caverna, o lugar onde quem usa o campo (o peso do CA, a nota do GA) quer
+vazio, e positivo é o que soma. A borda fica 0 porque é a própria superfície,
+a fronteira entre os dois lados. O externo fica negativo, e mais negativo
+quanto mais longe da parede.
+
+**O que o interno é no Elaphes.** O PLY observa a parede, não o ar. Como a
+caverna tem entradas, o ar do túnel se liga ao lado de fora e a água o
+alcança: ele fica externo. O interno é a espessura da parede voxelizada (e
+buracos fechados), não o ar transitável; o `docs/architecture.md` registra
+que esse campo não valida `VOID` real.
+
 **Sinal:** interno positivo, combinado para este experimento. O
 `docs/architecture.md` usa o inverso (`SDF < 0` no `VOID`); para mudar, troque
 `SINAL_INTERNO` para `-1`. O npz guarda a convenção usada no campo
@@ -107,11 +122,29 @@ aplica duas transformações, **sempre nesta ordem**, sem recalcular a distânci
    | fora, a 4 voxels | −4 | 0 (neutro) |
    | fora, a 10 voxels | −10 | −6 |
 
-2. **Log** (`--log E`): `comprimir_log` (`E · sinal(x) · ln(1 + |x|)`).
-   As duas transformações ficam em `src/cavegen/sdf/manipulacao.py`, porque
-   são do SDF e o CA (peso) e o GA (peso e alvo) também as usam; o pacote
-   não importa de `tools/`, então este script importa de lá. Vem depois do limiar para o zero continuar em `L`: o log leva 0 em
-   0. Na ordem inversa, o zero sairia do lugar.
+2. **Log** (`--log E`): `comprimir_log`, `E · sinal(x) · ln(1 + |x|)`.
+   O SDF cru vai até −63,16 no Elaphes; sem compressão, o voxel mais
+   distante pesaria 63 vezes o voxel colado na parede. O log cresce rápido
+   perto de zero e devagar depois, então a distância grande pesa só um pouco
+   mais que a pequena (com `E = 1`, 4,16 contra 0,69: 6 vezes). O `ln(x)`
+   sozinho não serve: **não existe para x negativo** (o externo inteiro), por
+   isso a conta usa `|x|` e devolve o sinal no fim; e **vai a menos infinito
+   em x = 0** (a borda), por isso o `1 +`, que leva a borda a `ln(1) = 0`. A
+   tabela com os valores reais do Elaphes (escala 1, sem limiar) está no
+   [README do GA](../../src/cavegen/optimization/genetic/README.md#2-o-log-por-que-sinald--ln1--d).
+
+As duas transformações ficam em `src/cavegen/sdf/manipulacao.py`, porque são
+do SDF e o CA (peso) e o GA (peso e alvo) também as usam; o pacote não
+importa de `tools/`, então este script importa de lá.
+
+**A ordem importa: primeiro o limiar, depois o log.** O log leva 0 em 0, então
+o zero que o limiar pôs em `d = L` continua lá depois do log. Na ordem
+inversa (log primeiro, depois somar `|L|`), o zero iria para onde o log vale
+`L`, ou seja, `ln(1 + |d|) = |L|`, `|d| = e^|L| − 1`. Com o `L = −3` que o GA
+usou até 22/11/2026, o zero sairia de `d = −3` para `d ≈ −19,09`, 16 voxels
+mais longe da parede: a borda valeria +3 em vez de +1,39, e a região
+positiva do Elaphes teria 72.027 voxels em vez de 5.201. Por isso
+`manipular_sdf` fixa a ordem.
 
 As duas transformações só crescem, então a ordem dos voxels não muda: o corte
 do plot passa pela mesma conta (`corte_do_campo`) e mostra os mesmos voxels,
@@ -122,14 +155,15 @@ No Elaphes 64³ (`L = −4`): a região com nota positiva passa de 292 voxels
 (só o interno) para 7.891, e 401 voxels ficam exatamente neutros. Com
 `L = −4` e log × 2, o campo vai de −8,19 a +3,89, com a borda em +3,22.
 
-**Para o algoritmo genético, atenção ao alvo:** no Elaphes, o positivo do SDF
-base é a espessura da parede (o ar do túnel é alcançado pela água e fica
-negativo), e o `docs/architecture.md` registra que esse campo não valida `VOID`
-real. Mesmo assim, o Felipe decidiu (12/11/2026) usar o Elaphes com `L = −3`
-como alvo do GA do CA: 5.201 voxels positivos (2% da grade), a casca da parede
-mais a faixa de até 3 voxels em volta. A nota mede aderência a esse campo, não
-ao vazio real, e exige o controle de cópia pura; ver
-`docs/methodology-adjustments.md`.
+**Para o algoritmo genético, atenção ao alvo:** desde 22/11/2026 o GA do CA
+usa, em cada caverna, **um campo só, sem limiar**: o SDF com log de escala 1
+(`--log 1`), que é o peso do CA e o alvo da nota ao mesmo tempo. No Elaphes
+são 292 voxels positivos, só a espessura da parede (o ar do túnel é alcançado
+pela água e fica negativo), e o `docs/architecture.md` registra que esse campo
+não valida `VOID` real. A nota mede aderência a esse campo, não ao vazio real.
+De 12/11 a 22/11/2026 o alvo foi o SDF com `L = −3` e log (5.201 positivos, a
+casca mais a faixa de até 3 voxels em volta); o limiar continua disponível na
+ferramenta, mas o GA não o usa mais. Ver `docs/methodology-adjustments.md`.
 
 ## Como regenerar
 
@@ -147,9 +181,14 @@ Depois, o SDF (a inundação roda dentro dele):
 
 ```
 uv run python -m tools.sdf.sdf [superficie.npz]                       # SDF base
+uv run python -m tools.sdf.sdf [superficie.npz] --log 1               # o campo do GA (peso e alvo)
 uv run python -m tools.sdf.sdf [superficie.npz] --limiar -4            # zero a 4 voxels para fora
 uv run python -m tools.sdf.sdf [superficie.npz] --limiar -4 --log 2    # e depois o log × 2
 ```
+
+O campo do GA de outra caverna sai da grade de superfície dela, por exemplo
+`uv run python -m tools.sdf.sdf indian_tunnel_temp/npz/indian_tunnel_surface_64.npz --log 1`,
+que grava `npz/indian_tunnel_surface_64_sdf_log1.npz` (265 voxels positivos).
 
 Cada combinação grava um npz e um plot com o nome dela, e o SDF base continua
 com o mesmo nome de antes (`elaphes_surface_64_sdf.npz`), que é o peso padrão

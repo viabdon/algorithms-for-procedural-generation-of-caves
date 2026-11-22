@@ -42,15 +42,16 @@ def manipular_sdf(sdf: np.ndarray, limiar: float = 0.0,
 
 def comprimir_log(sdf: np.ndarray, escala: float) -> np.ndarray:
     """
-        Aplica escala * sinal(d) * ln(1 + |d|) ao SDF pronto. O 1 + |d| evita o
-        infinito negativo em d = 0, e o sinal mantém o externo negativo, porque o
-        logaritmo sozinho só enxerga a distância.
-        A escala é o que mantém o guia funcionando: os vizinhos vão só até 27,
-        então com escala 1 o peso mais forte do volume mal passa de -4 e a célula
-        nasce em qualquer lugar. Com escala 2 o peso quase não muda até 3 voxels
-        da superfície e cresce bem menos depois disso.
+        Aplica escala * sinal(d) * ln(1 + |d|) ao SDF pronto. O ln(d) sozinho não
+        serve: não existe para d negativo (o externo) e vai a menos infinito em
+        d = 0 (a borda). Por isso ele recebe só a distância |d|, o sinal volta no
+        fim, e o 1 + leva a borda a ln(1) = 0. A compressão faz a distância
+        grande pesar pouco mais que a pequena: no Elaphes, o voxel mais distante
+        (d = -63,16) vale -4,16 em vez de -63,16, só 6 vezes o d = -1 (-0,69).
         sdf: campo com sinal, em voxels.
-        escala: multiplicador do logaritmo, finito e maior que 0.
+        escala: multiplicador do logaritmo, finito e maior que 0. A ferramenta
+                aceita qualquer escala; o GA do CA usa sempre 1, fixa por decisão
+                metodológica (ver o README do GA).
     """
     # NaN passaria por um "escala <= 0" e zeraria o volume do CA sem nenhum erro.
     if not np.isfinite(escala) or escala <= 0:
