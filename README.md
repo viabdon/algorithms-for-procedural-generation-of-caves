@@ -171,7 +171,7 @@ uv run poe menu-ca                          # menu do CA
 uv run poe menu-rw                          # menu do Random Walk
 uv run poe ui                               # bancada Streamlit do CA
 uv run poe ga                               # algoritmo genético do CA, etapa por etapa
-uv run poe ga-aleatoria                     # busca aleatória de controle do GA
+uv run poe busca-aleatoria                  # busca aleatória do CA (controle do GA, só sorteia)
 ```
 
 Os comandos abaixo são verificações leves que não exigem os datasets externos:
