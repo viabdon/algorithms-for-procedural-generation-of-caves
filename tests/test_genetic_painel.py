@@ -20,9 +20,12 @@ from cavegen.optimization.genetic.painel import Estilo, Painel
 GENES = (Gene("x", 0.0, 1.0), Gene("n", 1, 20, inteiro=True))
 
 def sintetica(genes: dict) -> tuple[float, dict]:
+    # Os detalhes imitam os do AvaliadorCA: onde o vazio terminou em cada semente.
     if genes["n"] > 15:
-        return NOTA_MINIMA, {"iteracoes": 1, "motivos": ["vazio_demais"]}
-    return -((genes["x"] - 0.3) ** 2), {"iteracoes": 3, "motivos": ["convergiu"]}
+        return NOTA_MINIMA, {"iteracoes": 1,
+                             "cavernas": {"c": {"fim": ["vazio_demais", "na_faixa"]}}}
+    return -((genes["x"] - 0.3) ** 2), {"iteracoes": 3,
+                                        "cavernas": {"c": {"fim": ["na_faixa", "na_faixa"]}}}
 
 class ObservadorTests(unittest.TestCase):
     def test_observar_nao_muda_a_busca(self):
@@ -76,7 +79,7 @@ class PainelTests(unittest.TestCase):
 
         self.assertIn("\r  candidato 1/40 · geração 0 · ", texto)
         self.assertIn("candidato 40/40", texto)
-        self.assertIn("cortado (vazio_demais)", texto)
+        self.assertIn("cortado (no fim: vazio_demais)", texto)
 
     def test_busca_aleatoria_resume_por_lote(self):
         saida = io.StringIO()
@@ -106,10 +109,18 @@ class TerminalFalso(io.StringIO):
     def isatty(self):
         return True
 
+def reservadas(media=0.62, pior=0.5, por_caverna=None):
+    por_caverna = {"c": media} if por_caverna is None else por_caverna
+    return {"media": media, "min": min(por_caverna.values()), "max": max(por_caverna.values()),
+            "desvio": 0.0, "por_caverna": por_caverna, "pior_semente": pior}
+
 def melhores_falsos(nota_min=0.5):
     return [{"posicao": i, "genes": {"x": 0.5 + i / 100, "n": 13}, "iteracoes": 20 + i,
-             "nota_ajuste": 0.6 - i / 100, "nota_reservada_media": 0.62,
-             "nota_reservada_min": nota_min if i == 4 else 0.5} for i in range(1, 6)]
+             "nota_ajuste": 0.6 - i / 100,
+             "ajuste": {"media": 0.6 - i / 100, "min": 0.6 - i / 100, "max": 0.6 - i / 100,
+                        "desvio": 0.0, "por_caverna": {"c": 0.6 - i / 100}},
+             "nota_reservada_media": 0.62,
+             "reservadas": reservadas(pior=nota_min if i == 4 else 0.5)} for i in range(1, 6)]
 
 ATIVAR_ANSI = "cavegen.optimization.genetic.painel._ativar_ansi"
 
@@ -119,9 +130,9 @@ class EstiloTests(unittest.TestCase):
         painel = Painel(40, saida=saida)
         evoluir(GENES, sintetica, ConfiguracaoGA(orcamento=40), seed=3, observar=painel)
         painel.etapa(3, 4, "Conferindo", "🔍")
-        painel.conferido(1, 1, {"x": 0.5, "n": 3}, 0.6, 0.61, NOTA_MINIMA)
-        painel.tabela_melhores(melhores_falsos(), ["x", "n"], 10)
-        painel.referencias(0.1, 1.0, "results/ga_001.npz")
+        painel.conferido(1, 1, {"x": 0.5, "n": 3}, 0.6, reservadas(0.61, NOTA_MINIMA))
+        painel.tabela_melhores(melhores_falsos(), ["x", "n"], ["c"], 5, 10)
+        painel.referencias({"c": 1.0}, "results/ga_001.npz")
         texto = saida.getvalue()
         self.assertNotIn("\033", texto)
         # Nada de emoji: só letras, acentos e o ponto do meio.
@@ -159,9 +170,9 @@ class EstiloTests(unittest.TestCase):
         for estilo in (Estilo(), Estilo(cores=True)):
             saida = io.StringIO()
             Painel(10, saida=saida, estilo=estilo).tabela_melhores(
-                melhores_falsos(NOTA_MINIMA), ["x", "n"], 10)
+                melhores_falsos(NOTA_MINIMA), ["x", "n"], ["c"], 5, 10)
             linhas = [re.sub(r"\033\[[0-9;]*m", "", linha)
-                      for linha in saida.getvalue().splitlines()[2:]]
+                      for linha in saida.getvalue().splitlines()[3:]]
             self.assertEqual(len({len(linha) for linha in linhas}), 1, linhas)
             self.assertIn("cortado", linhas[4])
 
@@ -184,8 +195,40 @@ class EstiloTests(unittest.TestCase):
 
     def test_fragil_aparece_quando_uma_seed_reservada_corta(self):
         saida = io.StringIO()
-        Painel(10, saida=saida).conferido(1, 2, {"x": 0.5}, 0.6, NOTA_MINIMA, NOTA_MINIMA)
+        Painel(10, saida=saida).conferido(1, 2, {"x": 0.5}, 0.6,
+                                          reservadas(NOTA_MINIMA, NOTA_MINIMA))
         self.assertIn("frágil", saida.getvalue())
+
+    def test_conferido_mostra_cada_caverna_so_quando_ha_varias(self):
+        uma, varias = io.StringIO(), io.StringIO()
+        Painel(10, saida=uma).conferido(1, 1, {"x": 0.5}, 0.6, reservadas(0.62, 0.4))
+        Painel(10, saida=varias).conferido(
+            1, 1, {"x": 0.5}, 0.6, reservadas(0.55, 0.3, {"a": 0.5, "b": 0.6}))
+        self.assertEqual(uma.getvalue().strip(),
+                         "1/1 x=0.5: ajuste +0.600, reservadas +0.620, pior seed +0.400")
+        self.assertIn("reservadas +0.550 (a +0.500, b +0.600), pior seed +0.300",
+                      varias.getvalue())
+        self.assertNotIn("frágil", uma.getvalue() + varias.getvalue())
+
+    def test_referencia_e_so_a_copia_pura(self):
+        saida = io.StringIO()
+        Painel(10, saida=saida).referencias({"a": 1.0, "b": 1.0}, "results/ga_001.npz")
+        texto = saida.getvalue()
+        self.assertIn("referência: cópia pura (peso > 0 vira vazio, sem rodar o CA): "
+                      "a +1.000, b +1.000", texto)
+        self.assertNotIn("teto", texto)
+
+    def test_caverna_fora_do_protocolo_ganha_aviso(self):
+        saida = io.StringIO()
+        painel = Painel(10, saida=saida)
+        painel.caverna("e", "e.npz", (64, 64, 64), -4.16, 1.1, 292, (146.0, 1460.0), 1.0)
+        painel.caverna("p", "p.npz", (32, 32, 32), -3.0, 1.0, 40, (20.0, 200.0), 1.0,
+                       aviso="grade 32³, fora do protocolo de 64³")
+        linhas = saida.getvalue().splitlines()
+        self.assertEqual(linhas[1].strip(), "grade 64x64x64, campo de -4.16 a +1.10, 292 voxels "
+                         "positivos; vazio aceito de 146 a 1460; cópia pura +1.000")
+        self.assertEqual(len(linhas), 5)
+        self.assertIn("fora do protocolo", linhas[4])
 
 if __name__ == "__main__":
     unittest.main()

@@ -5,8 +5,10 @@
 import contextlib
 import io
 import json
+import math
 import tempfile
 import unittest
+import warnings
 from pathlib import Path
 from unittest import mock
 
@@ -25,14 +27,26 @@ from cavegen.optimization.genetic.aptidao import (
     NOTA_MINIMA,
     Alvo,
     Cortes,
-    motivo_da_parada,
     nota_da_copia_pura,
     nota_do_passo,
+    resumo_entre_cavernas,
+    situacao_do_vazio,
 )
-from cavegen.optimization.genetic.ca import GENES_CA, AvaliadorCA, rodar_ca
+from cavegen.optimization.genetic.ca import (
+    GENES_CA,
+    MAX_ITERACOES,
+    AvaliadorCA,
+    Caverna,
+    media_por_passo,
+    rodar_ca,
+)
 from cavegen.sdf.manipulacao import comprimir_log
 
 GENES = (Gene("x", 0.0, 1.0), Gene("n", 1, 20, inteiro=True))
+# Nas esferas de raio 5 e 6 (16³, com log), estes genes dão nota positiva nas duas.
+BONS = {"chance_inicial": 0.6, "sensibilidade": 15}
+ENCHE = {"chance_inicial": 0.5, "sensibilidade": 1}    # a grade enche no primeiro passo
+MORRE = {"chance_inicial": 0.5, "sensibilidade": 27}   # nem 27 vizinhos bastam: tudo vira rocha
 
 def sintetica(genes: dict) -> tuple[float, dict]:
     """Aptidão de ótimo conhecido: x = 0,3 e n = 7."""
@@ -52,6 +66,38 @@ def esfera_sdf(lado: int = 16, raio: float = 4.0) -> np.ndarray:
     centro = (lado - 1) / 2
     return (raio - np.sqrt((z - centro) ** 2 + (y - centro) ** 2 + (x - centro) ** 2)).astype(
         np.float32)
+
+def campo_esfera(raio: float = 5.0, lado: int = 16) -> np.ndarray:
+    """O campo do GA para a esfera: o SDF dela com log de escala 1, sem limiar."""
+    return comprimir_log(esfera_sdf(lado, raio), 1.0)
+
+def gravar_campo(caminho: Path, campo: np.ndarray, limiar: float = 0.0,
+                 escala_log: float | None = 1.0) -> Path:
+    """Grava um npz no formato do tools/sdf."""
+    extras = {} if escala_log is None else {"escala_log": escala_log}
+    np.savez_compressed(caminho, sdf=campo, convencao=np.array("teste"), limiar=limiar, **extras)
+    return caminho
+
+def rodar_main(*argv: str) -> Path:
+    from cavegen.optimization.genetic import executar
+
+    # Sem gravar na planilha real do track_resources.
+    with (mock.patch("cavegen.profiling.resource_tracker.registrar_execucao"),
+          contextlib.redirect_stdout(io.StringIO())):
+        return executar.main(list(argv))
+
+def erro_do_main(*argv: str) -> str:
+    """Roda o main esperando parser.error, e devolve a mensagem."""
+    erro = io.StringIO()
+    with (contextlib.redirect_stderr(erro), contextlib.redirect_stdout(io.StringIO()),
+          mock.patch("cavegen.profiling.resource_tracker.registrar_execucao")):
+        from cavegen.optimization.genetic import executar
+        try:
+            executar.main(list(argv))
+        except SystemExit as saida:
+            assert saida.code == 2, saida.code
+            return erro.getvalue()
+    raise AssertionError("o main não falhou")
 
 class GeneTests(unittest.TestCase):
     def test_corrigir_e_sortear_ficam_na_faixa(self):
@@ -225,18 +271,23 @@ class AptidaoTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             Alvo(np.array([1.0, np.nan]))
 
-    def test_regras_de_parada(self):
+    def test_cortes_so_tem_a_faixa_de_vazio(self):
+        # A parada por convergência saiu junto com a parada antecipada.
+        self.assertEqual(Cortes().como_dict(), {"fator_minimo": 0.5, "fator_maximo": 5.0})
+        with self.assertRaises(TypeError):
+            Cortes(fracao_convergencia=1e-4)
+        for fatores in ((0.0, 5.0), (1.0, 5.0), (0.5, 1.0), (0.5, 0.4)):
+            with self.assertRaises(ValueError):
+                Cortes(*fatores)
+
+    def test_situacao_do_vazio(self):
         alvo = Alvo(np.ones((10, 10, 10)))  # referência 1000: faixa [500, 5000] de vazio
-        cortes = Cortes(fracao_convergencia=0.01)  # 10 células
-        # Acima do máximo, mas encolhendo: continua (é o ruído inicial).
-        self.assertIsNone(motivo_da_parada(6000, 9000, 3000, alvo, cortes))
-        self.assertEqual(motivo_da_parada(6000, 6000, 50, alvo, cortes), "vazio_demais")
-        self.assertEqual(motivo_da_parada(6100, 6000, 100, alvo, cortes), "vazio_demais")
-        # Abaixo do mínimo, mas crescendo: continua.
-        self.assertIsNone(motivo_da_parada(400, 300, 100, alvo, cortes))
-        self.assertEqual(motivo_da_parada(400, 450, 50, alvo, cortes), "vazio_de_menos")
-        self.assertEqual(motivo_da_parada(1000, 1003, 9, alvo, cortes), "convergiu")
-        self.assertIsNone(motivo_da_parada(1000, 1003, 10, alvo, cortes))
+        cortes = Cortes()
+        self.assertEqual(alvo.faixa(cortes), (500.0, 5000.0))
+        self.assertEqual(situacao_do_vazio(499, alvo, cortes), "vazio_de_menos")
+        self.assertEqual(situacao_do_vazio(500, alvo, cortes), "na_faixa")
+        self.assertEqual(situacao_do_vazio(5000, alvo, cortes), "na_faixa")
+        self.assertEqual(situacao_do_vazio(5001, alvo, cortes), "vazio_demais")
 
     def test_nota_do_passo_corta_fora_da_faixa(self):
         alvo = Alvo(np.pad(np.ones((2, 2, 2)), 1, constant_values=-1))  # referência 8
@@ -248,63 +299,196 @@ class AptidaoTests(unittest.TestCase):
         vazio[1, 1, 1] = True  # 1 < 0,5 x 8
         self.assertEqual(nota_do_passo(vazio, alvo, Cortes()), NOTA_MINIMA)
 
-    def test_copia_pura(self):
+    def test_copia_pura_do_proprio_campo_vale_1(self):
+        # O alvo é o mesmo campo do peso: a cópia pura acerta todo o positivo.
+        for campo in (campo_esfera(5.0), campo_esfera(6.0), esfera_sdf()):
+            self.assertEqual(nota_da_copia_pura(campo, Alvo(campo)), 1.0)
+        # Se o alvo fosse outro campo, ela deixaria de ser 1: é uma conferência.
         sdf = esfera_sdf()
-        alvo = Alvo(sdf + 3)  # zero 3 voxels para fora
-        nota = nota_da_copia_pura(sdf, alvo)
-        self.assertEqual(nota, alvo.nota(sdf > 0))
-        self.assertTrue(0 < nota < 1)
+        self.assertTrue(0 < nota_da_copia_pura(sdf, Alvo(sdf + 3)) < 1)
+
+    def test_resumo_entre_cavernas(self):
+        resumo = resumo_entre_cavernas({"a": 0.2, "b": 0.6, "c": 0.7})
+        self.assertAlmostEqual(resumo["media"], 0.5)
+        self.assertEqual((resumo["min"], resumo["max"]), (0.2, 0.7))
+        self.assertAlmostEqual(resumo["desvio"], float(np.std([0.2, 0.6, 0.7])))
+        self.assertEqual(resumo["por_caverna"], {"a": 0.2, "b": 0.6, "c": 0.7})
+        # Uma caverna só: tudo é a nota dela e o desvio é 0.
+        self.assertEqual(resumo_entre_cavernas({"a": 0.4}),
+                         {"media": 0.4, "min": 0.4, "max": 0.4, "desvio": 0.0,
+                          "por_caverna": {"a": 0.4}})
+        with self.assertRaises(ValueError):
+            resumo_entre_cavernas({})
+
+    def test_resumo_com_caverna_cortada_nao_vence_e_nao_avisa(self):
+        # Uma média alta não pode esconder uma caverna cortada.
+        with warnings.catch_warnings():
+            warnings.simplefilter("error")
+            resumo = resumo_entre_cavernas({"a": 0.9, "b": NOTA_MINIMA})
+        self.assertEqual(resumo["media"], NOTA_MINIMA)
+        self.assertEqual(resumo["min"], NOTA_MINIMA)
+        self.assertEqual(resumo["max"], 0.9)
+        self.assertTrue(math.isnan(resumo["desvio"]))
+
+class CavernaTests(unittest.TestCase):
+    def test_peso_e_alvo_sao_o_mesmo_campo(self):
+        campo = campo_esfera()
+        caverna = Caverna("esfera", campo)
+        np.testing.assert_array_equal(caverna.peso, campo)
+        np.testing.assert_array_equal(caverna.alvo.campo, campo)
+        self.assertEqual(caverna.peso.dtype, campo.dtype)
+        self.assertEqual(caverna.alvo.referencia, int((campo > 0).sum()))
+        self.assertFalse(caverna.peso.flags.writeable)
+        campo *= 10  # mexer no original não muda a caverna
+        self.assertEqual(float(caverna.peso.max()), float(campo_esfera().max()))
+
+    def test_sem_positivo_falha_dizendo_qual_caverna(self):
+        with self.assertRaisesRegex(ValueError, "caverna rocha .*nenhum voxel positivo"):
+            Caverna("rocha", np.full((8, 8, 8), -1.0, dtype=np.float32))
+
+    def test_grade_nao_cubica_ou_nao_finita_falha_dizendo_qual_caverna(self):
+        campo = np.ones((8, 8, 10), dtype=np.float32)
+        with self.assertRaisesRegex(ValueError, "caverna torta tem grade \\(8, 8, 10\\)"):
+            Caverna("torta", campo)
+        with self.assertRaisesRegex(ValueError, "caverna plana"):
+            Caverna("plana", np.ones((8, 8), dtype=np.float32))
+        campo = campo_esfera()
+        campo[0, 0, 0] = np.nan
+        with self.assertRaisesRegex(ValueError, "caverna nan .*não finitos"):
+            Caverna("nan", campo)
 
 class AvaliadorCATests(unittest.TestCase):
     def setUp(self):
-        self.sdf = esfera_sdf()
-        self.alvo = Alvo(self.sdf + 3)
-        self.genes = {"chance_inicial": 0.5, "sensibilidade": 10}
+        self.a = Caverna("a", campo_esfera(5.0))
+        self.b = Caverna("b", campo_esfera(6.0))
 
-    def test_rodar_ca_e_reproduzivel_e_completa_as_notas(self):
-        a = rodar_ca(self.genes, self.sdf, self.alvo, semente=3, max_iteracoes=30)
-        b = rodar_ca(self.genes, self.sdf, self.alvo, semente=3, max_iteracoes=30)
+    def test_rodar_ca_e_reproduzivel(self):
+        x = rodar_ca(BONS, self.a, semente=3, max_iteracoes=30)
+        y = rodar_ca(BONS, self.a, semente=3, max_iteracoes=30)
 
-        np.testing.assert_array_equal(a.final, b.final)
-        np.testing.assert_array_equal(a.notas, b.notas)
-        self.assertEqual(a.notas.shape, (30,))
-        self.assertEqual(len(a.vazios), a.parada)
-        # Depois da parada, a nota repete a do passo em que parou.
-        self.assertTrue(np.all(a.notas[a.parada - 1:] == a.notas[a.parada - 1]))
-        self.assertEqual(int(a.final.sum()), a.vazios[-1])
+        np.testing.assert_array_equal(x.final, y.final)
+        np.testing.assert_array_equal(x.notas, y.notas)
+        self.assertEqual(x.notas.shape, (30,))
+        self.assertEqual(int(x.final.sum()), x.vazios[-1])
 
-    def test_melhor_iteracao_e_a_da_media_das_sementes(self):
-        avaliador = AvaliadorCA(self.sdf, self.alvo, (1, 2), max_iteracoes=20)
-        nota, detalhes = avaliador(self.genes)
-        media = np.mean([t.notas for t in avaliador.trajetorias(self.genes)], axis=0)
+    def test_sem_parada_antecipada_o_ca_roda_todas_as_iteracoes(self):
+        # Enche, morre ou fica na faixa: o CA sempre roda as N iterações.
+        chamadas = []
+        original = modulo_ca.iterate
 
-        self.assertEqual(detalhes["iteracoes"], int(np.argmax(media)) + 1)
-        self.assertEqual(nota, float(media.max()))
+        def contar(*args, **kwargs):
+            chamadas.append(1)
+            return original(*args, **kwargs)
+
+        for genes in (BONS, ENCHE, MORRE):
+            with self.subTest(genes=genes):
+                chamadas.clear()
+                with mock.patch.object(modulo_ca, "iterate", side_effect=contar):
+                    t = rodar_ca(genes, self.a, semente=1, max_iteracoes=25)
+                self.assertEqual(len(chamadas), 25)
+                self.assertEqual(len(t.vazios), 25)
+                self.assertEqual(len(t.mudancas), 25)
+                self.assertEqual(t.notas.shape, (25,))
+        self.assertFalse(hasattr(t, "parada") or hasattr(t, "motivo"))
+
+    def test_a_penalizacao_continua_sem_a_parada(self):
+        # Encher ou esvaziar a grade inteira nunca vira candidato bem avaliado.
+        avaliador = AvaliadorCA([self.a], (1, 2, 3, 4, 5), max_iteracoes=15)
+        for genes, fim in ((ENCHE, "vazio_demais"), (MORRE, "vazio_de_menos")):
+            with self.subTest(genes=genes):
+                nota, detalhes = avaliador(genes)
+                self.assertEqual(nota, NOTA_MINIMA)
+                self.assertEqual(detalhes["cavernas"]["a"]["fim"], [fim] * 5)
+                for t in avaliador.trajetorias(genes)["a"]:
+                    self.assertTrue(np.all(t.notas == NOTA_MINIMA))
+                    self.assertEqual(len(t.vazios), 15)
+        # E a lista dos melhores nunca traz um cortado.
+        busca = busca_aleatoria(GENES_CA, avaliador, 25, seed=0)
+        self.assertTrue(all(np.isfinite(a.nota) for a in busca.melhores(25)))
+
+    def test_melhor_iteracao_e_a_da_media_das_sementes_e_das_cavernas(self):
+        sementes = (1, 2, 3, 4, 5)
+        avaliador = AvaliadorCA([self.a, self.b], sementes, max_iteracoes=20)
+        nota, detalhes = avaliador(BONS)
+        trajetorias = avaliador.trajetorias(BONS)
+        por_caverna = {nome: np.mean([t.notas for t in ts], axis=0)
+                       for nome, ts in trajetorias.items()}
+        media = (por_caverna["a"] + por_caverna["b"]) / 2
+
+        melhor = int(np.argmax(media))
+        self.assertEqual(detalhes["iteracoes"], melhor + 1)
+        self.assertAlmostEqual(nota, float(media.max()))
         self.assertGreater(nota, 0)
+        # Uma iteração só, a mesma para as duas cavernas.
+        for nome, ts in trajetorias.items():
+            self.assertEqual(detalhes["cavernas"][nome]["notas_por_semente"],
+                             [float(t.notas[melhor]) for t in ts])
+            self.assertEqual(len(detalhes["cavernas"][nome]["vazios"]), len(sementes))
+        resumo = detalhes["entre_cavernas"]
+        notas = [por_caverna["a"][melhor], por_caverna["b"][melhor]]
+        self.assertEqual(resumo["media"], nota)
+        self.assertAlmostEqual(resumo["min"], min(notas))
+        self.assertAlmostEqual(resumo["max"], max(notas))
+        self.assertAlmostEqual(resumo["desvio"], float(np.std(notas)))
+        self.assertEqual(set(resumo["por_caverna"]), {"a", "b"})
+
+    def test_caverna_cortada_corta_o_candidato_mesmo_com_media_alta_nas_outras(self):
+        sozinha, _ = AvaliadorCA([self.a], (1, 2), max_iteracoes=12)(BONS)
+        self.assertGreater(sozinha, 0)
+        # Esfera minúscula: a faixa vira poucos voxels e o CA sempre passa dela.
+        minuscula = Caverna("minuscula", campo_esfera(1.0))
+        nota, detalhes = AvaliadorCA([self.a, minuscula], (1, 2), max_iteracoes=12)(BONS)
+        self.assertEqual(nota, NOTA_MINIMA)
+        self.assertEqual(detalhes["entre_cavernas"]["min"], NOTA_MINIMA)
+
+    def test_faixa_de_vazio_e_de_cada_caverna(self):
+        cortes = Cortes()
+        self.assertEqual(self.a.alvo.faixa(cortes), (0.5 * self.a.alvo.referencia,
+                                                     5.0 * self.a.alvo.referencia))
+        self.assertNotEqual(self.a.alvo.faixa(cortes), self.b.alvo.faixa(cortes))
+        # A mesma grade pode estar na faixa de uma caverna e fora da da outra.
+        vazios = int(4.9 * self.a.alvo.referencia)
+        self.assertEqual(situacao_do_vazio(vazios, self.a.alvo, cortes), "na_faixa")
+        self.assertEqual(situacao_do_vazio(int(5.1 * self.a.alvo.referencia), self.a.alvo,
+                                           cortes), "vazio_demais")
+        self.assertLess(self.a.alvo.referencia, self.b.alvo.referencia)
+        self.assertEqual(situacao_do_vazio(int(5.1 * self.a.alvo.referencia), self.b.alvo,
+                                           cortes), "na_faixa")
 
     def test_iteracao_escolhida_se_reproduz_sem_escolher_de_novo(self):
         # É o que garante a avaliação honesta nas sementes reservadas: rodar com
         # N = iteração escolhida dá exatamente a nota que a busca viu.
-        avaliador = AvaliadorCA(self.sdf, self.alvo, (1, 2, 3), max_iteracoes=25)
-        nota, detalhes = avaliador(self.genes)
-        repetida = avaliador.nota_com_iteracoes(self.genes, detalhes["iteracoes"], (1, 2, 3))
+        sementes = (1, 2, 3, 4, 5)
+        avaliador = AvaliadorCA([self.a, self.b], sementes, max_iteracoes=25)
+        nota, detalhes = avaliador(BONS)
+        conferido = avaliador.conferir(BONS, detalhes["iteracoes"], sementes)
 
-        np.testing.assert_array_equal(repetida, detalhes["notas_por_semente"])
-        self.assertEqual(float(repetida.mean()), nota)
+        self.assertEqual(conferido["media"], nota)
+        for chave in ("min", "max", "desvio", "por_caverna"):
+            self.assertEqual(conferido[chave], detalhes["entre_cavernas"][chave], chave)
+        for nome in ("a", "b"):
+            self.assertEqual(conferido["notas_por_semente"][nome],
+                             detalhes["cavernas"][nome]["notas_por_semente"])
+        todas = [n for v in conferido["notas_por_semente"].values() for n in v]
+        self.assertEqual(conferido["pior_semente"], min(todas))
 
-    def test_candidato_que_morre_recebe_a_nota_minima(self):
-        avaliador = AvaliadorCA(self.sdf, self.alvo, (1,), max_iteracoes=10)
-        nota, detalhes = avaliador({**self.genes, "sensibilidade": 27})
+    def test_media_por_passo_e_a_media_de_cada_coluna(self):
+        notas = np.array([[0.1, 0.2, NOTA_MINIMA], [0.3, 0.6, 0.5]])
+        np.testing.assert_array_equal(media_por_passo(notas), [0.2, 0.4, NOTA_MINIMA])
 
-        self.assertEqual(nota, NOTA_MINIMA)
-        self.assertEqual(detalhes["motivos"], ["vazio_de_menos"])
+    def test_avaliador_recusa_cavernas_vazias_ou_repetidas(self):
+        with self.assertRaises(ValueError):
+            AvaliadorCA([], (1,))
+        with self.assertRaises(ValueError):
+            AvaliadorCA([self.a, Caverna("a", campo_esfera(6.0))], (1,))
+        with self.assertRaises(ValueError):
+            AvaliadorCA([self.a], ())
 
     def test_cromossomo_nao_tem_escala_do_peso(self):
         self.assertEqual([g.nome for g in GENES_CA], ["chance_inicial", "sensibilidade"])
 
     def test_peso_chega_ao_ca_identico_ao_carregado(self):
         # Contrato: nada multiplica, comprime ou corta o peso entre o arquivo e o CA.
-        peso = comprimir_log(self.sdf, 1.0)
         recebidos = []
         original = modulo_ca.iterate
 
@@ -312,129 +496,182 @@ class AvaliadorCATests(unittest.TestCase):
             recebidos.append(peso_recebido)
             return original(matriz, sensibilidade, borda, peso_recebido, *args, **kwargs)
 
-        avaliador = AvaliadorCA(peso, self.alvo, (1, 2), max_iteracoes=5)
+        avaliador = AvaliadorCA([self.a, self.b], (1, 2), max_iteracoes=5)
         with mock.patch.object(modulo_ca, "iterate", side_effect=espiar):
-            avaliador(self.genes)
-            avaliador.nota_com_iteracoes(self.genes, 3, (101,))
-        self.assertTrue(recebidos)
+            avaliador(BONS)
+            avaliador.conferir(BONS, 3, (101,))
+        self.assertEqual(len(recebidos), 2 * 2 * 5 + 2 * 3)
+        campos = (campo_esfera(5.0), campo_esfera(6.0))
         for recebido in recebidos:
-            self.assertTrue(np.array_equal(recebido, peso))
-            self.assertEqual(recebido.dtype, peso.dtype)
-
-    def test_avaliador_guarda_copia_do_peso(self):
-        peso = comprimir_log(self.sdf, 1.0)
-        avaliador = AvaliadorCA(peso, self.alvo, (1,), max_iteracoes=3)
-        antes = avaliador(self.genes)[0]
-        peso *= 10  # mexer no original não muda o que o avaliador usa
-        self.assertEqual(avaliador(self.genes)[0], antes)
-        self.assertFalse(avaliador.peso.flags.writeable)
-
-    def test_peso_e_alvo_precisam_do_mesmo_cubo(self):
-        with self.assertRaises(ValueError):
-            rodar_ca(self.genes, self.sdf, Alvo(np.ones((8, 8, 8))), semente=1)
+            self.assertTrue(any(np.array_equal(recebido, c) for c in campos))
+            self.assertEqual(recebido.dtype, np.float32)
 
 class ExecutarTests(unittest.TestCase):
-    def test_execucao_curta_grava_tudo(self):
-        from cavegen.optimization.genetic import executar
+    def setUp(self):
+        self._pasta = tempfile.TemporaryDirectory()
+        self.pasta = Path(self._pasta.name)
+        self.esfera = gravar_campo(self.pasta / "esfera_sdf_log1.npz", campo_esfera(5.0))
+        self.maior = gravar_campo(self.pasta / "maior_sdf_log1.npz", campo_esfera(6.0))
+        self.saida = str(self.pasta / "results")
 
-        with tempfile.TemporaryDirectory() as pasta:
-            pasta = Path(pasta)
-            sdf = esfera_sdf()
-            np.savez_compressed(pasta / "peso.npz", sdf=sdf, convencao=np.array("base"),
-                                limiar=0.0)
-            np.savez_compressed(pasta / "alvo.npz", sdf=sdf + 3, convencao=np.array("alvo"),
-                                limiar=-3.0, escala_log=1.0)
-            # Sem gravar na planilha real do track_resources.
-            with (mock.patch("cavegen.profiling.resource_tracker.registrar_execucao"),
-                  contextlib.redirect_stdout(io.StringIO())):
-                destino = executar.main(["--orcamento", "6", "--populacao", "3",
-                                         "--peso", str(pasta / "peso.npz"),
-                                         "--alvo", str(pasta / "alvo.npz"),
-                                         "--saida", str(pasta / "results")])
-            with np.load(destino) as r:
-                self.assertEqual(str(r["metodo"]), "genetico")
-                self.assertEqual(r["genes"].shape, (6, 2))
-                self.assertEqual(r["notas"].shape, (6,))
-                for campo in ("campeao", "notas_reservadas", "nota_copia_pura", "cortes",
-                              "sementes_reservadas", "alvo", "genes_limites", "detalhes",
-                              "nota_teto_trivial", "forma", "ambiente"):
-                    self.assertIn(campo, r.files)
-                # O alvo é o peso deslocado em 3: cortar o peso em -3 acerta tudo.
-                self.assertEqual(json.loads(str(r["nota_teto_trivial"])), 1.0)
-                detalhes = json.loads(str(r["detalhes"]))
-                self.assertEqual(len(detalhes), 6)
-                self.assertEqual(len(detalhes[0]["vazios"]), 3)  # uma lista por semente
-                self.assertEqual(json.loads(str(r["forma"])), [16, 16, 16])
-                ambiente = json.loads(str(r["ambiente"]))
-                self.assertTrue(ambiente["arquivo_peso"].endswith("peso.npz"))
-                self.assertEqual(len(ambiente["sha256_peso"]), 64)
-                melhores = json.loads(str(r["melhores"]))
-                campeao = json.loads(str(r["campeao"]))
-                self.assertTrue(1 <= len(melhores) <= 6)
-                self.assertEqual([m["posicao"] for m in melhores],
-                                 list(range(1, len(melhores) + 1)))
+    def tearDown(self):
+        self._pasta.cleanup()
+
+    def test_execucao_curta_grava_tudo(self):
+        destino = rodar_main("--orcamento", "6", "--populacao", "3",
+                             "--cavernas", str(self.esfera), "--saida", self.saida)
+        with np.load(destino) as r:
+            self.assertEqual(str(r["metodo"]), "genetico")
+            self.assertEqual(r["genes"].shape, (6, 2))
+            self.assertEqual(r["notas"].shape, (6,))
+            for campo in ("campeao", "nota_reservada_media", "nota_copia_pura", "cortes",
+                          "sementes_ajuste", "sementes_reservadas", "cavernas", "genes_limites",
+                          "detalhes", "ambiente", "criterio_ranking", "modo_peso"):
+                self.assertIn(campo, r.files)
+            # Saíram com o alvo único e o teto trivial.
+            for campo in ("nota_teto_trivial", "peso", "alvo", "forma", "faixa_vazio",
+                          "referencia_alvo", "notas_reservadas"):
+                self.assertNotIn(campo, r.files)
+            self.assertEqual(json.loads(str(r["nota_copia_pura"])), {"esfera": 1.0})
+            self.assertEqual(json.loads(str(r["modo_peso"])), "completo")
+            self.assertEqual(json.loads(str(r["sementes_ajuste"])), [1, 2, 3, 4, 5])
+            self.assertEqual(json.loads(str(r["cortes"])),
+                             {"fator_minimo": 0.5, "fator_maximo": 5.0})
+            cavernas = json.loads(str(r["cavernas"]))
+            self.assertEqual([c["nome"] for c in cavernas], ["esfera"])
+            self.assertTrue(cavernas[0]["origem"].endswith("esfera_sdf_log1.npz"))
+            self.assertEqual(len(cavernas[0]["sha256"]), 64)
+            self.assertEqual(cavernas[0]["forma"], [16, 16, 16])
+            self.assertEqual((cavernas[0]["limiar"], cavernas[0]["escala_log"]), (0.0, 1.0))
+            referencia = int((campo_esfera(5.0) > 0).sum())
+            self.assertEqual(cavernas[0]["referencia_alvo"], referencia)
+            self.assertEqual(cavernas[0]["faixa_vazio"], [0.5 * referencia, 5.0 * referencia])
+            detalhes = json.loads(str(r["detalhes"]))
+            self.assertEqual(len(detalhes), 6)
+            vazios = detalhes[0]["cavernas"]["esfera"]["vazios"]
+            self.assertEqual(len(vazios), 5)  # uma lista por semente
+            self.assertTrue(all(len(v) == MAX_ITERACOES for v in vazios))  # sem parada
+            melhores = json.loads(str(r["melhores"]))
+            campeao = json.loads(str(r["campeao"]))
+            self.assertTrue(0 <= len(melhores) <= 6)
+            self.assertEqual([m["posicao"] for m in melhores], list(range(1, len(melhores) + 1)))
+            if melhores:
                 self.assertEqual(melhores[0]["genes"], campeao["genes"])
                 self.assertEqual(melhores[0]["nota_reservada_media"],
                                  json.loads(str(r["nota_reservada_media"])))
 
+    def test_varias_cavernas_gravam_a_nota_de_cada_uma_e_o_resumo(self):
+        destino = rodar_main("--metodo", "aleatoria", "--orcamento", "20", "--populacao", "3",
+                             "--top", "4", "--cavernas", str(self.esfera), str(self.maior),
+                             "--saida", self.saida)
+        with np.load(destino) as r:
+            cavernas = json.loads(str(r["cavernas"]))
+            melhores = json.loads(str(r["melhores"]))
+            copias = json.loads(str(r["nota_copia_pura"]))
+            criterio = json.loads(str(r["criterio_ranking"]))
+        self.assertEqual([c["nome"] for c in cavernas], ["esfera", "maior"])
+        # A faixa é de cada caverna, relativa ao alvo dela.
+        self.assertLess(cavernas[0]["faixa_vazio"][1], cavernas[1]["faixa_vazio"][1])
+        self.assertEqual(copias, {"esfera": 1.0, "maior": 1.0})
+        self.assertIn("média", criterio)
+        self.assertGreater(len(melhores), 0)
+        notas = [m["nota_ajuste"] for m in melhores]
+        self.assertEqual(notas, sorted(notas, reverse=True))  # ordem pela média
+        avaliador = AvaliadorCA([Caverna("esfera", campo_esfera(5.0)),
+                                 Caverna("maior", campo_esfera(6.0))], (1, 2, 3, 4, 5))
+        for item in melhores:
+            ajuste = item["ajuste"]
+            self.assertEqual(set(ajuste["por_caverna"]), {"esfera", "maior"})
+            self.assertEqual(ajuste["media"], item["nota_ajuste"])
+            self.assertEqual(ajuste["min"], min(ajuste["por_caverna"].values()))
+            self.assertEqual(ajuste["max"], max(ajuste["por_caverna"].values()))
+            self.assertAlmostEqual(ajuste["desvio"],
+                                   float(np.std(list(ajuste["por_caverna"].values()))))
+            reservadas = item["reservadas"]
+            self.assertEqual(set(reservadas["notas_por_semente"]), {"esfera", "maior"})
+            self.assertTrue(all(len(v) == 10 for v in reservadas["notas_por_semente"].values()))
+            refeito = avaliador.conferir(item["genes"], item["iteracoes"], (1, 2, 3, 4, 5))
+            self.assertEqual(refeito["media"], item["nota_ajuste"])
+            self.assertEqual(refeito["por_caverna"], ajuste["por_caverna"])
+
     def test_top_limita_a_lista_e_cada_item_se_reproduz(self):
         from cavegen.optimization.genetic import executar
 
-        with tempfile.TemporaryDirectory() as pasta:
-            pasta = Path(pasta)
-            sdf = esfera_sdf()
-            np.savez_compressed(pasta / "peso.npz", sdf=sdf, convencao=np.array("base"),
-                                limiar=0.0)
-            np.savez_compressed(pasta / "alvo.npz", sdf=sdf + 3, convencao=np.array("alvo"),
-                                limiar=-3.0, escala_log=1.0)
-            with (mock.patch("cavegen.profiling.resource_tracker.registrar_execucao"),
-                  contextlib.redirect_stdout(io.StringIO())):
-                destino = executar.main(["--metodo", "aleatoria", "--orcamento", "12",
-                                         "--populacao", "3", "--top", "3",
-                                         "--peso", str(pasta / "peso.npz"),
-                                         "--alvo", str(pasta / "alvo.npz"),
-                                         "--saida", str(pasta / "results")])
-            with np.load(destino) as r:
-                melhores = json.loads(str(r["melhores"]))
+        destino = rodar_main("--metodo", "aleatoria", "--orcamento", "20", "--populacao", "3",
+                             "--top", "3", "--cavernas", str(self.esfera), "--saida", self.saida)
+        with np.load(destino) as r:
+            melhores = json.loads(str(r["melhores"]))
         self.assertLessEqual(len(melhores), 3)
         self.assertGreater(len(melhores), 0)
-        avaliador = AvaliadorCA(sdf, Alvo(sdf + 3), executar.SEMENTES_AJUSTE)
+        avaliador = AvaliadorCA([Caverna("esfera", campo_esfera(5.0))], executar.SEMENTES_AJUSTE)
         for item in melhores:
-            ajuste = avaliador.nota_com_iteracoes(item["genes"], item["iteracoes"],
-                                                  executar.SEMENTES_AJUSTE)
-            reservadas = avaliador.nota_com_iteracoes(item["genes"], item["iteracoes"],
-                                                      executar.SEMENTES_RESERVADAS)
-            self.assertEqual(float(ajuste.mean()), item["nota_ajuste"])
-            self.assertEqual(float(reservadas.mean()), item["nota_reservada_media"])
-            self.assertEqual(float(reservadas.min()), item["nota_reservada_min"])
+            ajuste = avaliador.conferir(item["genes"], item["iteracoes"], executar.SEMENTES_AJUSTE)
+            reservadas = avaliador.conferir(item["genes"], item["iteracoes"],
+                                            executar.SEMENTES_RESERVADAS)
+            self.assertEqual(ajuste["media"], item["nota_ajuste"])
+            self.assertEqual(reservadas["media"], item["nota_reservada_media"])
+            self.assertEqual(reservadas["pior_semente"], item["reservadas"]["pior_semente"])
+            self.assertEqual(reservadas["notas_por_semente"],
+                             item["reservadas"]["notas_por_semente"])
 
-    def test_teto_trivial_com_peso_comprimido_por_log(self):
-        # O padrão do GA é o peso com log: o teto converte o limiar do alvo
-        # para a unidade do peso e continua acertando tudo.
+    def test_caverna_sem_positivo_falha_dizendo_qual_e_por_que(self):
+        rocha = gravar_campo(self.pasta / "rocha_sdf_log1.npz",
+                             np.full((8, 8, 8), -1.0, dtype=np.float32))
+        mensagem = erro_do_main("--cavernas", str(self.esfera), str(rocha), "--saida", self.saida)
+        self.assertIn("caverna rocha", mensagem)
+        self.assertIn("nenhum voxel positivo", mensagem)
+
+    def test_caverna_com_limiar_ou_sem_log_e_recusada(self):
+        com_limiar = gravar_campo(self.pasta / "deslocada.npz", campo_esfera(5.0), limiar=-3.0)
+        sem_log = gravar_campo(self.pasta / "crua.npz", esfera_sdf(), escala_log=None)
+        log2 = gravar_campo(self.pasta / "dobrada.npz", campo_esfera(5.0), escala_log=2.0)
+        for caminho, trecho in ((com_limiar, "limiar -3"), (sem_log, "sem log"),
+                                (log2, "log x2")):
+            with self.subTest(caminho=caminho.name):
+                mensagem = erro_do_main("--cavernas", str(caminho), "--saida", self.saida)
+                self.assertIn(trecho, mensagem)
+                self.assertIn("--log 1", mensagem)
+
+    def test_caverna_nao_cubica_falha_dizendo_qual(self):
+        torta = gravar_campo(self.pasta / "torta_sdf_log1.npz",
+                             np.ones((8, 8, 10), dtype=np.float32))
+        self.assertIn("caverna torta tem grade (8, 8, 10)",
+                      erro_do_main("--cavernas", str(torta), "--saida", self.saida))
+
+    def test_caverna_que_falta_ou_repetida(self):
+        mensagem = erro_do_main("--cavernas", str(self.pasta / "nada_sdf_log1.npz"))
+        self.assertIn("não existe", mensagem)
+        self.assertIn("tools.sdf.sdf", mensagem)
+        mensagem = erro_do_main("--cavernas", str(self.esfera), str(self.esfera))
+        self.assertIn("repetida", mensagem)
+
+    def test_nomes_e_caminhos_das_cavernas(self):
         from cavegen.optimization.genetic import executar
 
-        with tempfile.TemporaryDirectory() as pasta:
-            pasta = Path(pasta)
-            sdf = esfera_sdf()
-            np.savez_compressed(pasta / "peso.npz", sdf=comprimir_log(sdf, 1.0),
-                                convencao=np.array("log"), limiar=0.0, escala_log=1.0)
-            np.savez_compressed(pasta / "alvo.npz", sdf=sdf + 3, convencao=np.array("alvo"),
-                                limiar=-3.0, escala_log=1.0)
-            with (mock.patch("cavegen.profiling.resource_tracker.registrar_execucao"),
-                  contextlib.redirect_stdout(io.StringIO())):
-                destino = executar.main(["--orcamento", "3", "--populacao", "3",
-                                         "--peso", str(pasta / "peso.npz"),
-                                         "--alvo", str(pasta / "alvo.npz"),
-                                         "--saida", str(pasta / "results")])
-            with np.load(destino) as r:
-                self.assertEqual(json.loads(str(r["nota_teto_trivial"])), 1.0)
-                self.assertEqual(json.loads(str(r["peso"]))["escala_log"], 1.0)
+        self.assertEqual(executar.CAVERNAS_PADRAO, ("elaphes",))
+        self.assertEqual(executar.caminho_da_caverna("elaphes"), executar.CAMPO_ELAPHES)
+        self.assertEqual(executar.CAMPO_ELAPHES.name, "elaphes_surface_64_sdf_log1.npz")
+        self.assertEqual(executar.caminho_da_caverna("indian_tunnel").name,
+                         "indian_tunnel_surface_64_sdf_log1.npz")
+        self.assertEqual(executar.nome_da_caverna(executar.CAMPO_ELAPHES), "elaphes")
+        self.assertEqual(executar.nome_da_caverna(Path("x/elaphes_surface_32_pablo_sdf_log1.npz")),
+                         "elaphes_surface_32_pablo")
+        caminho = self.pasta / "qualquer.npz"
+        self.assertEqual(executar.caminho_da_caverna(str(caminho)), caminho)
 
-    def test_peso_padrao_e_o_sdf_com_log_1(self):
+    def test_campo_padrao_e_o_sdf_com_log_1_sem_limiar(self):
         from cavegen.optimization.genetic import executar
 
-        self.assertEqual(executar.PESO_ELAPHES.name, "elaphes_surface_64_sdf_log1.npz")
-        self.assertIn("--log 1", executar.COMANDO_PESO)
+        self.assertIn("--log 1", executar.COMANDO_ELAPHES)
+        self.assertNotIn("--limiar", executar.COMANDO_ELAPHES)
+        self.assertFalse(hasattr(executar, "ALVO_ELAPHES"))
+
+    def test_seeds_de_ajuste_sao_5_e_as_reservadas_10_sem_nenhuma_em_comum(self):
+        from cavegen.optimization.genetic import executar
+
+        self.assertEqual(executar.SEMENTES_AJUSTE, (1, 2, 3, 4, 5))
+        self.assertEqual(len(executar.SEMENTES_RESERVADAS), 10)
+        self.assertFalse(set(executar.SEMENTES_AJUSTE) & set(executar.SEMENTES_RESERVADAS))
 
 if __name__ == "__main__":
     unittest.main()

@@ -5,6 +5,7 @@
 import contextlib
 import io
 import json
+import math
 import re
 import tempfile
 import unicodedata
@@ -15,7 +16,11 @@ from unittest import mock
 
 import numpy as np
 
-from cavegen.generators.cellular_automata.generator import BorderTreatment, neighbor_counts
+from cavegen.generators.cellular_automata.generator import (
+    BorderTreatment,
+    ModoPeso,
+    neighbor_counts,
+)
 from cavegen.optimization.genetic import ca as modulo_ca
 from cavegen.optimization.genetic.algoritmo import (
     ConfiguracaoGA,
@@ -25,9 +30,15 @@ from cavegen.optimization.genetic.algoritmo import (
     evoluir,
     mutar,
 )
-from cavegen.optimization.genetic.aptidao import NOTA_MINIMA, Alvo
-from cavegen.optimization.genetic.ca import GENES_CA, MAX_ITERACOES, AvaliadorCA, rodar_ca
-from cavegen.optimization.genetic.painel import Estilo, Painel
+from cavegen.optimization.genetic.aptidao import NOTA_MINIMA, Cortes
+from cavegen.optimization.genetic.ca import (
+    GENES_CA,
+    MAX_ITERACOES,
+    AvaliadorCA,
+    Caverna,
+)
+from cavegen.optimization.genetic.painel import Estilo, Painel, motivos_do_corte
+from cavegen.sdf.manipulacao import comprimir_log
 
 # Funções do gerador global que não podem ser usadas no caminho do GA.
 GLOBAIS_PROIBIDAS = ("rand", "random", "random_sample", "randint", "uniform", "normal",
@@ -40,6 +51,17 @@ def esfera_sdf(lado: int = 16, raio: float = 4.0) -> np.ndarray:
     centro = (lado - 1) / 2
     return (raio - np.sqrt((z - centro) ** 2 + (y - centro) ** 2 + (x - centro) ** 2)).astype(
         np.float32)
+
+
+def campo_esfera(raio: float = 5.0) -> np.ndarray:
+    """O campo do GA para a esfera: SDF com log de escala 1, sem limiar (peso e alvo)."""
+    return comprimir_log(esfera_sdf(raio=raio), 1.0)
+
+
+def gravar_esfera(caminho: Path, raio: float = 5.0) -> Path:
+    np.savez_compressed(caminho, sdf=campo_esfera(raio), convencao=np.array("log"),
+                        limiar=0.0, escala_log=1.0)
+    return caminho
 
 
 @contextlib.contextmanager
@@ -55,15 +77,11 @@ def sem_gerador_global():
 def rodar_executar(pasta: Path, *extra: str) -> Path:
     from cavegen.optimization.genetic import executar
 
-    sdf = esfera_sdf()
-    if not (pasta / "peso.npz").exists():
-        np.savez_compressed(pasta / "peso.npz", sdf=sdf, convencao=np.array("base"), limiar=0.0)
-        np.savez_compressed(pasta / "alvo.npz", sdf=sdf + 3, convencao=np.array("alvo"),
-                            limiar=-3.0, escala_log=1.0)
+    if not (pasta / "esfera_sdf_log1.npz").exists():
+        gravar_esfera(pasta / "esfera_sdf_log1.npz")
     with (mock.patch("cavegen.profiling.resource_tracker.registrar_execucao"),
           contextlib.redirect_stdout(io.StringIO())):
-        return executar.main(["--peso", str(pasta / "peso.npz"),
-                              "--alvo", str(pasta / "alvo.npz"),
+        return executar.main(["--cavernas", str(pasta / "esfera_sdf_log1.npz"),
                               "--saida", str(pasta / "results"), *extra])
 
 
@@ -71,7 +89,7 @@ def extras_gravados(destino: Path) -> dict:
     with np.load(destino) as r:
         return {nome: json.loads(str(r[nome])) for nome in
                 ("config", "seed", "genes_limites", "max_iteracoes", "borda", "sementes_ajuste",
-                 "sementes_reservadas", "campeao", "notas_reservadas")}
+                 "sementes_reservadas", "campeao", "nota_reservada_media")}
 
 
 class BordaNearestRevisorTests(unittest.TestCase):
@@ -181,11 +199,10 @@ class OrcamentoRevisorTests(unittest.TestCase):
 
 class ReprodutibilidadeRevisorTests(unittest.TestCase):
     def setUp(self):
-        self.sdf = esfera_sdf()
-        self.alvo = Alvo(self.sdf + 3)
+        self.cavernas = [Caverna("a", campo_esfera(5.0)), Caverna("b", campo_esfera(6.0))]
 
     def busca(self, metodo, seed):
-        avaliador = AvaliadorCA(self.sdf, self.alvo, (1, 2, 3), max_iteracoes=12)
+        avaliador = AvaliadorCA(self.cavernas, (1, 2, 3, 4, 5), max_iteracoes=12)
         if metodo == "genetico":
             return evoluir(GENES_CA, avaliador, ConfiguracaoGA(tamanho_populacao=4, orcamento=10),
                            seed)
@@ -207,57 +224,57 @@ class ReprodutibilidadeRevisorTests(unittest.TestCase):
 
 
 class ConsistenciaIteracoesRevisorTests(unittest.TestCase):
-    """A nota que a busca vê na iteração N tem de ser a que a regra 'até N' dá."""
+    """A nota que a busca vê na iteração N tem de ser a que rodar só N iterações dá."""
 
     GENES = (
         {"chance_inicial": 0.5, "sensibilidade": 8},
         {"chance_inicial": 0.3, "sensibilidade": 14},
         {"chance_inicial": 0.7, "sensibilidade": 1},
         {"chance_inicial": 0.45, "sensibilidade": 20},
-        {"chance_inicial": 0.6, "sensibilidade": 12},
+        {"chance_inicial": 0.6, "sensibilidade": 15},
         {"chance_inicial": 0.4, "sensibilidade": 17},
     )
 
-    def test_padding_bate_com_nota_com_iteracoes_em_todo_n(self):
-        sdf = esfera_sdf()
-        sementes = (1, 2, 3)
+    def test_nota_com_iteracoes_bate_com_a_trajetoria_em_todo_n(self):
+        sementes = (1, 2, 3, 4, 5)
         maximo = 12
-        motivos = set()
-        # Dois alvos: com o menor, o corte de excesso fica alcançável na grade 16³.
-        for alvo in (Alvo(sdf + 3), Alvo(sdf - 1)):
-            avaliador = AvaliadorCA(sdf, alvo, sementes, max_iteracoes=maximo)
-            for genes in self.GENES:
-                trajetorias = avaliador.trajetorias(genes)
-                motivos.update(t.motivo for t in trajetorias)
-                por_semente = np.stack([t.notas for t in trajetorias])
-                for n in range(1, maximo + 1):
-                    with self.subTest(genes=genes, n=n, referencia=alvo.referencia):
-                        np.testing.assert_array_equal(
-                            avaliador.nota_com_iteracoes(genes, n, sementes),
-                            por_semente[:, n - 1])
-        # O teste só vale se passou pelos três tipos de parada.
-        self.assertTrue({"vazio_demais", "vazio_de_menos", "convergiu"} <= motivos, motivos)
+        fins = set()
+        avaliador = AvaliadorCA([Caverna("a", campo_esfera(5.0)), Caverna("b", campo_esfera(6.0))],
+                                sementes, max_iteracoes=maximo)
+        for genes in self.GENES:
+            trajetorias = avaliador.trajetorias(genes)
+            fins.update(t.fim for ts in trajetorias.values() for t in ts)
+            for n in range(1, maximo + 1):
+                refeitas = avaliador.nota_com_iteracoes(genes, n, sementes)
+                for nome, ts in trajetorias.items():
+                    with self.subTest(genes=genes, n=n, caverna=nome):
+                        np.testing.assert_array_equal(refeitas[nome],
+                                                      [t.notas[n - 1] for t in ts])
+        # O teste só vale se passou por candidatos na faixa e fora dela, dos dois lados.
+        self.assertEqual(fins, {"na_faixa", "vazio_demais", "vazio_de_menos"})
 
-    def test_depois_do_corte_a_nota_e_minima_e_a_media_nao_avisa(self):
-        sdf = esfera_sdf()
-        alvo = Alvo(sdf + 3)
-        avaliador = AvaliadorCA(sdf, alvo, (1, 2, 3), max_iteracoes=10)
+    def test_a_nota_e_minima_exatamente_nos_passos_fora_da_faixa_e_nada_avisa(self):
+        # Sem parada antecipada, a faixa continua decidindo a nota de cada passo.
+        caverna = Caverna("a", campo_esfera(5.0))
+        cortes = Cortes()
+        minimo, maximo = caverna.alvo.faixa(cortes)
+        avaliador = AvaliadorCA([caverna], (1, 2, 3), max_iteracoes=10, cortes=cortes)
         with warnings.catch_warnings():
             warnings.simplefilter("error")
             for genes in self.GENES:
                 nota, detalhes = avaliador(genes)
                 self.assertFalse(np.isnan(nota))
-                for t in avaliador.trajetorias(genes):
-                    if t.motivo in ("vazio_demais", "vazio_de_menos"):
-                        self.assertTrue(np.all(t.notas[t.parada - 1:] == NOTA_MINIMA))
                 self.assertTrue(1 <= detalhes["iteracoes"] <= 10)
+                for t in avaliador.trajetorias(genes)["a"]:
+                    dentro = np.array([minimo <= v <= maximo for v in t.vazios])
+                    np.testing.assert_array_equal(t.notas == NOTA_MINIMA, ~dentro)
+                    self.assertTrue(np.all(np.isfinite(t.notas[dentro])))
 
-    def test_rodar_ca_nao_aceita_volume_nao_cubico(self):
+    def test_caverna_nao_aceita_volume_nao_cubico(self):
         sdf = np.zeros((8, 8, 10), dtype=np.float32)
         sdf[3:5, 3:5, 3:7] = 1
         with self.assertRaises(ValueError):
-            rodar_ca({"chance_inicial": 0.5, "sensibilidade": 8},
-                     sdf, Alvo(sdf), semente=1)
+            Caverna("torta", sdf)
 
 
 class ExecutarRevisorTests(unittest.TestCase):
@@ -265,6 +282,7 @@ class ExecutarRevisorTests(unittest.TestCase):
         from cavegen.optimization.genetic import executar
 
         self.assertFalse(set(executar.SEMENTES_AJUSTE) & set(executar.SEMENTES_RESERVADAS))
+        self.assertEqual(len(executar.SEMENTES_AJUSTE), 5)
         self.assertEqual(len(executar.SEMENTES_RESERVADAS), 10)
 
     def test_busca_so_usa_sementes_de_ajuste_e_reservadas_so_depois(self):
@@ -279,14 +297,16 @@ class ExecutarRevisorTests(unittest.TestCase):
 
         with (tempfile.TemporaryDirectory() as pasta,
               mock.patch.object(modulo_ca, "generate_seed_matrix", side_effect=espiar)):
-            destino = rodar_executar(Path(pasta), "--orcamento", "6", "--populacao", "3")
+            destino = rodar_executar(Path(pasta), "--metodo", "aleatoria", "--orcamento", "12",
+                                     "--populacao", "3")
             with np.load(destino) as r:
-                unicas = 6 - int(r["reaproveitadas"])
+                unicas = 12 - int(r["reaproveitadas"])
                 listados = len(json.loads(str(r["melhores"])))
-        # A busca só vê as de ajuste; as reservadas rodam depois, uma vez para
-        # cada parâmetro da lista dos melhores.
-        na_busca, no_fim = usadas[:3 * unicas], usadas[3 * unicas:]
-        self.assertTrue(set(na_busca) <= set(executar.SEMENTES_AJUSTE), set(na_busca))
+        # A busca só vê as de ajuste (5 por candidato); as reservadas rodam
+        # depois, uma vez para cada parâmetro da lista dos melhores.
+        por_candidato = len(executar.SEMENTES_AJUSTE)
+        na_busca, no_fim = usadas[:por_candidato * unicas], usadas[por_candidato * unicas:]
+        self.assertEqual(set(na_busca), set(executar.SEMENTES_AJUSTE))
         self.assertGreater(listados, 0)
         self.assertEqual(no_fim, list(executar.SEMENTES_RESERVADAS) * listados)
 
@@ -307,21 +327,24 @@ class ExecutarRevisorTests(unittest.TestCase):
                 self.assertEqual(len(a["notas"]), len(c["notas"]))
                 np.testing.assert_array_equal(a["notas"], b["notas"])
                 np.testing.assert_array_equal(a["genes"], b["genes"])
-            self.assertEqual(e_ga["notas_reservadas"], extras_gravados(ga2)["notas_reservadas"])
+            self.assertEqual(json.dumps(e_ga["campeao"]["reservadas"]),
+                             json.dumps(extras_gravados(ga2)["campeao"]["reservadas"]))
 
     def test_nota_gravada_do_campeao_se_reproduz_fora_da_busca(self):
         with tempfile.TemporaryDirectory() as pasta:
             destino = rodar_executar(Path(pasta), "--orcamento", "6", "--populacao", "3")
             extras = extras_gravados(destino)
-        sdf = esfera_sdf()
-        avaliador = AvaliadorCA(sdf, Alvo(sdf + 3), tuple(extras["sementes_ajuste"]))
+        avaliador = AvaliadorCA([Caverna("esfera", campo_esfera(5.0))],
+                                tuple(extras["sementes_ajuste"]))
         campeao = extras["campeao"]
-        ajuste = avaliador.nota_com_iteracoes(campeao["genes"], campeao["iteracoes"],
-                                              tuple(extras["sementes_ajuste"]))
-        reservadas = avaliador.nota_com_iteracoes(campeao["genes"], campeao["iteracoes"],
-                                                  tuple(extras["sementes_reservadas"]))
-        self.assertEqual(float(ajuste.mean()), campeao["nota_ajuste"])
-        self.assertEqual(reservadas.tolist(), extras["notas_reservadas"])
+        ajuste = avaliador.conferir(campeao["genes"], campeao["iteracoes"],
+                                    tuple(extras["sementes_ajuste"]))
+        reservadas = avaliador.conferir(campeao["genes"], campeao["iteracoes"],
+                                        tuple(extras["sementes_reservadas"]))
+        self.assertEqual(ajuste["media"], campeao["nota_ajuste"])
+        self.assertEqual(reservadas["notas_por_semente"],
+                         campeao["reservadas"]["notas_por_semente"])
+        self.assertEqual(reservadas["media"], extras["nota_reservada_media"])
 
 
 ANSI = re.compile(r"\033\[[0-9;]*m")
@@ -417,31 +440,61 @@ def largura_na_tela(texto: str) -> int:
     return sum(2 if unicodedata.east_asian_width(c) == "W" else 1 for c in texto)
 
 
-def melhores_falsos() -> list[dict]:
-    return [{"posicao": i,
-             "genes": {"chance_inicial": GRADE_CHANCE[10 + i], "sensibilidade": 9 + i},
-             "iteracoes": 10 + i, "nota_ajuste": 0.7 - i / 50,
-             "nota_reservada_media": NOTA_MINIMA if i == 5 else 0.6 - i / 50,
-             "nota_reservada_min": NOTA_MINIMA if i >= 4 else 0.5 - i / 50}
-            for i in range(1, 7)]
+def resumo_falso(media: float, minimo: float, maximo: float, por_caverna: dict) -> dict:
+    desvio = float(np.std(list(por_caverna.values()))) if np.isfinite(minimo) else math.nan
+    return {"media": media, "min": minimo, "max": maximo, "desvio": desvio,
+            "por_caverna": por_caverna}
+
+
+def melhores_falsos(cavernas=("elaphes",)) -> list[dict]:
+    lista = []
+    for i in range(1, 7):
+        ajuste = 0.7 - i / 50
+        por_caverna = {nome: ajuste + (k - (len(cavernas) - 1) / 2) / 20
+                       for k, nome in enumerate(cavernas)}
+        reservada = NOTA_MINIMA if i == 5 else 0.6 - i / 50
+        pior = NOTA_MINIMA if i >= 4 else 0.5 - i / 50
+        reservadas = resumo_falso(reservada, reservada, reservada,
+                                  {nome: reservada for nome in cavernas})
+        lista.append({"posicao": i,
+                      "genes": {"chance_inicial": GRADE_CHANCE[10 + i], "sensibilidade": 9 + i},
+                      "iteracoes": 10 + i, "nota_ajuste": ajuste,
+                      "ajuste": resumo_falso(ajuste, min(por_caverna.values()),
+                                             max(por_caverna.values()), por_caverna),
+                      "nota_reservada_media": reservada,
+                      "reservadas": {**reservadas, "pior_semente": pior}})
+    return lista
+
+
+def reservadas_falsas(media: float, pior: float) -> dict:
+    return {**resumo_falso(media, media, media, {"elaphes": media}), "pior_semente": pior}
 
 
 def sessao_do_painel(painel: Painel):
     """O que o executar.py mostra, do começo ao fim, com uma busca pequena."""
     def nota(genes):
         if genes["sensibilidade"] > 16:
-            return NOTA_MINIMA, {"iteracoes": 1, "motivos": ["vazio_demais"]}
+            return NOTA_MINIMA, {"iteracoes": 1,
+                                 "cavernas": {"elaphes": {"fim": ["vazio_demais", "na_faixa"]}}}
         return (-abs(genes["chance_inicial"] - 0.5) - genes["sensibilidade"] / 100,
-                {"iteracoes": 3, "motivos": ["convergiu"]})
+                {"iteracoes": 3, "cavernas": {"elaphes": {"fim": ["na_faixa", "na_faixa"]}}})
 
+    painel.etapa(1, 4, "Carregando", "📂")
+    painel.caverna("elaphes", "tools/sdf/npz/elaphes_surface_64_sdf_log1.npz", (64, 64, 64),
+                   -4.16, 1.10, 292, (146.0, 1460.0), 1.0)
+    painel.caverna("pequena", "x.npz", (32, 32, 32), -3.0, 1.0, 50, (25.0, 250.0), 1.0,
+                   aviso="grade 32³, fora do protocolo de 64³")
     painel.etapa(2, 4, "Busca genética", "🧬")
     resultado = evoluir(GENES_CA, nota, ConfiguracaoGA(orcamento=60), seed=7, observar=painel)
     painel.etapa(3, 4, "Conferindo", "🔍")
-    painel.conferido(1, 2, {"chance_inicial": 0.5, "sensibilidade": 3}, 0.6, 0.61, 0.5)
-    painel.conferido(2, 2, {"chance_inicial": 0.52, "sensibilidade": 3}, 0.6, NOTA_MINIMA,
-                     NOTA_MINIMA)
-    painel.tabela_melhores(melhores_falsos(), [g.nome for g in GENES_CA], 10)
-    painel.referencias(0.1, 1.0, "results/ga_001.npz")
+    painel.conferido(1, 2, {"chance_inicial": 0.5, "sensibilidade": 3}, 0.6,
+                     reservadas_falsas(0.61, 0.5))
+    painel.conferido(2, 2, {"chance_inicial": 0.52, "sensibilidade": 3}, 0.6,
+                     reservadas_falsas(NOTA_MINIMA, NOTA_MINIMA))
+    painel.tabela_melhores(melhores_falsos(), [g.nome for g in GENES_CA], ["elaphes"], 5, 10)
+    painel.tabela_melhores(melhores_falsos(("elaphes", "indian_tunnel")),
+                           [g.nome for g in GENES_CA], ["elaphes", "indian_tunnel"], 5, 10)
+    painel.referencias({"elaphes": 1.0, "indian_tunnel": 1.0}, "results/ga_001.npz")
     return resultado
 
 
@@ -467,28 +520,57 @@ class PainelRevisorTests(unittest.TestCase):
                 self.assertIn("\033[", colorido.getvalue())
                 self.assertEqual(ANSI.sub("", colorido.getvalue()), puro.getvalue())
 
-    def test_tabela_pura_igual_a_antiga_mostrar_lista_quando_as_notas_sao_finitas(self):
-        lista = [dict(item, nota_reservada_media=0.4, nota_reservada_min=0.3)
-                 for item in melhores_falsos()]
+    def test_tabela_pura_de_uma_caverna_tem_as_colunas_de_sempre(self):
+        lista = melhores_falsos()
+        for item in lista:
+            item["nota_reservada_media"] = 0.4
+            item["reservadas"]["pior_semente"] = 0.3
         nomes = [g.nome for g in GENES_CA]
-        antiga = [f"{'#':>3} " + " ".join(f"{n:>15}" for n in nomes)
-                  + f" {'iteracoes':>9} {'nota ajuste':>11} {'reservadas':>10} {'mín':>7}"]
+        esperada = [f"{'#':>3} " + " ".join(f"{n:>15}" for n in nomes)
+                    + f" {'iteracoes':>9} {'nota ajuste':>11} {'reservadas':>10} "
+                    f"{'pior seed':>9}"]
         for item in lista:
             valores = " ".join(f"{item['genes'][n]:>15.4g}" for n in nomes)
-            antiga.append(f"{item['posicao']:>3} {valores} {item['iteracoes']:>9} "
-                          f"{item['nota_ajuste']:>+11.3f} {item['nota_reservada_media']:>+10.3f} "
-                          f"{item['nota_reservada_min']:>+7.3f}")
+            esperada.append(f"{item['posicao']:>3} {valores} {item['iteracoes']:>9} "
+                            f"{item['nota_ajuste']:>+11.3f} {0.4:>+10.3f} {0.3:>+9.3f}")
         saida = io.StringIO()
-        Painel(10, saida=saida, estilo=Estilo()).tabela_melhores(lista, nomes, 10)
-        self.assertEqual(saida.getvalue().splitlines()[2:], antiga)
+        Painel(10, saida=saida, estilo=Estilo()).tabela_melhores(lista, nomes, ["elaphes"], 5, 10)
+        linhas = saida.getvalue().splitlines()
+        # Linha em branco, título com o critério, legenda e a tabela.
+        self.assertIn("ordenados pela nota de ajuste (média das 5 seeds de ajuste em elaphes)",
+                      linhas[1])
+        self.assertEqual(linhas[3:], esperada)
+
+    def test_tabela_de_varias_cavernas_mostra_cada_uma_e_o_resumo(self):
+        cavernas = ["elaphes", "indian_tunnel"]
+        lista = melhores_falsos(tuple(cavernas))
+        saida = io.StringIO()
+        Painel(10, saida=saida, estilo=Estilo()).tabela_melhores(
+            lista, [g.nome for g in GENES_CA], cavernas, 5, 10)
+        linhas = saida.getvalue().splitlines()
+        self.assertIn("ordenados pela média entre as 2 cavernas nas 5 seeds de ajuste", linhas[1])
+        self.assertIn("mín, máx e desvio: entre as cavernas", linhas[2])
+        cabecalho = linhas[3].split()
+        for coluna in ("média", "mín", "máx", "desvio", "elaphes", "indian_tunnel",
+                       "reservadas", "pior"):
+            self.assertIn(coluna, cabecalho)
+        primeira = lista[0]
+        celulas = linhas[4].split()
+        for valor in (primeira["nota_ajuste"], primeira["ajuste"]["min"], primeira["ajuste"]["max"],
+                      *primeira["ajuste"]["por_caverna"].values()):
+            self.assertIn(f"{valor:+.3f}", celulas)
+        self.assertIn(f"{primeira['ajuste']['desvio']:.3f}", celulas)
+        self.assertEqual(len({len(linha) for linha in linhas[3:]}), 1, linhas[3:])
 
     def test_tabela_com_medalhas_fica_alinhada_na_tela(self):
-        saida = io.StringIO()
-        Painel(10, saida=saida, estilo=Estilo(cores=True, emojis=True)).tabela_melhores(
-            melhores_falsos(), [g.nome for g in GENES_CA], 10)
-        linhas = [ANSI.sub("", linha) for linha in saida.getvalue().splitlines()[2:]]
-        self.assertTrue(linhas[1].startswith("🥇 "), linhas[1])
-        self.assertEqual(len({largura_na_tela(linha) for linha in linhas}), 1, linhas)
+        for cavernas in (["elaphes"], ["elaphes", "indian_tunnel"]):
+            with self.subTest(cavernas=cavernas):
+                saida = io.StringIO()
+                Painel(10, saida=saida, estilo=Estilo(cores=True, emojis=True)).tabela_melhores(
+                    melhores_falsos(tuple(cavernas)), [g.nome for g in GENES_CA], cavernas, 5, 10)
+                linhas = [ANSI.sub("", linha) for linha in saida.getvalue().splitlines()[3:]]
+                self.assertTrue(linhas[1].startswith("🥇 "), linhas[1])
+                self.assertEqual(len({largura_na_tela(linha) for linha in linhas}), 1, linhas)
 
     def test_estilo_para_fora_do_terminal_nunca_liga_nem_chama_o_console(self):
         with mock.patch("cavegen.optimization.genetic.painel._ativar_ansi") as ativar:
@@ -525,17 +607,12 @@ class ExecutarGradeRevisorTests(unittest.TestCase):
 
         with tempfile.TemporaryDirectory() as pasta:
             pasta = Path(pasta)
-            sdf = esfera_sdf()
-            np.savez_compressed(pasta / "peso.npz", sdf=sdf, convencao=np.array("base"),
-                                limiar=0.0)
-            np.savez_compressed(pasta / "alvo.npz", sdf=sdf + 3, convencao=np.array("alvo"),
-                                limiar=-3.0, escala_log=1.0)
+            gravar_esfera(pasta / "esfera_sdf_log1.npz")
             fora = io.StringIO()
             with (mock.patch("cavegen.profiling.resource_tracker.registrar_execucao"),
                   mock.patch.object(executar, "Painel", side_effect=painel_capturado),
                   contextlib.redirect_stdout(fora)):
-                executar.main(["--peso", str(pasta / "peso.npz"),
-                               "--alvo", str(pasta / "alvo.npz"),
+                executar.main(["--cavernas", str(pasta / "esfera_sdf_log1.npz"),
                                "--saida", str(pasta / "results"), "--orcamento", "6",
                                "--populacao", "3"])
         texto = do_painel.getvalue()
@@ -543,9 +620,230 @@ class ExecutarGradeRevisorTests(unittest.TestCase):
         self.assertNotIn("\033", texto)
         self.assertNotIn("\r", texto)
         for trecho in ("[1/4] Carregando", "chance_inicial [0.2, 0.8, de 0.02 em 0.02]",
-                       "[4/4] Gravando", "melhores parâmetros", "referências: cópia pura",
-                       "gravado em"):
+                       "seeds de ajuste [1, 2, 3, 4, 5]", "reservadas 101 a 110 (10 seeds)",
+                       "esfera", "cópia pura +1.000", "[4/4] Gravando", "melhores parâmetros",
+                       "referência: cópia pura", "gravado em"):
             self.assertIn(trecho, texto)
+        self.assertNotIn("teto", texto)
+
+
+# Nas esferas 16³ com log, estes genes ficam na faixa e dão nota positiva.
+BONS = {"chance_inicial": 0.6, "sensibilidade": 15}
+# Raios das esferas 16³ usadas como "cavernas" diferentes entre si.
+RAIOS = (5.0, 6.0, 5.5, 4.5, 6.5, 5.2, 5.8, 4.8, 6.2)
+
+
+def gravar_campo(caminho: Path, campo: np.ndarray) -> Path:
+    np.savez_compressed(caminho, sdf=campo, convencao=np.array("log"), limiar=0.0,
+                        escala_log=1.0)
+    return caminho
+
+
+def rodar_main_com_painel(*argv: str) -> tuple[Path, str]:
+    """Roda o executar.main e devolve o destino e tudo o que o painel escreveu."""
+    from cavegen.optimization.genetic import executar
+
+    do_painel = io.StringIO()
+    original = executar.Painel
+
+    def painel_capturado(*args, **kwargs):
+        return original(*args, saida=do_painel, **kwargs)
+
+    with (mock.patch("cavegen.profiling.resource_tracker.registrar_execucao"),
+          mock.patch.object(executar, "Painel", side_effect=painel_capturado),
+          contextlib.redirect_stdout(io.StringIO())):
+        destino = executar.main(list(argv))
+    return destino, do_painel.getvalue()
+
+
+def erro_do_main(*argv: str) -> str | None:
+    """Mensagem do parser.error, ou None se o main rodou até o fim."""
+    from cavegen.optimization.genetic import executar
+
+    erro = io.StringIO()
+    with (mock.patch("cavegen.profiling.resource_tracker.registrar_execucao"),
+          contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(erro)):
+        try:
+            executar.main(list(argv))
+        except SystemExit as saida:
+            if saida.code == 2:
+                return erro.getvalue()
+            raise
+    return None
+
+
+class VariasCavernasRevisorTests(unittest.TestCase):
+    def test_nota_se_reproduz_bit_a_bit_com_mais_de_8_seeds_e_de_8_cavernas(self):
+        # Acima de 8 valores o numpy soma com 8 acumuladores; abaixo, em sequência.
+        # A média por coluna (media_por_passo) tem de dar o mesmo float que a média
+        # de um vetor só, que é a conta do conferir, nos dois caminhos.
+        cavernas = [Caverna(f"r{r:g}", campo_esfera(r)) for r in RAIOS]
+        sementes = tuple(range(101, 111))
+        self.assertGreater(len(cavernas), 8)
+        self.assertGreater(len(sementes), 8)
+        avaliador = AvaliadorCA(cavernas, sementes, max_iteracoes=12)
+        nota, detalhes = avaliador(BONS)
+        self.assertTrue(math.isfinite(nota))  # com -inf a igualdade seria trivial
+        conferido = avaliador.conferir(BONS, detalhes["iteracoes"], sementes)
+        self.assertEqual(conferido["media"], nota)
+        self.assertEqual(conferido["por_caverna"], detalhes["entre_cavernas"]["por_caverna"])
+        self.assertEqual(conferido["desvio"], detalhes["entre_cavernas"]["desvio"])
+        for nome in avaliador.nomes:
+            self.assertEqual(conferido["notas_por_semente"][nome],
+                             detalhes["cavernas"][nome]["notas_por_semente"])
+
+    def test_invariantes_da_nota_em_cada_candidato_de_uma_busca(self):
+        # Para todo candidato: a nota é a média entre as cavernas das médias das
+        # seeds, é finita só se todas as seeds de todas as cavernas estão na faixa,
+        # nunca passa da cópia pura (1), e um cortado sempre diz onde o vazio
+        # terminou fora da faixa.
+        a, b = Caverna("a", campo_esfera(5.0)), Caverna("b", campo_esfera(6.0))
+        minuscula = Caverna("minuscula", campo_esfera(1.0))
+        vistos = {"finito": 0, "cortado": 0, "cortado_so_pela_minuscula": 0}
+        for cavernas in ((a, b), (a, minuscula)):
+            avaliador = AvaliadorCA(cavernas, (1, 2, 3, 4, 5), max_iteracoes=15)
+            so_a = AvaliadorCA((a,), (1, 2, 3, 4, 5), max_iteracoes=15)
+            with warnings.catch_warnings():
+                warnings.simplefilter("error", RuntimeWarning)
+                busca = busca_aleatoria(GENES_CA, avaliador, 14, seed=11)
+            for avaliacao in busca.avaliacoes:
+                nota, detalhes = avaliacao.nota, avaliacao.detalhes
+                resumo = detalhes["entre_cavernas"]
+                por_semente = {nome: detalhes["cavernas"][nome]["notas_por_semente"]
+                               for nome in avaliador.nomes}
+                with self.subTest(cavernas=avaliador.nomes, genes=avaliacao.genes):
+                    self.assertFalse(math.isnan(nota))
+                    self.assertLessEqual(nota, 1.0)
+                    self.assertTrue(1 <= detalhes["iteracoes"] <= 15)
+                    self.assertEqual(nota, resumo["media"])
+                    for nome, notas in por_semente.items():
+                        self.assertEqual(resumo["por_caverna"][nome], float(np.mean(notas)))
+                    todas_finitas = all(math.isfinite(n) for v in por_semente.values()
+                                        for n in v)
+                    self.assertEqual(math.isfinite(nota), todas_finitas)
+                    if math.isfinite(nota):
+                        vistos["finito"] += 1
+                        notas = list(resumo["por_caverna"].values())
+                        self.assertEqual((resumo["min"], resumo["max"]), (min(notas), max(notas)))
+                        self.assertEqual(resumo["desvio"], float(np.std(notas)))
+                    else:
+                        vistos["cortado"] += 1
+                        self.assertTrue(math.isnan(resumo["desvio"]))
+                        self.assertEqual(resumo["min"], NOTA_MINIMA)
+                        self.assertTrue(motivos_do_corte(detalhes), detalhes)
+                        if "minuscula" in por_semente and math.isfinite(
+                                so_a(avaliacao.genes)[0]):
+                            vistos["cortado_so_pela_minuscula"] += 1
+        # O teste só vale se passou pelos três casos.
+        self.assertTrue(all(vistos.values()), vistos)
+
+
+class ExecutarCavernasRevisorTests(unittest.TestCase):
+    def setUp(self):
+        self._pasta = tempfile.TemporaryDirectory()
+        self.pasta = Path(self._pasta.name)
+        self.saida = str(self.pasta / "results")
+        self.a = gravar_campo(self.pasta / "a_sdf_log1.npz", campo_esfera(5.0))
+        self.b = gravar_campo(self.pasta / "b_sdf_log1.npz", campo_esfera(6.0))
+
+    def tearDown(self):
+        self._pasta.cleanup()
+
+    def test_peso_chega_ao_ca_igual_ao_arquivo_em_cada_caverna(self):
+        # Contrato: o campo do arquivo entra no CA sem escala, sem corte e no mesmo
+        # tipo, em todas as cavernas, na busca e na conferência das reservadas.
+        do_arquivo = {}
+        for nome, caminho in (("a", self.a), ("b", self.b)):
+            with np.load(caminho) as r:
+                do_arquivo[nome] = r["sdf"]
+        recebidos = []
+        original = modulo_ca.iterate
+
+        def espiar(matriz, sensibilidade, borda, peso=None, modo=None):
+            recebidos.append((peso, borda, modo))
+            return original(matriz, sensibilidade, borda, peso, modo)
+
+        with mock.patch.object(modulo_ca, "iterate", side_effect=espiar):
+            rodar_main_com_painel("--cavernas", str(self.a), str(self.b), "--metodo",
+                                  "aleatoria", "--orcamento", "3", "--populacao", "3",
+                                  "--top", "1", "--saida", self.saida)
+        contagem = {"a": 0, "b": 0}
+        for peso, borda, modo in recebidos:
+            self.assertIs(borda, BorderTreatment.NEAREST)
+            self.assertIs(modo, ModoPeso.COMPLETO)
+            self.assertEqual(peso.dtype, np.float32)
+            self.assertFalse(peso.flags.writeable)
+            iguais = [nome for nome, campo in do_arquivo.items() if np.array_equal(peso, campo)]
+            self.assertEqual(len(iguais), 1)
+            contagem[iguais[0]] += 1
+        # Cada caverna recebe o mesmo número de passos: nenhuma fica de fora.
+        self.assertGreater(contagem["a"], 0)
+        self.assertEqual(contagem["a"], contagem["b"])
+
+    def test_caverna_cubica_fora_do_protocolo_roda_com_aviso_so_nela(self):
+        from cavegen.optimization.genetic import executar
+
+        pequena = gravar_campo(self.pasta / "pequena_sdf_log1.npz",
+                               comprimir_log(esfera_sdf(lado=12, raio=4.0), 1.0))
+        argv = ("--cavernas", str(self.a), str(pequena), "--metodo", "aleatoria",
+                "--orcamento", "3", "--populacao", "3", "--top", "1", "--saida", self.saida)
+        # Com o protocolo em 16³, só a de 12³ está fora dele.
+        with mock.patch.object(executar, "LADO_DO_PROTOCOLO", 16):
+            destino, texto = rodar_main_com_painel(*argv)
+        linhas = texto.splitlines()
+        avisos = [i for i, linha in enumerate(linhas) if "fora do protocolo" in linha]
+        self.assertEqual(len(avisos), 1, texto)
+        self.assertIn("grade 12³", linhas[avisos[0]])
+        self.assertIn("grade 12x12x12", linhas[avisos[0] - 1])
+        with np.load(destino) as r:
+            formas = [c["forma"] for c in json.loads(str(r["cavernas"]))]
+            self.assertEqual(formas, [[16, 16, 16], [12, 12, 12]])
+            self.assertEqual(len(r["notas"]), 3)
+        # Com o protocolo real (64³), as duas ganham o aviso.
+        _, texto = rodar_main_com_painel(*argv)
+        self.assertEqual(texto.count("fora do protocolo de 64³"), 2)
+
+    def test_tudo_cortado_grava_json_que_le_de_volta_e_nao_avisa(self):
+        # Todo passo cortado: -inf na nota, NaN no desvio. Nada pode avisar, e o
+        # que foi gravado tem de ler de volta com os mesmos valores.
+        with (mock.patch.object(modulo_ca, "nota_do_passo", return_value=NOTA_MINIMA),
+              warnings.catch_warnings()):
+            warnings.simplefilter("error", RuntimeWarning)
+            destino, texto = rodar_main_com_painel(
+                "--cavernas", str(self.a), str(self.b), "--orcamento", "4", "--populacao", "3",
+                "--saida", self.saida)
+        self.assertIn("nenhum: todos os candidatos foram cortados", texto)
+        with np.load(destino) as r:
+            # Todo campo gravado como texto JSON (metodo é texto puro).
+            lidos = {nome: json.loads(str(r[nome])) for nome in r.files
+                     if r[nome].dtype.kind == "U" and r[nome].ndim == 0 and nome != "metodo"}
+            notas = r["notas"]
+        self.assertTrue(np.all(notas == NOTA_MINIMA))
+        self.assertEqual(lidos["melhores"], [])
+        campeao = lidos["campeao"]
+        self.assertEqual(campeao["nota_ajuste"], NOTA_MINIMA)
+        self.assertEqual(campeao["ajuste"]["media"], NOTA_MINIMA)
+        self.assertTrue(math.isnan(campeao["ajuste"]["desvio"]))
+        self.assertEqual(campeao["reservadas"]["media"], NOTA_MINIMA)
+        self.assertEqual(campeao["reservadas"]["pior_semente"], NOTA_MINIMA)
+        self.assertTrue(math.isnan(campeao["reservadas"]["desvio"]))
+        self.assertEqual(lidos["nota_reservada_media"], NOTA_MINIMA)
+        self.assertEqual(len(lidos["detalhes"]), 4)
+        for detalhes in lidos["detalhes"]:
+            self.assertTrue(math.isnan(detalhes["entre_cavernas"]["desvio"]))
+            self.assertEqual(set(detalhes["cavernas"]), {"a", "b"})
+
+    def test_mesma_caverna_com_outro_nome_e_recusada(self):
+        # Contrato: --cavernas recusa caverna repetida. Hoje a checagem é só pelo
+        # nome tirado do arquivo, então o mesmo campo com outro nome (uma cópia, ou
+        # "elaphes" e "Elaphes" no Windows, que abrem o mesmo arquivo) entra duas
+        # vezes e pesa em dobro na média entre as cavernas, que ordena o ranking.
+        copia = self.pasta / "copia_de_a_sdf_log1.npz"
+        copia.write_bytes(self.a.read_bytes())
+        mensagem = erro_do_main("--cavernas", str(self.a), str(copia), "--orcamento", "3",
+                                "--populacao", "3", "--top", "1", "--saida", self.saida)
+        self.assertIsNotNone(mensagem, "o main aceitou a mesma caverna duas vezes")
+        self.assertIn("repetida", mensagem)
 
 
 if __name__ == "__main__":

@@ -37,6 +37,20 @@ def formatar_genes(genes: dict) -> str:
 def formatar_nota(nota: float) -> str:
     return f"{nota:+.3f}" if math.isfinite(nota) else "cortado"
 
+def formatar_desvio(desvio: float) -> str:
+    # Sem desvio (NaN) quando alguma caverna foi cortada.
+    return f"{desvio:.3f}" if math.isfinite(desvio) else "-"
+
+def motivos_do_corte(detalhes: dict) -> list[str]:
+    """
+        Onde o vazio terminou nas sementes que acabaram fora da faixa
+        (vazio_demais, vazio_de_menos), sem repetir. Um candidato cortado tem
+        pelo menos uma semente assim: senão a última iteração teria nota.
+    """
+    fins = {fim for caverna in detalhes.get("cavernas", {}).values()
+            for fim in caverna.get("fim", [])}
+    return sorted(fins - {"na_faixa"})
+
 def _ativar_ansi(saida: TextIO) -> bool:
     """
         Liga as cores no console do Windows (fora dele, os terminais já
@@ -155,6 +169,23 @@ class Painel:
         self.escrever(e.pintar(f"[{numero}/{total}] ", NEGRITO, CIANO)
                       + e.icone(emoji) + e.pintar(texto, NEGRITO))
 
+    def caverna(self, nome: str, origem: str, forma: tuple, campo_min: float, campo_max: float,
+                positivos: int, faixa: tuple[float, float], copia: float,
+                aviso: str | None = None):
+        """
+            Duas linhas da etapa de carga: de onde veio o campo da caverna, a
+            grade, os voxels positivos do alvo, a faixa de vazio aceita e a
+            cópia pura. aviso: uma terceira linha, em amarelo, se vier.
+        """
+        e = self.estilo
+        grade = "x".join(str(lado) for lado in forma)
+        self.escrever(f"  {e.pintar(nome, NEGRITO)}  {origem}")
+        self.escrever(f"      grade {grade}, campo de {campo_min:+.2f} a {campo_max:+.2f}, "
+                      f"{positivos} voxels positivos; vazio aceito de {faixa[0]:.0f} a "
+                      f"{faixa[1]:.0f}; cópia pura {e.nota(copia)}")
+        if aviso:
+            self.escrever("      " + e.icone("⚠️") + e.pintar(aviso, AMARELO))
+
     # Eventos do motor ------------------------------------------------------
 
     def __call__(self, evento: str, dados: dict):
@@ -174,8 +205,8 @@ class Painel:
             puro = f"{formatar_nota(avaliacao.nota)} ({avaliacao.detalhes['iteracoes']} it)"
             resultado = f"{e.nota(avaliacao.nota)} ({avaliacao.detalhes['iteracoes']} it)"
         else:
-            motivos = sorted(set(avaliacao.detalhes.get("motivos", [])) - {"convergiu", "maximo"})
-            puro = "cortado" + (f" ({', '.join(motivos)})" if motivos else "")
+            motivos = motivos_do_corte(avaliacao.detalhes)
+            puro = "cortado" + (f" (no fim: {', '.join(motivos)})" if motivos else "")
             resultado = e.pintar(puro, VERMELHO)
         if repetido:
             puro += " [repetido]"
@@ -222,53 +253,104 @@ class Painel:
 
     # Fim da busca ----------------------------------------------------------
 
-    def conferido(self, posicao: int, total: int, genes: dict, ajuste: float,
-                  media: float, minimo: float):
-        """Uma linha da etapa das sementes reservadas."""
+    def conferido(self, posicao: int, total: int, genes: dict, ajuste: float, reservadas: dict):
+        """
+            Uma linha da etapa das sementes reservadas.
+            ajuste: a nota da busca (média entre as cavernas nas sementes de ajuste).
+            reservadas: o que AvaliadorCA.conferir devolve (media, por_caverna,
+                        pior_semente...).
+        """
         e = self.estilo
         aviso = ""
-        if not math.isfinite(minimo):
+        if not math.isfinite(reservadas["pior_semente"]):
             aviso = " " + e.icone("⚠️") + e.pintar("frágil: cortado em seed nova", VERMELHO)
+        por_caverna = ""
+        if len(reservadas["por_caverna"]) > 1:
+            por_caverna = " (" + ", ".join(f"{nome} {e.nota(nota)}" for nome, nota
+                                           in reservadas["por_caverna"].items()) + ")"
         self.escrever(f"  {posicao:>2}/{total} {formatar_genes(genes)}: ajuste {e.nota(ajuste)}, "
-                      f"reservadas {e.nota(media, NEGRITO)} (mín {e.nota(minimo)}){aviso}")
+                      f"reservadas {e.nota(reservadas['media'], NEGRITO)}{por_caverna}, "
+                      f"pior seed {e.nota(reservadas['pior_semente'])}{aviso}")
 
-    def tabela_melhores(self, lista: list[dict], nomes: list[str], reservadas: int):
-        """A lista final dos melhores parâmetros; os 3 primeiros ganham medalha."""
+    def tabela_melhores(self, lista: list[dict], genes: list[str], cavernas: list[str],
+                        ajuste: int, reservadas: int):
+        """
+            A lista final dos melhores parâmetros; os 3 primeiros ganham medalha.
+            Com uma caverna, a nota de ajuste é a média das sementes dela. Com
+            várias, é a média entre as cavernas (o critério da ordem), seguida do
+            mínimo, do máximo e do desvio entre elas e da nota de cada uma.
+            genes, cavernas: nomes, na ordem das colunas.
+            ajuste, reservadas: quantas sementes de cada tipo, para o título.
+        """
         e = self.estilo
         medalhas = {1: "🥇", 2: "🥈", 3: "🥉"}
+        varias = len(cavernas) > 1
+        if varias:
+            titulo = (f"{len(lista)} melhores parâmetros, ordenados pela média entre as "
+                      f"{len(cavernas)} cavernas nas {ajuste} seeds de ajuste:")
+            legenda = ("mín, máx e desvio: entre as cavernas; reservadas: média entre as "
+                       f"cavernas nas {reservadas} seeds reservadas; pior seed: a menor nota "
+                       "entre elas")
+        else:
+            titulo = (f"{len(lista)} melhores parâmetros, ordenados pela nota de ajuste "
+                      f"(média das {ajuste} seeds de ajuste em {cavernas[0]}):")
+            legenda = (f"reservadas: média nas {reservadas} seeds reservadas; pior seed: a "
+                       "menor nota entre elas")
         self.escrever()
-        self.escrever(e.icone("🏆") + e.pintar(
-            f"{len(lista)} melhores parâmetros (nota nas sementes de ajuste e média e "
-            f"mínimo nas {reservadas} reservadas):", NEGRITO))
+        self.escrever(e.icone("🏆") + e.pintar(titulo, NEGRITO))
+        self.escrever(e.pintar(f"  {legenda}", FRACO))
         if not lista:
             self.escrever(e.pintar("  nenhum: todos os candidatos foram cortados", VERMELHO))
             return
+
+        # (título, largura, valor do item, é desvio, códigos de estilo)
+        colunas = [("média ajuste" if varias else "nota ajuste", 12 if varias else 11,
+                    lambda item: item["nota_ajuste"], False, ())]
+        if varias:
+            colunas += [("mín", 7, lambda item: item["ajuste"]["min"], False, ()),
+                        ("máx", 7, lambda item: item["ajuste"]["max"], False, ()),
+                        ("desvio", 6, lambda item: item["ajuste"]["desvio"], True, ())]
+            colunas += [(nome, max(len(nome), 7),
+                         lambda item, nome=nome: item["ajuste"]["por_caverna"][nome], False, ())
+                        for nome in cavernas]
+        colunas += [("reservadas", 10, lambda item: item["nota_reservada_media"], False,
+                     (NEGRITO,)),
+                    ("pior seed", 9, lambda item: item["reservadas"]["pior_semente"], False, ())]
+
         # Com emoji, a medalha ocupa a coluna do número nos 3 primeiros (2 de largura + espaço).
-        self.escrever(e.pintar(f"{'#':>3} " + " ".join(f"{n:>15}" for n in nomes)
-                               + f" {'iteracoes':>9} {'nota ajuste':>11} {'reservadas':>10} "
-                               f"{'mín':>7}", NEGRITO))
+        self.escrever(e.pintar(f"{'#':>3} " + " ".join(f"{n:>15}" for n in genes)
+                               + f" {'iteracoes':>9}"
+                               + "".join(f" {titulo:>{largura}}"
+                                         for titulo, largura, *_ in colunas), NEGRITO))
         for item in lista:
             posicao = item["posicao"]
             if e.emojis and posicao in medalhas:
                 coluna = f"{medalhas[posicao]} "
             else:
                 coluna = f"{posicao:>3}"
-            valores = " ".join(f"{item['genes'][n]:>15.4g}" for n in nomes)
+            valores = " ".join(f"{item['genes'][n]:>15.4g}" for n in genes)
             linha_genes = f"{valores} {item['iteracoes']:>9}"
             if posicao == 1:
                 linha_genes = e.pintar(linha_genes, NEGRITO)
-            self.escrever(f"{coluna} {linha_genes} "
-                          f"{self._nota_alinhada(item['nota_ajuste'], 11)} "
-                          f"{self._nota_alinhada(item['nota_reservada_media'], 10, NEGRITO)} "
-                          f"{self._nota_alinhada(item['nota_reservada_min'], 7)}")
+            celulas = "".join(
+                " " + (f"{formatar_desvio(valor(item)):>{largura}}" if desvio
+                       else self._nota_alinhada(valor(item), largura, *codigos))
+                for _, largura, valor, desvio, codigos in colunas)
+            self.escrever(f"{coluna} {linha_genes}{celulas}")
 
     def _nota_alinhada(self, nota: float, largura: int, *codigos: str) -> str:
         # Alinha pelo texto visível: os códigos de cor não aparecem na tela.
         return " " * max(largura - len(formatar_nota(nota)), 0) + self.estilo.nota(nota, *codigos)
 
-    def referencias(self, copia: float, teto: float, destino: str):
+    def referencias(self, copias: dict[str, float], destino: str):
+        """
+            A nota de referência de cada caverna e onde o resultado foi gravado.
+            copias: nota da cópia pura (peso > 0 vira vazio, sem rodar o CA) por
+                    caverna; com o alvo igual ao peso, ela é 1.
+        """
         e = self.estilo
         self.escrever()
-        self.escrever(f"{e.icone('📊')}referências: cópia pura {e.nota(copia)}; "
-                      f"teto trivial {e.nota(teto)}")
+        notas = ", ".join(f"{nome} {e.nota(nota)}" for nome, nota in copias.items())
+        self.escrever(f"{e.icone('📊')}referência: cópia pura (peso > 0 vira vazio, sem rodar "
+                      f"o CA): {notas}")
         self.escrever(f"{e.icone('📁')}gravado em {e.pintar(destino, CIANO)}")
