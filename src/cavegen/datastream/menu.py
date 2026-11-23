@@ -83,7 +83,11 @@ def _prepare() -> tuple[list[str], Path]:
 def _crop_menu() -> None:
     from cavegen.datastream.gallery_crop import CROP_FORMATS, inspect_crop, prepare_crop, process_crop
     from cavegen.datastream.crop_planner import default_plan_destination, propose_crops, read_plan_config
-    from cavegen.datastream.crop_preview import write_crop_preview
+    from cavegen.datastream.crop_preview import (
+        preview_manifest,
+        write_crop_preview,
+        write_individual_crop_previews,
+    )
 
     template = "configs/crops/gallery.template.json"
     while True:
@@ -93,7 +97,7 @@ def _crop_menu() -> None:
         print("3. Processar recorte em CPU")
         print("4. Inspecionar recorte processado")
         print("5. Propor e extrair N recortes pela linha central")
-        print("6. Gerar prévia 3D de um PLY recortado")
+        print("6. Gerar prévia 3D dos recortes do plano")
         print("0. Voltar")
         choice = _choice("Opção", "0", ("0", "1", "2", "3", "4", "5", "6"))
         if choice == "0":
@@ -113,7 +117,9 @@ def _crop_menu() -> None:
             elif choice == "4":
                 folder = _ask("Pasta da saída do recorte (Enter para cancelar)")
                 if folder:
-                    inspect_crop(_path(folder))
+                    slices, volume = inspect_crop(_path(folder))
+                    print(f"Fatias no Plotly: {slices}")
+                    print(f"Volume 3D no Plotly: {volume}", flush=True)
             elif choice == "5":
                 plan = _ask("JSON do planejamento (modelo em configs/crops/plan.template.json; Enter para cancelar)")
                 if not plan:
@@ -132,12 +138,24 @@ def _crop_menu() -> None:
                 print(f"Propostos {manifest['proposed']} de {manifest['requested']}. Com alertas: {flagged}.")
                 print(f"Plano e nuvens para revisão: {target}")
             elif choice == "6":
-                ply = _ask("PLY do recorte (Enter para cancelar)")
-                if not ply:
+                mode = _choice("Prévia (1 todos juntos, 2 um HTML por recorte, 0 voltar)", "1", ("0", "1", "2"))
+                if mode == "0":
                     continue
-                source = _path(ply)
-                output = _path(_ask("Arquivo HTML", str(source.with_name("preview.html"))))
-                print(f"Prévia para abrir no navegador: {write_crop_preview(source, output)}")
+                path = _ask("Pasta do plano, plan.json ou PLY de um recorte (Enter para cancelar)")
+                if not path:
+                    continue
+                source = _path(path)
+                if mode == "2":
+                    for output in write_individual_crop_previews(source):
+                        print(f"Prévia para abrir no navegador: {output}")
+                else:
+                    manifest = preview_manifest(source)
+                    default = (
+                        manifest.with_name("preview_plano_tampas.html") if manifest
+                        else source.with_name("preview_tampas.html")
+                    )
+                    output = _path(_ask("Arquivo HTML", str(default)))
+                    print(f"Prévia para abrir no navegador: {write_crop_preview(source, output)}")
             else:
                 path = _ask(f"JSON do recorte (modelo em {template}; Enter para cancelar)")
                 if not path:

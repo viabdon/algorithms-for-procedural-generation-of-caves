@@ -57,7 +57,8 @@ def _vector(value, field: str) -> np.ndarray:
     return result
 
 
-def _section(config: dict, origin: np.ndarray) -> Section:
+def parse_section(config: dict, origin: np.ndarray) -> Section:
+    """Build the plane basis and UV polygon used for caps and their previews."""
     if not isinstance(config, dict):
         raise ValueError("Cada seção deve ser um objeto JSON.")
     point = _vector(config.get("point_xyz"), "point_xyz") - origin
@@ -132,7 +133,7 @@ def prepare_crop(path: Path, *, repository: Path = Path(".")) -> GalleryCrop:
     sections = spec.get("sections")
     if not isinstance(sections, list) or len(sections) != 2:
         raise ValueError("Informe as duas seções revisadas.")
-    start, end = (_section(section, origin) for section in sections)
+    start, end = (parse_section(section, origin) for section in sections)
     seed = _vector(spec.get("seed_xyz"), "seed_xyz") - origin
     if np.any(seed < lo - origin) or np.any(seed >= hi - origin) or np.any(seed < 0) or np.any(seed >= extent):
         raise ValueError("A semente deve estar dentro da caixa e da grade.")
@@ -279,26 +280,84 @@ def process_crop(crop: GalleryCrop, *, progress: Callable[[int], None] | None = 
     return record
 
 
-def inspect_crop(folder: Path) -> None:
-    """Display orthogonal sections through the seed of a processed crop."""
-    import matplotlib.pyplot as plt
-    from matplotlib.colors import ListedColormap
+def inspect_crop(folder: Path) -> tuple[Path, Path]:
+    """Export Plotly HTMLs for the seed slices and the voxel layers."""
+    import plotly.graph_objects as go
+    from plotly.subplots import make_subplots
 
     surface, _ = load_surface_npz(folder / "surface.npz")
     interior = load_volume_npz(folder / "interior.npz")
     classes = np.zeros(surface.shape, dtype=np.uint8)
     classes[surface] = 1
     with np.load(folder / "masks.npz", allow_pickle=False) as masks:
-        classes[masks["caps"].any(axis=0)] = 2
+        caps = masks["caps"].any(axis=0)
+    classes[caps] = 2
     classes[interior.data] = 3
 
-    cmap = ListedColormap(["black", "white", "orange", "deepskyblue"])
-    figure, axes = plt.subplots(1, 3, figsize=(12, 4))
-    for axis, (plot, index, title) in enumerate(
-        zip(axes, interior.metadata["seed_zyx"], ("XY", "XZ", "YZ"))
-    ):
-        plot.imshow(classes.take(index, axis=axis), origin="lower", cmap=cmap,
-                    vmin=0, vmax=3, interpolation="nearest")
-        plot.set_title(f"{title} · índice {index}")
-    figure.suptitle("Branco: parede · laranja: tampa · azul: ar candidato")
-    plt.show()
+    labels = np.array(["Exterior ou vazio não selecionado", "Parede", "Tampa", "Ar candidato"])
+    colors = ["black", "white", "orange", "deepskyblue"]
+    colorscale = [
+        (edge / len(colors), color)
+        for i, color in enumerate(colors)
+        for edge in (i, i + 1)
+    ]
+    seed = interior.metadata["seed_zyx"]
+    planes = ("XY", "XZ", "YZ")
+    perpendicular_axes = "ZYX"
+    figure = make_subplots(
+        rows=1, cols=3,
+        subplot_titles=[
+            f"{plane} · {fixed} = {index}"
+            for plane, fixed, index in zip(planes, perpendicular_axes, seed)
+        ],
+    )
+    for axis, (index, (x_axis, y_axis)) in enumerate(zip(seed, planes)):
+        column = axis + 1
+        voxels = classes.take(index, axis=axis)
+        figure.add_trace(go.Heatmap(
+            z=voxels, customdata=labels[voxels], coloraxis="coloraxis",
+            hovertemplate=f"{x_axis} %{{x}} · {y_axis} %{{y}}<br>%{{customdata}}<extra></extra>",
+        ), row=1, col=column)
+        figure.update_xaxes(title_text=f"{x_axis} (voxel)", constrain="domain", row=1, col=column)
+        figure.update_yaxes(
+            title_text=f"{y_axis} (voxel)", scaleanchor="x" if column == 1 else f"x{column}",
+            scaleratio=1, constrain="domain", row=1, col=column,
+        )
+    crop_id = interior.metadata.get("config", {}).get("crop_id", folder.parent.name)
+    figure.update_layout(
+        title=f"{crop_id} · fatias pela semente",
+        template="plotly_white",
+        height=450,
+        coloraxis=dict(
+            cmin=-0.5, cmax=len(labels) - 0.5, colorscale=colorscale,
+            colorbar=dict(tickvals=list(range(len(labels))), ticktext=labels.tolist()),
+        ),
+    )
+    slices = folder / "fatias_plotly.html"
+    figure.write_html(slices, include_plotlyjs=True)
+
+    spatial = go.Figure()
+    layers = [
+        ("Superfície observada", surface, "#526478", 0.3, True),
+        ("Ar candidato", interior.data, "#0284C7", 0.7, True),
+        ("Tampas", caps, "#EA580C", 0.9, "legendonly"),
+    ]
+    for name, mask, color, opacity, visible in layers:
+        z, y, x = mask.nonzero()
+        spatial.add_trace(go.Scatter3d(
+            x=x, y=y, z=z, mode="markers", name=name, visible=visible,
+            marker=dict(size=3, color=color, opacity=opacity),
+            hovertemplate=f"{name}<br>X %{{x}} · Y %{{y}} · Z %{{z}}<extra></extra>",
+        ))
+    spatial.update_layout(
+        title=f"{crop_id} · camadas de voxels",
+        template="plotly_white",
+        legend=dict(title_text="Camadas"),
+        scene=dict(
+            aspectmode="data",
+            xaxis_title="X (voxel)", yaxis_title="Y (voxel)", zaxis_title="Z (voxel)",
+        ),
+    )
+    volume = folder / "volume_plotly.html"
+    spatial.write_html(volume, include_plotlyjs=True)
+    return slices, volume

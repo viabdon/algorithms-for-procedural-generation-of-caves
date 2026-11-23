@@ -14,8 +14,11 @@ as nuvens do HD (a pasta pode ser alterada). Copie o
 [modelo JSON](../configs/crops/gallery.template.json) para um arquivo por
 trecho. A opção **2** confere a configuração e mostra o destino e a partição
 sem ler os pontos. A opção **3** roda o processamento em CPU após digitar
-`PROCESSAR`. A opção **4** abre três fatias ortogonais pela semente, usando
-a pasta da execução.
+`PROCESSAR`. Na opção **4**, informe a pasta da execução para salvar
+`fatias_plotly.html` com as três fatias ortogonais pela semente e
+`volume_plotly.html` com a vista 3D dos voxels. Na vista 3D, clique na
+legenda para alternar superfície observada, ar candidato e tampas. A
+superfície e o ar aparecem ao abrir, e as tampas começam ocultas.
 
 ### Propor e extrair recortes pela linha central
 
@@ -32,10 +35,17 @@ a pasta da execução.
    com `uv sync --locked --extra centreline`. Com grafo pronto, o planejador
    percorre a nuvem duas vezes para estimar seções e extrair pontos. A
    geração da linha central acrescenta uma leitura em lotes.
-3. Quando quiser visualizar, use a opção **6** sobre o `cloud.ply`. Ela
-   salva um HTML interativo do Plotly com até 60.000 pontos espaçados
-   uniformemente pelos registros do arquivo. Abra o HTML no navegador.
-   A plotagem é independente e funciona com o PLY sozinho.
+3. Quando quiser visualizar, use a opção **6** e informe a pasta do plano,
+   seu `plan.json` ou o `cloud.ply` de um dos recortes. Escolha **1** para
+   agrupar os recortes com pontos em um único `preview_plano_tampas.html`, com
+   uma cor por trecho e até 60.000 pontos distribuídos entre eles. Na
+   legenda, clique no nome para mostrar ou ocultar o trecho. Escolha **2**
+   para salvar um `preview_individual_tampas.html` ao lado de cada PLY em uma só
+   execução, com até 60.000 pontos por recorte. Abra os HTMLs no navegador.
+   Use **Mostrar tampas** para sobrepor todos os contornos disponíveis ou
+   alterne uma extremidade pela legenda. Os contornos vêm do `crop.json` e
+   ficam ocultos ao abrir o HTML. Extremidades sem polígono ficam sem contorno.
+   Um PLY avulso ainda pode ser visualizado individualmente.
 4. Revise o PLY, os alertas, os contornos e a semente do `crop.json`.
    Use a opção **2** para validar a configuração e, após a revisão, a
    opção **3** para voxelizar e aplicar o flood fill ao PLY. No caso de Elaphes,

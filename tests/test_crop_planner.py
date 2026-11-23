@@ -19,6 +19,13 @@ def straight_cloud(length, y=0):
     return np.column_stack((station.ravel(), y + .8 * np.cos(theta.ravel()), .8 * np.sin(theta.ravel())))
 
 
+def preview_traces(path):
+    call = path.read_text(encoding="utf-8").rsplit("Plotly.newPlot(", 1)[1]
+    traces, _ = json.JSONDecoder().raw_decode(call.split(",", 1)[1].lstrip())
+    assert all(trace["type"] == "scatter3d" for trace in traces)
+    return traces
+
+
 def setup_plan(tmp_path, points, nodes, *, count=2, source_format="npz"):
     source = tmp_path / "raw cloud.xyz"
     np.savetxt(source, points)
@@ -68,10 +75,26 @@ def test_racine_plan_builds_shared_caps_and_preview_is_a_separate_menu_action(tm
 
     raw.unlink()
     html = tmp_path / "preview.html"
-    answers = iter(["2", "6", str(first.source), str(html), "0", "0"])
+    answers = iter(["2", "6", "1", str(first.source), str(html), "0", "0"])
     main()
     assert "Prévia para abrir" in capsys.readouterr().out
-    assert '"type":"scatter3d"' in html.read_text()
+    traces = preview_traces(html)
+    assert [trace["name"] for trace in traces if trace["mode"] == "markers"] == [
+        folder.name for folder in folders
+    ]
+    caps = [trace for trace in traces if trace["mode"] == "lines"]
+    assert len(caps) == 4
+    assert all(cap["visible"] == "legendonly" for cap in caps)
+    assert "Mostrar tampas" in html.read_text(encoding="utf-8")
+
+    answers = iter(["2", "6", "2", str(output / "plan.json"), "0", "0"])
+    main()
+    assert capsys.readouterr().out.count("Prévia para abrir") == 2
+    for folder in folders:
+        traces = preview_traces(folder / "preview_individual_tampas.html")
+        assert [trace["name"] for trace in traces] == [
+            folder.name, f"Tampa inicial · {folder.name}", f"Tampa final · {folder.name}"
+        ]
     assert process_crop(first)["air_voxels"] > 0
 
 

@@ -114,3 +114,23 @@ def test_menu_previews_and_requires_explicit_confirmation(gallery, tmp_path, mon
     main()
     assert "Ar candidato: 32 m³" in capsys.readouterr().out
     assert (crop.destination / "run.json").exists()
+
+    answers = iter(["2", "4", str(crop.destination), "0", "0"])
+    main()
+    output = crop.destination / "fatias_plotly.html"
+    volume = crop.destination / "volume_plotly.html"
+    menu_output = capsys.readouterr().out
+    assert str(output) in menu_output
+    assert str(volume) in menu_output
+    call = output.read_text(encoding="utf-8").rsplit("Plotly.newPlot(", 1)[1]
+    decoder = json.JSONDecoder()
+    traces, _ = decoder.raw_decode(call.split(",", 1)[1].lstrip())
+    assert [trace["type"] for trace in traces] == ["heatmap"] * 3
+    assert [trace["xaxis"] for trace in traces] == ["x", "x2", "x3"]
+    assert all(trace["customdata"][4][4] == "Ar candidato" for trace in traces)
+
+    call = volume.read_text(encoding="utf-8").rsplit("Plotly.newPlot(", 1)[1]
+    traces, _ = decoder.raw_decode(call.split(",", 1)[1].lstrip())
+    assert [trace["type"] for trace in traces] == ["scatter3d"] * 3
+    assert [trace["name"] for trace in traces] == ["Superfície observada", "Ar candidato", "Tampas"]
+    assert [trace["visible"] for trace in traces] == [True, True, "legendonly"]
