@@ -6,6 +6,25 @@ trabalho de Felipe nos clássicos, coleta e tabela. O
 limites, referências e critérios de aceitação. Ver também
 [tarefas de Felipe](tarefas-felipe-sdf-ca.md) e [roadmap](roadmap.md).
 
+## Prioridade atual da GAN
+
+- [ ] Ampliar a busca ao redor de cortes com cobertura insuficiente. Testar
+  posições nos dois sentidos em passos de quatro voxels e refinar em passos
+  de um voxel. Recalcular o contorno com pontos do LAS em cada posição.
+  [Busca proposta](planejamento-recortes-voxelizacao.md#busca-de-cortes-com-melhor-cobertura)
+- [ ] Testar um critério que acompanhe a abertura da galeria de interesse
+  nas seções. Usar a tampa inicial do 001 para verificar a extensão lateral
+  que passou com 16 faixas cobertas.
+- [ ] Investigar a ausência das duas tampas no limite 005/006, confirmada
+  no Plotly e nos JSONs. Comparar a cobertura na faixa do LAS original e
+  nos pontos selecionados para estimar a seção. [Registro do caso](plano-reconstrucao-secoes.md#limite-005006-sem-tampas)
+- [ ] Ensaiar os cortes compartilhados 001/002 e 005/006 de Archamps /
+  PostEtroiture. Registrar tentativas, reextrair os vizinhos em um plano
+  separado e verificar o fechamento com o flood fill. Preservar 003 e 004
+  como controles do plano original.
+- [ ] Após o ensaio, preparar o lote retomável de PreEtroiture e
+  PostEtroiture em background e a consolidação dos `summary.csv` por caverna.
+
 ## Entregas iniciais
 
 - [ ] Ler `metrics/structural.py` e [métricas estruturais](metricas-estruturais.md);

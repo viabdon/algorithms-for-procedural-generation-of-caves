@@ -41,15 +41,14 @@ de tampa e o que ainda precisamos medir antes do treino.
 
 ## Próximos passos
 
-1. **Escolher um trecho curto e bem observado** e preservar a precisão dos
-   pontos originais. Separar os pontos desse trecho mantendo uma faixa de
-   contexto, para não cortar paredes por acidente.
-2. **Reconstruí-lo por cortes sucessivos**, como fatias transversais, revisando
-   o contorno interno de cada uma.
-3. **Colocar tampas computacionais nas extremidades do recorte** para delimitar
-   seu interior. As tampas seguem os contornos da galeria; não são as faces da
-   caixa que guarda os blocos. São limites artificiais; falhas nas paredes
-   ainda exigem revisão.
+1. **Buscar cortes com melhor cobertura.** Reavaliar primeiro os limites
+   001/002 e 005/006 de PostEtroiture, em passos de quatro voxels pela linha
+   central e com refinamento de um voxel. [Planejamento da busca](planejamento-recortes-voxelizacao.md#busca-de-cortes-com-melhor-cobertura)
+2. **Reextrair e verificar os vizinhos.** Os dois recortes devem compartilhar
+   o limite escolhido. A cobertura angular ajuda a escolher a posição, e
+   o flood fill testa se o interior obtido fica isolado.
+3. **Processar o restante de Archamps** após o ensaio e reunir os resumos
+   das voxelizações em um CSV por caverna.
 4. **Comparar resoluções e conferir os túneis com os pontos observados**,
    registrando o que foi medido e o que precisou ser estimado.
 5. **Repetir a auditoria e manter os recortes separados por caverna** antes

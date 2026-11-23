@@ -34,6 +34,14 @@ decisão para revisão. Os recortes continuam fora dos dados de treino.
 A comparação de resoluções, a validação geométrica e a política sobre
 voxels artificiais permanecem pendentes. [Histórico do piloto](plano-reconstrucao-secoes.md#evolucao-do-piloto-em-archamps)
 
+**Próxima prioridade da preparação dos dados.** Buscar posições alternativas
+para os cortes com cobertura insuficiente em Archamps / PostEtroiture.
+O ensaio explorará a linha central a cada quatro voxels e refinará a
+posição em passos de um voxel. Cada novo limite será compartilhado pelos
+dois recortes vizinhos. A voxelização em lote de Archamps e a consolidação
+dos relatórios ficam para depois desse ensaio.
+[Planejamento da busca](planejamento-recortes-voxelizacao.md#busca-de-cortes-com-melhor-cobertura)
+
 ### 1. Resultado da auditoria e alcance científico
 
 Foram percorridos todos os nove NPZ de `data/processed/references` e seus

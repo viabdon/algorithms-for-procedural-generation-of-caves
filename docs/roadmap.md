@@ -64,6 +64,15 @@ registram os limites e os experimentos preservados.
 
 ## Frente de Pablo — modelos neurais
 
+- [ ] **Ampliar a busca de cortes sem cobertura**, próxima prioridade da GAN.
+  Começar pelos limites 001/002 e 005/006 de Archamps / PostEtroiture, com
+  avanço de quatro voxels em ambos os sentidos e refinamento de um voxel.
+  Usar a tampa inicial do 001 para testar se o contorno acompanha a
+  abertura de interesse perto de uma ramificação. Reextrair os vizinhos
+  com a mesma seção e verificar o fechamento.
+  [Procedimento e critérios](planejamento-recortes-voxelizacao.md#busca-de-cortes-com-melhor-cobertura)
+- [ ] Depois do ensaio de cortes, organizar a voxelização em background dos
+  recortes pendentes de Archamps e consolidar os resumos em um CSV por caverna.
 - [ ] Definir estado, ações, transições, recompensa, término e orçamento do
   PCGRL; validar ambiente pequeno e política aleatória antes do treinamento.
 - [x] Auditar os dados atuais de GAN e definir folds por caverna, registrando

@@ -19,6 +19,89 @@ documenta limpeza, linhas centrais e identificação de ramos. O estudo
 conectividade de levantamentos. O fechamento com tampas e a inferência de ar
 no piloto são adaptações experimentais do projeto.
 
+## Busca de cortes com melhor cobertura
+
+**Próxima prioridade do piloto.** Ampliar a busca pela posição dos cortes
+quando a seção original e os ajustes locais de um voxel deixam o contorno
+sem suporte suficiente. Antes de rodar a voxelização em lote de Archamps,
+o primeiro ensaio deve tratar os dois limites compartilhados abaixo, no
+plano de PostEtroiture a 2 mm, com voxels de 16 cm.
+
+| Posição ao longo da linha central | Extremidades afetadas | Cobertura registrada |
+| --- | --- | --- |
+| 8,76 m | Final do 001 e início do 002 | 11 de 16 faixas |
+| 42,34 m | Final do 005 e início do 006 | 11 de 16 faixas |
+
+A inspeção do 001 acrescentou um segundo caso de teste. Sua tampa inicial,
+a **0,16 m**, tem **16 de 16 faixas** e mesmo assim se estende da galeria
+principal até a região de uma provável ramificação lateral. A hipótese é
+que o ajuste radial reuniu pontos de superfícies diferentes numa só
+volta. A extensão foi observada na prévia dos pontos do PLY, antes da
+voxelização. [Registro da inspeção do 001](plano-reconstrucao-secoes.md#contorno-da-tampa-inicial-do-001)
+
+No limite **005/006**, a inspeção confirmou a ausência da tampa final
+do 005 e da inicial do 006. Os dois JSONs registram a mesma posição e
+deixam o contorno em branco por cobertura insuficiente. Antes de deslocar
+esse limite, comparar a cobertura angular na faixa do LAS original e
+nos pontos selecionados para ajustar o contorno. A comparação deve usar
+o mesmo plano para investigar se a cobertura já era baixa na faixa
+observada ou se diminuiu durante a seleção. [Registro da inspeção do 005/006](plano-reconstrucao-secoes.md#limite-005006-sem-tampas)
+
+### Busca proposta
+
+1. **Explorar os dois sentidos.** Em um corte sem contorno válido, testar
+   posições a cada **quatro voxels** de distância ao longo da linha central.
+   Para o piloto atual, o passo equivale a **64 cm**. Limitar a busca ao
+   intervalo do ramo que mantém a ordem dos cortes e o comprimento mínimo
+   dos dois trechos. Registrar a distância máxima testada. O alcance ainda
+   será definido no ensaio.
+2. **Reestimar o contorno da abertura de interesse.** Calcular a direção
+   local da linha central, formar o plano e projetar os pontos na sua
+   vizinhança. Usar a interseção da linha central como referência para
+   identificar a abertura que continua o trecho. Como hipótese a testar,
+   agrupar os pontos na seção e nas fatias imediatamente vizinhas para
+   distinguir um contorno local de um prolongamento lateral ou de outra
+   abertura. Verificar se o contorno se mantém nas fatias vizinhas antes de
+   preencher setores angulares faltantes. Se duas interpretações continuarem
+   plausíveis, marcar a seção para inspeção ou buscar outra posição.
+   Aplicar a triagem de pelo menos **14 de 16 faixas angulares** com
+   suporte e lacunas isoladas ao contorno da abertura selecionada.
+3. **Refinar o deslocamento.** Quando uma posição passar na triagem,
+   testar as posições intermediárias no intervalo vizinho em passos de
+   **um voxel**, ou **16 cm** no piloto. Entre as posições aprovadas,
+   escolher a mais próxima do corte original. Se nenhuma atender ao critério
+   dentro da faixa permitida, registrar as sondagens e manter o corte
+   pendente de revisão.
+4. **Aplicar o mesmo corte aos dois vizinhos.** Reextrair ambos do LAS
+   com a mesma posição de corte e orientações voltadas para o interior de
+   cada trecho. Recalcular a caixa, a margem e a grade de cada um. Manter o
+   tamanho físico de voxel e registrar quando algum eixo exceder a grade
+   de referência de 64 células. Preservar o plano inicial como controle e
+   salvar a variante em um novo plano dentro do mesmo fold.
+5. **Confirmar o fechamento.** Voxelizar os vizinhos e verificar o resultado
+   pelo flood fill e pelos relatórios da pipeline. Registrar separadamente
+   a qualidade do contorno e a conectividade do interior. O 003 passou na
+   triagem angular e apresentou uma fuga lateral, enquanto o 004 fechou no
+   ensaio original. Ambos servem de controle para preservar as seções
+   consistentes. Usar a tampa inicial do 001 para conferir se o critério
+   geométrico detecta a extensão lateral mesmo com 16 faixas cobertas.
+
+Para cada corte deslocado, guardar a posição original, os offsets testados,
+a cobertura, a continuidade angular, possíveis grupos laterais e o
+motivo da escolha. Antes do ensaio real, testar um caso sintético que
+melhora com o deslocamento, um em que todas as posições permanecem
+insuficientes e outro em que duas aberturas na faixa da seção aparentam
+boa cobertura. Conferir a fronteira compartilhada e a ordem dos cortes.
+O objetivo é medir quantos limites ganham um contorno sustentado
+e quantos trechos fecham depois, incluindo os casos que seguem pendentes.
+O ensaio termina quando os dois limites compartilhados e a tampa inicial
+do 001 tiverem uma decisão registrada. Nas seções aprovadas, anexar
+o resultado da voxelização dos recortes afetados. Nas seções pendentes,
+registrar a faixa explorada e a razão da rejeição.
+Depois disso, a etapa seguinte será planejar e executar em
+background os recortes pendentes de PreEtroiture e PostEtroiture e
+consolidar seus resumos em um CSV por caverna.
+
 ## Separação dos dados antes dos recortes
 
 A unidade independente continua sendo a **caverna**, não o trecho, a densidade

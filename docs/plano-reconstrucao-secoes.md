@@ -30,8 +30,9 @@ Archamps / PostEtroiture usou o LAS amostrado a 2 mm, seis recortes e voxel
 de 16 cm. Esses parâmetros descrevem o ensaio. A comparação entre escalas
 e cavernas ainda precisa ser feita.
 
-Quatro contornos de recorte apresentaram alerta de cobertura em pelo
-menos uma extremidade. Os casos 003 e 004 passaram pela estimativa de
+Quatro recortes apresentaram alerta de cobertura em uma extremidade.
+Os quatro alertas se concentram em dois cortes compartilhados entre
+vizinhos. Os casos 003 e 004 passaram pela estimativa de
 contorno e seguiram para a mesma grade 64³. O 004 recuperou 8.132 voxels
 de ar candidato, cerca de 33,31 m³. Retirar qualquer uma das duas tampas
 no ensaio fez a semente alcançar o exterior. Isso confirmou que o
@@ -166,6 +167,86 @@ LAS georreferenciada com dois pontos originais no bin ausente do PLY.
 Esses casos testam a implementação. A comparação de resoluções, a
 revisão da continuidade e a avaliação em outras galerias ainda são
 necessárias para recomendar os parâmetros como metodologia geral.
+
+### Contorno da tampa inicial do 001
+
+Em três vistas do Plotly, o contorno laranja atravessa a região entre a
+galeria principal e uma extensão lateral da nuvem. A extensão tem
+aparência de ramificação e parece se fechar em pelo menos uma das vistas.
+As imagens permitem identificar o contorno estendido, mas a conectividade
+e o fechamento físico da extensão ainda precisam de verificação na nuvem.
+
+O `crop.json` e a legenda do Plotly confirmam que esse contorno é a
+**tampa inicial do 001**, na posição **0,16 m** ao longo da linha central.
+Ela foi estimada com **16 de 16 faixas angulares**. A tampa final do
+mesmo recorte continua sem contorno no corte **001/002**, a **8,76 m**,
+com **11 de 16 faixas**. São dois problemas distintos no mesmo recorte.
+
+A hipótese é que pontos da galeria e da extensão lateral foram reunidos
+na faixa da mesma seção. O ajuste atual projeta esses pontos do LAS no
+plano, usa o percentil 75 das distâncias em cada faixa angular e liga os
+raios numa única volta. Quando há superfícies a diferentes distâncias na
+mesma direção, pontos mais afastados podem alongar alguns raios e
+estender o contorno até outra abertura. A cobertura angular mede presença
+de pontos por direção. Falta verificar se esses pontos sustentam o
+contorno da mesma passagem. A extensão do contorno já aparece antes da
+voxelização.
+
+### Limite 005/006 sem tampas
+
+A inspeção visual confirmou que o 005 exibe apenas a tampa inicial e o
+006 apenas a final. Os dois arquivos `crop.json` têm o mesmo corte a
+**42,34 m** na linha central, com **11 de 16 faixas angulares** sustentadas.
+O planejador deixou `polygon_uv` vazio no final do 005 e no início do 006,
+as duas extremidades que usam esse corte. A prévia reflete os contornos
+gerados no plano.
+
+A extremidade fica sem a barreira prevista. Como a etapa de voxelização
+exige os dois contornos, o flood fill e o reparo local ainda não foram
+testados nesses trechos. A falha confirmada ocorreu na estimativa da
+seção, antes de verificar o fechamento da grade.
+
+A origem da baixa cobertura continua pendente. A faixa pode ter trechos
+com poucos pontos no LAS, ou a escolha do plano e a seleção dos pontos
+podem ter deixado parte da passagem fora da estimativa. O ensaio deverá
+comparar as faixas angulares sustentadas na nuvem original e nos pontos
+selecionados para a seção, usando a mesma posição e orientação. Isso
+ajudará a distinguir falta de observações na faixa de efeitos da seleção
+ou do corte. A evidência atual ainda não confirma a extensão lateral
+observada na tampa inicial do 001.
+
+### Arquivos de referência do piloto
+
+A inspeção usou a execução local em
+`data/processed/crop_plans/archamps/PostEtroiture/holdout_indian_tunnel/piloto_2mm_6_trechos/`.
+O `plan.json` identifica a nuvem de 2 mm, a linha central, o fold e o
+tamanho do voxel. Nas pastas `ramo_001_001`, `ramo_001_005` e
+`ramo_001_006`, conferir `proposal.cut_stations` e
+`proposal.section_bins_supported` nos `crop.json` e os contornos em
+`preview_individual_tampas.html`. Esses artefatos permanecem locais.
+Para recriar as vistas a partir dos PLYs, usar a opção 6 no
+[menu de preparação](preparacao-volumes.md#propor-e-extrair-recortes-pela-linha-central).
+
+### Próximo ensaio: selecionar a abertura e buscar posições melhores
+
+O próximo ensaio prioriza as duas seções de PostEtroiture que ficaram com
+11 de 16 faixas angulares sustentadas, entre os recortes 001/002 e 005/006.
+Sem um contorno inicial nesses cortes, o reparo local de vazamentos ainda
+não entra em ação. A busca planejada acontece antes da extração final da
+nuvem. Ela desloca a seção ao longo da linha central em passos de quatro
+voxels, recalcula o contorno a partir do LAS e refina em passos de um voxel
+perto de um candidato aceitável. A triagem também deverá verificar se o
+contorno acompanha a abertura da galeria de interesse. O 001 inicial
+servirá como caso de controle para detectar uma extensão indevida mesmo
+com cobertura angular completa.
+
+Essa etapa é inspirada na varredura por janelas do 003. Lá, os planos são
+barreiras temporárias usadas para localizar uma fuga na grade. Aqui, cada
+posição serve para avaliar um contorno observado e escolher um novo
+limite compartilhado. A evidência será registrada em duas etapas, com
+cobertura angular na escolha da seção e conectividade após reextrair e
+voxelizar os vizinhos. O lote de Archamps fica para depois desse ensaio.
+[Detalhes da busca e critérios de escolha](planejamento-recortes-voxelizacao.md#busca-de-cortes-com-melhor-cobertura)
 
 ## Abordagem escolhida
 
