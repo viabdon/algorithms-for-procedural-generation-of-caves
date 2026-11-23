@@ -18,6 +18,9 @@ como exemplos de cavernas resolvidas. Reduzir para 16³ apaga todo o ar.
    Inclui também os planos de reconstrução/recortes e o resumo do gargalo.
    A preparação do piloto usa o
    [menu local em CPU](../../docs/preparacao-volumes.md#piloto-local-de-recortes-por-galeria).
+   Os recortes do piloto, suas máscaras de reparo e diagnósticos em
+   `reference_sections/` estão em revisão, fora do conjunto usado
+   por este notebook.
    Os NPZ são ignorados pelo Git: um clone sozinho não contém os dados.
 3. Envie `01_gan_reference_volumes.ipynb` ao Colab, selecione uma VM com GPU e
    execute as células de instalação e upload. Envie o ZIP quando solicitado;

@@ -6,9 +6,12 @@ revisão dos trechos antes de voxelizar e aplicar flood fill em CPU. O menu
 também oferece configuração manual e prévia Plotly independente a partir do
 PLY. Quando o levantamento não fornece grafo, o menu pode estimá-lo no
 mesmo plano pela sequência de contração laplaciana e árvore geradora mínima
-do ensaio exploratório do Elaphes. Os recortes reais ainda aguardam validação. O
-[plano de seções sucessivas](plano-reconstrucao-secoes.md) descreve a reconstrução
-mais ampla, que inclui interpolação e regiões de incerteza.
+do ensaio exploratório do Elaphes. O piloto agora diagnostica fugas com duas
+tampas móveis e valida remendos locais em uma máscara separada. Os primeiros
+resultados reais estão registrados na
+[evolução do piloto em Archamps](plano-reconstrucao-secoes.md#evolucao-do-piloto-em-archamps).
+A reconstrução mais ampla por interpolação e a validação geométrica
+sistemática continuam em aberto.
 
 O *Karst Conduit Catalogue* (DOI `10.5194/essd-2025-194`, §§2.3, 2.7 e 3.3)
 documenta limpeza, linhas centrais e identificação de ramos. O estudo
@@ -130,11 +133,13 @@ dentro da grade, com margem exterior além delas, sem usar a face do array
 para fechar o flood fill. Registrar a espessura de rasterização e verificá-la
 em cada resolução, sem alargar a passagem ou bloquear uma seção interna.
 
-Mostrar separadamente parede observada, superfície interpolada, tampa e ar
-inferido. Tampas nas extremidades não corrigem falhas laterais. Regiões sem
-suporte suficiente permanecem incertas ou levam à rejeição. O exterior da
-galeria delimitada não comprova rocha em toda a região: podem existir outras
-cavidades não observadas.
+Mostrar separadamente parede observada, tampas, reparo local e ar inferido.
+O teste com os planos completos distingue uma rota lateral de uma que
+depende dos cortes. As tampas móveis restringem a região a investigar
+quando a semente ainda se conecta ao exterior. Para reparos, exigir
+evidência nos bins e revalidar o recorte inteiro com as tampas originais.
+Áreas sem suporte permanecem para revisão. O exterior da galeria
+delimitada pode conter cavidades além do trecho estudado.
 
 ## 5. Manifesto e organização
 
@@ -145,13 +150,18 @@ Uma execução manual bem-sucedida apresenta esta estrutura:
 data/processed/reference_sections/<caverna>/<levantamento>/<recorte>/<resolucao>/
     surface.npz       # superfície observada
     interior.npz      # ar candidato em ZYX
-    masks.npz         # máscaras das tampas
+    masks.npz         # tampas e máscara de reparo local
     run.json          # configuração efetiva, contagens e status pending_review
+    diagnostics/      # resumo, checagens independentes e evidências da busca em CSV
 ```
 
 Para recortes propostos, o caminho dos volumes também inclui o fold e o ID
 do plano entre o levantamento e o recorte. A nuvem extraída e o grafo gerado
 ficam no diretório do plano descrito no [guia do piloto](preparacao-volumes.md#propor-e-extrair-recortes-pela-linha-central).
+Uma tentativa rejeitada guarda CSVs em `<resolucao>.diagnostics/<tentativa>/`
+ao lado da pasta esperada para o volume. A opção 4 monta a visualização a
+partir do NPZ local comprimido quando há busca por vazamento. As janelas
+da busca ficam em memória. Ver o [guia de reprodução](preparacao-volumes.md#relatorio-por-recorte-e-reproducao).
 
 Para integrar o piloto ao treino, estender o manifesto para registrar:
 
@@ -172,9 +182,11 @@ auditoria e loader ao novo método, sem rotulá-lo como o flood fill anterior.
 ## 6. Verificações antes de preparar dados de treino
 
 Os testes sintéticos verificam a seleção por limites, a estabilidade entre
-lotes, a precisão local do LAS, o fechamento pelas tampas e a detecção de
-vazamento. Nos próximos ensaios, conferir associação em galerias próximas e
-a reconstrução nas regiões que exigirem interpolação.
+lotes, a precisão local do LAS, o fechamento pelas tampas, a busca por
+janelas e o reparo de lacunas pequenas. Um vão largo deve manter o resultado
+pendente, com o diagnóstico disponível. Nos próximos ensaios, conferir
+associação em galerias próximas e a reconstrução nas regiões que exigirem
+interpolação.
 
 Nos trechos reais, conferir contornos contra a nuvem, continuidade, gargalos,
 margem exterior e ausência de vazamentos nas tampas. Comparar pequenas

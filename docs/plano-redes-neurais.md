@@ -27,8 +27,12 @@ Em 17/11/2026, o [planejamento dos recortes](planejamento-recortes-voxelizacao.m
 detalhou a seleção dos pontos por galeria, contexto além dos cortes, planos
 das tampas, bounds da grade e metadados. O split continua por caverna antes
 da extração. O [piloto de recortes e tampas](preparacao-volumes.md#piloto-local-de-recortes-por-galeria)
-usa o menu local e aguarda validação em dados reais. A reconstrução por seções
-sucessivas e a inclusão dos recortes no treino continuam pendentes.
+usa o menu local. No ensaio em Archamps / PostEtroiture, o 004 fechou
+diretamente e o 003 fechou com um reparo de um voxel após a busca por
+janelas e a comparação com a nuvem de origem. A máscara conserva essa
+decisão para revisão. Os recortes continuam fora dos dados de treino.
+A comparação de resoluções, a validação geométrica e a política sobre
+voxels artificiais permanecem pendentes. [Histórico do piloto](plano-reconstrucao-secoes.md#evolucao-do-piloto-em-archamps)
 
 ### 1. Resultado da auditoria e alcance científico
 

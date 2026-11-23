@@ -18,8 +18,11 @@ limites, referências e critérios de aceitação. Ver também
   definir folds por caverna. Os quatro interiores não passaram a triagem.
 - [x] Preparar a GAN de ocupação/SDF e notebook Colab, com testes em máscaras
   artificiais, checkpoints e avaliação por seeds. Sem treino nas referências.
-- [ ] Implementar e validar o [piloto de recortes](planejamento-recortes-voxelizacao.md):
-  seleção em lotes com contexto, precisão local, seções, tampas e margens.
+- [x] Implementar o [piloto de recortes](planejamento-recortes-voxelizacao.md)
+  com seleção em lotes, precisão local, seções, tampas, busca por janelas e
+  máscara de reparo.
+- [ ] Revisar a geometria do 003 reparado e do controle 004 em resoluções
+  comparáveis e repetir o diagnóstico em outras galerias. [Resultados do piloto](plano-reconstrucao-secoes.md#evolucao-do-piloto-em-archamps)
 - [ ] Acordar o que PCGARL significa no projeto e a referência adversarial; testar
   alcançabilidade e custos do solucionador antes de acoplar os agentes.
 - [ ] Implementar provas pequenas e só então treinar, versionar checkpoints,

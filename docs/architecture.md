@@ -86,9 +86,13 @@ Uma variante de CA com peso espacial já existe na branch `CA`. O ensaio com o c
 Uma GAN requer volumes de treino com semântica válida; dados sintéticos verificam a infraestrutura, mas não sustentam alegação de aprendizagem de cavernas reais. O código atual implementa G/D, treino e inferência a partir de checkpoint, sem modelo treinado nas referências. A variante neural usa TSDF discreto nos centros, com interface entre centros e recuperação por sinal, distinta do contrato histórico de borda zero acima; ver o [plano neural](plano-redes-neurais.md). PCGRL ainda depende de ambiente pequeno, recompensa e definição do MDP.
 
 Para preparar referências menores, o [planejamento dos recortes](planejamento-recortes-voxelizacao.md)
-separa seleção de pontos, seções/tampas e bounds da grade. O filtro por trecho
-e o preparo em coordenadas locais ainda serão implementados. O interior será
-inferido e revisado com máscaras de tampas/incerteza, preservando a divisão
-por caverna; não passa automaticamente a ser vazio real conhecido.
+separa seleção de pontos, seções/tampas e bounds da grade. O menu local
+executa o filtro em lotes e voxeliza o recorte em coordenadas locais.
+Se a semente alcança a borda, o diagnóstico por janelas localiza
+caminhos de fuga e avalia um remendo apoiado pela nuvem. O NPZ de superfície
+guarda a observação, as máscaras registram tampas e reparo, e o NPZ de
+interior guarda apenas a componente de ar candidata. A integração
+posterior à GAN deve preservar a divisão por caverna e considerar a
+proveniência de cada máscara. [Histórico e critérios](plano-reconstrucao-secoes.md#evolucao-do-piloto-em-archamps)
 
 Ver [ajustes metodológicos](methodology-adjustments.md) e [roadmap](roadmap.md).

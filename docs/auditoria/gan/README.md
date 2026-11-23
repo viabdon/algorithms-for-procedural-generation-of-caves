@@ -144,12 +144,17 @@ galeria delimitada e preservar seus detalhes. O
 [plano detalhado](../../plano-reconstrucao-secoes.md) registra os passos,
 as validações e a integração futura com a GAN; o
 [resumo simplificado](../../resumo-gargalo-gan.md) explica o problema atual.
-Essa escolha é uma proposta a implementar e validar, sem treinamento nesta etapa.
+O piloto local já produziu os primeiros interiores candidatos em Archamps.
+O 004 fechou com as tampas, enquanto o 003 exigiu diagnóstico por janelas
+e um remendo de um voxel. Esses resultados ficam em
+`data/processed/reference_sections/`, com revisão geométrica pendente,
+fora dos manifests e partições desta auditoria. [Evolução do piloto](../../plano-reconstrucao-secoes.md#evolucao-do-piloto-em-archamps)
 
 Em 17/11/2026, o [planejamento dos recortes](../../planejamento-recortes-voxelizacao.md)
 detalhou a seleção incremental de pontos com contexto, as seções das tampas,
-o domínio da grade e o manifesto por trecho. A seleção será feita antes da
-voxelização: fornecer bounds menores ao CLI atual não extrai o recorte.
+o domínio da grade e o manifesto por trecho. O menu local faz a seleção
+antes de voxelizar. Os limites passados ao CLI global controlam o domínio
+da voxelização global.
 
 1. Inspecionar cortes das nuvens e/ou malhas oficiais nos gargalos e entradas.
    Confrontar a superfície voxelizada com a nuvem para verificar perda de

@@ -36,8 +36,8 @@ registram os limites e os experimentos preservados.
   ocupação/SDF, treino/checkpoints, inferência, avaliação e notebook Colab.
   Testes usam fixtures artificiais; não há treino nas referências.
 - [ ] Corrigir os dados da GAN: interiores globais atuais têm 2, 1, 98 e 5
-  voxels de ar e não passam a triagem. O [plano de recortes](planejamento-recortes-voxelizacao.md)
-  define seleção em lotes, contexto, limites da grade e tampas a implementar.
+  voxels de ar e não passam a triagem. O piloto local já produz candidatos
+  com inspeção das tampas e do reparo, ainda em revisão. [Evolução do piloto](plano-reconstrucao-secoes.md#evolucao-do-piloto-em-archamps)
 - [ ] Gerar e avaliar os modelos neurais após validar seus dados/ambientes.
   PCGRL ainda tem placeholders; PCGARL continua sem implementação.
 
@@ -68,8 +68,9 @@ registram os limites e os experimentos preservados.
   PCGRL; validar ambiente pequeno e política aleatória antes do treinamento.
 - [x] Auditar os dados atuais de GAN e definir folds por caverna, registrando
   origem, hashes, resolução e limitações. Isso não aprovou os interiores.
-- [ ] Implementar o piloto de recortes: origem local antes de float32, seleção
-  dos pontos com contexto, seções e tampas separadas da borda da grade.
+- [x] Implementar o piloto com origem local, seleção em lotes, tampas e
+  diagnóstico por janelas. Registrar reparos em máscara própria e distinguir
+  um fechamento verificado de um recorte que continua vazando.
 - [ ] Validar detalhes, continuidade e limites em grades comparáveis; registrar
   máscaras, revisão e novos manifestos antes de treinar e medir VRAM no Colab.
 - [ ] Confirmar o significado de PCGARL e definir gerador, adversário, objetivo,

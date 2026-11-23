@@ -397,6 +397,11 @@ Para preparar nuvens XYZ, PLY, F32 ou LAS pelo menu independente dos geradores:
 
 Para recortes de galeria, escolha a opção **2** e use a configuração JSON
 descrita no [guia do piloto local](docs/preparacao-volumes.md#piloto-local-de-recortes-por-galeria).
+A preparação do recorte testa a conectividade, usa tampas móveis para
+localizar vazamentos e guarda remendos verificados em uma máscara própria.
+A inspeção no Plotly mostra parede, tampas, reparo e ar candidato. Consulte
+as etapas e as saídas no [guia de diagnóstico](docs/preparacao-volumes.md#quando-o-flood-fill-encontra-o-exterior).
+
 A opção **1** voxeliza a nuvem inteira e solicita entrada, resolução, pasta,
 limites, lote, progresso e flood fill. Permite executar em primeiro plano ou
 em background, mostra o comando equivalente e protege saídas anteriores.
