@@ -14,7 +14,9 @@ as nuvens do HD (a pasta pode ser alterada). Copie o
 [modelo JSON](../configs/crops/gallery.template.json) para um arquivo por
 trecho. A opção **2** confere a configuração e mostra o destino e a partição
 sem ler os pontos. A opção **3** roda o processamento em CPU após digitar
-`PROCESSAR`. Na opção **4**, informe a pasta da execução para salvar
+`PROCESSAR`. A execução testa o fechamento original e inicia o
+[diagnóstico de vazamento](#quando-o-flood-fill-encontra-o-exterior)
+se alcançar a borda pela semente. Na opção **4**, informe a pasta da execução para salvar
 `fatias_plotly.html` com as três fatias ortogonais pela semente e
 `volume_plotly.html` com a vista 3D dos voxels. Na vista 3D, clique na
 legenda para alternar superfície observada, ar candidato e tampas. A
@@ -124,21 +126,105 @@ enquanto recuperar pontos excluídos exige uma nova extração.
   resoluções no mesmo domínio físico, dobre o shape e reduza o lado do
   voxel à metade. A `plane_tolerance` deve ser pequena frente ao voxel.
 - `seed_xyz` marca um ponto revisado dentro da passagem. O flood fill
-  parte do exterior, com seis vizinhos por face. O ar candidato é a
-  componente confinada que contém a semente. Vazamento até a semente,
-  barreira na borda e tampas sem contato com a parede interrompem a execução.
+  percorre voxels livres por seis vizinhos de face. No recorte, o código
+  parte da semente e verifica se a componente alcança a borda. Semente
+  ocupada, barreira na borda e tampas sem contato com a parede exigem
+  correção da configuração. Para uma semente livre conectada ao exterior,
+  o menu inicia o diagnóstico automático.
 - `batch_size` limita o lote de leitura. `progress_every` define a
   frequência do aviso em pontos lidos, com `0` para desativar.
   A nuvem é percorrida uma vez por recorte.
 
 Para a configuração manual, as saídas ficam em
 `data/processed/reference_sections/<caverna>/<levantamento>/<recorte>/<resolucao>/`.
-`surface.npz` contém a parede observada, `masks.npz` as duas tampas,
-`interior.npz` o ar candidato em ZYX, e `run.json` a configuração,
+`surface.npz` contém a parede observada. `masks.npz` reúne as duas
+tampas em `caps` e a máscara `repair`. `interior.npz` contém o ar
+candidato em ZYX, e `run.json` guarda a configuração,
 partição, contagens e status `pending_review`. Revise se o interior se
 mantém contínuo e estável frente a pequenas mudanças de corte e resolução.
 O [planejamento dos recortes](planejamento-recortes-voxelizacao.md) descreve
 a metodologia e os critérios ainda pendentes antes de usar os volumes no treino.
+
+### Quando o flood fill encontra o exterior
+
+1. **Delimitar a falha.** O diagnóstico reutiliza a grade, testa se os planos
+   de corte completos barram a fuga e percorre a galeria com duas tampas
+   temporárias. A varredura usa janelas de oito voxels com avanço de quatro.
+   Nas janelas que vazam, move um plano por vez em passos de um voxel.
+   Cada tentativa fica registrada por intervalo e estado da semente.
+2. **Investigar os bins.** Um caminho de fuga é rastreado na grade por
+   vizinhança de face. O código conta os pontos do PLY e, se a fonte estiver
+   disponível, da nuvem original nos mesmos bins próximos do caminho.
+   O `plan.json` dá a proveniência. Se os caminhos tiverem mudado, use
+   `leak_diagnostics.raw_source` e `leak_diagnostics.centreline` no
+   `crop.json`, com caminhos absolutos ou relativos a esse JSON. Use a
+   mesma nuvem e a mesma linha central do plano. O relatório identifica
+   a projeção usada e a disponibilidade da comparação.
+3. **Testar um reparo pequeno.** Os candidatos precisam de pontos da fonte
+   dentro da seleção ou continuidade local da parede, inferida com apoio em
+   direções opostas. O algoritmo testa voxels sobre rotas que efetivamente
+   vazam. O orçamento é de até 12 voxels. A checagem final exige fechamento
+   do recorte inteiro após retirar as tampas móveis e preserva as sementes
+   das janelas que já fecharam. O resultado continua pendente de revisão.
+4. **Verificar por inundação exterior.** A busca se propaga a partir da
+   semente. Para conferir a conclusão, a pipeline reclassifica a grade
+   partindo da borda, compara a componente à máscara de ar e retira cada
+   voxel de reparo por vez. A semente deve voltar a ser alcançada pelo
+   exterior sem cada voxel publicado. Remover cada tampa também é testado
+   e documenta quanto o fechamento depende dos cortes.
+
+### Relatório por recorte e reprodução
+
+Cada execução concluída grava `<resolucao>/diagnostics/`. Se uma checagem
+de superfície, margem, contato, semente ou fechamento impedir a publicação,
+o menu aponta para `<resolucao>.diagnostics/<tentativa>/summary.csv`.
+Cada tentativa fica disponível e a falha fica sem NPZ de interior.
+
+| Arquivo | O que registra |
+| --- | --- |
+| `summary.csv` | Uma linha por execução, com fonte, método, versões de bibliotecas, parâmetros, grade, estado da comparação e desfecho. |
+| `checks.csv` | Checagens de superfície, margem, contato, semente, comparação do ar e retirada de tampas ou de voxels de reparo. |
+| `probes.csv` | Planos completos, deslocamentos das tampas e janelas da busca com intervalo físico e estado da semente. |
+| `bins.csv` | Bins suspeitos em ZYX, centro XYZ na origem da fonte, contagens do PLY e do original, apoio geométrico e remendo publicado. |
+| `paths.csv` | Trajetórias de fuga com IDs e coordenadas dos voxels em ordem. |
+| `preview_data.npz` | Máscaras locais pequenas e amostras de pontos necessárias à inspeção no Plotly. |
+
+As duas primeiras tabelas bastam quando a geometria falha antes da busca
+ou o recorte fecha sozinho. As demais saídas são gravadas quando há
+busca por vazamento. Os CSVs usam UTF-8, vírgula como separador e ponto
+decimal. Valor vazio significa que aquela informação não se aplica ou
+não foi medida. Um `0` nas contagens significa que o bin foi checado e
+nenhum ponto foi encontrado. Em `checks.csv`, `expected` e `passed`
+ficam vazios nas ablações informativas das tampas.
+
+Passe a pasta da execução, a da tentativa ou o `summary.csv` à opção **4**.
+Quando existe uma amostra local, o menu gera três fatias com camadas
+alternáveis de trajetória e pontos. O HTML amostra os pontos para
+visualização. As contagens em `bins.csv` usam todos os pontos relevantes.
+Os volumes das janelas temporárias ficam em memória. Os dados binários
+da visualização ficam no NPZ comprimido, e o `run.json` continua sendo
+o recibo de configuração da execução.
+
+Para repetir só a reclassificação e as retiradas usando os NPZs já
+salvos, sem reler a nuvem, execute na raiz do projeto:
+
+```bash
+.venv/bin/python -m cavegen.datastream.gallery_reports CAMINHO_DA_RESOLUCAO
+```
+
+O comando grava `diagnostics/checks_replay.csv`. Para repetir também a
+localização da fuga e as contagens do PLY e do original, use uma cópia
+do `crop.json` na mesma pasta, preservando o `crop_id` e usando um
+`plan_id` diferente na opção **3**. Em Python, é possível reaproveitar o
+mesmo `crop.json` e trocar apenas o destino com
+`dataclasses.replace(prepare_crop(config), destination=novo_destino)`
+antes de chamar `process_crop`. No caso de Archamps, a rechecagem usou a
+configuração local `crop_rechecagem_original.json` com os caminhos
+atualizados do LAS e da linha central.
+
+O [histórico e os critérios do piloto](plano-reconstrucao-secoes.md#evolucao-do-piloto-em-archamps)
+explicam por que o 003 motivou a varredura e como interpretar um reparo
+verificado sem confundi-lo com uma observação da superfície.
 
 ## Ambiente e menu
 

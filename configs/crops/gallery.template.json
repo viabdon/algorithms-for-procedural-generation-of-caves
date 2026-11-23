@@ -26,6 +26,10 @@
     }
   ],
   "seed_xyz": null,
+  "leak_diagnostics": {
+    "raw_source": null,
+    "centreline": null
+  },
   "plane_tolerance": 1e-8,
   "batch_size": 65536,
   "progress_every": 1000000

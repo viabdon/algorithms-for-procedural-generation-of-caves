@@ -88,6 +88,8 @@ def _crop_menu() -> None:
         write_crop_preview,
         write_individual_crop_previews,
     )
+    from cavegen.datastream.gallery_leak_preview import write_leak_preview
+    from cavegen.datastream.gallery_reports import PREVIEW_FILE, find_report
 
     template = "configs/crops/gallery.template.json"
     while True:
@@ -95,7 +97,7 @@ def _crop_menu() -> None:
         print("1. Listar nuvens brutas")
         print("2. Conferir configuração JSON")
         print("3. Processar recorte em CPU")
-        print("4. Inspecionar recorte processado")
+        print("4. Inspecionar recorte ou diagnóstico de vazamento")
         print("5. Propor e extrair N recortes pela linha central")
         print("6. Gerar prévia 3D dos recortes do plano")
         print("0. Voltar")
@@ -115,11 +117,20 @@ def _crop_menu() -> None:
                     ):
                         print(source)
             elif choice == "4":
-                folder = _ask("Pasta da saída do recorte (Enter para cancelar)")
-                if folder:
-                    slices, volume = inspect_crop(_path(folder))
-                    print(f"Fatias no Plotly: {slices}")
-                    print(f"Volume 3D no Plotly: {volume}", flush=True)
+                selection = _ask("Pasta da saída, pasta do diagnóstico ou summary.csv (Enter para cancelar)")
+                if selection:
+                    path = _path(selection)
+                    report = find_report(path)
+                    if (path / "interior.npz").is_file():
+                        slices, volume = inspect_crop(path)
+                        print(f"Fatias no Plotly: {slices}")
+                        print(f"Volume 3D no Plotly: {volume}", flush=True)
+                    elif report is None:
+                        raise FileNotFoundError(f"Não há resultado nem diagnóstico em {path}.")
+                    if report is not None:
+                        print(f"Relatório do recorte: {report}", flush=True)
+                        if report.suffix == ".json" or report.with_name(PREVIEW_FILE).is_file():
+                            print(f"Diagnóstico local no Plotly: {write_leak_preview(report)}", flush=True)
             elif choice == "5":
                 plan = _ask("JSON do planejamento (modelo em configs/crops/plan.template.json; Enter para cancelar)")
                 if not plan:
@@ -168,9 +179,13 @@ def _crop_menu() -> None:
                 print(f"Saída: {crop.destination.absolute()}")
                 if choice == "3" and _ask("Digite PROCESSAR para confirmar") == "PROCESSAR":
                     record = process_crop(
-                        crop, progress=lambda count: print(f"Pontos lidos: {count:,}", flush=True)
+                        crop, progress=lambda count: print(f"Pontos lidos: {count:,}", flush=True),
+                        diagnostic_progress=lambda message: print(message, flush=True),
                     )
                     print(f"Contagens de seleção: {record['counts']}")
+                    if record["repair_voxels"]:
+                        print(f"Reparo separado para revisão: {record['repair_voxels']} voxels.")
+                    print(f"Relatório do recorte: {crop.destination / record['diagnostics']}")
                     print(f"Ar candidato: {record['candidate_volume']:.3g} {crop.config['units']}³")
         except (OSError, ValueError, TypeError, KeyError) as error:
             print(f"Não foi possível concluir: {error}")

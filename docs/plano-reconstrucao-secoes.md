@@ -1,14 +1,15 @@
 # Plano de reconstrução de interiores por seções sucessivas
 
-Registro de 15/11/2026. Esta é a próxima abordagem escolhida para preparar
-referências de galerias para a GAN. **O procedimento ainda será implementado
-e validado; nenhum treinamento está autorizado nesta etapa.**
+Registro iniciado em 15/11/2026. O piloto local de recortes, tampas e
+diagnóstico de vazamentos está implementado. A validação geométrica dos
+resultados e a reconstrução por interpolação de seções continuam em aberto.
+O uso no treinamento depende dessa validação.
 
 Detalhamento de 17/11/2026: o
 [planejamento dos recortes e limites da voxelização](planejamento-recortes-voxelizacao.md)
 define como separar os pontos de cada trecho, distinguir seleção/seções/grade,
-preservar contexto e registrar os limites corretos. Essa especificação ainda
-não é uma funcionalidade do menu de preparação.
+preservar contexto e registrar os limites corretos. As funções do menu e
+os arquivos de inspeção estão no [guia de preparação](preparacao-volumes.md).
 
 O objetivo é obter interiores mais fiéis às paredes observadas e preservar
 detalhes que se perdem ao colocar uma caverna inteira em uma grade pequena.
@@ -18,6 +19,153 @@ e o desempenho da GAN precisarão ser demonstrados separadamente.
 Leitura complementar: [resumo simplificado do gargalo](resumo-gargalo-gan.md),
 [auditoria dos dados atuais](auditoria/gan/README.md) e
 [plano das redes](plano-redes-neurais.md).
+
+## Evolução do piloto em Archamps
+
+As grades globais 64³ perderam quase todo o ar inferido. Era preciso
+reduzir o domínio físico antes de aumentar a resolução e saber em que
+etapa surgia a falha. O piloto passou a selecionar trechos pela linha
+central e fechar cada extremidade no contorno de sua seção. O exemplo
+Archamps / PostEtroiture usou o LAS amostrado a 2 mm, seis recortes e voxel
+de 16 cm. Esses parâmetros descrevem o ensaio. A comparação entre escalas
+e cavernas ainda precisa ser feita.
+
+Quatro contornos de recorte apresentaram alerta de cobertura em pelo
+menos uma extremidade. Os casos 003 e 004 passaram pela estimativa de
+contorno e seguiram para a mesma grade 64³. O 004 recuperou 8.132 voxels
+de ar candidato, cerca de 33,31 m³. Retirar qualquer uma das duas tampas
+no ensaio fez a semente alcançar o exterior. Isso confirmou que o
+fechamento depende das duas seções no controle.
+
+O 003 leu 20.652.469 pontos do PLY e reteve 20.652.467 na voxelização.
+As duas tampas tocavam a superfície. Mesmo assim, a semente estava livre
+e ligada à borda. A aparência contínua dos pontos e o contato com a
+tampa permitiam formular a hipótese de fechamento. A conectividade em
+seis faces foi a verificação que a invalidou.
+
+A primeira hipótese era uma fresta na junção de uma das tampas. Ensaiamos
+cópias deslocadas para dentro da galeria em passos de 16 cm, até 96 cm,
+com as originais presentes e também por substituição temporária. Nenhuma
+posição ensaiada isolou o 003. Mesmo bloquear os dois planos de corte
+inteiros deixou a semente conectada à borda da grade. Havia, portanto,
+pelo menos uma rota lateral na grade. O teste ainda deixava em aberto a
+localização da rota e a causa física da descontinuidade.
+
+### Da dupla tampa à varredura de janelas
+
+Mover as tampas temporariamente permite fazer uma pergunta diferente para
+cada trecho. A rotina mantém as paredes voxelizadas, insere dois planos
+digitais transversais e lança a inundação a partir de uma semente local.
+Cada passo usa a mesma grade e o mesmo tamanho de voxel. Com o grafo e as
+estações do plano disponíveis, a posição e a direção seguem a linha
+central. Quando essa informação não pode ser reproduzida, o código usa
+uma poligonal pelos dois cortes e a semente e registra a aproximação.
+
+As primeiras janelas medem até oito voxels, com avanço de quatro. Para
+cada janela com fuga, o código fixa uma extremidade e move a outra um
+voxel por vez até a janela deixar de vazar ou restarem quatro passos ou
+menos. Repete a partir da outra extremidade. Uma janela pode fechar
+quando um plano cruza e cobre a própria abertura. Outra janela
+sobreposta pode revelar a fuga. Esse comportamento motiva os testes
+nos dois sentidos e impede assumir que o resultado é monotônico. As
+faixas obtidas são regiões de investigação. Uma semente ocupada ou um
+plano que recorta novamente a linha central invalida aquela sondagem.
+
+O controle com os planos originais completos continua sendo o primeiro
+teste de localização. Se esse controle isola a semente, o código também
+testa as cópias dos contornos originais nas duas extremidades, até seis
+voxels para dentro. As máscaras das tampas móveis são descartadas a
+cada tentativa. Cada estado fica no relatório sem persistir volumes de
+janelas intermediárias.
+
+### Do caminho de fuga ao remendo
+
+O flood fill responde se existe conexão. Para investigar **por onde**,
+o código rastreia uma rota de menor custo entre a semente e a borda,
+com custo uniforme e seis vizinhos. Rastreia a fuga no recorte inteiro
+e nas janelas refinadas. Uma rota pode atravessar mais de um bin livre;
+seu comprimento mínimo esclarece por onde a conexão é possível e
+outras rotas ainda podem existir. [SciPy, preenchimento por conectividade à borda](https://docs.scipy.org/doc/scipy/reference/generated/scipy.ndimage.binary_fill_holes.html) · [scikit-image, custo mínimo e rastreamento](https://scikit-image.org/docs/stable/api/skimage.graph.html#skimage.graph.MCP)
+
+A comparação é local. O PLY e a nuvem de origem, quando disponível,
+são lidos em lotes e projetados nos **mesmos bins**, com a origem e a
+escala da execução. As contagens com e sem a seleção do recorte ajudam
+a distinguir um ponto removido no preparo de uma célula sem registro
+na fonte. A inspeção no Plotly sobrepõe uma pequena amostra da nuvem às
+fatias voxelizadas perto da rota. É possível ampliar uma região
+específica e alternar cada camada.
+
+Para propor um remendo, a célula deve estar livre, perto do caminho e
+da parede, dentro da seleção e longe da borda da grade. Duas medidas
+originais no bin dentro da seleção podem apoiar a restauração. Sem
+esse apoio direto, uma operação de fechamento de uma célula propõe
+voxels e a continuidade precisa ser sustentada por pares de vizinhos
+em lados opostos. Uma falha lateral exige dois pares de parede
+observada. Na junção da tampa, exige-se um par observado e dois pares
+na barreira composta de parede e tampa. Os pares podem incluir
+diagonais, enquanto o flood fill continua por faces. O reparo fica
+separado em `masks.npz`.
+
+Com o candidato mais apoiado que esteja na rota, o código bloqueia um
+voxel e verifica se a semente ainda alcança a borda. Se houver outra
+rota, repete até o limite de 12 voxels. Depois retira sucessivamente
+remendos redundantes. O resultado só é publicado quando o recorte
+inteiro fecha com as tampas originais e o reparo, e as sementes de
+janelas anteriormente isoladas continuam no interior recuperado.
+O processo protege a linha central e os vazios já isolados. Um
+retorno ou outra passagem próximos, quando sinalizados no plano,
+deixam o reparo para revisão. O limite de 12 voxels é um orçamento
+conservador do piloto e precisa ser avaliado em outras escalas.
+
+Cada verificação elimina uma interpretação diferente. O contato
+inicial evita testar uma tampa solta. Os planos completos separam
+hipóteses sobre corte e paredes laterais. A varredura reduz a região
+suspeita. A comparação dos bins verifica se existem pontos no local.
+O último flood fill confirma que a barreira digital completa fechou
+sem as tampas móveis. Nenhum desses testes determina sozinho se uma
+abertura da nuvem é uma passagem real. Os casos com sucesso continuam
+com status `pending_review`, e os casos sem reparo sustentado guardam
+apenas o diagnóstico, sem publicar um interior.
+
+### Resultado da rechecagem do 003 e controle 004
+
+Com a linha central do plano e a origem preservada, a busca realizou
+23 sondagens no 003. Treze isolaram a semente local e dez detectaram
+fuga. Entre as janelas refinadas com fuga, a menor abrangeu o intervalo
+de **3,20 a 3,84 m** a partir do primeiro corte. Um único voxel em
+**ZYX `[22, 25, 30]`** interrompeu a rota na execução completa. O bin
+tinha **zero pontos no PLY e zero no LAS original amostrado a 2 mm**,
+com três pares opostos de vizinhos de parede. Portanto, o reparo desse
+bin veio de continuidade inferida. A comparação nos mesmos bins não
+encontrou evidência de que a filtragem tivesse removido um ponto que
+preencheria a célula. A origem física do vão continua em aberto.
+
+Com as tampas móveis retiradas, obtivemos **7.502 voxels de ar
+candidato, cerca de 30,73 m³**, preservando as 13 sementes de janelas
+isoladas. Uma reclassificação independente da grade confirmou que o
+003 volta a vazar quando se remove esse único voxel de reparo. Essa
+checagem agora roda na própria pipeline e pode ser repetida nos NPZs
+salvos. O interior permanece pendente de revisão geométrica. O controle 004 foi
+reexecutado com a mesma versão do fluxo e reproduziu, voxel a voxel, os
+8.132 voxels do resultado anterior, sem acionar o reparo.
+
+Para reproduzir a afirmação, compare as linhas `outside_fill_without_repair`,
+`outside_fill_final` e `remove_repair_voxel` em `diagnostics/checks.csv`.
+A primeira e a terceira registram `exterior`. A segunda registra `interior`.
+O algoritmo das ablações usa a inundação a partir da borda e compara
+a componente com o ar encontrado pela busca a partir da semente.
+O `bins.csv` registra os dois zeros medidos, o apoio dos vizinhos e
+o voxel publicado. `probes.csv` e `paths.csv` ligam essa decisão aos
+testes por janela e à trajetória. A [reprodução em CLI](preparacao-volumes.md#relatorio-por-recorte-e-reproducao)
+repete as ablações sem recontar pontos. Uma nova voxelização com o mesmo
+recorte e a mesma fonte repete a investigação dos bins.
+
+O ensaio sintético cobre uma abertura de um voxel, uma abertura maior
+que exige revisão, uma falha no contorno de extremidade e uma leitura
+LAS georreferenciada com dois pontos originais no bin ausente do PLY.
+Esses casos testam a implementação. A comparação de resoluções, a
+revisão da continuidade e a avaliação em outras galerias ainda são
+necessárias para recomendar os parâmetros como metodologia geral.
 
 ## Abordagem escolhida
 
@@ -61,13 +209,13 @@ de galerias; não validará a topologia de uma caverna inteira.
   permitindo recolocar o recorte na nuvem original.
 - [ ] Conferir as dimensões do trecho antes e depois da transformação.
 
-O leitor LAS atual converte coordenadas georreferenciadas para `float32`
-antes dessa translação. Na magnitude de uma coordenada de Archamps, cerca de
-6,56 milhões, o espaçamento representável é de 0,5 unidade. A unidade desse
-levantamento está registrada como metro. Isso pode eliminar detalhe antes
-da grade; sua contribuição para os problemas observados ainda precisa ser
-medida. Retirar a origem de coordenadas já arredondadas não recupera esse
-detalhe: é necessário reler o arquivo original.
+Na voxelização global, arredondar coordenadas georreferenciadas para
+`float32` na ordem de 6,56 milhões reduz a precisão para um espaçamento
+de 0,5 m em Archamps. O piloto de recortes lê o LAS em coordenadas locais
+com `float64` antes de discretizar, tanto na extração como na comparação
+local com a fonte. Isso preserva a resolução necessária para contar os
+pontos nos mesmos bins. A contribuição desse arredondamento para os
+resultados globais históricos continua sem medição isolada.
 
 ## 3. Extrair e revisar as seções sucessivas
 

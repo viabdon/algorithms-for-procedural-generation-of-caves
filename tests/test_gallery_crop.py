@@ -1,14 +1,24 @@
 """Prepare a synthetic gallery through the same JSON and menu used locally."""
 
+import csv
 import json
 
+import laspy
 import numpy as np
 import pytest
 
+from cavegen.core.surface_filling import INTERIOR, classify_surface_by_flood_fill
+from cavegen.datastream.crop_preview import ply_header
 from cavegen.datastream.gallery_crop import prepare_crop, process_crop
+from cavegen.datastream.gallery_reports import replay_checks
 from cavegen.datastream.menu import main
 from cavegen.datastream.surface_io import load_surface_npz
 from cavegen.datastream.voxel_io import load_volume_npz
+
+
+def read_rows(path):
+    with path.open(encoding="utf-8", newline="") as stream:
+        return list(csv.DictReader(stream))
 
 
 @pytest.fixture
@@ -78,6 +88,12 @@ def test_crop_outputs_and_selection_are_independent_of_batch_size(gallery, tmp_p
     assert record["partition"] == "train"
     assert record["status"] == "pending_review"
     assert json.loads((first.destination / "run.json").read_text()) == record
+    reports = first.destination / "diagnostics"
+    assert read_rows(reports / "summary.csv")[0]["outcome"] == "sealed_without_repair"
+    assert not (reports / "bins.csv").exists()
+    checks = {row["check"]: row for row in read_rows(reports / "checks.csv")}
+    assert checks["outside_fill_final"]["result"] == "interior"
+    assert checks["remove_initial_cap"]["result"] == checks["remove_final_cap"]["result"] == "exterior"
     with np.load(first.destination / "masks.npz") as masks:
         assert masks["caps"].shape == (2, *wall.shape)
 
@@ -90,14 +106,150 @@ def test_crop_outputs_and_selection_are_independent_of_batch_size(gallery, tmp_p
         process_crop(first)
 
 
-def test_lateral_leak_produces_no_outputs(gallery, tmp_path):
+def test_small_lateral_gap_is_repaired_without_mutating_observations(gallery, tmp_path):
+    path, spec, source, wall = gallery
+    # A long enough test gallery has both sealed and leaking overlapping probes.
+    wall = np.zeros((18, *wall.shape[1:]), dtype=bool)
+    wall[2:16, (3, 6), 2:8] = True
+    wall[2:16, 3:7, (2, 7)] = True
+    missing = (8, 3, 4)
+    wall[missing] = False
+    spec.update(shape_zyx=[18, 10, 10], selection_max_xyz=[9, 9, 17], seed_xyz=[4.5, 4.5, 8.5])
+    spec["sections"][1]["point_xyz"][2] = 15.5
+    path.write_text(json.dumps(spec))
+    np.savetxt(source, np.argwhere(wall)[:, ::-1] + 0.5)
+    crop = prepare_crop(path, repository=tmp_path)
+    record = process_crop(crop)
+
+    surface, _ = load_surface_npz(crop.destination / "surface.npz")
+    np.testing.assert_array_equal(surface, wall)
+    air = load_volume_npz(crop.destination / "interior.npz").data
+    with np.load(crop.destination / "masks.npz") as masks:
+        np.testing.assert_array_equal(np.argwhere(masks["repair"]), [missing])
+        assert not (air & (wall | masks["caps"].any(axis=0) | masks["repair"])).any()
+        rerun = classify_surface_by_flood_fill(wall | masks["caps"].any(axis=0) | masks["repair"])
+        assert rerun[crop.seed_zyx] == INTERIOR
+    assert record["repair_voxels"] == 1
+    reports = crop.destination / "diagnostics"
+    summary = read_rows(reports / "summary.csv")[0]
+    assert summary["outcome"] == "repaired"
+    assert summary["raw_comparison"] == "source_not_in_plan"
+    probes = read_rows(reports / "probes.csv")
+    assert (probes[0]["probe"], probes[0]["outcome"]) == ("full_end_planes", "leaking")
+    assert any(trial["stage"] == "refine" for trial in probes)
+    assert any(trial["outcome"] == "sealed" for trial in probes)
+    paths = read_rows(reports / "paths.csv")
+    assert any(tuple(int(row[axis]) for axis in "zyx") == missing for row in paths)
+    checks = {row["check"]: row for row in read_rows(reports / "checks.csv")}
+    assert checks["outside_fill_without_repair"]["result"] == "exterior"
+    assert checks["outside_fill_final"]["result"] == "interior"
+    ablation = checks["remove_repair_voxel"]
+    assert tuple(int(ablation[axis]) for axis in "zyx") == missing
+    assert (ablation["result"], ablation["passed"]) == ("exterior", "True")
+    replay = {row["check"]: row for row in read_rows(replay_checks(crop.destination))}
+    assert replay["remove_repair_voxel"] == ablation
+    assert replay["candidate_air_component"]["result"] == "match"
+
+
+def test_large_lateral_opening_is_reported_without_an_interior(gallery, tmp_path, monkeypatch, capsys):
     path, _, source, wall = gallery
-    wall[4, 3, 4] = False
+    wall[3:7, 3, 3:7] = False
     np.savetxt(source, np.argwhere(wall)[:, ::-1] + 0.5)
     crop = prepare_crop(path, repository=tmp_path)
     with pytest.raises(ValueError, match="exterior"):
         process_crop(crop)
     assert not crop.destination.exists()
+    reports = crop.destination.with_name("10x10x10.diagnostics")
+    (attempt,) = reports.iterdir()
+    summary = read_rows(attempt / "summary.csv")[0]
+    assert summary["outcome"] == "escape_path_without_supported_voxels"
+    assert not any(row["published"] == "True" for row in read_rows(attempt / "bins.csv"))
+
+    answers = iter(["2", "4", str(crop.destination), "0", "0"])
+    monkeypatch.setattr("builtins.input", lambda _: next(answers))
+    main()
+    html = attempt / "leak_diagnostics.html"
+    assert str(html) in capsys.readouterr().out
+    assert "Caminho de fuga" in html.read_text(encoding="utf-8")
+
+
+def test_cap_gap_runs_double_cap_probe(gallery, tmp_path):
+    path, spec, _, _ = gallery
+    spec["sections"][0]["polygon_uv"] = [[0, 2], [6, 2], [6, 4], [0, 4]]
+    path.write_text(json.dumps(spec))
+    crop = prepare_crop(path, repository=tmp_path)
+    with pytest.raises(ValueError, match="exterior"):
+        process_crop(crop)
+    (attempt,) = crop.destination.with_name("10x10x10.diagnostics").iterdir()
+    probes = read_rows(attempt / "probes.csv")
+    assert (probes[0]["probe"], probes[0]["outcome"]) == ("full_end_planes", "sealed")
+    assert sum(row["probe"] == "double_cap" for row in probes) == 48
+
+
+def test_blocked_seed_reports_failed_precondition(gallery, tmp_path):
+    path, spec, _, _ = gallery
+    spec["seed_xyz"] = [4.5, 3.5, 4.5]
+    path.write_text(json.dumps(spec))
+    crop = prepare_crop(path, repository=tmp_path)
+    with pytest.raises(ValueError, match="semente caiu na barreira"):
+        process_crop(crop)
+    (attempt,) = crop.destination.with_name("10x10x10.diagnostics").iterdir()
+    assert read_rows(attempt / "summary.csv")[0]["outcome"] == "seed_blocked"
+    assert read_rows(attempt / "checks.csv")[-1]["passed"] == "False"
+    assert not crop.destination.exists()
+
+
+def test_compare_bins_with_georeferenced_original(gallery, tmp_path):
+    _, spec, _, wall = gallery
+    missing = [4, 3, 4]
+    offset = np.array([943844.0, 6561936.0, 1044.0])
+    raw_xyz = np.argwhere(wall)[:, ::-1] + 0.5 + offset
+    raw = tmp_path / "original.las"
+    header = laspy.LasHeader(point_format=2, version="1.2")
+    header.scales = [0.001] * 3
+    header.offsets = offset
+    las = laspy.LasData(header)
+    las.xyz = np.vstack((raw_xyz, np.array(missing)[::-1] + 0.6 + offset))
+    las.write(raw)
+    spec.update(
+        source="cloud.ply", source_origin_xyz=offset.tolist(), branch="passagem_001",
+        proposal={"cut_stations": [0, 5]},
+        leak_diagnostics={"raw_source": str(raw)},
+    )
+    for section in spec["sections"]:
+        point = np.array(section["point_xyz"])
+        shift = np.array([2.5, 1.5, 0])
+        section["point_xyz"] = (point + shift).tolist()
+        section["polygon_uv"] = (
+            np.array(section["polygon_uv"]) - [2.5, section["inward_normal_xyz"][2] * 1.5]
+        ).tolist()
+    graph = tmp_path / "axis.npz"
+    np.savez(
+        graph, nodes_xyz=np.array([s["point_xyz"] for s in spec["sections"]]) + offset,
+        edges=np.array([[0, 1]]),
+    )
+    source = tmp_path / "plan/gallery/cloud.ply"
+    source.parent.mkdir(parents=True)
+    (source.parent.parent / "plan.json").write_text(json.dumps({
+        "source_origin_xyz": offset.tolist(), "source": "old_missing.las",
+        "centreline": str(graph), "crops": [{"crop_id": "gallery"}],
+    }))
+    path = source.with_name("crop.json")
+    path.write_text(json.dumps(spec))
+    wall[4, 3, 4] = False
+    xyz = np.argwhere(wall)[:, ::-1] + 0.5
+    source.write_bytes(ply_header(len(xyz)) + xyz.astype("<f8").tobytes())
+    crop = prepare_crop(path, repository=tmp_path)
+    record = process_crop(crop)
+    reports = crop.destination / "diagnostics"
+    summary = read_rows(reports / "summary.csv")[0]
+    assert record["repair_voxels"] == 1
+    assert summary["axis_source"] == "plan_centreline"
+    assert summary["raw_comparison"] == "compared"
+    (cell,) = (row for row in read_rows(reports / "bins.csv") if row["published"] == "True")
+    assert [int(cell[axis]) for axis in "zyx"] == missing
+    assert (cell["crop_points"], cell["raw_points"], cell["raw_points_in_selection"]) == ("0", "2", "2")
+    assert cell["support"] == "original_points"
 
 
 def test_menu_previews_and_requires_explicit_confirmation(gallery, tmp_path, monkeypatch, capsys):

@@ -5,6 +5,8 @@ data/processed/
 ├── experiments/
 │   └── experiment_elaphes-meshing/   # ensaios históricos do Elaphes
 ├── references/                      # superfícies e interiores candidatos de scans
+├── crop_plans/                      # PLYs, linhas centrais e configurações de recortes
+├── reference_sections/              # grades, máscaras e diagnósticos dos recortes
 ├── generated/
 │   ├── cellular_automata/
 │   │   ├── baseline_32/
@@ -59,17 +61,27 @@ reprodução estão no [guia de preparação de volumes](../../docs/preparacao-v
 A pasta antiga `data/references/`, que continha apenas um marcador versionado,
 foi substituída na estrutura por `data/processed/references/`.
 
-## Recortes de referência planejados
+## Recortes de referência
 
-A organização proposta para o piloto é
-`reference_sections/<caverna>/<levantamento>/<recorte>/<resolucao>/`, separada
-dos volumes globais. Cada recorte registrará seleção de pontos, contexto,
-seções inicial/final, tampas, bounds da grade, transformação local e tamanho
-físico do voxel, além de máscaras de incerteza.
+O menu grava propostas em `crop_plans/<caverna>/<levantamento>/<fold>/<plano>/`.
+A voxelização planejada guarda resultados em
+`reference_sections/<caverna>/<levantamento>/<fold>/<plano>/<recorte>/<resolucao>/`.
+Os recortes manuais sem ID de plano usam
+`reference_sections/<caverna>/<levantamento>/<recorte>/<resolucao>/`.
+Manter todos os trechos da mesma caverna no mesmo grupo do fold.
 
-A caixa de seleção não representa uma parede, e as tampas não coincidem
-obrigatoriamente com a borda da grade. O
-[planejamento dos recortes](../../docs/planejamento-recortes-voxelizacao.md)
-define essas diferenças e os campos do manifesto. São saídas futuras, ainda
-não produzidas pelo menu. Manter recortes da mesma caverna na mesma partição
-e não sobrescrever os NPZ da auditoria atual.
+- `surface.npz` guarda a parede observada. `masks.npz` guarda as tampas
+  em `caps` e as alterações inferidas em `repair`. Execuções anteriores
+  podem conter somente `caps`.
+- `interior.npz` guarda a componente de ar candidata. `run.json` registra
+  escala, seleção, transformação local, contagens e método, inclusive
+  quantos voxels de reparo foram necessários.
+- `diagnostics/` guarda `summary.csv` e `checks.csv`. Quando há
+  vazamento, guarda também as tabelas de sondagens, bins, trajetórias
+  e o NPZ compacto de inspeção. Tentativas rejeitadas ficam em
+  `<resolucao>.diagnostics/<tentativa>/` junto da pasta esperada,
+  sem publicar um interior. A opção 4 gera a inspeção em Plotly.
+
+Essas saídas preservam os NPZ globais da auditoria em `references/`.
+O significado das máscaras, o uso das tampas móveis e a revisão antes
+do treino estão no [guia de preparação](../../docs/preparacao-volumes.md#quando-o-flood-fill-encontra-o-exterior).

@@ -8,13 +8,16 @@ import json
 import os
 from pathlib import Path
 from tempfile import TemporaryDirectory
+from typing import NoReturn
 
 from matplotlib.path import Path as PolygonPath
 import numpy as np
-from scipy.ndimage import generate_binary_structure, label
 
-from cavegen.core.surface_filling import INTERIOR, classify_surface_by_flood_fill
 from cavegen.core.volume import Volume3D
+from cavegen.datastream.gallery_leaks import analyze_leak, seed_component, touches_boundary
+from cavegen.datastream.gallery_reports import (
+    REPORT_FOLDER, SUMMARY_FILE, audit_flood_fill, check, write_failed_report, write_report,
+)
 from cavegen.datastream.point_cloud import iter_point_cloud_xyz
 from cavegen.datastream.progress import report_point_progress
 from cavegen.datastream.surface_io import load_surface_npz, save_surface_npz
@@ -34,6 +37,7 @@ class Section:
 @dataclass(frozen=True)
 class GalleryCrop:
     config: dict
+    config_path: Path
     source: Path
     destination: Path
     partition: str
@@ -109,6 +113,15 @@ def prepare_crop(path: Path, *, repository: Path = Path(".")) -> GalleryCrop:
     lo = _vector(spec.get("selection_min_xyz"), "selection_min_xyz")
     hi = _vector(spec.get("selection_max_xyz"), "selection_max_xyz")
     origin = _vector(spec.get("origin_xyz"), "origin_xyz")
+    if "source_origin_xyz" in spec:
+        _vector(spec["source_origin_xyz"], "source_origin_xyz")
+    diagnostic = spec.get("leak_diagnostics", {})
+    if not isinstance(diagnostic, dict):
+        raise ValueError("leak_diagnostics deve ser um objeto com caminhos opcionais.")
+    for key in ("raw_source", "centreline"):
+        value = diagnostic.get(key)
+        if value is not None and (not isinstance(value, str) or not value.strip()):
+            raise ValueError(f"leak_diagnostics.{key} deve ser um caminho.")
     shape = spec.get("shape_zyx")
     size = spec.get("voxel_size")
     tolerance = spec.setdefault("plane_tolerance", 1e-8)
@@ -163,6 +176,7 @@ def prepare_crop(path: Path, *, repository: Path = Path(".")) -> GalleryCrop:
     seed_zyx = tuple(int(i) for i in np.floor(seed[::-1] / size))
     return GalleryCrop(
         config=spec,
+        config_path=path.resolve(),
         source=source,
         destination=destination,
         partition=partition,
@@ -216,22 +230,19 @@ def _rasterize_caps(crop: GalleryCrop) -> np.ndarray:
     return caps
 
 
-def _infer_air(surface: np.ndarray, caps: np.ndarray, seed_zyx: tuple[int, int, int]) -> np.ndarray:
-    barrier = surface | caps.any(axis=0)
-    if any(np.take(barrier, (0, -1), axis=axis).any() for axis in range(3)):
-        raise ValueError("Parede ou tampa toca a borda da grade. Revise a margem.")
-    if any(not (cap & surface).any() for cap in caps):
-        raise ValueError("Uma tampa ficou vazia ou sem contato voxelizado com a parede.")
-    enclosed = classify_surface_by_flood_fill(barrier) == INTERIOR
-    components, _ = label(enclosed, structure=generate_binary_structure(3, 1))
-    seed_label = components[seed_zyx]
-    if not seed_label:
-        raise ValueError("A semente caiu na barreira ou ficou conectada ao exterior.")
-    return components == seed_label
+def _reject_crop(crop: GalleryCrop, record: dict, checks: list[dict], error: str,
+                 *, outcome: str, report: dict | None = None) -> NoReturn:
+    folder = write_failed_report(crop, record, checks, outcome=outcome, leak=report, error=error)
+    raise ValueError(f"{error} Relatório: {folder / SUMMARY_FILE}")
 
 
-def process_crop(crop: GalleryCrop, *, progress: Callable[[int], None] | None = None) -> dict:
-    """Stream points, infer candidate air, and publish the four outputs together."""
+def process_crop(
+    crop: GalleryCrop,
+    *,
+    progress: Callable[[int], None] | None = None,
+    diagnostic_progress: Callable[[str], None] | None = None,
+) -> dict:
+    """Voxelize one crop, diagnose leaks and publish a candidate only if it seals."""
     target = crop.destination
     if target.exists():
         raise FileExistsError(f"Já existe uma execução em {target}.")
@@ -245,34 +256,89 @@ def process_crop(crop: GalleryCrop, *, progress: Callable[[int], None] | None = 
         before.st_size, before.st_mtime_ns, before.st_ino, before.st_dev
     ) != (after.st_size, after.st_mtime_ns, after.st_ino, after.st_dev):
         raise ValueError("A fonte mudou durante a leitura.")
-    if not surface.any() or counts["outside_grid"]:
-        raise ValueError(f"Recorte vazio ou com pontos selecionados fora da grade. Contagens: {counts}")
 
-    caps = _rasterize_caps(crop)
-    air = _infer_air(surface, caps, crop.seed_zyx)
-    air_voxels = int(air.sum())
+    surface_voxels = int(surface.sum())
     record = {
         "config": crop.config,
         "partition": crop.partition,
         "source_path": str(crop.source),
         "source_size_bytes": before.st_size,
         "source_mtime_ns": before.st_mtime_ns,
-        "method": "reviewed_planar_caps_exterior_flood_fill_6",
-        "status": "pending_review",
         "counts": counts,
         "axis_order": "ZYX",
         "seed_zyx": list(crop.seed_zyx),
-        "surface_voxels": int(surface.sum()),
-        "cap_voxels": [int(cap.sum()) for cap in caps],
-        "air_voxels": air_voxels,
-        "candidate_volume": air_voxels * crop.voxel_size**3,
+        "surface_voxels": surface_voxels,
     }
+    checks = [
+        check("surface_present", bool(surface_voxels), True, count=surface_voxels),
+        check("points_outside_grid", counts["outside_grid"], 0),
+    ]
+    if not surface_voxels or counts["outside_grid"]:
+        _reject_crop(crop, record, checks, "Recorte vazio ou com pontos selecionados fora da grade.",
+                     outcome="invalid_surface")
+    caps = _rasterize_caps(crop)
+    record["cap_voxels"] = [int(cap.sum()) for cap in caps]
+    barrier = surface | caps.any(axis=0)
+    margin = not touches_boundary(barrier)
+    contacts = [int(np.count_nonzero(cap & surface)) for cap in caps]
+    checks.append(check("exterior_grid_margin", margin, True))
+    for name, contact in zip(("initial_cap_contact", "final_cap_contact"), contacts):
+        checks.append(check(name, bool(contact), True, count=contact))
+    if not margin:
+        _reject_crop(crop, record, checks, "Parede ou tampa toca a borda da grade. Revise a margem.",
+                     outcome="invalid_margin")
+    if not all(contacts):
+        _reject_crop(crop, record, checks, "Uma tampa ficou vazia ou sem contato voxelizado com a parede.",
+                     outcome="invalid_cap")
+    outcome, air = seed_component(barrier, crop.seed_zyx)
+    checks.append(check("seed_outside_barrier", outcome != "seed_blocked", True, voxel=crop.seed_zyx))
+    if outcome == "seed_blocked":
+        _reject_crop(crop, record, checks, "A semente caiu na barreira. Revise sua localização na galeria.",
+                     outcome="seed_blocked")
+
+    report = None
+    repair = np.zeros_like(surface)
+    if outcome == "leaking":
+        if diagnostic_progress is not None:
+            diagnostic_progress("Semente conectada ao exterior. Buscando o vazamento com tampas móveis.")
+        analysis = analyze_leak(crop, surface, caps, progress=diagnostic_progress)
+        report = analysis.report
+        air, repair = analysis.air, analysis.repair
+
+    checks.extend(audit_flood_fill(
+        surface, caps, repair, crop.seed_zyx, air,
+        expected_original="exterior" if outcome == "leaking" else "interior",
+    ))
+    if air is None:
+        _reject_crop(crop, record, checks, "A semente ficou conectada ao exterior e o reparo não foi verificado.",
+                     outcome=report["outcome"], report=report)
+    if any(row["passed"] is False for row in checks):
+        _reject_crop(crop, record, checks, "A reclassificação independente não confirmou o interior candidato.",
+                     outcome="independent_check_failed", report=report)
+
+    repair_voxels = int(repair.sum())
+    air_voxels = int(air.sum())
+    record.update(
+        method=(
+            "reviewed_planar_caps_local_repair_exterior_flood_fill_6" if repair_voxels
+            else "reviewed_planar_caps_exterior_flood_fill_6"
+        ),
+        status="pending_review",
+        repair_voxels=repair_voxels,
+        air_voxels=air_voxels,
+        candidate_volume=air_voxels * crop.voxel_size**3,
+        diagnostics=f"{REPORT_FOLDER}/{SUMMARY_FILE}",
+    )
     target.parent.mkdir(parents=True, exist_ok=True)
     with TemporaryDirectory(dir=target.parent) as staging:
         folder = Path(staging)
         save_surface_npz(surface, folder / "surface.npz", record)
-        np.savez_compressed(folder / "masks.npz", caps=caps)
+        np.savez_compressed(folder / "masks.npz", caps=caps, repair=repair)
         save_volume_npz(Volume3D(air, metadata=record), folder / "interior.npz")
+        write_report(
+            folder / REPORT_FOLDER, crop, record, checks,
+            outcome="repaired" if repair_voxels else "sealed_without_repair", leak=report,
+        )
         (folder / "run.json").write_text(
             json.dumps(record, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
         )
@@ -291,11 +357,16 @@ def inspect_crop(folder: Path) -> tuple[Path, Path]:
     classes[surface] = 1
     with np.load(folder / "masks.npz", allow_pickle=False) as masks:
         caps = masks["caps"].any(axis=0)
+        repair = masks["repair"] if "repair" in masks else np.zeros_like(surface)
     classes[caps] = 2
     classes[interior.data] = 3
+    classes[repair] = 4
 
     labels = np.array(["Exterior ou vazio não selecionado", "Parede", "Tampa", "Ar candidato"])
     colors = ["black", "white", "orange", "deepskyblue"]
+    if repair.any():
+        labels = np.append(labels, "Reparo local")
+        colors.append("#A855F7")
     colorscale = [
         (edge / len(colors), color)
         for i, color in enumerate(colors)
@@ -342,6 +413,8 @@ def inspect_crop(folder: Path) -> tuple[Path, Path]:
         ("Ar candidato", interior.data, "#0284C7", 0.7, True),
         ("Tampas", caps, "#EA580C", 0.9, "legendonly"),
     ]
+    if repair.any():
+        layers.append(("Reparo local", repair, "#A855F7", 0.95, True))
     for name, mask, color, opacity, visible in layers:
         z, y, x = mask.nonzero()
         spatial.add_trace(go.Scatter3d(
