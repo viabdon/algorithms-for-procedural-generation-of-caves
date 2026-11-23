@@ -47,8 +47,9 @@ def esfera_sdf(lado: int = 16, raio: float = 5.0) -> np.ndarray:
         np.float32)
 
 
-def campo_esfera(raio: float = 5.0, lado: int = 16) -> np.ndarray:
-    return comprimir_log(esfera_sdf(lado, raio), 1.0)
+def campo_esfera(raio: float = 5.0, lado: int = 16, escala: float = 2.0) -> np.ndarray:
+    """O campo do GA (log x2); escala 1 para os testes que fixam a dinâmica medida com ela."""
+    return comprimir_log(esfera_sdf(lado, raio), escala)
 
 
 def casca(raio: float, lado: int = 16, espessura: float = 1.0) -> np.ndarray:
@@ -139,7 +140,8 @@ class FaixaSemMaximoTests(unittest.TestCase):
         self.assertIsNone(Cortes(0.5, None).fator_maximo)
 
 
-# Na esfera de raio 5 (16³), a grade enche aos poucos: cheia no passo 4, não no 1.
+# Na esfera de raio 5 (16³) com log x1, a grade enche aos poucos: cheia no passo 4,
+# não no 1. O comportamento fixado vale para qualquer escala; o log x1 só dá o exemplo.
 ENCHE_AOS_POUCOS = {"chance_inicial": 0.2, "sensibilidade": 3}
 
 
@@ -150,7 +152,7 @@ class TrajetoriaQueEncheTests(unittest.TestCase):
         nota da grade cheia. Este teste fixa esse comportamento para o relatório.
     """
     def setUp(self):
-        self.caverna = Caverna("a", campo_esfera(5.0))
+        self.caverna = Caverna("a", campo_esfera(5.0, escala=1.0))
         self.cheia = self.caverna.alvo.nota_da_grade_cheia()
 
     def test_quem_enche_aos_poucos_leva_a_nota_do_primeiro_passo(self):
@@ -293,7 +295,10 @@ class GravacaoDaFaixaTests(ComExecucao):
         for caverna in sem_constantes(texto):  # o JSON das cavernas não tem Infinity
             self.assertIsNone(caverna["faixa_vazio"][1])
             self.assertTrue(math.isfinite(caverna["nota_grade_cheia"]))
-            self.assertLess(caverna["nota_grade_cheia"], 0)
+            # Numa esfera de 16³ o lado de fora é curto e, com o acréscimo do alvo,
+            # a grade cheia pode até dar positivo; nas cavernas 64³ ela fica perto
+            # de -1000. O contrato é ficar abaixo do máximo, 1.
+            self.assertLess(caverna["nota_grade_cheia"], 1)
 
     def test_figuras_com_notas_extremas_saem_em_json_sem_constantes(self):
         execucao = copy.deepcopy(self.execucao)

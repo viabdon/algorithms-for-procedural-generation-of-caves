@@ -23,6 +23,7 @@ from cavegen.generators.cellular_automata.genetico import (
     pipeline,
     resultados,
 )
+from cavegen.generators.cellular_automata.genetico.ca import ACRESCIMO_ALVO
 from cavegen.tools.sdf.sdf import VERSAO_SDF
 
 
@@ -68,20 +69,20 @@ class ComPastas(unittest.TestCase):
 
 class CamposTests(ComPastas):
     def test_gera_o_que_falta_e_reaproveita_o_que_esta_em_dia(self):
-        self.assertEqual(self.preparar(), ["  a: gerado (a_surface_64_sdf_log1.npz)",
-                                           "  b: gerado (b_surface_64_sdf_log1.npz)"])
-        antes = sha256(self.campos / "a_surface_64_sdf_log1.npz")
+        self.assertEqual(self.preparar(), ["  a: gerado (a_surface_64_sdf_log2.npz)",
+                                           "  b: gerado (b_surface_64_sdf_log2.npz)"])
+        antes = sha256(self.campos / "a_surface_64_sdf_log2.npz")
         self.assertTrue(all("reaproveitado" in aviso for aviso in self.preparar()))
-        self.assertEqual(sha256(self.campos / "a_surface_64_sdf_log1.npz"), antes)
+        self.assertEqual(sha256(self.campos / "a_surface_64_sdf_log2.npz"), antes)
 
     def test_refaz_so_o_campo_da_grade_que_mudou(self):
         self.preparar()
         gravar_grade(self.grade_a, 3.5)
         avisos = self.preparar()
         self.assertEqual(avisos[0], "  a: refeito: a grade da entrada mudou "
-                                    "(a_surface_64_sdf_log1.npz)")
+                                    "(a_surface_64_sdf_log2.npz)")
         self.assertIn("reaproveitado", avisos[1])
-        with np.load(self.campos / "a_surface_64_sdf_log1.npz") as campo:
+        with np.load(self.campos / "a_surface_64_sdf_log2.npz") as campo:
             self.assertEqual(str(campo["sha256_entrada"]), sha256(self.grade_a))
 
     def test_versao_do_sdf_e_campo_errado_tambem_refazem(self):
@@ -89,7 +90,7 @@ class CamposTests(ComPastas):
         with mock.patch.object(campos, "VERSAO_SDF", VERSAO_SDF + 1):
             self.assertTrue(all("o cálculo do SDF mudou" in a for a in self.preparar()))
         # Um campo com limiar (o alvo antigo) no lugar do campo do GA.
-        np.savez_compressed(self.campos / "b_surface_64_sdf_log1.npz", sdf=np.ones((16,) * 3),
+        np.savez_compressed(self.campos / "b_surface_64_sdf_log2.npz", sdf=np.ones((16,) * 3),
                             limiar=-3.0, escala_log=1.0)
         self.assertIn("não é o campo do GA", self.preparar()[1])
 
@@ -99,10 +100,10 @@ class CamposTests(ComPastas):
 
     def test_campo_grava_de_onde_veio_e_e_o_sdf_com_log_1(self):
         self.preparar(["a"])
-        self.assertFalse((self.campos / "b_surface_64_sdf_log1.npz").exists())
-        with np.load(self.campos / "a_surface_64_sdf_log1.npz") as campo:
+        self.assertFalse((self.campos / "b_surface_64_sdf_log2.npz").exists())
+        with np.load(self.campos / "a_surface_64_sdf_log2.npz") as campo:
             self.assertEqual(float(campo["limiar"]), 0.0)
-            self.assertEqual(float(campo["escala_log"]), 1.0)
+            self.assertEqual(float(campo["escala_log"]), 2.0)
             self.assertEqual(int(campo["versao"]), VERSAO_SDF)
             self.assertTrue(str(campo["entrada"]).endswith("a_surface_64.npz"))
             self.assertGreater(int((campo["sdf"] > 0).sum()), 0)
@@ -154,7 +155,7 @@ class PipelineTests(ComPastas):
         cavernas = {c["nome"]: c for c in execucao["cavernas"]}
         self.assertEqual(list(cavernas), ["a", "b"])  # padrão: todas as da entrada
         for nome, grade in (("a", self.grade_a), ("b", self.grade_b)):
-            campo = self.campos / f"{nome}_surface_64_sdf_log1.npz"
+            campo = self.campos / f"{nome}_surface_64_sdf_log2.npz"
             # Rastreabilidade: de qual grade, de qual campo e de qual versão.
             self.assertEqual(cavernas[nome]["sha256_entrada"], sha256(grade))
             self.assertEqual(cavernas[nome]["sha256"], sha256(campo))
@@ -383,13 +384,13 @@ class ErrosEAvisosTests(ComPastas):
 
     def test_forcar_com_campo_que_falta_diz_gerado(self):
         self.assertEqual(self.preparar(["a"], forcar=True),
-                         ["  a: gerado (a_surface_64_sdf_log1.npz)"])
+                         ["  a: gerado (a_surface_64_sdf_log2.npz)"])
 
     def test_resultado_diz_se_o_campo_foi_conferido_com_a_entrada(self):
         destino = self.rodar_pipeline()
         execucao = resultados.ler_execucao(destino)
         self.assertTrue(all(c["conferido_com_entrada"] for c in execucao["cavernas"]))
-        campo = self.campos / "a_surface_64_sdf_log1.npz"
+        campo = self.campos / "a_surface_64_sdf_log2.npz"
         with (mock.patch("cavegen.profiling.resource_tracker.registrar_execucao"),
               contextlib.redirect_stdout(io.StringIO())):
             direto = busca.main(["--cavernas", str(campo), "--orcamento", "3", "--populacao", "3",
@@ -408,6 +409,18 @@ class ErrosEAvisosTests(ComPastas):
         self.assertEqual(avisos, ["ga_009 não é comparável com ga_001: difere em cavernas ou "
                                   "campos, orçamento."])
         self.assertIn("Aviso:", figuras.pagina(execucao, [outra]))
+
+    def test_alvo_com_acrescimo_fica_no_cabecalho_e_no_aviso_de_comparacao(self):
+        execucao = resultados.ler_execucao(self.rodar_pipeline())
+        self.assertEqual(execucao["acrescimo_alvo"], ACRESCIMO_ALVO)
+        self.assertIn(f"alvo: o campo do peso mais {ACRESCIMO_ALVO:g} em todo voxel",
+                      resultados.markdown_dos_melhores(execucao))
+        # As execuções de antes não gravaram o acréscimo: o alvo era o próprio peso.
+        antiga = {chave: valor for chave, valor in execucao.items() if chave != "acrescimo_alvo"}
+        antiga["nome"] = "ga_013"
+        self.assertIn("alvo: o próprio campo do peso", resultados.markdown_dos_melhores(antiga))
+        self.assertEqual(resultados.avisos_de_comparacao(execucao, [antiga]),
+                         ["ga_013 não é comparável com ga_001: difere em acréscimo do alvo."])
 
 if __name__ == "__main__":
     unittest.main()

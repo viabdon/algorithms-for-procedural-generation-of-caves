@@ -24,8 +24,8 @@ Cada etapa lê a pasta da anterior e escreve na seguinte:
 
 ```
 1_entrada/      as grades de superfície das cavernas reais, 64³ (você põe aqui)
-    │  etapa 2, campos.py: o SDF de cada grade, com ln(1 + |d|), escala 1, sem limiar
-2_campos/       um campo por caverna: o peso que guia o CA e o alvo que dá a nota
+    │  etapa 2, campos.py: o SDF de cada grade, com 2 · ln(1 + |d|) (log x2), sem limiar
+2_campos/       um campo por caverna: o peso que guia o CA; o alvo da nota é ele + 1,5
     │  etapa 3, busca.py: o GA (ou a busca aleatória) roda o CA nos campos
     │  etapa 4, resultados.py: a lista legível e as figuras
 3_resultados/   ga_NNN.npz (tudo), ga_NNN_melhores.md (lista) e ga_NNN_relatorio.html (figuras)
@@ -155,12 +155,15 @@ iterações; não são o mesmo espaço de busca das seguintes.**
 
 ### O que fica fora do cromossomo
 
-- **campo**: cada caverna tem um campo só, o SDF dela com `ln(1 + |d|)` e
-  escala 1, que é ao mesmo tempo o peso do CA e o alvo da nota (ver abaixo).
+- **campo**: cada caverna tem um campo só, o SDF dela com `2 · ln(1 + |d|)`
+  (escala 2, o mesmo `--log 2` dos pesos usados no CA), que é o peso do CA.
   Ele entra no CA **como está**: nada o multiplica, comprime ou corta. A
-  escala do log é **fixa em 1, por decisão metodológica**: até 15/11/2026 ela
-  era um gene, e o GA a subia até o peso dominar os vizinhos (ver "O decalque
-  e a retirada da escala");
+  escala do log é **fixa, por decisão metodológica**: até 15/11/2026 ela era
+  um gene, e o GA a subia até o peso dominar os vizinhos (ver "O decalque e a
+  retirada da escala"). Foi 1 de 15/11 a 22/11/2026 e passou a 2;
+- **alvo**: o mesmo campo **mais um acréscimo em todo voxel**
+  (`ACRESCIMO_ALVO` em `ca.py`, hoje 1,5). O valor está **em aberto**: 1,5 é
+  o melhor testado até agora, não um valor escolhido de vez (ver a seção 7);
 - **borda**: sempre `NEAREST`, que repete a beirada da grade. `ZEROS` fecharia
   e `ONES` abriria a caverna onde ela toca a borda, e `RANDOM` depende da sorte;
 - **iterações**: o CA roda **sempre** `MAX_ITERACOES = 40`, sem nenhuma
@@ -223,28 +226,31 @@ Mas `ln(d)` sozinho não serve, por dois motivos:
 
 O resultado, `sinal(d) · ln(1 + |d|)`, mantém o zero na borda, o sinal de
 cada lado e a ordem dos voxels (quem estava mais longe continua mais longe),
-só que comprimida. Valores reais do Elaphes 64³, escala 1, sem limiar
-(`2_campos/elaphes_surface_64_sdf_log1.npz`):
+só que comprimida. Valores reais do Elaphes 64³, sem limiar. A escala
+multiplica o log: o GA usou 1 de 15/11 a 22/11/2026 e usa 2 desde então
+(`2_campos/elaphes_surface_64_sdf_log2.npz`); a última coluna é o alvo de
+hoje, o log x2 mais 1,5 (seção 7):
 
-| região | d (voxels) | `sinal(d) · ln(1 + \|d\|)` | voxels com esse d |
-|---|---|---|---|
-| interno, mais fundo | +2 | +1,0986 | 4 |
-| interno | +√3 ≈ +1,73 | +1,0051 | 4 |
-| interno | +√2 ≈ +1,41 | +0,8814 | 27 |
-| interno, colado na borda | +1 | +0,6931 | 257 |
-| borda | 0 | 0 | 783 |
-| externo, colado na borda | −1 | −0,6931 | 1.095 |
-| externo | −2 | −1,0986 | 624 |
-| externo | −3 | −1,3863 | 830 |
-| externo | −5 | −1,7918 | 652 |
-| externo | −10 | −2,3979 | 186 |
-| externo | −20 | −3,0445 | 77 |
-| o mais distante | −63,16 | −4,1614 | 1 |
+| região | d (voxels) | log x1 | log x2 (o peso) | alvo (log x2 + 1,5) | voxels com esse d |
+|---|---|---|---|---|---|
+| interno, mais fundo | +2 | +1,0986 | +2,1972 | +3,6972 | 4 |
+| interno | +√3 ≈ +1,73 | +1,0051 | +2,0101 | +3,5101 | 4 |
+| interno | +√2 ≈ +1,41 | +0,8814 | +1,7627 | +3,2627 | 27 |
+| interno, colado na borda | +1 | +0,6931 | +1,3863 | +2,8863 | 257 |
+| borda | 0 | 0 | 0 | +1,5 | 783 |
+| externo, colado na borda | −1 | −0,6931 | −1,3863 | +0,1137 | 1.095 |
+| externo | −2 | −1,0986 | −2,1972 | −0,6972 | 624 |
+| externo | −3 | −1,3863 | −2,7726 | −1,2726 | 830 |
+| externo | −5 | −1,7918 | −3,5835 | −2,0835 | 652 |
+| externo | −10 | −2,3979 | −4,7958 | −3,2958 | 186 |
+| externo | −20 | −3,0445 | −6,0890 | −4,5890 | 77 |
+| o mais distante | −63,16 | −4,1614 | −8,3228 | −6,8228 | 1 |
 
 Sem o log, o voxel mais distante vale 63 vezes o de d = −1; com o log, 6
-vezes (4,16 / 0,69). O campo final vai de −4,16 a +1,10. Como a contagem de
-vizinhos vai de 0 a 27, o peso é uma **dica**: empurra a célula, mas os
-vizinhos ainda decidem.
+vezes (4,16 / 0,69, em qualquer escala). O peso do GA vai de −8,32 a +2,20
+no Elaphes (−7,78 a +2,20 no Indian Tunnel). Como a contagem de vizinhos vai
+de 0 a 27, o peso continua uma **dica**: empurra a célula, mas os vizinhos
+ainda decidem.
 
 A ferramenta do SDF também desloca o zero (limiar) antes do log; o GA **não
 usa** o limiar desde 22/11/2026. A ordem limiar → log e o que acontece na
@@ -257,32 +263,43 @@ nota = soma(alvo nos voxels vazios) / soma(alvo onde ele é positivo)
 ```
 
 - **O numerador** percorre os voxels que a caverna gerada deixou vazios e
-  soma o valor do alvo em cada um. Vazio no interno soma (+0,69 a +1,10),
-  vazio na borda não muda nada (0), vazio no externo **desconta** (−0,69 a
-  −4,16). Sem o desconto, encher a grade inteira acertaria todo o interno e
-  ganharia a nota máxima; com ele, encher a grade do Elaphes dá −4.033
-  (quatro mil; −4.045,6 no Indian Tunnel). Esse valor fica gravado em cada
+  soma o valor do alvo em cada um. Com o alvo de hoje (log x2 + 1,5), vazio
+  no interno soma (+2,89 a +3,70), vazio na borda soma +1,5, vazio na
+  primeira camada de fora (d = −1) soma um pouco (+0,11), e vazio mais longe
+  **desconta** (de −0,26 em d = −√2 até −6,82). Sem o desconto, encher a
+  grade inteira acertaria todo o positivo e ganharia a nota máxima; com ele,
+  encher a grade do Elaphes dá −604,1 (−481,7 no Indian Tunnel; com o
+  acréscimo de 1, −959,2 e −792,2; com o alvo log x1 de antes, −4.033 e
+  −4.045,6). Esse valor fica gravado em cada
   execução (`nota_grade_cheia`) e sai no painel, como régua das notas
   negativas.
 - **O denominador** é o máximo que o numerador pode alcançar: vazio em todo
-  voxel positivo e em nenhum negativo. No Elaphes ele vale 210,35 (a soma
-  dos 292 internos); no Indian Tunnel, 191,63.
+  voxel positivo e em nenhum negativo. No Elaphes ele vale 2.157,7 (a soma
+  dos 292 internos, das 783 bordas e dos 1.095 voxels da primeira camada de
+  fora); no Indian Tunnel, 2.402,5. Com o acréscimo de 1, 1.495,7 e 1.626,3;
+  com o alvo log x1 de antes, 210,35 e 191,63.
 - **Por que o teto é 1**: o numerador nunca passa do denominador, porque o
   melhor que dá para fazer é somar todos os positivos sem descontar nada.
   Dividir um pelo outro dá 1 nesse caso, 0 com a grade toda rocha (nenhum
   vazio, nada somado) e um número negativo quando o vazio fora pesa mais que
-  o de dentro. O piso é o vazio só no externo, 1 abaixo da grade cheia
-  (−4.034,2 no Elaphes): a nota pode ser muito negativa, e as notas de uma
-  execução vão de perto de +1 a perto de −4.000.
+  o de dentro. O piso é o vazio só no negativo do alvo, 1 abaixo da grade
+  cheia (−605,1 no Elaphes): a nota pode ser muito negativa, e as notas de
+  uma execução vão de perto de +1 a algumas centenas negativas (perto de
+  −4.000 com o alvo log x1).
 - **Por que a nota sai "quebrada"** (0,543 e não 10 mil pontos): ela é a
   **fração do máximo possível**. 0,543 quer dizer que a caverna gerada somou
   54,3% do que a caverna perfeita somaria, já descontado o vazio fora. A
-  soma crua dependeria do tamanho e da forma de cada caverna (210,35 no
-  Elaphes, 191,63 no Indian Tunnel) e não daria para comparar cavernas.
+  soma crua dependeria do tamanho e da forma de cada caverna (2.157,7 no
+  Elaphes, 2.402,5 no Indian Tunnel) e não daria para comparar cavernas.
   Dividindo, a nota fica na mesma régua em todas, e multiplicar o alvo por
   qualquer constante não a muda (a constante aparece em cima e embaixo).
-- Um exemplo de equilíbrio: no Elaphes, um voxel vazio em d = −1 (−0,69)
-  cancela exatamente um voxel vazio em d = +1 (+0,69).
+  Somar uma constante muda: por isso o acréscimo do alvo é uma decisão
+  metodológica, e a escala do log, que antes não mexia na nota, agora mexe.
+- Um exemplo de equilíbrio: no Elaphes, com o acréscimo de 1,5, vazio em
+  d = −1 já não custa nada (+0,11), e um voxel vazio em d = +1 (+2,89) paga
+  quatro voxels vazios em d = −2 (−0,70 cada). Com o acréscimo de 1, ele
+  pagava seis em d = −1 (−0,39) e dois em d = −2 (−1,20); com o alvo log x1
+  de antes, um voxel em d = +1 (+0,69) só pagava um em d = −1 (−0,69).
 
 ### 4. O vazio mínimo aceito
 
@@ -297,8 +314,12 @@ Abaixo dele, a nota daquele passo é `-inf` (`NOTA_MINIMA`), que nunca vence.
 
 | caverna | voxels positivos | vazio aceito |
 |---|---|---|
-| Elaphes 64³ | 292 | a partir de 146 |
-| Indian Tunnel 64³ | 265 | a partir de 132,5 |
+| Elaphes 64³ | 2.170 (292 internos, 783 de borda e 1.095 da primeira camada de fora) | a partir de 1.085 |
+| Indian Tunnel 64³ | 2.604 (265 internos, 978 de borda e 1.361 da primeira camada de fora) | a partir de 1.302 |
+
+Os positivos são os do alvo, então o mínimo acompanha o acréscimo: com o
+acréscimo de 1 eram 1.075 e 1.243 positivos (a partir de 537,5 e 621,5), e
+com o alvo igual ao peso, 292 e 265 (a partir de 146 e 132,5).
 
 Por que existe: sem o mínimo, uma grade toda rocha (nota 0) venceria qualquer
 caverna que escavasse um pouco fora da forma (nota negativa). O mínimo **não
@@ -407,7 +428,7 @@ tinha o melhor passo do Elaphes na iteração 23 (+0,172); com o Indian Tunnel
 junto, a iteração escolhida virou a 19, onde o Elaphes vale −0,972.
 
 **O que a caverna precisa ter.** O arquivo tem que ser o SDF com log de
-escala 1 e sem limiar, como a etapa 2 grava; outro limiar ou outro log
+escala 2 e sem limiar, como a etapa 2 grava; outro limiar ou outro log
 param a execução dizendo qual caverna. O SDF precisa de pelo menos um voxel
 positivo (senão a nota dividiria por zero), e a grade precisa ser cúbica
 (a semente do CA é um cubo); nos dois casos o erro diz qual caverna e por
@@ -432,32 +453,69 @@ em partes; ver `indian_tunnel_temp/README.md`).
 Para pôr outra caverna: copie a grade de superfície dela para `1_entrada/`;
 na próxima execução o pipeline gera o campo e a inclui.
 
-### 7. Por que o alvo é o mesmo campo do peso
+### 7. Por que o alvo é o campo do peso mais um acréscimo
 
 Os dois vêm do SDF da mesma caverna. Sem o peso, o CA só gera "geodos" sem
 relação com a caverna, então guiar e pontuar com a mesma caverna é
-inevitável. Até 22/11/2026 o alvo era o SDF com o zero deslocado 3 voxels
-para fora (5.201 positivos no Elaphes); agora é **o próprio campo do peso**,
-sem deslocamento, para avaliar exatamente os voxels que o SDF define como
-caverna, sem a faixa extra de 3 voxels em volta. O que isso implica:
+inevitável. A história do alvo, todas em 22/11/2026 ou antes:
 
-- **A cópia pura vale 1.** O peso binarizado (positivo vira vazio) acerta
-  exatamente todos os positivos do alvo e nenhum negativo, que é a nota
-  máxima. É a única nota de referência (ver abaixo).
+1. até 22/11/2026, o SDF com o zero deslocado 3 voxels para fora (limiar −3,
+   5.201 positivos no Elaphes): somava 3 à distância antes do log e deixava
+   positivo quase tudo em volta da parede;
+2. depois, **o próprio campo do peso**, sem deslocamento (292 positivos):
+   avaliava só o interno, e a borda (SDF 0) não valia nada;
+3. desde a decisão do Felipe de 22/11/2026, **o campo do peso (log x2) mais
+   um acréscimo em todo voxel** (`ACRESCIMO_ALVO` em `ca.py`). O acréscimo
+   vem depois do log, então ele não é o limiar (que soma à distância antes
+   do log). Com 1 (`ga_015`), só a borda passava a ser positiva (+1), a
+   primeira camada de fora ficava quase neutra (−0,39) e o Elaphes tinha
+   1.075 positivos. Com **1,5, o valor de hoje** (`ga_016`), a borda vale
+   +1,5, a primeira camada de fora (d = −1) também vira positiva, por pouco
+   (+0,11), e d = −√2 já desconta (−0,26). No Elaphes são 2.170 positivos
+   (292 internos, 783 de borda e 1.095 da primeira camada de fora).
+
+**O valor do acréscimo está em aberto.** 1,5 é o melhor testado até agora,
+não um valor escolhido de vez: ainda falta comparar outros valores e decidir
+qual entra no TCC. Ele é uma constante só (`ACRESCIMO_ALVO` em `ca.py`), e
+cada execução grava o valor que usou (`acrescimo_alvo`); o `--comparar`
+avisa quando duas execuções usaram valores diferentes, porque as notas delas
+não estão na mesma régua (o máximo continua 1, mas os positivos, a cópia
+pura e o vazio mínimo mudam com ele). Na execução padrão (orçamento 400,
+seed 0, Elaphes e Indian Tunnel): com 1, o melhor teve +0,715 (`ga_015`);
+com 1,5, +0,847 (`ga_016`, chance 0,6 e sensibilidade 13 na iteração 12).
+As notas de valores diferentes não se comparam diretamente: o que se compara
+é a caverna que cada campeão gera no CA.
+
+Por que o acréscimo: com o alvo igual ao peso, a nota punia o vazio colado na
+forma tanto quanto premiava o interno, e preferia um caminho apertado e
+quebrado a um caminho contínuo um pouco mais largo. Nas plotagens do CA, os
+resultados com o caminho completo (028 a 036) cobriam de 80% a 100% da forma
+e tinham notas de −2,8 a −16; o campeão do GA (038) cobria 34% e tinha −0,84.
+O acréscimo dá valor a pintar a borda e cobra pouco (ou nada) da primeira
+camada de fora. O peso que guia o CA não leva o acréscimo. O que isso
+implica:
+
+- **A cópia pura fica abaixo de 1.** O peso binarizado (positivo vira vazio)
+  acerta o interno, mas não pinta a borda nem a primeira camada de fora, que
+  agora são positivas no alvo: com 1,5, no Elaphes ela vale 0,398, e no
+  Indian Tunnel, 0,325 (com 1, 0,476 e 0,399). A nota máxima continua 1
+  (vazio exatamente nos positivos do alvo).
 - **A nota mede aderência ao campo, não ganho gerativo.** Uma nota perto de
   1 quer dizer que o CA reproduziu o sinal do peso que ele mesmo recebeu, não
   que gerou uma caverna nova parecida com a real.
-- **No Elaphes, o positivo é a espessura da parede, não o ar do túnel** (ver
-  a seção 1). A nota mede o quanto o CA acerta essa casca de 292 voxels, e não
-  semelhança com o vazio real do Elaphes.
+- **No Elaphes, o positivo é a espessura da parede e a borda dela, não o ar
+  do túnel** (ver a seção 1). A nota mede o quanto o CA acerta essa casca
+  (2.170 voxels com o acréscimo de 1,5), e não semelhança com o vazio real
+  do Elaphes.
 
 ### 8. A referência: cópia pura
 
 Junto com o resultado sai, por caverna, a nota da **cópia pura**: o peso
 binarizado (`peso > 0` vira vazio), sem rodar o CA e sem passar pela faixa.
-Com o alvo igual ao peso ela dá exatamente 1 em toda caverna. Ela fica como
-conferência (se não der 1, peso e alvo não são o mesmo campo) e como régua:
-a nota do CA se lê contra o 1. Até 22/11/2026 havia também o "teto trivial"
+Com o alvo igual ao peso ela dá exatamente 1 em toda caverna; com o
+acréscimo de 1,5 no alvo (o valor de hoje, em aberto), 0,398 no Elaphes e
+0,325 no Indian Tunnel (0,476 e 0,399 com 1). Ela fica como régua: um CA que passa dela pinta mais da borda
+do que a cópia do sinal do peso, sem pagar demais pelo vazio de fora. Até 22/11/2026 havia também o "teto trivial"
 (o peso cortado no limiar do alvo); sem o limiar, ele é a mesma conta que a
 cópia pura e saiu.
 
@@ -473,38 +531,43 @@ uv run poe busca-aleatoria --orcamento 200         # o mesmo fluxo com a busca d
 O atalho chama `python -m cavegen.generators.cellular_automata.genetico.pipeline`,
 que também pode ser rodado direto. O terminal mostra a etapa 2 (o que foi
 gerado ou reaproveitado), as quatro partes da busca e onde ficaram os
-relatórios (execução curta de validação, 22/11/2026):
+relatórios (a execução padrão `ga_015`, de 22/11/2026, ainda com o
+acréscimo de 1; com 1,5 mudam os positivos, o vazio mínimo, a cópia pura e a
+grade cheia):
 
 ```
-== Etapa 2: campos (SDF com log x1, sem limiar) ==
-  elaphes: reaproveitado (elaphes_surface_64_sdf_log1.npz)
-  indian_tunnel: reaproveitado (indian_tunnel_surface_64_sdf_log1.npz)
+== Etapa 2: campos (SDF com log x2, sem limiar) ==
+  elaphes: reaproveitado (elaphes_surface_64_sdf_log2.npz)
+  indian_tunnel: reaproveitado (indian_tunnel_surface_64_sdf_log2.npz)
 
 == Etapa 3: busca ==
 
-[1/4] Carregando as cavernas (o campo de cada uma é o peso e o alvo dela)
-  elaphes  src/cavegen/generators/cellular_automata/genetico/2_campos/elaphes_surface_64_sdf_log1.npz
-      grade 64x64x64, campo de -4.16 a +1.10, 292 voxels positivos; vazio aceito a partir de 146
-      cópia pura +1.000, grade cheia -4033.246
-  indian_tunnel  src/cavegen/generators/cellular_automata/genetico/2_campos/indian_tunnel_surface_64_sdf_log1.npz
-      grade 64x64x64, campo de -3.89 a +1.10, 265 voxels positivos; vazio aceito a partir de 132
-      cópia pura +1.000, grade cheia -4045.606
+[1/4] Carregando as cavernas (o campo de cada uma é o peso; o alvo é ele + 1)
+  elaphes  src/cavegen/generators/cellular_automata/genetico/2_campos/elaphes_surface_64_sdf_log2.npz
+      grade 64x64x64, campo de -8.32 a +2.20, 1075 voxels positivos; vazio aceito a partir de 538
+      cópia pura +0.476, grade cheia -959.180
+  indian_tunnel  src/cavegen/generators/cellular_automata/genetico/2_campos/indian_tunnel_surface_64_sdf_log2.npz
+      grade 64x64x64, campo de -7.78 a +2.20, 1243 voxels positivos; vazio aceito a partir de 622
+      cópia pura +0.399, grade cheia -792.250
   genes chance_inicial [0.2, 0.8, de 0.02 em 0.02], sensibilidade [1, 20]
   seeds de ajuste [1, 2, 3, 4, 5]; reservadas 101 a 110 (10 seeds); 40 iterações sempre
 
-[2/4] Busca genética: 40 candidatos, população 20, elite 2, seed 0
-  geração   0 | 20/40 | melhor -0.073 (chance_inicial=0.5 sensibilidade=13) | válidos 15/20 | mediana -2848.781 | 123.9 s
-  candidato 23/40 · geração 1 · chance_inicial=0.68 sensibilidade=13 -> -1243.096 · melhor -0.073
+[2/4] Busca genética: 400 candidatos, população 20, elite 2, seed 0
+  geração   0 |  20/400 | melhor +0.641 (chance_inicial=0.66 sensibilidade=15) | válidos 13/20 | mediana -25.473 | 122.8 s
+  ...
+  geração  19 | 362/400 | melhor +0.715 (chance_inicial=0.58 sensibilidade=13) | válidos 20/20 | mediana +0.715 | 0.0 s
+  400 avaliações (318 repetidas, sem refazer o CA)
 
 [3/4] Conferindo os 10 melhores nas 10 seeds reservadas, em 2 caverna(s)
-   3/5 chance_inicial=0.66 sensibilidade=15: ajuste -0.577, reservadas -0.249 (elaphes -0.345, indian_tunnel -0.153), pior seed -2.184
+   1/10 chance_inicial=0.58 sensibilidade=13: ajuste +0.715, reservadas +0.722 (elaphes +0.731, indian_tunnel +0.713), pior seed +0.631
+   ...
 
 [4/4] Gravando o resultado
 (... a tabela dos melhores ...)
 
 == Etapa 4: resultados ==
-  lista dos melhores  src/cavegen/generators/cellular_automata/genetico/3_resultados/ga_013_melhores.md
-  relatório           src/cavegen/generators/cellular_automata/genetico/3_resultados/ga_013_relatorio.html  (abra no navegador)
+  lista dos melhores  src/cavegen/generators/cellular_automata/genetico/3_resultados/ga_015_melhores.md
+  relatório           src/cavegen/generators/cellular_automata/genetico/3_resultados/ga_015_relatorio.html  (abra no navegador)
 ```
 
 - **geração**: uma linha por geração completa, com a melhor nota vista até
@@ -698,7 +761,8 @@ relatório já saem dele.
 | `detalhes` (JSON) | por candidato: `entre_cavernas` (média, mínimo, máximo, desvio, nota de cada caverna) e, em `cavernas`, por caverna: a nota de cada seed na iteração escolhida, a nota de cada passo (`notas_por_passo`, a média das seeds), onde o vazio terminou em cada seed (`fim`), e o vazio e as mudanças em cada passo | a trajetória de qualquer candidato |
 | `melhores` (JSON) | a lista dos melhores: posição, genes, iterações, `nota_ajuste` (o critério), `ajuste` (o resumo entre as cavernas), `nota_reservada_media` e `reservadas` (o resumo nas seeds reservadas, a pior seed e a nota de cada seed em cada caverna) | a lista legível sai daqui |
 | `campeao`, `nota_reservada_media` (JSON) | o primeiro da lista, com o ajuste e as reservadas | a leitura rápida |
-| `nota_copia_pura` (JSON) | a cópia pura de cada caverna (1 quando o alvo é o peso) | a régua da nota |
+| `nota_copia_pura` (JSON) | a cópia pura de cada caverna (1 quando o alvo é o peso; abaixo de 1 com o acréscimo) | a régua da nota |
+| `acrescimo_alvo` (JSON) | o que foi somado ao campo para virar o alvo (1 em `ga_015`, 1,5 a partir de `ga_016`; o valor está em aberto; as execuções de antes não o têm, e o alvo delas era o próprio peso) | saber qual alvo deu a nota |
 | `cavernas` (JSON) | por caverna: `nome`, a grade de entrada (`entrada`) e o `sha256_entrada` dela, o arquivo do campo (`origem`) e o `sha256` dele, a versão do cálculo (`versao_sdf`), se o campo foi conferido com a grade da entrada (`conferido_com_entrada`: sim quando a caverna veio por nome, não quando veio um `.npz` direto), `convencao`, `limiar`, `escala_log`, `forma`, `referencia_alvo` (voxels positivos), `faixa_vazio` (o mínimo e o máximo de vazio aceitos, em voxels; o máximo é `null` desde 22/11/2026) e `nota_grade_cheia` (a nota de tudo vazio, a régua das notas negativas; só nas execuções a partir de 22/11/2026, depois da saída do máximo) | saber exatamente de qual arquivo e de qual versão veio cada caverna |
 | `criterio_ranking` (JSON) | o critério da ordem, por extenso | ler o ranking sem adivinhar |
 | `config`, `genes_limites`, `cortes`, `max_iteracoes`, `borda`, `modo_peso`, `sementes_ajuste`, `sementes_reservadas`, `seed`, `ambiente` (JSON) | os parâmetros do GA, as faixas dos genes, a faixa de vazio, o CA, as seeds, a semente da busca e a máquina, as versões e o commit | refazer a execução |
@@ -775,6 +839,18 @@ que o GA ganha do sorteio.
 
 A penalização por diversidade (`nota × (1 − IoU médio entre as cavernas das
 seeds)`) segue como proposta em aberto, separada desta mudança.
+
+**De 1 para 2 (22/11/2026, decisão do Felipe).** A escala continua fixa, mas
+passou a 2, a mesma dos pesos que o Felipe usa no CA (`--log 2`). O 1 tinha
+entrado como "o campo sem multiplicador", sem uma comparação medida. Com o
+log x1 o peso vai só de −4,16 a +1,10: com sensibilidade 12 ele não segura o
+vazio fora da forma, e com 13 ou 14 o interno morre, então o GA acabava num
+caminho quebrado. Medido antes da troca (chance 0,5, as 5 seeds de ajuste,
+Elaphes e Indian Tunnel, ainda com o alvo igual ao peso): a melhor nota média
+foi −0,07 com log x1 (sensibilidade 13, iteração 18, cobrindo 40% a 52% da
+forma) e +0,55 com log x2 (sensibilidade 13, iteração 8, cobrindo 56% a 72%);
+com log x2 e sensibilidade 12, +0,38 na iteração 40, cobrindo 79% a 93%. Com
+o log x2 o peso vai a −8,32 no Elaphes, longe dos 27 vizinhos do decalque.
 
 ## Testes
 

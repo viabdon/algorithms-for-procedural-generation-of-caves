@@ -1,8 +1,8 @@
 """O fluxo inteiro do GA do CA, etapa por etapa.
 
     1_entrada/     as grades de superfície das cavernas reais, 64³ (você põe aqui)
-        │  etapa 2, campos.py: o SDF de cada grade, com log x1 e sem limiar
-    2_campos/      um campo por caverna: o peso do CA e o alvo da nota
+        │  etapa 2, campos.py: o SDF de cada grade, com log x2 e sem limiar
+    2_campos/      um campo por caverna: o peso do CA (o alvo da nota é ele + o acréscimo)
         │  etapa 3, busca.py: o GA (ou a busca aleatória de controle) nos campos
         │  etapa 4, resultados.py: a lista legível e as figuras
     3_resultados/  ga_NNN.npz, ga_NNN_melhores.md e ga_NNN_relatorio.html
@@ -45,7 +45,7 @@ def main(argv=None) -> Path:
                         help="pasta dos resultados")
     args = parser.parse_args(argv)
 
-    print("\n== Etapa 2: campos (SDF com log x1, sem limiar) ==")
+    print(f"\n== Etapa 2: campos (SDF com log x{campos.ESCALA_LOG:g}, sem limiar) ==")
     try:
         feitos = campos.preparar(args.cavernas, args.forcar, args.entrada, args.campos)
     except ValueError as erro:

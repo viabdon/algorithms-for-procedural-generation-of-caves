@@ -33,6 +33,7 @@ from cavegen.generators.cellular_automata.genetico.aptidao import (
     situacao_do_vazio,
 )
 from cavegen.generators.cellular_automata.genetico.ca import (
+    ACRESCIMO_ALVO,
     GENES_CA,
     MAX_ITERACOES,
     AvaliadorCA,
@@ -67,12 +68,21 @@ def esfera_sdf(lado: int = 16, raio: float = 4.0) -> np.ndarray:
     return (raio - np.sqrt((z - centro) ** 2 + (y - centro) ** 2 + (x - centro) ** 2)).astype(
         np.float32)
 
-def campo_esfera(raio: float = 5.0, lado: int = 16) -> np.ndarray:
-    """O campo do GA para a esfera: o SDF dela com log de escala 1, sem limiar."""
-    return comprimir_log(esfera_sdf(lado, raio), 1.0)
+def campo_esfera(raio: float = 5.0, lado: int = 16, escala: float = 2.0) -> np.ndarray:
+    """
+        O campo do GA para a esfera: o SDF dela com log de escala 2, sem limiar.
+        escala 1 é a do GA até 22/11/2026, que alguns testes de comportamento
+        do CA usam porque fixam uma dinâmica medida com ela.
+    """
+    return comprimir_log(esfera_sdf(lado, raio), escala)
+
+def copia_pura(raio: float) -> float:
+    """A nota da cópia pura da esfera com o alvo da busca (o campo mais o acréscimo)."""
+    caverna = Caverna("esfera", campo_esfera(raio), ACRESCIMO_ALVO)
+    return nota_da_copia_pura(caverna.peso, caverna.alvo)
 
 def gravar_campo(caminho: Path, campo: np.ndarray, limiar: float = 0.0,
-                 escala_log: float | None = 1.0) -> Path:
+                 escala_log: float | None = 2.0) -> Path:
     """Grava um npz no formato do cavegen/tools/sdf."""
     extras = {} if escala_log is None else {"escala_log": escala_log}
     np.savez_compressed(caminho, sdf=campo, convencao=np.array("teste"), limiar=limiar, **extras)
@@ -341,6 +351,36 @@ class AptidaoTests(unittest.TestCase):
         self.assertTrue(math.isnan(resumo["desvio"]))
 
 class CavernaTests(unittest.TestCase):
+    def test_acrescimo_vai_so_para_o_alvo(self):
+        campo = campo_esfera()
+        caverna = Caverna("esfera", campo, 1.0)
+        np.testing.assert_array_equal(caverna.peso, campo)  # o peso fica como está
+        np.testing.assert_allclose(caverna.alvo.campo, campo + 1.0, rtol=0, atol=1e-6)
+        self.assertEqual(caverna.acrescimo_alvo, 1.0)
+        # A casca de borda (campo 0) passa a ser positiva no alvo; nada de fora dela.
+        self.assertEqual(caverna.alvo.referencia, int((campo > -1.0).sum()))
+        self.assertGreater(caverna.alvo.referencia, int((campo > 0).sum()))
+        # A nota máxima continua 1, mas a cópia pura não pinta a casca e fica abaixo.
+        self.assertAlmostEqual(caverna.alvo.nota(caverna.alvo.campo > 0), 1.0)
+        self.assertLess(nota_da_copia_pura(caverna.peso, caverna.alvo), 1.0)
+
+    def test_acrescimo_da_busca_e_positivo_e_o_padrao_da_caverna_e_0(self):
+        # O valor da busca está em aberto (1 em ga_015, 1,5 desde ga_016): o
+        # contrato é ser um número finito e positivo, não um valor fixo.
+        self.assertTrue(math.isfinite(ACRESCIMO_ALVO))
+        self.assertGreater(ACRESCIMO_ALVO, 0)
+        self.assertEqual(Caverna("esfera", campo_esfera()).acrescimo_alvo, 0.0)
+        for ruim in (math.inf, math.nan):
+            with self.subTest(acrescimo=ruim), self.assertRaises(ValueError):
+                Caverna("esfera", campo_esfera(), ruim)
+
+    def test_acrescimo_pode_dar_positivo_a_um_campo_sem_positivo(self):
+        # Campo todo 0 (só borda): sem acréscimo não há o que acertar; com ele, há.
+        plano = np.zeros((8, 8, 8), dtype=np.float32)
+        with self.assertRaises(ValueError):
+            Caverna("borda", plano)
+        self.assertEqual(Caverna("borda", plano, 1.0).alvo.referencia, plano.size)
+
     def test_peso_e_alvo_sao_o_mesmo_campo(self):
         campo = campo_esfera()
         caverna = Caverna("esfera", campo)
@@ -462,7 +502,7 @@ class AvaliadorCATests(unittest.TestCase):
         # Esfera minúscula: com o limite de cima, a faixa vira poucos voxels e o
         # CA sempre passa dela. O que se testa é a agregação: uma caverna
         # cortada corta o candidato.
-        minuscula = Caverna("minuscula", campo_esfera(1.0))
+        minuscula = Caverna("minuscula", campo_esfera(1.0, escala=1.0))
         nota, detalhes = AvaliadorCA([self.a, minuscula], (1, 2), max_iteracoes=12,
                                      cortes=Cortes(0.5, 5.0))(BONS)
         self.assertEqual(nota, NOTA_MINIMA)
@@ -538,8 +578,8 @@ class ExecutarTests(unittest.TestCase):
     def setUp(self):
         self._pasta = tempfile.TemporaryDirectory()
         self.pasta = Path(self._pasta.name)
-        self.esfera = gravar_campo(self.pasta / "esfera_sdf_log1.npz", campo_esfera(5.0))
-        self.maior = gravar_campo(self.pasta / "maior_sdf_log1.npz", campo_esfera(6.0))
+        self.esfera = gravar_campo(self.pasta / "esfera_sdf_log2.npz", campo_esfera(5.0))
+        self.maior = gravar_campo(self.pasta / "maior_sdf_log2.npz", campo_esfera(6.0))
         self.saida = str(self.pasta / "results")
 
     def tearDown(self):
@@ -560,24 +600,28 @@ class ExecutarTests(unittest.TestCase):
             for campo in ("nota_teto_trivial", "peso", "alvo", "forma", "faixa_vazio",
                           "referencia_alvo", "notas_reservadas"):
                 self.assertNotIn(campo, r.files)
-            self.assertEqual(json.loads(str(r["nota_copia_pura"])), {"esfera": 1.0})
+            # Com o acréscimo do alvo, a cópia pura não pinta a casca de borda.
+            self.assertEqual(json.loads(str(r["nota_copia_pura"])), {"esfera": copia_pura(5.0)})
+            self.assertEqual(json.loads(str(r["acrescimo_alvo"])), ACRESCIMO_ALVO)
             self.assertEqual(json.loads(str(r["modo_peso"])), "completo")
             self.assertEqual(json.loads(str(r["sementes_ajuste"])), [1, 2, 3, 4, 5])
             self.assertEqual(json.loads(str(r["cortes"])),
                              {"fator_minimo": 0.5, "fator_maximo": None})
             cavernas = json.loads(str(r["cavernas"]))
             self.assertEqual([c["nome"] for c in cavernas], ["esfera"])
-            self.assertTrue(cavernas[0]["origem"].endswith("esfera_sdf_log1.npz"))
+            self.assertTrue(cavernas[0]["origem"].endswith("esfera_sdf_log2.npz"))
             self.assertEqual(len(cavernas[0]["sha256"]), 64)
             self.assertEqual(cavernas[0]["forma"], [16, 16, 16])
-            self.assertEqual((cavernas[0]["limiar"], cavernas[0]["escala_log"]), (0.0, 1.0))
-            referencia = int((campo_esfera(5.0) > 0).sum())
+            self.assertEqual((cavernas[0]["limiar"], cavernas[0]["escala_log"]), (0.0, 2.0))
+            # Os positivos do alvo são os do campo mais o acréscimo (a casca de borda entra).
+            alvo = Caverna("esfera", campo_esfera(5.0), ACRESCIMO_ALVO).alvo
+            referencia = int((campo_esfera(5.0) + ACRESCIMO_ALVO > 0).sum())
+            self.assertGreater(referencia, int((campo_esfera(5.0) > 0).sum()))
             self.assertEqual(cavernas[0]["referencia_alvo"], referencia)
             # Sem limite de cima, o máximo vai como null (o JSON não tem inf).
             self.assertEqual(cavernas[0]["faixa_vazio"], [0.5 * referencia, None])
-            self.assertEqual(cavernas[0]["nota_grade_cheia"],
-                             Alvo(campo_esfera(5.0)).nota_da_grade_cheia())
-            self.assertLess(cavernas[0]["nota_grade_cheia"], 0)
+            self.assertEqual(cavernas[0]["nota_grade_cheia"], alvo.nota_da_grade_cheia())
+            self.assertLess(cavernas[0]["nota_grade_cheia"], 1)
             detalhes = json.loads(str(r["detalhes"]))
             self.assertEqual(len(detalhes), 6)
             vazios = detalhes[0]["cavernas"]["esfera"]["vazios"]
@@ -605,13 +649,14 @@ class ExecutarTests(unittest.TestCase):
         # A faixa é de cada caverna, relativa ao alvo dela.
         self.assertLess(cavernas[0]["faixa_vazio"][0], cavernas[1]["faixa_vazio"][0])
         self.assertEqual([c["faixa_vazio"][1] for c in cavernas], [None, None])
-        self.assertEqual(copias, {"esfera": 1.0, "maior": 1.0})
+        self.assertEqual(copias, {"esfera": copia_pura(5.0), "maior": copia_pura(6.0)})
         self.assertIn("média", criterio)
         self.assertGreater(len(melhores), 0)
         notas = [m["nota_ajuste"] for m in melhores]
         self.assertEqual(notas, sorted(notas, reverse=True))  # ordem pela média
-        avaliador = AvaliadorCA([Caverna("esfera", campo_esfera(5.0)),
-                                 Caverna("maior", campo_esfera(6.0))], (1, 2, 3, 4, 5))
+        avaliador = AvaliadorCA([Caverna("esfera", campo_esfera(5.0), ACRESCIMO_ALVO),
+                                 Caverna("maior", campo_esfera(6.0), ACRESCIMO_ALVO)],
+                                (1, 2, 3, 4, 5))
         for item in melhores:
             ajuste = item["ajuste"]
             self.assertEqual(set(ajuste["por_caverna"]), {"esfera", "maior"})
@@ -636,7 +681,8 @@ class ExecutarTests(unittest.TestCase):
             melhores = json.loads(str(r["melhores"]))
         self.assertLessEqual(len(melhores), 3)
         self.assertGreater(len(melhores), 0)
-        avaliador = AvaliadorCA([Caverna("esfera", campo_esfera(5.0))], executar.SEMENTES_AJUSTE)
+        avaliador = AvaliadorCA([Caverna("esfera", campo_esfera(5.0), ACRESCIMO_ALVO)],
+                                executar.SEMENTES_AJUSTE)
         for item in melhores:
             ajuste = avaliador.conferir(item["genes"], item["iteracoes"], executar.SEMENTES_AJUSTE)
             reservadas = avaliador.conferir(item["genes"], item["iteracoes"],
@@ -648,8 +694,9 @@ class ExecutarTests(unittest.TestCase):
                              item["reservadas"]["notas_por_semente"])
 
     def test_caverna_sem_positivo_falha_dizendo_qual_e_por_que(self):
-        rocha = gravar_campo(self.pasta / "rocha_sdf_log1.npz",
-                             np.full((8, 8, 8), -1.0, dtype=np.float32))
+        # Bem abaixo de -ACRESCIMO_ALVO: o alvo (campo + acréscimo) continua sem positivo.
+        rocha = gravar_campo(self.pasta / "rocha_sdf_log2.npz",
+                             np.full((8, 8, 8), -10.0 - ACRESCIMO_ALVO, dtype=np.float32))
         mensagem = erro_do_main("--cavernas", str(self.esfera), str(rocha), "--saida", self.saida)
         self.assertIn("caverna rocha", mensagem)
         self.assertIn("nenhum voxel positivo", mensagem)
@@ -657,23 +704,23 @@ class ExecutarTests(unittest.TestCase):
     def test_caverna_com_limiar_ou_sem_log_e_recusada(self):
         com_limiar = gravar_campo(self.pasta / "deslocada.npz", campo_esfera(5.0), limiar=-3.0)
         sem_log = gravar_campo(self.pasta / "crua.npz", esfera_sdf(), escala_log=None)
-        log2 = gravar_campo(self.pasta / "dobrada.npz", campo_esfera(5.0), escala_log=2.0)
+        log1 = gravar_campo(self.pasta / "simples.npz", campo_esfera(5.0), escala_log=1.0)
         for caminho, trecho in ((com_limiar, "limiar -3"), (sem_log, "sem log"),
-                                (log2, "log x2")):
+                                (log1, "log x1")):
             with self.subTest(caminho=caminho.name):
                 mensagem = erro_do_main("--cavernas", str(caminho), "--saida", self.saida)
                 self.assertIn(trecho, mensagem)
-                self.assertIn("log x1 e sem limiar", mensagem)
+                self.assertIn("log x2 e sem limiar", mensagem)
                 self.assertIn("genetico.campos", mensagem)  # o comando da etapa 2
 
     def test_caverna_nao_cubica_falha_dizendo_qual(self):
-        torta = gravar_campo(self.pasta / "torta_sdf_log1.npz",
+        torta = gravar_campo(self.pasta / "torta_sdf_log2.npz",
                              np.ones((8, 8, 10), dtype=np.float32))
         self.assertIn("caverna torta tem grade (8, 8, 10)",
                       erro_do_main("--cavernas", str(torta), "--saida", self.saida))
 
     def test_caverna_que_falta_ou_repetida(self):
-        mensagem = erro_do_main("--cavernas", str(self.pasta / "nada_sdf_log1.npz"))
+        mensagem = erro_do_main("--cavernas", str(self.pasta / "nada_sdf_log2.npz"))
         self.assertIn("não existe", mensagem)
         self.assertIn("genetico.campos", mensagem)
         mensagem = erro_do_main("--cavernas", str(self.esfera), str(self.esfera))
@@ -684,20 +731,20 @@ class ExecutarTests(unittest.TestCase):
 
         grade = Path("1_entrada/elaphes_surface_64.npz")
         campo = campos.caminho_do_campo(grade, Path("2_campos"))
-        self.assertEqual(campo, Path("2_campos/elaphes_surface_64_sdf_log1.npz"))
+        self.assertEqual(campo, Path("2_campos/elaphes_surface_64_sdf_log2.npz"))
         self.assertEqual(campos.nome_da_caverna(grade), "elaphes")
         self.assertEqual(campos.nome_da_caverna(campo), "elaphes")
         self.assertEqual(campos.nome_da_caverna(Path("x/indian_tunnel_surface_64.npz")),
                          "indian_tunnel")
-        self.assertEqual(campos.nome_da_caverna(Path("x/elaphes_surface_32_pablo_sdf_log1.npz")),
+        self.assertEqual(campos.nome_da_caverna(Path("x/elaphes_surface_32_pablo_sdf_log2.npz")),
                          "elaphes_surface_32_pablo")
 
-    def test_campo_do_ga_e_o_sdf_com_log_1_sem_limiar(self):
+    def test_campo_do_ga_e_o_sdf_com_log_2_sem_limiar(self):
         from cavegen.generators.cellular_automata.genetico import busca as executar
         from cavegen.generators.cellular_automata.genetico import campos
 
-        self.assertEqual((campos.LIMIAR, campos.ESCALA_LOG), (0.0, 1.0))
-        self.assertEqual(campos.SUFIXO_CAMPO, "_sdf_log1")
+        self.assertEqual((campos.LIMIAR, campos.ESCALA_LOG), (0.0, 2.0))
+        self.assertEqual(campos.SUFIXO_CAMPO, "_sdf_log2")
         for antigo in ("ALVO_ELAPHES", "CAMPO_ELAPHES", "CAVERNAS_PADRAO", "NPZ_SDF"):
             self.assertFalse(hasattr(executar, antigo), antigo)
 

@@ -7,12 +7,20 @@ limiar -3, e chance alargada em 19/11/2026; ver o README do módulo):
     sensibilidade    [1, 20]      inteiro; de 18 para cima a caverna sempre morria
 
 Fora do cromossomo, fixos:
-    campo: cada caverna tem um campo só, o SDF dela comprimido com ln(1 + |d|) e
-           escala 1, que é ao mesmo tempo o peso somado aos vizinhos e o alvo da
-           nota. Ele entra no CA como está: nada o multiplica, comprime ou corta.
-           A escala é fixa em 1 por decisão metodológica: quando ela era gene, o
-           GA a subia até o peso passar dos 27 vizinhos possíveis e o CA virava
-           um limiar sobre o SDF (o decalque).
+    campo: cada caverna tem um campo só, o SDF dela comprimido com
+           2 · ln(1 + |d|) (escala 2), que é o peso somado aos vizinhos. Ele
+           entra no CA como está: nada o multiplica, comprime ou corta. A escala
+           é fixa por decisão metodológica: quando ela era gene, o GA a subia até
+           o peso passar dos 27 vizinhos possíveis e o CA virava um limiar sobre
+           o SDF (o decalque). Foi 1 de 15/11 a 22/11/2026; passou a 2, a
+           escala dos pesos que o Felipe usa no CA (no Elaphes, de -8,3 a +2,2).
+    alvo: o mesmo campo mais ACRESCIMO_ALVO em todo voxel (desde 22/11/2026).
+          O valor está em aberto: foi 1 em ga_015 e é 1,5 desde ga_016. Com
+          o log x2, +1 deixava positiva só a casca de borda (SDF 0) e aliviava
+          a primeira camada de fora (de -1,39 para -0,39); +1,5 deixa
+          positiva também essa camada (+0,11), e d = -√2 já desconta. Antes,
+          o limiar -3 da ferramenta do SDF somava 3 à distância antes do log
+          e deixava positivo tudo a menos de 3 voxels da parede.
     iterações: o CA roda sempre MAX_ITERACOES, sem parada antecipada, e a nota é
                calculada em todo passo. A melhor iteração (pela média das seeds e
                das cavernas) sai junto com a nota e vale para todas as cavernas.
@@ -48,6 +56,11 @@ GENES_CA = (
     Gene("sensibilidade", 1, 20, inteiro=True),
 )
 MAX_ITERACOES = 40
+# Somado ao campo para virar o alvo da nota (ver o topo do arquivo); o peso fica
+# sem ele. Valor em aberto: 1,5 é o melhor testado até agora, não uma escolha
+# definitiva. Cada execução grava o valor (acrescimo_alvo), e o --comparar avisa
+# quando duas execuções usaram valores diferentes.
+ACRESCIMO_ALVO = 1.5
 BORDA = BorderTreatment.NEAREST
 MODO_PESO = ModoPeso.COMPLETO
 CORTES_PADRAO = Cortes()
@@ -55,30 +68,35 @@ CORTES_PADRAO = Cortes()
 class Caverna:
     """
         Uma caverna em que os candidatos são avaliados. Ela tem um campo só,
-        que guia o CA (peso) e dá a nota (alvo).
+        que guia o CA (peso) e, com o acréscimo, dá a nota (alvo).
         nome: rótulo da caverna nas notas, no painel e no resultado.
         campo: SDF da caverna com log, cúbico, em ZYX. O peso é uma cópia
-               somente leitura com os mesmos valores e o mesmo tipo; o alvo é o
-               Alvo do mesmo campo.
+               somente leitura com os mesmos valores e o mesmo tipo.
+        acrescimo_alvo: somado a todo voxel do campo para virar o alvo. O
+                        padrão 0 deixa o alvo igual ao peso; a busca passa
+                        ACRESCIMO_ALVO.
     """
-    def __init__(self, nome: str, campo: np.ndarray):
+    def __init__(self, nome: str, campo: np.ndarray, acrescimo_alvo: float = 0.0):
         campo = np.asarray(campo)
         if campo.ndim != 3 or len(set(campo.shape)) != 1:
             raise ValueError(f"A caverna {nome} tem grade {campo.shape}: a semente do CA é "
                              "um cubo (lado x lado x lado), então a grade precisa ser cúbica.")
         if not np.all(np.isfinite(campo)):
             raise ValueError(f"A caverna {nome} tem valores não finitos no SDF.")
-        if not np.any(campo > 0):
+        if not np.isfinite(acrescimo_alvo):
+            raise ValueError("O acréscimo do alvo precisa ser finito.")
+        if not np.any(campo + acrescimo_alvo > 0):
             raise ValueError(
-                f"A caverna {nome} não tem nenhum voxel positivo no SDF. A nota divide pela "
-                "soma do campo positivo (o interno, que a inundação não alcança), então sem "
+                f"A caverna {nome} não tem nenhum voxel positivo no alvo. A nota divide pela "
+                "soma do alvo positivo (o interno, que a inundação não alcança), então sem "
                 "ele não há o que acertar. Confira a inundação da grade dessa caverna.")
         # O CA recebe exatamente o campo carregado, e a busca não consegue mexer nele.
         peso = np.array(campo, copy=True)
         peso.setflags(write=False)
         self.nome = nome
         self.peso = peso
-        self.alvo = Alvo(campo)
+        self.acrescimo_alvo = float(acrescimo_alvo)
+        self.alvo = Alvo(campo.astype(np.float64) + self.acrescimo_alvo)
 
     @property
     def lado(self) -> int:
@@ -223,5 +241,5 @@ class AvaliadorCA:
                 "pior_semente": float(min(v.min() for v in notas.values())),
                 "notas_por_semente": {nome: v.tolist() for nome, v in notas.items()}}
 
-__all__ = ["BORDA", "CORTES_PADRAO", "GENES_CA", "MAX_ITERACOES", "MODO_PESO", "NOTA_MINIMA",
+__all__ = ["ACRESCIMO_ALVO", "BORDA", "CORTES_PADRAO", "GENES_CA", "MAX_ITERACOES", "MODO_PESO", "NOTA_MINIMA",
            "AvaliadorCA", "Caverna", "Trajetoria", "media_por_passo", "rodar_ca"]

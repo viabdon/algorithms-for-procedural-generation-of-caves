@@ -12,9 +12,11 @@ e em nenhum negativo), então a nota é a fração desse máximo: 1 no melhor ca
 dentro. Multiplicar o alvo por uma constante não muda a nota (ela aparece em
 cima e embaixo).
 
-O alvo de cada caverna é o mesmo campo do peso: o SDF dela comprimido com
-ln(1 + |d|), sem deslocar o zero (`cavegen/tools/sdf/sdf.py --log 1`). Ele fica fixo
-durante toda a busca. A explicação completa, com os números do Elaphes, está no
+O alvo de cada caverna é o campo do peso, o SDF dela comprimido com
+2 · ln(1 + |d|) e sem deslocar o zero (`cavegen/tools/sdf/sdf.py --log 2`), mais
+um acréscimo somado a todo voxel (ca.ACRESCIMO_ALVO: 1 em ga_015, 1,5 desde
+ga_016, valor em aberto). Ele
+fica fixo durante toda a busca. A explicação completa, com os números do Elaphes, está no
 README do módulo.
 """
 from __future__ import annotations
@@ -39,7 +41,8 @@ class Cortes:
 
         Só o mínimo fica porque a grade vazia tem nota 0 e, sem ele, ganharia
         de todo candidato com nota negativa. O excesso de vazio a própria nota
-        já pune (encher a grade do Elaphes dá -4033), e o limite de cima
+        já pune (encher a grade do Elaphes dava -4033 com o alvo log x1; com o
+        log x2 e o acréscimo de 1,5, dá -604), e o limite de cima
         cortava a maioria dos candidatos, sem dar direção à seleção. Atenção:
         a iteração escolhida é a de maior nota, então um candidato que enche a
         grade aos poucos leva a nota do passo menos cheio (quase sempre o 1),
@@ -93,7 +96,8 @@ class Alvo:
 
     def nota_da_grade_cheia(self) -> float:
         """
-            Nota de tudo vazio (no Elaphes, -4033): a régua para ler uma nota
+            Nota de tudo vazio (no Elaphes, -604 com o log x2 e o acréscimo
+            de 1,5; -4033 com o alvo log x1): a régua para ler uma nota
             negativa, já que ela depende da caverna. Não é o piso: vazio só no
             lado negativo dá 1 a menos (a nota da grade cheia soma o 1 da
             parte positiva).
@@ -126,11 +130,11 @@ def nota_da_copia_pura(peso: np.ndarray, alvo: Alvo) -> float:
     """
         Nota do próprio peso binarizado (peso > 0 vira vazio), sem rodar o CA e
         sem passar pela faixa de vazio: a caverna que só copia o sinal do peso.
-        No GA o alvo é o mesmo campo do peso, então os positivos dos dois são os
-        mesmos voxels e a cópia pura dá exatamente 1, o máximo da nota. Ela fica
-        como conferência (se não der 1, peso e alvo não são o mesmo campo) e
-        como régua: a nota do CA mede o quanto ele chega perto de copiar o
-        campo, não ganho gerativo.
+        Com o alvo igual ao peso, ela dá exatamente 1, o máximo da nota. Com o
+        acréscimo do alvo (desde 22/11/2026) ela fica abaixo de 1, porque a
+        casca de borda (peso 0), e com 1,5 também a primeira camada de fora,
+        passa a ser positiva no alvo e a cópia não a pinta. Fica como régua: a nota do CA mede o quanto ele chega perto de
+        copiar o campo, não ganho gerativo.
     """
     return alvo.nota(np.asarray(peso) > 0)
 

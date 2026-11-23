@@ -71,8 +71,8 @@ class ComPastasRevisor(unittest.TestCase):
         self.entrada.mkdir()
         self.grade_a = gravar_grade(self.entrada / "a_surface_64.npz", 6.0)
         self.grade_b = gravar_grade(self.entrada / "b_surface_64.npz", 6.5)
-        self.campo_a = self.campos / "a_surface_64_sdf_log1.npz"
-        self.campo_b = self.campos / "b_surface_64_sdf_log1.npz"
+        self.campo_a = self.campos / "a_surface_64_sdf_log2.npz"
+        self.campo_b = self.campos / "b_surface_64_sdf_log2.npz"
 
     def tearDown(self):
         self._pasta.cleanup()
@@ -159,7 +159,7 @@ class StalenessRevisorTests(ComPastasRevisor):
         np.savez_compressed(self.campo_a, **antigo)
         avisos = self.preparar(["a"])
         self.assertEqual(avisos, [("  a: refeito: não diz de que grade e de que versão veio "
-                                   "(a_surface_64_sdf_log1.npz)")])
+                                   "(a_surface_64_sdf_log2.npz)")])
         with np.load(self.campo_a) as campo:
             self.assertEqual(str(campo["sha256_entrada"]), sha256(self.grade_a))
 
@@ -167,7 +167,7 @@ class StalenessRevisorTests(ComPastasRevisor):
         self.preparar()
         antes_b = self.campo_b.stat().st_mtime_ns, sha256(self.campo_b)
         avisos = self.preparar(["a"], forcar=True)
-        self.assertEqual(avisos, ["  a: refeito: forçado (a_surface_64_sdf_log1.npz)"])
+        self.assertEqual(avisos, ["  a: refeito: forçado (a_surface_64_sdf_log2.npz)"])
         self.assertEqual((self.campo_b.stat().st_mtime_ns, sha256(self.campo_b)), antes_b)
 
     def test_grade_trocada_pela_de_outra_caverna_com_o_mesmo_nome(self):
@@ -247,13 +247,13 @@ class RastreabilidadeRevisorTests(ComPastasRevisor):
         self.assertEqual(caverna["sha256_entrada"], sha256(self.grade_a))
         self.assertEqual(caverna["versao_sdf"], VERSAO_SDF)
         self.assertTrue(caverna["entrada"].endswith("a_surface_64.npz"))
-        self.assertTrue(caverna["origem"].endswith("a_surface_64_sdf_log1.npz"))
+        self.assertTrue(caverna["origem"].endswith("a_surface_64_sdf_log2.npz"))
 
     def test_npz_direto_sem_metadados_grava_nulos_sem_quebrar(self):
         self.preparar(["a"])
-        antigo = self.raiz / "antigo_sdf_log1.npz"
+        antigo = self.raiz / "antigo_sdf_log2.npz"
         with np.load(self.campo_a) as campo:
-            np.savez_compressed(antigo, sdf=campo["sdf"], limiar=0.0, escala_log=1.0)
+            np.savez_compressed(antigo, sdf=campo["sdf"], limiar=0.0, escala_log=2.0)
         destino, mensagem = self.busca("--cavernas", str(antigo))
         self.assertIsNone(mensagem)
         with np.load(destino) as r:

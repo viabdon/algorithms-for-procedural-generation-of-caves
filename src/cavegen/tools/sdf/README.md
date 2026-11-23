@@ -157,10 +157,14 @@ No Elaphes 64³ (`L = −4`): a região com nota positiva passa de 292 voxels
 `L = −4` e log × 2, o campo vai de −8,19 a +3,89, com a borda em +3,22.
 
 **Para o algoritmo genético, atenção ao alvo:** desde 22/11/2026 o GA do CA
-usa, em cada caverna, **um campo só, sem limiar**: o SDF com log de escala 1
-(`--log 1`), que é o peso do CA e o alvo da nota ao mesmo tempo. No Elaphes
-são 292 voxels positivos, só a espessura da parede (o ar do túnel é alcançado
-pela água e fica negativo), e o `docs/architecture.md` registra que esse campo
+usa, em cada caverna, **um campo só, sem limiar**: o SDF com log de escala 2
+(`--log 2`; foi `--log 1` até a decisão de 22/11/2026), que é o peso do CA. O
+alvo da nota é esse campo mais um acréscimo em todo voxel (hoje 1,5, valor
+em aberto), somado pelo GA depois do log
+(não é o limiar, que desloca a distância antes do log). No Elaphes o peso tem
+292 voxels positivos, só a espessura da parede (o ar do túnel é alcançado
+pela água e fica negativo), e o alvo tem 2.170 (a parede, a borda e, com o
+acréscimo de 1,5, a primeira camada de fora), e o `docs/architecture.md` registra que esse campo
 não valida `VOID` real. A nota mede aderência a esse campo, não ao vazio real.
 De 12/11 a 22/11/2026 o alvo foi o SDF com `L = −3` e log (5.201 positivos, a
 casca mais a faixa de até 3 voxels em volta); o limiar continua disponível na
@@ -182,14 +186,15 @@ Depois, o SDF (a inundação roda dentro dele):
 
 ```
 uv run python -m cavegen.tools.sdf.sdf [superficie.npz]                       # SDF base
-uv run python -m cavegen.tools.sdf.sdf [superficie.npz] --log 1               # o campo do GA (peso e alvo)
+uv run python -m cavegen.tools.sdf.sdf [superficie.npz] --log 2               # o campo do GA (o peso)
 uv run python -m cavegen.tools.sdf.sdf [superficie.npz] --limiar -4            # zero a 4 voxels para fora
 uv run python -m cavegen.tools.sdf.sdf [superficie.npz] --limiar -4 --log 2    # e depois o log × 2
 ```
 
 O campo do GA de outra caverna sai da grade de superfície dela, por exemplo
-`uv run python -m cavegen.tools.sdf.sdf indian_tunnel_temp/npz/indian_tunnel_surface_64.npz --log 1`,
-que grava `npz/indian_tunnel_surface_64_sdf_log1.npz` (265 voxels positivos).
+`uv run python -m cavegen.tools.sdf.sdf indian_tunnel_temp/npz/indian_tunnel_surface_64.npz --log 2`,
+que grava `npz/indian_tunnel_surface_64_sdf_log2.npz` (265 voxels positivos).
+No pipeline do GA quem faz isso é a etapa 2 (`genetico/campos.py`).
 
 Cada combinação grava um npz e um plot com o nome dela, e o SDF base continua
 com o mesmo nome de antes (`elaphes_surface_64_sdf.npz`), que é o peso padrão

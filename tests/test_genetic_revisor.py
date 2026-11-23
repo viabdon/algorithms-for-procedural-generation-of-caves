@@ -30,8 +30,13 @@ from cavegen.generators.cellular_automata.genetico.algoritmo import (
     evoluir,
     mutar,
 )
-from cavegen.generators.cellular_automata.genetico.aptidao import NOTA_MINIMA, Cortes
+from cavegen.generators.cellular_automata.genetico.aptidao import (
+    NOTA_MINIMA,
+    Cortes,
+    nota_da_copia_pura,
+)
 from cavegen.generators.cellular_automata.genetico.ca import (
+    ACRESCIMO_ALVO,
     GENES_CA,
     MAX_ITERACOES,
     AvaliadorCA,
@@ -54,13 +59,13 @@ def esfera_sdf(lado: int = 16, raio: float = 4.0) -> np.ndarray:
 
 
 def campo_esfera(raio: float = 5.0) -> np.ndarray:
-    """O campo do GA para a esfera: SDF com log de escala 1, sem limiar (peso e alvo)."""
-    return comprimir_log(esfera_sdf(raio=raio), 1.0)
+    """O campo do GA para a esfera: SDF com log de escala 2, sem limiar (o peso)."""
+    return comprimir_log(esfera_sdf(raio=raio), 2.0)
 
 
 def gravar_esfera(caminho: Path, raio: float = 5.0) -> Path:
     np.savez_compressed(caminho, sdf=campo_esfera(raio), convencao=np.array("log"),
-                        limiar=0.0, escala_log=1.0)
+                        limiar=0.0, escala_log=2.0)
     return caminho
 
 
@@ -77,11 +82,11 @@ def sem_gerador_global():
 def rodar_executar(pasta: Path, *extra: str) -> Path:
     from cavegen.generators.cellular_automata.genetico import busca as executar
 
-    if not (pasta / "esfera_sdf_log1.npz").exists():
-        gravar_esfera(pasta / "esfera_sdf_log1.npz")
+    if not (pasta / "esfera_sdf_log2.npz").exists():
+        gravar_esfera(pasta / "esfera_sdf_log2.npz")
     with (mock.patch("cavegen.profiling.resource_tracker.registrar_execucao"),
           contextlib.redirect_stdout(io.StringIO())):
-        return executar.main(["--cavernas", str(pasta / "esfera_sdf_log1.npz"),
+        return executar.main(["--cavernas", str(pasta / "esfera_sdf_log2.npz"),
                               "--saida", str(pasta / "results"), *extra])
 
 
@@ -336,7 +341,7 @@ class ExecutarRevisorTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as pasta:
             destino = rodar_executar(Path(pasta), "--orcamento", "6", "--populacao", "3")
             extras = extras_gravados(destino)
-        avaliador = AvaliadorCA([Caverna("esfera", campo_esfera(5.0))],
+        avaliador = AvaliadorCA([Caverna("esfera", campo_esfera(5.0), ACRESCIMO_ALVO)],
                                 tuple(extras["sementes_ajuste"]))
         campeao = extras["campeao"]
         ajuste = avaliador.conferir(campeao["genes"], campeao["iteracoes"],
@@ -482,7 +487,7 @@ def sessao_do_painel(painel: Painel):
                 {"iteracoes": 3, "cavernas": {"elaphes": {"fim": ["na_faixa", "na_faixa"]}}})
 
     painel.etapa(1, 4, "Carregando", "📂")
-    painel.caverna("elaphes", "tools/sdf/npz/elaphes_surface_64_sdf_log1.npz", (64, 64, 64),
+    painel.caverna("elaphes", "tools/sdf/npz/elaphes_surface_64_sdf_log2.npz", (64, 64, 64),
                    -4.16, 1.10, 292, (146.0, 1460.0), 1.0)
     painel.caverna("pequena", "x.npz", (32, 32, 32), -3.0, 1.0, 50, (25.0, 250.0), 1.0,
                    aviso="grade 32³, fora do protocolo de 64³")
@@ -610,21 +615,24 @@ class ExecutarGradeRevisorTests(unittest.TestCase):
 
         with tempfile.TemporaryDirectory() as pasta:
             pasta = Path(pasta)
-            gravar_esfera(pasta / "esfera_sdf_log1.npz")
+            gravar_esfera(pasta / "esfera_sdf_log2.npz")
             fora = io.StringIO()
             with (mock.patch("cavegen.profiling.resource_tracker.registrar_execucao"),
                   mock.patch.object(executar, "Painel", side_effect=painel_capturado),
                   contextlib.redirect_stdout(fora)):
-                executar.main(["--cavernas", str(pasta / "esfera_sdf_log1.npz"),
+                executar.main(["--cavernas", str(pasta / "esfera_sdf_log2.npz"),
                                "--saida", str(pasta / "results"), "--orcamento", "6",
                                "--populacao", "3"])
         texto = do_painel.getvalue()
+        esfera = Caverna("esfera", campo_esfera(5.0), ACRESCIMO_ALVO)
+        copia = nota_da_copia_pura(esfera.peso, esfera.alvo)
         self.assertEqual(fora.getvalue(), "")
         self.assertNotIn("\033", texto)
         self.assertNotIn("\r", texto)
         for trecho in ("[1/4] Carregando", "chance_inicial [0.2, 0.8, de 0.02 em 0.02]",
                        "seeds de ajuste [1, 2, 3, 4, 5]", "reservadas 101 a 110 (10 seeds)",
-                       "esfera", "cópia pura +1.000", "[4/4] Gravando", "melhores parâmetros",
+                       "esfera", f"cópia pura {copia:+.3f}", "[4/4] Gravando",
+                       "melhores parâmetros",
                        "referência: cópia pura", "gravado em"):
             self.assertIn(trecho, texto)
         self.assertNotIn("teto", texto)
@@ -638,7 +646,7 @@ RAIOS = (5.0, 6.0, 5.5, 4.5, 6.5, 5.2, 5.8, 4.8, 6.2)
 
 def gravar_campo(caminho: Path, campo: np.ndarray) -> Path:
     np.savez_compressed(caminho, sdf=campo, convencao=np.array("log"), limiar=0.0,
-                        escala_log=1.0)
+                        escala_log=2.0)
     return caminho
 
 
@@ -749,8 +757,8 @@ class ExecutarCavernasRevisorTests(unittest.TestCase):
         self._pasta = tempfile.TemporaryDirectory()
         self.pasta = Path(self._pasta.name)
         self.saida = str(self.pasta / "results")
-        self.a = gravar_campo(self.pasta / "a_sdf_log1.npz", campo_esfera(5.0))
-        self.b = gravar_campo(self.pasta / "b_sdf_log1.npz", campo_esfera(6.0))
+        self.a = gravar_campo(self.pasta / "a_sdf_log2.npz", campo_esfera(5.0))
+        self.b = gravar_campo(self.pasta / "b_sdf_log2.npz", campo_esfera(6.0))
 
     def tearDown(self):
         self._pasta.cleanup()
@@ -789,8 +797,8 @@ class ExecutarCavernasRevisorTests(unittest.TestCase):
     def test_caverna_cubica_fora_do_protocolo_roda_com_aviso_so_nela(self):
         from cavegen.generators.cellular_automata.genetico import busca as executar
 
-        pequena = gravar_campo(self.pasta / "pequena_sdf_log1.npz",
-                               comprimir_log(esfera_sdf(lado=12, raio=4.0), 1.0))
+        pequena = gravar_campo(self.pasta / "pequena_sdf_log2.npz",
+                               comprimir_log(esfera_sdf(lado=12, raio=4.0), 2.0))
         argv = ("--cavernas", str(self.a), str(pequena), "--metodo", "aleatoria",
                 "--orcamento", "3", "--populacao", "3", "--top", "1", "--saida", self.saida)
         # Com o protocolo em 16³, só a de 12³ está fora dele.
@@ -846,7 +854,7 @@ class ExecutarCavernasRevisorTests(unittest.TestCase):
         # nome tirado do arquivo, então o mesmo campo com outro nome (uma cópia, ou
         # "elaphes" e "Elaphes" no Windows, que abrem o mesmo arquivo) entra duas
         # vezes e pesa em dobro na média entre as cavernas, que ordena o ranking.
-        copia = self.pasta / "copia_de_a_sdf_log1.npz"
+        copia = self.pasta / "copia_de_a_sdf_log2.npz"
         copia.write_bytes(self.a.read_bytes())
         mensagem = erro_do_main("--cavernas", str(self.a), str(copia), "--orcamento", "3",
                                 "--populacao", "3", "--top", "1", "--saida", self.saida)

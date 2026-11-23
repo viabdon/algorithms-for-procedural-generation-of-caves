@@ -99,6 +99,8 @@ def avisos_de_comparacao(execucao: dict, outras: list[dict]) -> list[str]:
                  ("orçamento", lambda e: e["config"]["orcamento"]),
                  ("seeds de ajuste", lambda e: e["sementes_ajuste"]),
                  ("faixa de vazio", lambda e: e["cortes"]),
+                 # As execuções de antes de 22/11/2026 não gravaram: alvo igual ao peso.
+                 ("acréscimo do alvo", lambda e: e.get("acrescimo_alvo", 0.0)),
                  ("iterações", lambda e: e["max_iteracoes"]),
                  ("faixas dos genes", lambda e: e["genes_limites"]))
     avisos = []
@@ -159,7 +161,16 @@ def linhas_do_cabecalho(execucao: dict) -> list[str]:
              f"reservadas ({reservadas[0]} a {reservadas[-1]}); {execucao['max_iteracoes']} "
              "iterações sempre"),
             f"ordem: {execucao['criterio_ranking']}",
-            f"referência: cópia pura {copias} (a nota máxima)" + regua_negativa(execucao)]
+            descrever_alvo(execucao),
+            f"referência: cópia pura {copias}" + regua_negativa(execucao)]
+
+def descrever_alvo(execucao: dict) -> str:
+    """O alvo da nota: o campo do peso, com ou sem o acréscimo."""
+    acrescimo = execucao.get("acrescimo_alvo", 0.0)
+    if not acrescimo:
+        return "alvo: o próprio campo do peso (a cópia pura dá a nota máxima, 1)"
+    return (f"alvo: o campo do peso mais {acrescimo:g} em todo voxel (a nota máxima, 1, é "
+            "vazio exatamente onde o alvo é positivo; a cópia pura fica abaixo dela)")
 
 def regua_negativa(execucao: dict) -> str:
     """
@@ -189,13 +200,14 @@ def legenda_colunas(execucao: dict) -> str:
             "relatório).")
 
 def escala_das_notas(execucao: dict) -> str:
-    """Como ler notas que vão de +1 a cerca de -4000, com a régua que a execução gravou."""
+    """Como ler notas que vão de +1 a centenas ou milhares negativos, com a régua gravada."""
     if any("nota_grade_cheia" in c for c in execucao["cavernas"]):
         regua = "(o valor de cada caverna está no cabeçalho)"
     else:
         regua = "(esta execução, de antes de 22/11/2026, não gravou o valor de cada caverna)"
-    return ("Como ler a nota: +1 é a cópia pura (o máximo), 0 é a grade sem vazio, e a grade "
-            "toda vazia fica perto de -4000 no Elaphes e no Indian Tunnel "
+    return ("Como ler a nota: +1 é o máximo (vazio exatamente onde o alvo é positivo), 0 é "
+            "a grade sem vazio, e a grade toda vazia dá a nota mais baixa: perto de -4000 com "
+            "o alvo log x1 e de centenas negativas com o log x2 e o acréscimo do alvo "
             f"{regua}. Qualquer nota abaixo de -1 já tem mais vazio fora da forma do que a "
             "forma inteira vale. A média, o mínimo e o desvio entre as cavernas estão na mesma "
             "unidade: um desvio de 30 numa nota de -400 é pequeno; o mesmo 30 numa nota perto "

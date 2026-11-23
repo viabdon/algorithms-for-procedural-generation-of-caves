@@ -1,10 +1,11 @@
 """Etapa 2 do pipeline do GA: o campo de cada caverna da entrada.
 
-    1_entrada/<nome>_surface_64.npz  ->  2_campos/<nome>_surface_64_sdf_log1.npz
+    1_entrada/<nome>_surface_64.npz  ->  2_campos/<nome>_surface_64_sdf_log2.npz
 
-O campo é o SDF da grade de superfície comprimido com ln(1 + |d|), escala 1,
-sem limiar. É um arquivo só por caverna: o mesmo campo é o peso que guia o CA e
-o alvo que dá a nota. Quem calcula é a ferramenta do SDF
+O campo é o SDF da grade de superfície comprimido com 2 · ln(1 + |d|) (log de
+escala 2, o mesmo `--log 2` usado nos pesos do CA), sem limiar. É um arquivo só
+por caverna: ele é o peso que guia o CA, e o alvo da nota é ele mais o
+acréscimo do alvo (ca.ACRESCIMO_ALVO). Quem calcula é a ferramenta do SDF
 (cavegen.tools.sdf.sdf.gravar_campo); nada do cálculo é refeito aqui.
 
 Um campo é refeito quando falta, quando a grade da entrada mudou (o sha256
@@ -29,17 +30,18 @@ from cavegen.tools.sdf.sdf import VERSAO_SDF, gravar_campo, nome_do_campo
 PASTA = Path(__file__).resolve().parent
 ENTRADA_DIR = PASTA / "1_entrada"
 CAMPOS_DIR = PASTA / "2_campos"
-# O campo do GA: log de escala 1 e nenhum limiar (decisão de 22/11/2026).
-LIMIAR, ESCALA_LOG = 0.0, 1.0
+# O campo do GA: log de escala 2 e nenhum limiar (decisão do Felipe em 22/11/2026:
+# o mesmo log x2 dos pesos que ele usa no CA; de 15/11 a 22/11/2026 era x1).
+LIMIAR, ESCALA_LOG = 0.0, 2.0
 SUFIXO_GRADE = "_surface_64"
-SUFIXO_CAMPO = nome_do_campo("", LIMIAR, ESCALA_LOG)  # "_sdf_log1"
+SUFIXO_CAMPO = nome_do_campo("", LIMIAR, ESCALA_LOG)  # "_sdf_log2"
 COMANDO = "uv run python -m cavegen.generators.cellular_automata.genetico.campos"
 
 def sha256(caminho: Path) -> str:
     return hashlib.sha256(Path(caminho).read_bytes()).hexdigest()
 
 def nome_da_caverna(caminho: Path) -> str:
-    """Rótulo da caverna: o nome do arquivo sem _sdf_log1 e sem _surface_64 (elaphes)."""
+    """Rótulo da caverna: o nome do arquivo sem _sdf_log2 e sem _surface_64 (elaphes)."""
     nome = Path(caminho).stem
     for sufixo in (SUFIXO_CAMPO, SUFIXO_GRADE):
         nome = nome.removesuffix(sufixo)
@@ -139,7 +141,8 @@ def main(argv=None) -> dict[str, Path]:
     parser.add_argument("--entrada", type=Path, default=ENTRADA_DIR)
     parser.add_argument("--campos", type=Path, default=CAMPOS_DIR)
     args = parser.parse_args(argv)
-    print(f"Campos (SDF com log x1, sem limiar) de {caminho_legivel(args.entrada)}")
+    print(f"Campos (SDF com log x{ESCALA_LOG:g}, sem limiar) de "
+          f"{caminho_legivel(args.entrada)}")
     try:
         return preparar(args.cavernas, args.forcar, args.entrada, args.campos)
     except ValueError as erro:

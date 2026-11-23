@@ -42,7 +42,7 @@ FUNDO, TEXTO, GRADE, LINHA = "black", "white", "#333333", "#666666"
 EIXO = dict(color=TEXTO, gridcolor=GRADE, zeroline=False, showline=True, linecolor=LINHA,
             tickfont=dict(size=11))
 PALETA_SERIES = "Jet"
-# As notas vão de 1 (a cópia pura) a cerca de -4000 (a grade cheia), e o que
+# As notas vão de 1 (o máximo) a milhares negativos (a grade cheia), e o que
 # importa ler fica entre -1 e 1. Num eixo linear, um candidato que enche a grade
 # achataria todos os outros numa linha só. Por isso todo eixo e toda cor de nota
 # usam a escala log simétrica sinal(n) * log10(1 + |n| / NOTA_LINEAR): perto do
@@ -95,7 +95,7 @@ def _marca(nota: float) -> str:
 def eixo_de_notas(notas) -> dict:
     """
         Marcas e faixa de um eixo de notas comprimidas, do menor valor finito
-        até o 1 (o teto, a cópia pura), sempre com o zero. Para update_yaxes
+        até o 1 (o teto da nota), sempre com o zero. Para update_yaxes
         ou update_xaxes.
     """
     finitas = [n for n in notas if n is not None and math.isfinite(n)]

@@ -11,9 +11,9 @@ e o campo dela precisa estar em dia com a grade (senão, rode a etapa 2). Um
 caminho .npz é um campo usado como está. O fluxo inteiro, com a etapa 2 antes e
 os relatórios da etapa 4 depois, é o pipeline.py.
 
-Cada caverna tem um campo só, o SDF dela com ln(1 + |d|), escala 1 e sem
-limiar, que é o peso do CA e o alvo da nota. Ele entra no CA exatamente como
-está no arquivo. O resultado grava, por caverna, a grade de entrada e o sha256
+Cada caverna tem um campo só, o SDF dela com 2 · ln(1 + |d|) (escala 2) e
+sem limiar, que é o peso do CA; o alvo da nota é ele mais ACRESCIMO_ALVO
+(1,5, valor em aberto) em todo voxel. O peso entra no CA exatamente como está no arquivo. O resultado grava, por caverna, a grade de entrada e o sha256
 dela, o arquivo e o sha256 do campo e a versão do cálculo do SDF (`cavernas`).
 
 No fim, mostra a lista dos melhores parâmetros (--top, padrão 10), ordenada
@@ -47,6 +47,7 @@ from cavegen.generators.cellular_automata.genetico.algoritmo import (
 )
 from cavegen.generators.cellular_automata.genetico.aptidao import Cortes, nota_da_copia_pura
 from cavegen.generators.cellular_automata.genetico.ca import (
+    ACRESCIMO_ALVO,
     BORDA,
     GENES_CA,
     MAX_ITERACOES,
@@ -57,6 +58,7 @@ from cavegen.generators.cellular_automata.genetico.ca import (
 from cavegen.generators.cellular_automata.genetico.campos import (
     CAMPOS_DIR,
     ENTRADA_DIR,
+    ESCALA_LOG,
     caminho_do_campo,
     cavernas_da_entrada,
     escolher,
@@ -148,17 +150,18 @@ def carregar_campo(caminho: Path) -> tuple[np.ndarray, dict]:
 
 def carregar_caverna(caminho: Path) -> tuple[Caverna, dict]:
     """
-        Carrega o campo de uma caverna e confere que é o do GA: log de escala 1
-        e sem limiar. Erro (ValueError) diz qual caverna e por quê.
+        Carrega o campo de uma caverna e confere que é o do GA: log de escala
+        ESCALA_LOG e sem limiar. O alvo leva o ACRESCIMO_ALVO. Erro (ValueError)
+        diz qual caverna e por quê.
     """
     nome = nome_da_caverna(caminho)
     campo, info = carregar_campo(caminho)
-    if info["limiar"] != 0 or info["escala_log"] != 1:
+    if info["limiar"] != 0 or info["escala_log"] != ESCALA_LOG:
         log = "sem log" if info["escala_log"] is None else f"log x{info['escala_log']:g}"
         raise ValueError(f"A caverna {nome} ({info['origem']}) tem limiar {info['limiar']:g} e "
-                         f"{log}, mas o GA usa o SDF com log x1 e sem limiar. Gere com: "
+                         f"{log}, mas o GA usa o SDF com log x{ESCALA_LOG:g} e sem limiar. Gere com: "
                          f"{COMANDO_CAMPOS}")
-    return Caverna(nome, campo), info
+    return Caverna(nome, campo, ACRESCIMO_ALVO), info
 
 def ambiente() -> dict:
     """Máquina, versões e commit, para o resultado dizer onde e com que código rodou."""
@@ -244,8 +247,9 @@ def main(argv=None) -> Path:
                              "controle, que só sorteia (sem seleção nem cruzamento)")
     parser.add_argument("--cavernas", nargs="+", metavar="CAVERNA",
                         help="nomes de cavernas da entrada (elaphes, indian_tunnel) ou npz de "
-                             "campos com log 1 e sem limiar; o campo de cada caverna é o peso e "
-                             "o alvo dela (padrão: todas as cavernas da entrada)")
+                             f"campos com log {ESCALA_LOG:g} e sem limiar; o campo de cada "
+                             "caverna é o peso dela, e o alvo é o campo mais o acréscimo "
+                             "(padrão: todas as cavernas da entrada)")
     parser.add_argument("--entrada", type=Path, default=ENTRADA_DIR,
                         help="pasta das grades de superfície (etapa 1)")
     parser.add_argument("--campos", type=Path, default=CAMPOS_DIR,
@@ -273,8 +277,8 @@ def main(argv=None) -> Path:
     painel = Painel(config.orcamento, por_lote=not genetico,
                     tamanho_lote=config.tamanho_populacao)
 
-    painel.etapa(1, 4, "Carregando as cavernas (o campo de cada uma é o peso e o alvo dela)",
-                 "📂")
+    painel.etapa(1, 4, "Carregando as cavernas (o campo de cada uma é o peso; o alvo é ele "
+                       f"+ {ACRESCIMO_ALVO:g})", "📂")
     try:
         carregadas = [carregar_caverna(c) for c in caminhos]
     except ValueError as erro:
@@ -334,6 +338,7 @@ def main(argv=None) -> Path:
         "config": asdict(config), "seed": args.seed,
         "genes_limites": [g.como_dict() for g in GENES_CA],
         "cortes": cortes.como_dict(),
+        "acrescimo_alvo": ACRESCIMO_ALVO,
         "max_iteracoes": MAX_ITERACOES, "borda": BORDA.value, "modo_peso": MODO_PESO.value,
         "sementes_ajuste": list(SEMENTES_AJUSTE),
         "sementes_reservadas": list(SEMENTES_RESERVADAS),

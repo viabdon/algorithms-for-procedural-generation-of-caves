@@ -181,8 +181,9 @@ class Painel:
         """
             Duas linhas da etapa de carga: de onde veio o campo da caverna, a
             grade, os voxels positivos do alvo, a faixa de vazio aceita, a
-            cópia pura (a nota máxima, 1) e a grade cheia (a régua das notas
-            negativas). aviso: uma terceira linha, em amarelo, se vier.
+            cópia pura (1 com o alvo igual ao peso, abaixo de 1 com o
+            acréscimo) e a grade cheia (a régua das notas negativas). aviso:
+            uma terceira linha, em amarelo, se vier.
         """
         e = self.estilo
         grade = "x".join(str(lado) for lado in forma)
@@ -365,7 +366,8 @@ class Painel:
         """
             A nota de referência de cada caverna e onde o resultado foi gravado.
             copias: nota da cópia pura (peso > 0 vira vazio, sem rodar o CA) por
-                    caverna; com o alvo igual ao peso, ela é 1.
+                    caverna; com o alvo igual ao peso, ela é 1, e com o
+                    acréscimo do alvo fica abaixo de 1.
             cheias: nota da grade toda vazia por caverna, a régua das negativas.
         """
         e = self.estilo
