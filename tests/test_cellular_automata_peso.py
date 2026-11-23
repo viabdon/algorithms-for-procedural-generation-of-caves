@@ -16,10 +16,12 @@ import numpy as np
 
 from cavegen.generators.cellular_automata.generator import (
     BorderTreatment,
+    ModoPeso,
     aplicar_peso,
     cellular_automata,
     iterate,
     neighbor_counts,
+    preparar_peso,
 )
 from cavegen.generators.cellular_automata.pesos import (
     importar_sdf,
@@ -27,6 +29,12 @@ from cavegen.generators.cellular_automata.pesos import (
     load_peso_matrix,
     used_peso_ids,
 )
+from cavegen.generators.cellular_automata.results import (
+    config_do_run,
+    load_result_info,
+    result_path,
+)
+from cavegen.sdf.manipulacao import comprimir_log
 
 
 def matriz_aleatoria(formato: tuple[int, int, int], seed: int) -> np.ndarray:
@@ -40,8 +48,8 @@ class PesoTests(unittest.TestCase):
         zeros = np.zeros(inicial.shape, dtype=np.float32)
 
         for borda in (BorderTreatment.ZEROS, BorderTreatment.ONES):
-            basico, historico_basico = cellular_automata(inicial, 14, borda, 4)
-            com_peso, historico_peso = cellular_automata(inicial, 14, borda, 4, peso=zeros)
+            basico, historico_basico, *_ = cellular_automata(inicial, 14, borda, 4)
+            com_peso, historico_peso, *_ = cellular_automata(inicial, 14, borda, 4, peso=zeros)
             np.testing.assert_array_equal(com_peso, basico)
             np.testing.assert_array_equal(historico_peso, historico_basico)
 
@@ -80,6 +88,59 @@ class PesoTests(unittest.TestCase):
             aplicar_peso(vizinhos, np.zeros((4, 4, 5), dtype=np.float32))
 
 
+class ModoPesoTests(unittest.TestCase):
+    def test_so_negativo_e_o_peso_com_o_positivo_zerado(self) -> None:
+        matriz = matriz_aleatoria((8, 8, 8), seed=5)
+        peso = np.random.default_rng(6).uniform(-5, 5, size=matriz.shape).astype(np.float32)
+        cortado = np.minimum(peso, 0)
+
+        for borda in (BorderTreatment.ZEROS, BorderTreatment.NEAREST):
+            np.testing.assert_array_equal(
+                iterate(matriz, 12, borda, peso, ModoPeso.SO_NEGATIVO),
+                iterate(matriz, 12, borda, cortado))
+            esperado = cellular_automata(matriz, 12, borda, 4, peso=cortado)
+            obtido = cellular_automata(matriz, 12, borda, 4, peso=peso, modo_peso="so_negativo")
+            for a, b in zip(esperado, obtido):
+                np.testing.assert_array_equal(a, b)
+
+    def test_padrao_continua_sendo_o_peso_completo(self) -> None:
+        matriz = matriz_aleatoria((8, 8, 8), seed=7)
+        peso = np.full(matriz.shape, 3.0, dtype=np.float32)
+
+        np.testing.assert_array_equal(iterate(matriz, 12, BorderTreatment.ZEROS, peso),
+                                      iterate(matriz, 12, BorderTreatment.ZEROS, peso, "completo"))
+        # Peso só positivo: no modo só negativo vira o CA básico.
+        np.testing.assert_array_equal(
+            iterate(matriz, 12, BorderTreatment.ZEROS, peso, ModoPeso.SO_NEGATIVO),
+            iterate(matriz, 12, BorderTreatment.ZEROS))
+
+    def test_preparar_peso_nao_altera_o_original(self) -> None:
+        peso = np.array([-2.0, 0.0, 3.0], dtype=np.float32)
+        self.assertIsNone(preparar_peso(None, ModoPeso.SO_NEGATIVO))
+        np.testing.assert_array_equal(preparar_peso(peso, "so_negativo"), [-2.0, 0.0, 0.0])
+        np.testing.assert_array_equal(peso, [-2.0, 0.0, 3.0])
+        with self.assertRaises(ValueError):
+            preparar_peso(peso, "positivo")
+
+    def test_resultado_antigo_com_peso_le_como_completo(self) -> None:
+        with tempfile.TemporaryDirectory() as pasta:
+            np.savez_compressed(result_path(1, pasta), matrix=np.zeros((2, 2, 2)), result_id=1,
+                                seed_id=1, size=2, sensitivity=13, border_treatment="zeros",
+                                iterations=3, peso_id=1)
+            np.savez_compressed(result_path(2, pasta), matrix=np.zeros((2, 2, 2)), result_id=2,
+                                seed_id=1, size=2, sensitivity=13, border_treatment="zeros",
+                                iterations=3, peso_id=1, modo_peso="so_negativo")
+            self.assertEqual(load_result_info(1, pasta)["modo_peso"], "completo")
+            self.assertEqual(load_result_info(2, pasta)["modo_peso"], "so_negativo")
+
+    def test_rotulo_da_planilha_separa_os_modos(self) -> None:
+        base = {"seed_id": 1, "sensitivity": 13, "border_treatment": "nearest",
+                "iterations": 5, "peso_id": 2}
+        self.assertEqual(config_do_run(base), "seed001 s13 nearest it5 peso002")
+        self.assertEqual(config_do_run({**base, "modo_peso": "so_negativo"}),
+                         "seed001 s13 nearest it5 peso002 so_negativo")
+
+
 class ArmazenamentoDePesoTests(unittest.TestCase):
     def test_importar_sdf_copia_a_matriz_e_anota_a_origem(self) -> None:
         sdf = np.random.default_rng(4).uniform(-10, 2, size=(4, 5, 6)).astype(np.float32)
@@ -100,6 +161,76 @@ class ArmazenamentoDePesoTests(unittest.TestCase):
             self.assertEqual(info["shape"], (4, 5, 6))
             self.assertEqual(info["convencao"], "interno positivo")
             self.assertTrue(info["origem"].endswith("campo_sdf.npz"))
+            self.assertIsNone(info["escala_log"])
+
+    def test_importar_sdf_com_escala_grava_o_peso_comprimido_e_anota_a_escala(self) -> None:
+        sdf = np.random.default_rng(5).uniform(-48, 2, size=(4, 5, 6)).astype(np.float32)
+
+        with tempfile.TemporaryDirectory() as pasta:
+            origem = Path(pasta) / "campo_sdf.npz"
+            np.savez_compressed(origem, sdf=sdf, convencao="interno positivo")
+            destino_pesos = Path(pasta) / "pesos"
+
+            importar_sdf(origem, destino_pesos, escala_log=2.0)
+
+            gravado = load_peso_matrix(1, destino_pesos)
+            np.testing.assert_array_equal(gravado, comprimir_log(sdf, 2.0))
+            info = load_peso_info(1, destino_pesos)
+            self.assertEqual(info["escala_log"], 2.0)
+            self.assertTrue(info["convencao"].startswith("interno positivo; comprimido com 2"))
+            # O SDF de origem continua sendo distância: a compressão só existe na cópia.
+            with np.load(origem) as arquivo:
+                np.testing.assert_array_equal(arquivo["sdf"], sdf)
+
+    def test_peso_gravado_antes_da_escala_continua_legivel(self) -> None:
+        with tempfile.TemporaryDirectory() as pasta:
+            np.savez_compressed(
+                Path(pasta) / "peso_001.npz",
+                matrix=np.zeros((2, 2, 2), dtype=np.float32),
+                peso_id=1,
+                shape=np.array((2, 2, 2)),
+                origem="antigo.npz",
+                convencao="",
+            )
+
+            self.assertIsNone(load_peso_info(1, Path(pasta))["escala_log"])
+
+
+class CompressaoLogTests(unittest.TestCase):
+    def test_mantem_o_sinal_e_o_zero_da_superficie(self) -> None:
+        sdf = np.array([-48.0, -1.0, 0.0, 1.0, 2.0], dtype=np.float32)
+
+        saida = comprimir_log(sdf, 2.0)
+
+        np.testing.assert_array_equal(np.sign(saida), np.sign(sdf))
+        self.assertEqual(saida[2], 0.0)
+        self.assertTrue(np.all(np.isfinite(saida)))
+
+    def test_valores_conferidos_a_mao(self) -> None:
+        # e - 1 é a distância em que ln(1 + d) vale exatamente 1.
+        sdf = np.array([-(np.e - 1), np.e - 1], dtype=np.float64)
+
+        np.testing.assert_allclose(comprimir_log(sdf, 2.0), [-2.0, 2.0], atol=1e-6)
+
+    def test_ordem_das_distancias_e_preservada(self) -> None:
+        sdf = np.linspace(-60, 3, 200, dtype=np.float32)
+
+        self.assertTrue(np.all(np.diff(comprimir_log(sdf, 2.0)) > 0))
+
+    def test_escala_2_quase_nao_muda_perto_da_superficie_e_alivia_longe(self) -> None:
+        perto = np.array([-1.0, -2.0, -3.0], dtype=np.float32)
+        longe = np.array([-14.0, -48.0], dtype=np.float32)
+
+        np.testing.assert_allclose(comprimir_log(perto, 2.0), perto, atol=0.4)
+        self.assertTrue(np.all(comprimir_log(longe, 2.0) > longe / 2))
+
+    def test_saida_em_float32_como_o_peso_gravado(self) -> None:
+        self.assertEqual(comprimir_log(np.zeros(3, dtype=np.float64), 2.0).dtype, np.float32)
+
+    def test_escala_nao_positiva_falha(self) -> None:
+        for escala in (0, -1.0):
+            with self.assertRaises(ValueError):
+                comprimir_log(np.zeros(3), escala)
 
 
 if __name__ == "__main__":

@@ -16,8 +16,14 @@
 
     Fora da grade conta como água, então voxel cheio na borda da grade é 1.
 
-    uv run python sdf_temp/inundacao.py
+    É uma ferramenta à parte: inundar() e classificar_por_inundacao() servem a
+    qualquer grade booleana, e o SDF (cavegen/tools/sdf) chama as duas para decidir o
+    sinal. O script grava a classificação e o plot de uma grade de superfície
+    (o npz com "surface_voxels"); sem argumento, a do Elaphes 64³.
+
+    uv run python -m cavegen.tools.flood_fill.inundacao [superficie.npz]
 """
+import sys
 from pathlib import Path
 
 import numpy as np
@@ -31,9 +37,14 @@ from cavegen.generators.cellular_automata.plot import (
 )
 
 PASTA = Path(__file__).resolve().parent
-ENTRADA = PASTA / "entrada" / "elaphes_surface_64.npz"
-SAIDA_NPZ = PASTA / "npz" / "elaphes_surface_64_inundacao.npz"
-SAIDA_PLOT = PASTA / "plots" / "elaphes_surface_64_inundacao.html"
+# src/cavegen/tools/flood_fill -> a raiz do projeto fica 4 pastas acima.
+RAIZ_DO_PROJETO = PASTA.parents[3]
+PASTA_NPZ = PASTA / "npz"
+PASTA_PLOTS = PASTA / "plots"
+
+# Grade de superfície do Elaphes, já sem o outlier: a entrada padrão daqui e do SDF.
+SUPERFICIE_ELAPHES = (RAIZ_DO_PROJETO / "data" / "processed" / "references"
+                      / "elaphes_surface_64.npz")
 
 VAZIO = 0
 BORDA = 1
@@ -159,7 +170,11 @@ def figura(classificacao: np.ndarray, titulo: str) -> go.Figure:
     return fig
 
 def main():
-    dados = np.load(ENTRADA)
+    entrada = Path(sys.argv[1]) if len(sys.argv) > 1 else SUPERFICIE_ELAPHES
+    saida_npz = PASTA_NPZ / f"{entrada.stem}_inundacao.npz"
+    saida_plot = PASTA_PLOTS / f"{entrada.stem}_inundacao.html"
+
+    dados = np.load(entrada)
     cheio = dados["surface_voxels"].astype(bool)
 
     agua, buracos_fechados = inundar(cheio)
@@ -169,25 +184,24 @@ def main():
     interno = int((classificacao == INTERNO).sum())
     buracos = int(buracos_fechados.sum())
 
-    SAIDA_NPZ.parent.mkdir(exist_ok=True)
+    PASTA_NPZ.mkdir(exist_ok=True)
     np.savez_compressed(
-        SAIDA_NPZ,
+        saida_npz,
         classificacao=classificacao,
         agua=agua.astype(np.uint8),
         buracos_fechados=buracos_fechados.astype(np.uint8),
         metadata=dados["metadata"],
     )
 
-    largura = cheio.shape[2]
-    titulo = (f"Elaphes {largura}^3 - inundação: {borda} borda, {interno} interno "
+    titulo = (f"{entrada.stem} - inundação: {borda} borda, {interno} interno "
               f"({buracos} deles eram buracos fechados)")
-    SAIDA_PLOT.parent.mkdir(exist_ok=True)
-    figura(classificacao, titulo).write_html(SAIDA_PLOT, include_plotlyjs="cdn")
+    PASTA_PLOTS.mkdir(exist_ok=True)
+    figura(classificacao, titulo).write_html(saida_plot, include_plotlyjs="cdn")
 
     print(f"cheios: {int(cheio.sum())}, água: {int(agua.sum())}, buracos fechados: {buracos}")
     print(f"borda (1): {borda}, interno (2): {interno}")
-    print(f"npz salvo em {SAIDA_NPZ}")
-    print(f"figura salva em {SAIDA_PLOT}")
+    print(f"npz salvo em {saida_npz}")
+    print(f"figura salva em {saida_plot}")
 
 if __name__ == "__main__":
     main()

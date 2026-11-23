@@ -25,7 +25,6 @@ external/3D-Cave-Generation/.../SampleScene.unity    cena com os grafos de waypo
 | pasta | conteúdo | no Git |
 |---|---|---|
 | `configs/random_walk/` | grafo exportado de cada caverna (`example`, `knotlow_cavern`, `upper_long_churns`, `odins_mine`) | sim |
-| `configs/algorithms/random_walk.yaml` | parâmetros padrão do gerador | sim |
 | `external/3D-Cave-Generation/` | cópia do projeto base, sem o `.git` dele; só é necessária para refazer a exportação | não (é de outro autor) |
 | `src/cavegen/generators/random_walk/npz/` | saída das linhas de comando | não (regenerado) |
 | `src/cavegen/generators/random_walk/plots/` | figura de cada etapa e dos resultados do menu | não (regenerado) |

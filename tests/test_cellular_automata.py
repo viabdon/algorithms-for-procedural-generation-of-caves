@@ -22,8 +22,9 @@ from cavegen.generators.cellular_automata.generator import (
     iterate,
     neighbor_counts,
 )
+from cavegen.generators.cellular_automata.seeds import generate_seed_matrix
 
-BORDAS_DETERMINISTICAS = (BorderTreatment.ZEROS, BorderTreatment.ONES)
+BORDAS_DETERMINISTICAS = (BorderTreatment.ZEROS, BorderTreatment.ONES, BorderTreatment.NEAREST)
 
 
 def count_neighbors_em_laco(matrix: np.ndarray, x: int, y: int, z: int,
@@ -43,6 +44,11 @@ def count_neighbors_em_laco(matrix: np.ndarray, x: int, y: int, z: int,
                     neighbors += matrix[current_x, current_y, current_z]
                 elif border_treatment is BorderTreatment.ONES:
                     neighbors += 1
+                elif border_treatment is BorderTreatment.NEAREST:
+                    # Fora da matriz vale a célula de dentro mais próxima.
+                    neighbors += matrix[min(max(current_x, 0), depth - 1),
+                                        min(max(current_y, 0), height - 1),
+                                        min(max(current_z, 0), width - 1)]
 
     return neighbors
 
@@ -95,10 +101,44 @@ class ContagemVetorizadaTests(unittest.TestCase):
             esperado = iterate_em_laco(esperado, 14, BorderTreatment.ZEROS)
             historico_esperado.append(int(esperado.sum()))
 
-        final, historico = cellular_automata(volume, 14, BorderTreatment.ZEROS, 4)
+        final, historico, _, _ = cellular_automata(volume, 14, BorderTreatment.ZEROS, 4)
 
         self.assertTrue(np.array_equal(esperado, final))
         self.assertEqual(historico_esperado, list(historico))
+
+    def test_transicoes_batem_com_a_comparacao_celula_a_celula(self) -> None:
+        volume = volume_aleatorio((12, 12, 12), semente=6)
+        anterior, esperado_1, esperado_0 = volume.copy(), [], []
+        for _ in range(5):
+            seguinte = iterate_em_laco(anterior, 13, BorderTreatment.ONES)
+            esperado_1.append(sum(int(a == 0 and b == 1)
+                                  for a, b in zip(anterior.ravel(), seguinte.ravel())))
+            esperado_0.append(sum(int(a == 1 and b == 0)
+                                  for a, b in zip(anterior.ravel(), seguinte.ravel())))
+            anterior = seguinte
+
+        _, historico, viraram_1, viraram_0 = cellular_automata(volume, 13, BorderTreatment.ONES, 5)
+
+        self.assertEqual(esperado_1, list(viraram_1))
+        self.assertEqual(esperado_0, list(viraram_0))
+        # O saldo das transições de cada iteração é a variação das células vivas.
+        np.testing.assert_array_equal(np.diff(historico), viraram_1 - viraram_0)
+
+    def test_sem_iteracoes_nao_ha_transicoes(self) -> None:
+        volume = volume_aleatorio((6, 6, 6), semente=7)
+
+        final, historico, viraram_1, viraram_0 = cellular_automata(volume, 13, "zeros", 0)
+
+        np.testing.assert_array_equal(final, volume)
+        self.assertEqual(historico.size, 1)
+        self.assertEqual((viraram_1.size, viraram_0.size), (0, 0))
+
+    def test_transicoes_aceitam_seed_booleana(self) -> None:
+        booleano = np.random.default_rng(8).random((8, 8, 8)) < 0.5
+
+        _, historico, viraram_1, viraram_0 = cellular_automata(booleano, 13, "zeros", 3)
+
+        np.testing.assert_array_equal(np.diff(historico), viraram_1 - viraram_0)
 
     def test_contagem_preserva_o_formato_e_respeita_o_maximo(self) -> None:
         volume = np.ones((6, 7, 8), dtype=int)
@@ -117,6 +157,25 @@ class ContagemVetorizadaTests(unittest.TestCase):
         self.assertEqual(27, int(ones[0, 0, 0]))
         self.assertEqual(int(zeros[3, 3, 3]), int(ones[3, 3, 3]))  # miolo nao muda
 
+    def test_borda_nearest_nao_fecha_nem_abre_a_beirada(self) -> None:
+        # Volume uniforme: com NEAREST, a beirada vê o mesmo que o miolo.
+        for valor, esperado in ((1, 27), (0, 0)):
+            volume = np.full((6, 6, 6), valor, dtype=int)
+            somas = neighbor_counts(volume, BorderTreatment.NEAREST)
+            self.assertTrue(np.all(somas == esperado))
+
+    def test_borda_nearest_deixa_o_tunel_atravessar_a_beirada(self) -> None:
+        # Túnel 4x4 que vai de uma face à outra no eixo z. Com ZEROS, a ponta
+        # dele na beirada perde vizinhos e fecha; com NEAREST, continua aberta.
+        volume = np.zeros((10, 10, 10), dtype=int)
+        volume[3:7, 3:7, :] = 1
+
+        zeros = cellular_automata(volume, 14, BorderTreatment.ZEROS, 3)[0]
+        nearest = cellular_automata(volume, 14, BorderTreatment.NEAREST, 3)[0]
+
+        self.assertTrue(np.all(nearest[4:6, 4:6, [0, -1]] == 1))
+        self.assertTrue(np.all(zeros[:, :, [0, -1]] == 0))
+
     def test_borda_random_sorteia_valores_novos_a_cada_chamada(self) -> None:
         # Documenta a limitacao: RANDOM nao e reproduzivel, entao nao entra em
         # comparacao bit a bit nem em varredura que precise repetir a execucao.
@@ -127,6 +186,31 @@ class ContagemVetorizadaTests(unittest.TestCase):
         self.assertFalse(np.array_equal(primeira, segunda))
         # Ainda assim as duas ficam na mesma ordem de grandeza de celulas vivas.
         self.assertAlmostEqual(primeira.mean(), segunda.mean(), delta=0.05)
+
+
+class SementeTests(unittest.TestCase):
+    def test_mesma_semente_da_a_mesma_matriz(self) -> None:
+        # Sem isso o ajuste genético não repete a avaliação de um candidato.
+        primeira = generate_seed_matrix(16, 0.45, seed=7)
+        segunda = generate_seed_matrix(16, 0.45, seed=7)
+
+        np.testing.assert_array_equal(primeira, segunda)
+        self.assertFalse(np.array_equal(primeira, generate_seed_matrix(16, 0.45, seed=8)))
+
+    def test_semente_segue_a_probabilidade(self) -> None:
+        matriz = generate_seed_matrix(32, 0.3, seed=1)
+
+        self.assertEqual(matriz.shape, (32, 32, 32))
+        self.assertEqual(set(np.unique(matriz)), {0, 1})
+        self.assertAlmostEqual(float(matriz.mean()), 0.3, delta=0.01)
+
+    def test_semente_nao_mexe_no_gerador_global(self) -> None:
+        np.random.seed(123)
+        esperado = np.random.rand()
+        np.random.seed(123)
+        generate_seed_matrix(8, 0.5, seed=2)
+
+        self.assertEqual(np.random.rand(), esperado)
 
 
 if __name__ == "__main__":

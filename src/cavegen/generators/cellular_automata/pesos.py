@@ -1,9 +1,11 @@
 """Pesos do CA: matrizes somadas à contagem de vizinhos, como o SDF.
 
 Um peso é uma cópia do SDF guardada ao lado das seeds, com a origem e a
-convenção de sinal anotadas. O SDF original continua onde foi calculado.
+convenção de sinal anotadas. O SDF original continua onde foi calculado. A cópia
+pode ser comprimida com um logaritmo (comprimir_log, de cavegen.sdf.manipulacao),
+para o peso crescer menos à medida que a célula se afasta da superfície.
 
-    uv run python -m cavegen.generators.cellular_automata.pesos [caminho_do_sdf.npz]
+    uv run python -m cavegen.generators.cellular_automata.pesos [caminho_do_sdf.npz] [escala_log]
 """
 import sys
 from pathlib import Path
@@ -11,14 +13,16 @@ from pathlib import Path
 import numpy as np
 
 from cavegen.generators.cellular_automata.storage import build_path, next_id, storage_dir, used_ids
+from cavegen.sdf.manipulacao import comprimir_log
 
 # Pasta onde os pesos do CA sao gravados, ao lado deste arquivo.
 PESOS_DIR = storage_dir("pesos")
 PESO_PREFIX = "peso"
 
 RAIZ_DO_PROJETO = Path(__file__).resolve().parents[4]
-# SDF do Elaphes calculado no sdf_temp: a origem padrão da importação.
-SDF_ELAPHES = RAIZ_DO_PROJETO / "sdf_temp" / "npz" / "elaphes_surface_64_sdf.npz"
+# SDF do Elaphes calculado em cavegen/tools/sdf: a origem padrão da importação.
+SDF_ELAPHES = (RAIZ_DO_PROJETO / "src" / "cavegen" / "tools" / "sdf" / "npz"
+               / "elaphes_surface_64_sdf.npz")
 
 def used_peso_ids(directory: Path = PESOS_DIR) -> set:
     """
@@ -47,11 +51,13 @@ def caminho_legivel(caminho: Path) -> str:
     except ValueError:
         return caminho.as_posix()
 
-def importar_sdf(origem: Path = SDF_ELAPHES, directory: Path = PESOS_DIR) -> Path:
+def importar_sdf(origem: Path = SDF_ELAPHES, directory: Path = PESOS_DIR,
+                 escala_log: float | None = None) -> Path:
     """
         Copia o SDF de um npz para um peso novo e devolve o caminho do arquivo.
-        origem: npz com o campo "sdf" (o de sdf_temp/sdf.py, por padrão).
+        origem: npz com o campo "sdf" (o de cavegen/tools/sdf/sdf.py, por padrão).
         directory: pasta onde os pesos são gravados.
+        escala_log: escala de comprimir_log; None copia o SDF sem transformar.
     """
     directory = Path(directory)
     directory.mkdir(parents=True, exist_ok=True)
@@ -59,6 +65,14 @@ def importar_sdf(origem: Path = SDF_ELAPHES, directory: Path = PESOS_DIR) -> Pat
     with np.load(origem) as arquivo:
         matrix = arquivo["sdf"].astype(np.float32)
         convencao = str(arquivo["convencao"]) if "convencao" in arquivo.files else ""
+
+    # Pesos copiados sem transformar não levam escala_log, como o CA básico não leva peso_id.
+    extras = {}
+    if escala_log is not None:
+        matrix = comprimir_log(matrix, escala_log)
+        extras["escala_log"] = float(escala_log)
+        # A convenção da origem fala em distância, e o peso comprimido não é mais isso.
+        convencao = f"{convencao}; comprimido com {escala_log:g} * sinal(d) * ln(1 + |d|)"
 
     peso_id = next_id(directory, PESO_PREFIX)
     np.savez_compressed(
@@ -68,6 +82,7 @@ def importar_sdf(origem: Path = SDF_ELAPHES, directory: Path = PESOS_DIR) -> Pat
         shape=np.array(matrix.shape),
         origem=caminho_legivel(origem),
         convencao=convencao,
+        **extras,
     )
 
     return peso_path(peso_id, directory)
@@ -84,6 +99,7 @@ def load_peso_info(peso_id: int, directory: Path = PESOS_DIR) -> dict:
             "shape": tuple(int(lado) for lado in arquivo["shape"]),
             "origem": str(arquivo["origem"]),
             "convencao": str(arquivo["convencao"]),
+            "escala_log": float(arquivo["escala_log"]) if "escala_log" in arquivo.files else None,
         }
 
 def load_peso_matrix(peso_id: int, directory: Path = PESOS_DIR) -> np.ndarray:
@@ -97,10 +113,13 @@ def load_peso_matrix(peso_id: int, directory: Path = PESOS_DIR) -> np.ndarray:
 
 def main():
     origem = Path(sys.argv[1]) if len(sys.argv) > 1 else SDF_ELAPHES
-    destino = importar_sdf(origem)
+    escala_log = float(sys.argv[2]) if len(sys.argv) > 2 else None
+    destino = importar_sdf(origem, escala_log=escala_log)
     info = load_peso_info(int(destino.stem[-3:]))
     print(f"peso gravado: {destino}")
     print(f"origem: {info['origem']}, formato {info['shape']}, {info['convencao']}")
+    if escala_log is not None:
+        print(f"comprimido com {escala_log:g} * sinal(d) * ln(1 + |d|)")
 
 if __name__ == "__main__":
     main()
