@@ -1,4 +1,4 @@
-"""Confere o SDF de tools/sdf e as manipulações dele (limiar e logaritmo).
+"""Confere o SDF de cavegen/tools/sdf e as manipulações dele (limiar e logaritmo).
 
     uv run python -m unittest tests/test_sdf.py -v
 """
@@ -14,7 +14,7 @@ from cavegen.generators.cellular_automata.pesos import (
     load_peso_matrix,
 )
 from cavegen.sdf.manipulacao import comprimir_log, deslocar_zero, manipular_sdf
-from tools.sdf.sdf import (
+from cavegen.tools.sdf.sdf import (
     CORTE_NEGATIVO,
     corte_do_campo,
     gravar_campo,

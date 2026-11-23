@@ -236,8 +236,9 @@ class Relatorio(unittest.TestResult):
 def carregar(alvos: list[str]) -> unittest.TestSuite:
     """Suíte inteira, ou só os alvos: caminho (tests/test_x.py) ou nome (test_x.Classe)."""
     carregador = unittest.TestLoader()
-    # As ferramentas de tools/ ficam na raiz, fora do pacote instalado: rodando
-    # "python tests/rodar.py", a raiz não entra sozinha no sys.path.
+    # Rodando "python tests/rodar.py", a raiz não entra sozinha no sys.path. Era
+    # o que fazia os imports de tools/ funcionarem; desde 22/11/2026 as
+    # ferramentas moram em cavegen.tools e a raiz fica só por garantia.
     if str(RAIZ) not in sys.path:
         sys.path.insert(0, str(RAIZ))
     if not alvos:

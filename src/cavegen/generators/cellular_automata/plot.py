@@ -66,7 +66,7 @@ OPACIDADE_MINIMA = 0.25
 # As pontas escuras das paletas sumiriam no fundo, entao ficam de fora das linhas.
 CONTRASTE_MINIMO_LINHA = 3.0
 
-# Peso no estilo do plot do SDF (tools/sdf/sdf.py): a paleta Tropic e a opacidade em
+# Peso no estilo do plot do SDF (cavegen/tools/sdf/sdf.py): a paleta Tropic e a opacidade em
 # rampa, transparente no corte e opaca no valor mais positivo. Longe da superficie
 # nao ha nada para ver, entao o que esta a mais de CORTE_PESO_VOXELS nem entra.
 PALETA_PESO = "Tropic"

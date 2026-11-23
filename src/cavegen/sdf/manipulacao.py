@@ -1,9 +1,10 @@
 """Manipulações de um SDF pronto: deslocar o zero e comprimir com logaritmo.
 
-São transformações do campo, não do gerador: o SDF é calculado em tools/sdf e
-pode ser manipulado antes de virar peso do CA ou alvo do algoritmo genético.
-Ficam no pacote (e não em tools/sdf) porque o CA e o GA também as usam, e o
-pacote não importa de tools/.
+São transformações do campo, não do gerador: o SDF é calculado em
+cavegen/tools/sdf e pode ser manipulado antes de virar peso do CA ou alvo do
+algoritmo genético. Ficam aqui, e não junto do cálculo, porque o CA e o GA
+também as usam; vieram para cá quando a ferramenta do SDF ainda ficava fora
+do pacote (tools/, até 22/11/2026).
 
 As duas só crescem, então a ordem dos voxels não muda. Quando as duas entram,
 a ordem é fixa (manipular_sdf): deslocar e depois comprimir, para o zero

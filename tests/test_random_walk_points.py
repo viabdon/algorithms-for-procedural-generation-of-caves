@@ -1,4 +1,4 @@
-"""Confere as regras do Random Walk com pontos sorteados (tools/random_walk_points).
+"""Confere as regras do Random Walk com pontos sorteados (cavegen/tools/random_walk_points).
 
     uv run python -m unittest tests/test_random_walk_points.py -v
 """
@@ -15,7 +15,7 @@ from cavegen.generators.cellular_automata.pesos import (
 from cavegen.generators.random_walk.voxelizacao import classificar
 from cavegen.metrics.connectivity import connected_components
 from cavegen.sdf.manipulacao import comprimir_log
-from tools.random_walk_points.generator import (
+from cavegen.tools.random_walk_points.generator import (
     DESCIDA,
     INICIAL,
     LIGACAO,
@@ -31,9 +31,9 @@ from tools.random_walk_points.generator import (
     separar_componentes,
     target_mais_proximo,
 )
-from tools.random_walk_points.peso import calcular_sdf, gerar_peso
-from tools.random_walk_points.plot import ETAPAS, figura_progressao
-from tools.random_walk_points.results import (
+from cavegen.tools.random_walk_points.peso import calcular_sdf, gerar_peso
+from cavegen.tools.random_walk_points.plot import ETAPAS, figura_progressao
+from cavegen.tools.random_walk_points.results import (
     load_result,
     load_result_info,
     result_path,

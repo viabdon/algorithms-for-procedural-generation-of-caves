@@ -19,7 +19,7 @@
     com o mínimo de meia diagonal do voxel (√3/2): com ele todo ponto do
     caminho tem um centro de voxel ao alcance e o caminho não se parte.
 
-    Classificação auxiliar, nos mesmos códigos da inundação de tools/flood_fill:
+    Classificação auxiliar, nos mesmos códigos da inundação de cavegen/tools/flood_fill:
     0: fora da caverna (rocha).
     1: borda, vazio que encosta em rocha por alguma face.
     2: interno, vazio que não encosta em rocha.

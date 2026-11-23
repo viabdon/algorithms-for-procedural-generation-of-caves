@@ -17,11 +17,11 @@
     Fora da grade conta como água, então voxel cheio na borda da grade é 1.
 
     É uma ferramenta à parte: inundar() e classificar_por_inundacao() servem a
-    qualquer grade booleana, e o SDF (tools/sdf) chama as duas para decidir o
+    qualquer grade booleana, e o SDF (cavegen/tools/sdf) chama as duas para decidir o
     sinal. O script grava a classificação e o plot de uma grade de superfície
     (o npz com "surface_voxels"); sem argumento, a do Elaphes 64³.
 
-    uv run python -m tools.flood_fill.inundacao [superficie.npz]
+    uv run python -m cavegen.tools.flood_fill.inundacao [superficie.npz]
 """
 import sys
 from pathlib import Path
@@ -37,7 +37,8 @@ from cavegen.generators.cellular_automata.plot import (
 )
 
 PASTA = Path(__file__).resolve().parent
-RAIZ_DO_PROJETO = PASTA.parents[1]
+# src/cavegen/tools/flood_fill -> a raiz do projeto fica 4 pastas acima.
+RAIZ_DO_PROJETO = PASTA.parents[3]
 PASTA_NPZ = PASTA / "npz"
 PASTA_PLOTS = PASTA / "plots"
 

@@ -3,14 +3,14 @@
 Gera a rede de veios com pontos sorteados e plota a progressão das etapas.
 "enter = X" significa que apertar enter sem digitar nada aceita o valor X.
 
-    uv run python -m tools.random_walk_points.menu
+    uv run python -m cavegen.tools.random_walk_points.menu
 """
 import numpy as np
 
 from cavegen.generators.cellular_automata.menu import explicar, perguntar
 from cavegen.generators.random_walk.voxelizacao import BORDA, INTERNO
 from cavegen.metrics.connectivity import connected_components
-from tools.random_walk_points.generator import (
+from cavegen.tools.random_walk_points.generator import (
     DESCIDA,
     K_PADRAO,
     LADO_PADRAO,
@@ -21,8 +21,8 @@ from tools.random_walk_points.generator import (
     VIES_MINIMO,
     WEIGHT_PADRAO,
 )
-from tools.random_walk_points.plot import MODOS, plotar_resultado
-from tools.random_walk_points.results import (
+from cavegen.tools.random_walk_points.plot import MODOS, plotar_resultado
+from cavegen.tools.random_walk_points.results import (
     load_result,
     load_result_info,
     run_and_save,
@@ -215,7 +215,7 @@ def mostrar_menu():
     """
         Imprime as opções disponíveis e o que já existe gravado.
     """
-    print("\n=== Random Walk com pontos sorteados (tools/random_walk_points) ===")
+    print("\n=== Random Walk com pontos sorteados (cavegen/tools/random_walk_points) ===")
     print(f"  {len(used_result_ids())} resultado(s) gravados")
     for numero, (rotulo, _) in OPCOES.items():
         print(f"  {numero}) {rotulo}")

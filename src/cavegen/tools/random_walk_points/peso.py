@@ -1,7 +1,7 @@
 """
     Transforma um resultado voxelizado do experimento em peso do CA.
 
-    Usa as mesmas funções do SDF do Elaphes e do RW do pacote (tools/sdf/sdf.py):
+    Usa as mesmas funções do SDF do Elaphes e do RW do pacote (cavegen/tools/sdf/sdf.py):
     binariza a borda, mede a distância euclidiana exata até ela e volta com o
     sinal (interno positivo, externo negativo, borda 0). Depois entrega o npz ao
     importar_sdf do CA, que grava o peso e, se pedido, comprime com o logaritmo.
@@ -9,7 +9,7 @@
     Como no RW do pacote, aqui o interno é o miolo do túnel, o vazio de verdade
     da caverna, e não a espessura da parede, como no Elaphes.
 
-    uv run python -m tools.random_walk_points.peso <resultado> [escala_log]
+    uv run python -m cavegen.tools.random_walk_points.peso <resultado> [escala_log]
 """
 import sys
 from pathlib import Path
@@ -17,8 +17,14 @@ from pathlib import Path
 import numpy as np
 
 from cavegen.generators.cellular_automata.pesos import PESOS_DIR, importar_sdf, load_peso_info
-from tools.random_walk_points.results import RESULTS_DIR, load_result
-from tools.sdf.sdf import CONVENCAO, INTERNO, aplicar_sinal, binarizar_borda, distancia_ate_borda
+from cavegen.tools.random_walk_points.results import RESULTS_DIR, load_result
+from cavegen.tools.sdf.sdf import (
+    CONVENCAO,
+    INTERNO,
+    aplicar_sinal,
+    binarizar_borda,
+    distancia_ate_borda,
+)
 
 PASTA_NPZ = Path(__file__).resolve().parent / "npz"
 
@@ -63,7 +69,8 @@ def gerar_peso(result_id: int, escala_log: float | None = None, directory: Path 
 
 def main():
     if len(sys.argv) < 2:
-        raise SystemExit("informe o resultado, ex: python -m tools.random_walk_points.peso 1 2")
+        raise SystemExit("informe o resultado, ex: "
+                         "python -m cavegen.tools.random_walk_points.peso 1 2")
 
     escala_log = float(sys.argv[2]) if len(sys.argv) > 2 else None
     destino = gerar_peso(int(sys.argv[1]), escala_log)

@@ -3,7 +3,7 @@
     o manipula de forma reprodutível (limiar e logaritmo).
 
     Etapas do SDF base, na ordem:
-    1. Lê a grade de superfície e chama o flood fill (tools/flood_fill), que
+    1. Lê a grade de superfície e chama o flood fill (cavegen/tools/flood_fill), que
        classifica 0 vazio, 1 borda e 2 interno pelo que a água alcança.
     2. Tira os voxels 2 e binariza: só a borda fica 1. O interno vira 0 junto
        com o lado de fora, mas a máscara dele é guardada para o passo 4.
@@ -44,22 +44,24 @@
 
     Sem superfície, usa a grade do Elaphes 64³.
 
-    uv run python -m tools.sdf.sdf [superficie.npz] [--limiar -4] [--log 2]
+    uv run python -m cavegen.tools.sdf.sdf [superficie.npz] [--limiar -4] [--log 2]
 """
 import argparse
+import hashlib
 from pathlib import Path
 
 import numpy as np
 import plotly.graph_objects as go
 from scipy.ndimage import distance_transform_edt
 
+from cavegen.generators.cellular_automata.pesos import caminho_legivel
 from cavegen.generators.cellular_automata.plot import (
     caixa_wireframe,
     camera_isometrica,
     gizmo_eixos,
 )
 from cavegen.sdf.manipulacao import manipular_sdf
-from tools.flood_fill.inundacao import (
+from cavegen.tools.flood_fill.inundacao import (
     BORDA,
     INTERNO,
     SUPERFICIE_ELAPHES,
@@ -74,6 +76,10 @@ PASTA_PLOTS = PASTA / "plots"
 # 1: interno positivo e externo negativo. -1 inverte para a convenção do projeto.
 SINAL_INTERNO = 1
 CONVENCAO = "interno positivo, externo negativo, borda 0; distância em voxels"
+# Versão do cálculo (inundação, distância, sinal e as manipulações de
+# cavegen.sdf.manipulacao), gravada em todo npz. Suba quando qualquer um mudar:
+# o pipeline do GA refaz os campos de versão antiga, e só por ela sabe da mudança.
+VERSAO_SDF = 1
 
 # Distância, do lado de fora da borda, em que a opacidade chega a 0: o que está
 # além disso não é plotado.
@@ -152,7 +158,9 @@ def gravar_campo(entrada: Path, limiar: float = 0.0, escala_log: float | None = 
                  pasta: Path = PASTA_NPZ) -> Path:
     """
         Calcula o SDF base da superfície, manipula e grava; devolve o caminho.
-        O campo vai no campo "sdf", que é o que o importar_sdf do CA lê.
+        O campo vai no campo "sdf", que é o que o importar_sdf do CA lê. Junto
+        vão a grade de origem (entrada e sha256_entrada) e a versao do cálculo,
+        para saber depois de onde e de que versão o campo veio.
         entrada: npz com "surface_voxels" e "metadata".
         limiar, escala_log: os de manipular_sdf.
         pasta: onde o npz é gravado.
@@ -164,6 +172,7 @@ def gravar_campo(entrada: Path, limiar: float = 0.0, escala_log: float | None = 
     with np.load(entrada) as dados:
         cheio = dados["surface_voxels"].astype(bool)
         metadata = dados["metadata"]
+    sha256_entrada = hashlib.sha256(entrada.read_bytes()).hexdigest()
 
     sdf, borda, interno = sdf_da_superficie(cheio)
     extras = {} if escala_log is None else {"escala_log": float(escala_log)}
@@ -179,6 +188,9 @@ def gravar_campo(entrada: Path, limiar: float = 0.0, escala_log: float | None = 
         convencao=convencao_do_campo(limiar, escala_log),
         limiar=float(limiar),
         metadata=metadata,
+        entrada=caminho_legivel(entrada),
+        sha256_entrada=sha256_entrada,
+        versao=VERSAO_SDF,
         **extras,
     )
     return destino

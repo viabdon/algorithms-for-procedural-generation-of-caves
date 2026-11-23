@@ -1,8 +1,8 @@
-# tools/sdf — SDF manipulável
+# cavegen/tools/sdf — SDF manipulável
 
 Calcula o SDF de uma grade de superfície; sem argumento, a do Elaphes. O sinal
 vem do flood fill, que é uma ferramenta à parte
-([`tools/flood_fill`](../flood_fill/README.md)): o `sdf.py` chama a inundação
+([`cavegen/tools/flood_fill`](../flood_fill/README.md)): o `sdf.py` chama a inundação
 direto da grade e grava só o SDF e o plot dele. Depois, o SDF pode ser
 manipulado (limiar e logaritmo, ver a etapa 3) para virar peso do CA ou
 pontuação de um algoritmo genético, sempre com a manipulação gravada no npz.
@@ -10,7 +10,7 @@ pontuação de um algoritmo genético, sempre com a manipulação gravada no npz
 ```
 data/processed/references/elaphes_surface_64.npz   grade 64³ (depth, height, width), 1 = superfície observada
   -> sdf.py [--limiar L] [--log E]
-       1. tools/flood_fill: 0 vazio, 1 borda, 2 interno
+       1. cavegen/tools/flood_fill: 0 vazio, 1 borda, 2 interno
        2. tira o 2, binariza a borda, mede a distância
        3. devolve o sinal: interno +, externo -               (SDF base)
        4. desloca o zero para d = L, depois comprime com o log (opcional)
@@ -24,7 +24,7 @@ carregam o Plotly pela internet, então precisa estar online.
 
 | pasta | conteúdo | no git |
 |---|---|---|
-| `../../data/processed/references/` | npz base do Elaphes (entrada) | não (vem do PLY em `data/raw`) |
+| `../../../../data/processed/references/` | npz base do Elaphes (entrada) | não (vem do PLY em `data/raw`) |
 | `npz/` | o SDF | não (regenerado) |
 | `plots/` | figura do SDF | não (regenerado) |
 | `articles/` | artigos de base (EDT e FEED) | não (PDFs das editoras) |
@@ -41,7 +41,7 @@ histórico do git (commit `d20feaf`, `sdf_temp/remover_outlier.py`).
 ### 1. Inundação (flood fill)
 
 Separa borda e interno pela conectividade com o lado de fora da grade. Fica em
-[`tools/flood_fill`](../flood_fill/README.md), com a metodologia, os
+[`cavegen/tools/flood_fill`](../flood_fill/README.md), com a metodologia, os
 resultados, as limitações e a comparação com as abordagens descartadas.
 
 ### 2. SDF
@@ -98,7 +98,7 @@ entra no plot: dos 262.144 voxels, ficam 28.321. Cada nível distinto do SDF
 vira um trace (o plotly só aceita uma opacidade por trace); no Elaphes são 89
 níveis.
 
-- [elaphes_surface_64_sdf.html](file:///C:/Users/Felipe%20Cruz/Desktop/CESUPA/TCC/code/algorithms-for-procedural-generation-of-caves/tools/sdf/plots/elaphes_surface_64_sdf.html)
+- [elaphes_surface_64_sdf.html](file:///C:/Users/Felipe%20Cruz/Desktop/CESUPA/TCC/code/algorithms-for-procedural-generation-of-caves/src/cavegen/tools/sdf/plots/elaphes_surface_64_sdf.html)
 
 A EDT do scipy entra por enquanto. A implementação do artigo do Fuseiller
 (`articles/`) pode substituir `distancia_ate_borda()`: qualquer EDT exata dá o
@@ -131,11 +131,12 @@ aplica duas transformações, **sempre nesta ordem**, sem recalcular a distânci
    isso a conta usa `|x|` e devolve o sinal no fim; e **vai a menos infinito
    em x = 0** (a borda), por isso o `1 +`, que leva a borda a `ln(1) = 0`. A
    tabela com os valores reais do Elaphes (escala 1, sem limiar) está no
-   [README do GA](../../src/cavegen/optimization/genetic/README.md#2-o-log-por-que-sinald--ln1--d).
+   [README do GA](../../generators/cellular_automata/genetico/README.md#2-o-log-por-que-sinald--ln1--d).
 
 As duas transformações ficam em `src/cavegen/sdf/manipulacao.py`, porque são
-do SDF e o CA (peso) e o GA (peso e alvo) também as usam; o pacote não
-importa de `tools/`, então este script importa de lá.
+do SDF e o CA (peso) e o GA (peso e alvo) também as usam. Elas foram para lá
+quando esta ferramenta ainda ficava fora do pacote; desde 22/11/2026 ela mora
+em `src/cavegen/tools/sdf/` e importa de lá do mesmo jeito.
 
 **A ordem importa: primeiro o limiar, depois o log.** O log leva 0 em 0, então
 o zero que o limiar pôs em `d = L` continua lá depois do log. Na ordem
@@ -180,20 +181,20 @@ A voxelização devolve o outlier: zere o índice (60, 31, 13) da grade
 Depois, o SDF (a inundação roda dentro dele):
 
 ```
-uv run python -m tools.sdf.sdf [superficie.npz]                       # SDF base
-uv run python -m tools.sdf.sdf [superficie.npz] --log 1               # o campo do GA (peso e alvo)
-uv run python -m tools.sdf.sdf [superficie.npz] --limiar -4            # zero a 4 voxels para fora
-uv run python -m tools.sdf.sdf [superficie.npz] --limiar -4 --log 2    # e depois o log × 2
+uv run python -m cavegen.tools.sdf.sdf [superficie.npz]                       # SDF base
+uv run python -m cavegen.tools.sdf.sdf [superficie.npz] --log 1               # o campo do GA (peso e alvo)
+uv run python -m cavegen.tools.sdf.sdf [superficie.npz] --limiar -4            # zero a 4 voxels para fora
+uv run python -m cavegen.tools.sdf.sdf [superficie.npz] --limiar -4 --log 2    # e depois o log × 2
 ```
 
 O campo do GA de outra caverna sai da grade de superfície dela, por exemplo
-`uv run python -m tools.sdf.sdf indian_tunnel_temp/npz/indian_tunnel_surface_64.npz --log 1`,
+`uv run python -m cavegen.tools.sdf.sdf indian_tunnel_temp/npz/indian_tunnel_surface_64.npz --log 1`,
 que grava `npz/indian_tunnel_surface_64_sdf_log1.npz` (265 voxels positivos).
 
 Cada combinação grava um npz e um plot com o nome dela, e o SDF base continua
 com o mesmo nome de antes (`elaphes_surface_64_sdf.npz`), que é o peso padrão
 do CA. Um campo manipulado entra no CA como qualquer SDF:
-`uv run python -m cavegen.generators.cellular_automata.pesos tools/sdf/npz/<campo>.npz`
+`uv run python -m cavegen.generators.cellular_automata.pesos cavegen/tools/sdf/npz/<campo>.npz`
 (sem passar outra escala de log, para não comprimir duas vezes).
 
-O plot da inundação sozinha sai com `uv run python -m tools.flood_fill.inundacao`.
+O plot da inundação sozinha sai com `uv run python -m cavegen.tools.flood_fill.inundacao`.

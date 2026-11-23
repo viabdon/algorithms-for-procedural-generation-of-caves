@@ -1,10 +1,10 @@
-# tools/flood_fill — borda e interno por inundação
+# cavegen/tools/flood_fill — borda e interno por inundação
 
 Ferramenta à parte: separa os voxels de uma grade em borda e interno pela
 conectividade com o lado de fora da grade, em vez de pela contagem de
 vizinhos. As funções (`inundar`, `classificar_por_inundacao`) servem a
 qualquer grade booleana `(depth, height, width)`. O SDF
-([`tools/sdf`](../sdf/README.md)) chama as duas para decidir o sinal, e o
+([`cavegen/tools/sdf`](../sdf/README.md)) chama as duas para decidir o sinal, e o
 Indian Tunnel também.
 
 O script grava a classificação e o plot de uma grade de superfície. Sem
@@ -14,7 +14,7 @@ argumento, a entrada é a do Elaphes, `data/processed/references/elaphes_surface
 O link abre no navegador (cole na barra de endereço). A figura carrega o Plotly
 pela internet, então precisa estar online.
 
-- [elaphes_surface_64_inundacao.html](file:///C:/Users/Felipe%20Cruz/Desktop/CESUPA/TCC/code/algorithms-for-procedural-generation-of-caves/tools/flood_fill/plots/elaphes_surface_64_inundacao.html)
+- [elaphes_surface_64_inundacao.html](file:///C:/Users/Felipe%20Cruz/Desktop/CESUPA/TCC/code/algorithms-for-procedural-generation-of-caves/src/cavegen/tools/flood_fill/plots/elaphes_surface_64_inundacao.html)
 
 ## O problema que motivou
 
@@ -147,7 +147,7 @@ Formas de contornar sem consertar os dados na mão:
 
 Um SDF precisa do sinal: dentro ou fora. A inundação é uma forma clássica de
 decidir esse sinal (o que a água alcança é fora). A distância vem depois, em
-`tools/sdf/sdf.py`, que chama `inundar` e `classificar_por_inundacao` direto
+`cavegen/tools/sdf/sdf.py`, que chama `inundar` e `classificar_por_inundacao` direto
 da grade de superfície, sem precisar do npz gravado aqui.
 
 ## Arquivos
@@ -167,7 +167,7 @@ caixa wireframe, o gizmo e a câmera do plot do CA
 Da raiz do projeto (sem argumento, o Elaphes 64³):
 
 ```
-uv run python -m tools.flood_fill.inundacao [superficie.npz]
+uv run python -m cavegen.tools.flood_fill.inundacao [superficie.npz]
 ```
 
 ## Referências
