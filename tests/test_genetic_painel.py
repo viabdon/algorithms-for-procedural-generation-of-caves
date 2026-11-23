@@ -3,19 +3,20 @@
     uv run python -m unittest tests/test_genetic_painel.py -v
 """
 import io
+import math
 import re
 import unittest
 from unittest import mock
 
-from cavegen.optimization.genetic.algoritmo import (
+from cavegen.generators.cellular_automata.genetico.algoritmo import (
     Avaliacao,
     ConfiguracaoGA,
     Gene,
     busca_aleatoria,
     evoluir,
 )
-from cavegen.optimization.genetic.aptidao import NOTA_MINIMA
-from cavegen.optimization.genetic.painel import Estilo, Painel
+from cavegen.generators.cellular_automata.genetico.aptidao import NOTA_MINIMA
+from cavegen.generators.cellular_automata.genetico.painel import Estilo, Painel, descrever_vazio
 
 GENES = (Gene("x", 0.0, 1.0), Gene("n", 1, 20, inteiro=True))
 
@@ -122,7 +123,7 @@ def melhores_falsos(nota_min=0.5):
              "nota_reservada_media": 0.62,
              "reservadas": reservadas(pior=nota_min if i == 4 else 0.5)} for i in range(1, 6)]
 
-ATIVAR_ANSI = "cavegen.optimization.genetic.painel._ativar_ansi"
+ATIVAR_ANSI = "cavegen.generators.cellular_automata.genetico.painel._ativar_ansi"
 
 class EstiloTests(unittest.TestCase):
     def test_fora_do_terminal_sai_texto_puro(self):
@@ -226,9 +227,37 @@ class EstiloTests(unittest.TestCase):
                        aviso="grade 32³, fora do protocolo de 64³")
         linhas = saida.getvalue().splitlines()
         self.assertEqual(linhas[1].strip(), "grade 64x64x64, campo de -4.16 a +1.10, 292 voxels "
-                         "positivos; vazio aceito de 146 a 1460; cópia pura +1.000")
-        self.assertEqual(len(linhas), 5)
-        self.assertIn("fora do protocolo", linhas[4])
+                         "positivos; vazio aceito de 146 a 1460")
+        self.assertEqual(linhas[2].strip(), "cópia pura +1.000")
+        self.assertEqual(len(linhas), 7)
+        self.assertIn("fora do protocolo", linhas[6])
+
+    def test_caverna_sem_limite_de_cima_e_com_a_grade_cheia(self):
+        saida = io.StringIO()
+        Painel(10, saida=saida).caverna("e", "e.npz", (64, 64, 64), -4.16, 1.1, 292,
+                                        (146.0, math.inf), 1.0, cheia=-4033.246)
+        linhas = saida.getvalue().splitlines()
+        self.assertTrue(linhas[1].strip().endswith("292 voxels positivos; vazio aceito a partir "
+                                                   "de 146"), linhas[1])
+        self.assertEqual(linhas[2].strip(), "cópia pura +1.000, grade cheia -4033.246")
+        self.assertEqual(descrever_vazio(146.0, None), "vazio aceito a partir de 146")
+        self.assertEqual(descrever_vazio(146.0, 1460.0), "vazio aceito de 146 a 1460")
+
+    def test_tabela_dos_melhores_alinha_com_notas_de_milhares(self):
+        saida = io.StringIO()
+        item = {"posicao": 1, "genes": {"g": 0.5}, "iteracoes": 1, "nota_ajuste": -4033.246,
+                "nota_reservada_media": -4045.606,
+                "ajuste": {"min": -4045.606, "max": -4020.886, "desvio": 12.36,
+                           "por_caverna": {"a": -4045.606, "b": -4020.886}},
+                "reservadas": {"pior_semente": -4045.606}}
+        outro = {**item, "posicao": 2, "nota_ajuste": 0.5, "nota_reservada_media": 0.4,
+                 "ajuste": {"min": 0.4, "max": 0.6, "desvio": 0.1,
+                            "por_caverna": {"a": 0.4, "b": 0.6}},
+                 "reservadas": {"pior_semente": 0.3}}
+        Painel(10, saida=saida).tabela_melhores([item, outro], ["g"], ["a", "b"], 5, 10)
+        linhas = saida.getvalue().splitlines()[-3:]
+        # Cabeçalho e linhas com o mesmo comprimento: nenhuma coluna estourou.
+        self.assertEqual(len({len(linha.rstrip()) for linha in linhas}), 1, linhas)
 
 if __name__ == "__main__":
     unittest.main()

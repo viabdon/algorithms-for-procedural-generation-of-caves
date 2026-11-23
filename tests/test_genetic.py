@@ -14,8 +14,8 @@ from unittest import mock
 
 import numpy as np
 
-from cavegen.optimization.genetic import ca as modulo_ca
-from cavegen.optimization.genetic.algoritmo import (
+from cavegen.generators.cellular_automata.genetico import ca as modulo_ca
+from cavegen.generators.cellular_automata.genetico.algoritmo import (
     ConfiguracaoGA,
     Gene,
     busca_aleatoria,
@@ -23,7 +23,7 @@ from cavegen.optimization.genetic.algoritmo import (
     evoluir,
     mutar,
 )
-from cavegen.optimization.genetic.aptidao import (
+from cavegen.generators.cellular_automata.genetico.aptidao import (
     NOTA_MINIMA,
     Alvo,
     Cortes,
@@ -32,7 +32,7 @@ from cavegen.optimization.genetic.aptidao import (
     resumo_entre_cavernas,
     situacao_do_vazio,
 )
-from cavegen.optimization.genetic.ca import (
+from cavegen.generators.cellular_automata.genetico.ca import (
     GENES_CA,
     MAX_ITERACOES,
     AvaliadorCA,
@@ -73,13 +73,13 @@ def campo_esfera(raio: float = 5.0, lado: int = 16) -> np.ndarray:
 
 def gravar_campo(caminho: Path, campo: np.ndarray, limiar: float = 0.0,
                  escala_log: float | None = 1.0) -> Path:
-    """Grava um npz no formato do tools/sdf."""
+    """Grava um npz no formato do cavegen/tools/sdf."""
     extras = {} if escala_log is None else {"escala_log": escala_log}
     np.savez_compressed(caminho, sdf=campo, convencao=np.array("teste"), limiar=limiar, **extras)
     return caminho
 
 def rodar_main(*argv: str) -> Path:
-    from cavegen.optimization.genetic import executar
+    from cavegen.generators.cellular_automata.genetico import busca as executar
 
     # Sem gravar na planilha real do track_resources.
     with (mock.patch("cavegen.profiling.resource_tracker.registrar_execucao"),
@@ -91,7 +91,7 @@ def erro_do_main(*argv: str) -> str:
     erro = io.StringIO()
     with (contextlib.redirect_stderr(erro), contextlib.redirect_stdout(io.StringIO()),
           mock.patch("cavegen.profiling.resource_tracker.registrar_execucao")):
-        from cavegen.optimization.genetic import executar
+        from cavegen.generators.cellular_automata.genetico import busca as executar
         try:
             executar.main(list(argv))
         except SystemExit as saida:
@@ -273,28 +273,38 @@ class AptidaoTests(unittest.TestCase):
 
     def test_cortes_so_tem_a_faixa_de_vazio(self):
         # A parada por convergência saiu junto com a parada antecipada.
-        self.assertEqual(Cortes().como_dict(), {"fator_minimo": 0.5, "fator_maximo": 5.0})
+        # Desde 22/11/2026 só o mínimo vale por padrão: o máximo é None.
+        self.assertEqual(Cortes().como_dict(), {"fator_minimo": 0.5, "fator_maximo": None})
+        self.assertEqual(Cortes(0.5, 5.0).como_dict(), {"fator_minimo": 0.5, "fator_maximo": 5.0})
         with self.assertRaises(TypeError):
             Cortes(fracao_convergencia=1e-4)
-        for fatores in ((0.0, 5.0), (1.0, 5.0), (0.5, 1.0), (0.5, 0.4)):
+        for fatores in ((0.0, 5.0), (1.0, 5.0), (0.5, 1.0), (0.5, 0.4), (0.0, None), (1.0, None)):
             with self.assertRaises(ValueError):
                 Cortes(*fatores)
 
     def test_situacao_do_vazio(self):
-        alvo = Alvo(np.ones((10, 10, 10)))  # referência 1000: faixa [500, 5000] de vazio
+        alvo = Alvo(np.ones((10, 10, 10)))  # referência 1000: vazio aceito a partir de 500
         cortes = Cortes()
-        self.assertEqual(alvo.faixa(cortes), (500.0, 5000.0))
+        self.assertEqual(alvo.faixa(cortes), (500.0, math.inf))
         self.assertEqual(situacao_do_vazio(499, alvo, cortes), "vazio_de_menos")
         self.assertEqual(situacao_do_vazio(500, alvo, cortes), "na_faixa")
-        self.assertEqual(situacao_do_vazio(5000, alvo, cortes), "na_faixa")
-        self.assertEqual(situacao_do_vazio(5001, alvo, cortes), "vazio_demais")
+        self.assertEqual(situacao_do_vazio(10**9, alvo, cortes), "na_faixa")
+        # O limite de cima ainda existe quando pedido (as execuções antigas o usavam).
+        com_teto = Cortes(0.5, 5.0)
+        self.assertEqual(alvo.faixa(com_teto), (500.0, 5000.0))
+        self.assertEqual(situacao_do_vazio(5000, alvo, com_teto), "na_faixa")
+        self.assertEqual(situacao_do_vazio(5001, alvo, com_teto), "vazio_demais")
 
     def test_nota_do_passo_corta_fora_da_faixa(self):
         alvo = Alvo(np.pad(np.ones((2, 2, 2)), 1, constant_values=-1))  # referência 8
         vazio = np.zeros(alvo.shape, dtype=bool)
         vazio[1:3, 1:3, 1:3] = True
         self.assertEqual(nota_do_passo(vazio, alvo, Cortes()), 1.0)
-        self.assertEqual(nota_do_passo(np.ones(alvo.shape, bool), alvo, Cortes()), NOTA_MINIMA)
+        # Encher a grade não é mais cortado: a nota já pune, e fica a da grade cheia.
+        cheia = np.ones(alvo.shape, bool)
+        self.assertEqual(nota_do_passo(cheia, alvo, Cortes()), alvo.nota_da_grade_cheia())
+        self.assertEqual(alvo.nota_da_grade_cheia(), (8 - 56) / 8)
+        self.assertEqual(nota_do_passo(cheia, alvo, Cortes(0.5, 5.0)), NOTA_MINIMA)
         vazio[:] = False
         vazio[1, 1, 1] = True  # 1 < 0,5 x 8
         self.assertEqual(nota_do_passo(vazio, alvo, Cortes()), NOTA_MINIMA)
@@ -392,16 +402,30 @@ class AvaliadorCATests(unittest.TestCase):
         self.assertFalse(hasattr(t, "parada") or hasattr(t, "motivo"))
 
     def test_a_penalizacao_continua_sem_a_parada(self):
-        # Encher ou esvaziar a grade inteira nunca vira candidato bem avaliado.
+        # Esvaziar a grade é cortado pelo mínimo; encher não é cortado. O ENCHE
+        # enche já no passo 1, então todo passo vale a grade cheia, abaixo de
+        # qualquer candidato razoável (quem enche aos poucos leva o passo 1: ver
+        # test_genetico_faixa_revisor).
         avaliador = AvaliadorCA([self.a], (1, 2, 3, 4, 5), max_iteracoes=15)
-        for genes, fim in ((ENCHE, "vazio_demais"), (MORRE, "vazio_de_menos")):
-            with self.subTest(genes=genes):
-                nota, detalhes = avaliador(genes)
-                self.assertEqual(nota, NOTA_MINIMA)
-                self.assertEqual(detalhes["cavernas"]["a"]["fim"], [fim] * 5)
-                for t in avaliador.trajetorias(genes)["a"]:
-                    self.assertTrue(np.all(t.notas == NOTA_MINIMA))
-                    self.assertEqual(len(t.vazios), 15)
+        nota, detalhes = avaliador(MORRE)
+        self.assertEqual(nota, NOTA_MINIMA)
+        self.assertEqual(detalhes["cavernas"]["a"]["fim"], ["vazio_de_menos"] * 5)
+        for t in avaliador.trajetorias(MORRE)["a"]:
+            self.assertTrue(np.all(t.notas == NOTA_MINIMA))
+            self.assertEqual(len(t.vazios), 15)
+        nota, detalhes = avaliador(ENCHE)
+        self.assertEqual(detalhes["cavernas"]["a"]["fim"], ["na_faixa"] * 5)
+        self.assertTrue(np.isfinite(nota))
+        self.assertLess(nota, -1)
+        self.assertLess(nota, avaliador(BONS)[0])
+        for t in avaliador.trajetorias(ENCHE)["a"]:
+            self.assertEqual(t.notas[-1], self.a.alvo.nota_da_grade_cheia())
+        # Com o limite de cima pedido, encher volta a ser cortado.
+        com_teto = AvaliadorCA([self.a], (1, 2, 3, 4, 5), max_iteracoes=15,
+                               cortes=Cortes(0.5, 5.0))
+        nota, detalhes = com_teto(ENCHE)
+        self.assertEqual(nota, NOTA_MINIMA)
+        self.assertEqual(detalhes["cavernas"]["a"]["fim"], ["vazio_demais"] * 5)
         # E a lista dos melhores nunca traz um cortado.
         busca = busca_aleatoria(GENES_CA, avaliador, 25, seed=0)
         self.assertTrue(all(np.isfinite(a.nota) for a in busca.melhores(25)))
@@ -435,14 +459,18 @@ class AvaliadorCATests(unittest.TestCase):
     def test_caverna_cortada_corta_o_candidato_mesmo_com_media_alta_nas_outras(self):
         sozinha, _ = AvaliadorCA([self.a], (1, 2), max_iteracoes=12)(BONS)
         self.assertGreater(sozinha, 0)
-        # Esfera minúscula: a faixa vira poucos voxels e o CA sempre passa dela.
+        # Esfera minúscula: com o limite de cima, a faixa vira poucos voxels e o
+        # CA sempre passa dela. O que se testa é a agregação: uma caverna
+        # cortada corta o candidato.
         minuscula = Caverna("minuscula", campo_esfera(1.0))
-        nota, detalhes = AvaliadorCA([self.a, minuscula], (1, 2), max_iteracoes=12)(BONS)
+        nota, detalhes = AvaliadorCA([self.a, minuscula], (1, 2), max_iteracoes=12,
+                                     cortes=Cortes(0.5, 5.0))(BONS)
         self.assertEqual(nota, NOTA_MINIMA)
         self.assertEqual(detalhes["entre_cavernas"]["min"], NOTA_MINIMA)
 
     def test_faixa_de_vazio_e_de_cada_caverna(self):
-        cortes = Cortes()
+        self.assertEqual(self.a.alvo.faixa(Cortes()), (0.5 * self.a.alvo.referencia, math.inf))
+        cortes = Cortes(0.5, 5.0)
         self.assertEqual(self.a.alvo.faixa(cortes), (0.5 * self.a.alvo.referencia,
                                                      5.0 * self.a.alvo.referencia))
         self.assertNotEqual(self.a.alvo.faixa(cortes), self.b.alvo.faixa(cortes))
@@ -536,7 +564,7 @@ class ExecutarTests(unittest.TestCase):
             self.assertEqual(json.loads(str(r["modo_peso"])), "completo")
             self.assertEqual(json.loads(str(r["sementes_ajuste"])), [1, 2, 3, 4, 5])
             self.assertEqual(json.loads(str(r["cortes"])),
-                             {"fator_minimo": 0.5, "fator_maximo": 5.0})
+                             {"fator_minimo": 0.5, "fator_maximo": None})
             cavernas = json.loads(str(r["cavernas"]))
             self.assertEqual([c["nome"] for c in cavernas], ["esfera"])
             self.assertTrue(cavernas[0]["origem"].endswith("esfera_sdf_log1.npz"))
@@ -545,7 +573,11 @@ class ExecutarTests(unittest.TestCase):
             self.assertEqual((cavernas[0]["limiar"], cavernas[0]["escala_log"]), (0.0, 1.0))
             referencia = int((campo_esfera(5.0) > 0).sum())
             self.assertEqual(cavernas[0]["referencia_alvo"], referencia)
-            self.assertEqual(cavernas[0]["faixa_vazio"], [0.5 * referencia, 5.0 * referencia])
+            # Sem limite de cima, o máximo vai como null (o JSON não tem inf).
+            self.assertEqual(cavernas[0]["faixa_vazio"], [0.5 * referencia, None])
+            self.assertEqual(cavernas[0]["nota_grade_cheia"],
+                             Alvo(campo_esfera(5.0)).nota_da_grade_cheia())
+            self.assertLess(cavernas[0]["nota_grade_cheia"], 0)
             detalhes = json.loads(str(r["detalhes"]))
             self.assertEqual(len(detalhes), 6)
             vazios = detalhes[0]["cavernas"]["esfera"]["vazios"]
@@ -571,7 +603,8 @@ class ExecutarTests(unittest.TestCase):
             criterio = json.loads(str(r["criterio_ranking"]))
         self.assertEqual([c["nome"] for c in cavernas], ["esfera", "maior"])
         # A faixa é de cada caverna, relativa ao alvo dela.
-        self.assertLess(cavernas[0]["faixa_vazio"][1], cavernas[1]["faixa_vazio"][1])
+        self.assertLess(cavernas[0]["faixa_vazio"][0], cavernas[1]["faixa_vazio"][0])
+        self.assertEqual([c["faixa_vazio"][1] for c in cavernas], [None, None])
         self.assertEqual(copias, {"esfera": 1.0, "maior": 1.0})
         self.assertIn("média", criterio)
         self.assertGreater(len(melhores), 0)
@@ -595,7 +628,7 @@ class ExecutarTests(unittest.TestCase):
             self.assertEqual(refeito["por_caverna"], ajuste["por_caverna"])
 
     def test_top_limita_a_lista_e_cada_item_se_reproduz(self):
-        from cavegen.optimization.genetic import executar
+        from cavegen.generators.cellular_automata.genetico import busca as executar
 
         destino = rodar_main("--metodo", "aleatoria", "--orcamento", "20", "--populacao", "3",
                              "--top", "3", "--cavernas", str(self.esfera), "--saida", self.saida)
@@ -630,7 +663,8 @@ class ExecutarTests(unittest.TestCase):
             with self.subTest(caminho=caminho.name):
                 mensagem = erro_do_main("--cavernas", str(caminho), "--saida", self.saida)
                 self.assertIn(trecho, mensagem)
-                self.assertIn("--log 1", mensagem)
+                self.assertIn("log x1 e sem limiar", mensagem)
+                self.assertIn("genetico.campos", mensagem)  # o comando da etapa 2
 
     def test_caverna_nao_cubica_falha_dizendo_qual(self):
         torta = gravar_campo(self.pasta / "torta_sdf_log1.npz",
@@ -641,33 +675,34 @@ class ExecutarTests(unittest.TestCase):
     def test_caverna_que_falta_ou_repetida(self):
         mensagem = erro_do_main("--cavernas", str(self.pasta / "nada_sdf_log1.npz"))
         self.assertIn("não existe", mensagem)
-        self.assertIn("tools.sdf.sdf", mensagem)
+        self.assertIn("genetico.campos", mensagem)
         mensagem = erro_do_main("--cavernas", str(self.esfera), str(self.esfera))
         self.assertIn("repetida", mensagem)
 
     def test_nomes_e_caminhos_das_cavernas(self):
-        from cavegen.optimization.genetic import executar
+        from cavegen.generators.cellular_automata.genetico import campos
 
-        self.assertEqual(executar.CAVERNAS_PADRAO, ("elaphes",))
-        self.assertEqual(executar.caminho_da_caverna("elaphes"), executar.CAMPO_ELAPHES)
-        self.assertEqual(executar.CAMPO_ELAPHES.name, "elaphes_surface_64_sdf_log1.npz")
-        self.assertEqual(executar.caminho_da_caverna("indian_tunnel").name,
-                         "indian_tunnel_surface_64_sdf_log1.npz")
-        self.assertEqual(executar.nome_da_caverna(executar.CAMPO_ELAPHES), "elaphes")
-        self.assertEqual(executar.nome_da_caverna(Path("x/elaphes_surface_32_pablo_sdf_log1.npz")),
+        grade = Path("1_entrada/elaphes_surface_64.npz")
+        campo = campos.caminho_do_campo(grade, Path("2_campos"))
+        self.assertEqual(campo, Path("2_campos/elaphes_surface_64_sdf_log1.npz"))
+        self.assertEqual(campos.nome_da_caverna(grade), "elaphes")
+        self.assertEqual(campos.nome_da_caverna(campo), "elaphes")
+        self.assertEqual(campos.nome_da_caverna(Path("x/indian_tunnel_surface_64.npz")),
+                         "indian_tunnel")
+        self.assertEqual(campos.nome_da_caverna(Path("x/elaphes_surface_32_pablo_sdf_log1.npz")),
                          "elaphes_surface_32_pablo")
-        caminho = self.pasta / "qualquer.npz"
-        self.assertEqual(executar.caminho_da_caverna(str(caminho)), caminho)
 
-    def test_campo_padrao_e_o_sdf_com_log_1_sem_limiar(self):
-        from cavegen.optimization.genetic import executar
+    def test_campo_do_ga_e_o_sdf_com_log_1_sem_limiar(self):
+        from cavegen.generators.cellular_automata.genetico import busca as executar
+        from cavegen.generators.cellular_automata.genetico import campos
 
-        self.assertIn("--log 1", executar.COMANDO_ELAPHES)
-        self.assertNotIn("--limiar", executar.COMANDO_ELAPHES)
-        self.assertFalse(hasattr(executar, "ALVO_ELAPHES"))
+        self.assertEqual((campos.LIMIAR, campos.ESCALA_LOG), (0.0, 1.0))
+        self.assertEqual(campos.SUFIXO_CAMPO, "_sdf_log1")
+        for antigo in ("ALVO_ELAPHES", "CAMPO_ELAPHES", "CAVERNAS_PADRAO", "NPZ_SDF"):
+            self.assertFalse(hasattr(executar, antigo), antigo)
 
     def test_seeds_de_ajuste_sao_5_e_as_reservadas_10_sem_nenhuma_em_comum(self):
-        from cavegen.optimization.genetic import executar
+        from cavegen.generators.cellular_automata.genetico import busca as executar
 
         self.assertEqual(executar.SEMENTES_AJUSTE, (1, 2, 3, 4, 5))
         self.assertEqual(len(executar.SEMENTES_RESERVADAS), 10)

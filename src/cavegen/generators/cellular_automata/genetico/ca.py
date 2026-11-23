@@ -32,9 +32,8 @@ from dataclasses import dataclass
 import numpy as np
 
 from cavegen.generators.cellular_automata.generator import BorderTreatment, ModoPeso, iterate
-from cavegen.generators.cellular_automata.seeds import generate_seed_matrix
-from cavegen.optimization.genetic.algoritmo import Gene
-from cavegen.optimization.genetic.aptidao import (
+from cavegen.generators.cellular_automata.genetico.algoritmo import Gene
+from cavegen.generators.cellular_automata.genetico.aptidao import (
     NOTA_MINIMA,
     Alvo,
     Cortes,
@@ -42,6 +41,7 @@ from cavegen.optimization.genetic.aptidao import (
     resumo_entre_cavernas,
     situacao_do_vazio,
 )
+from cavegen.generators.cellular_automata.seeds import generate_seed_matrix
 
 GENES_CA = (
     Gene("chance_inicial", 0.2, 0.8, passo=0.02),
@@ -191,6 +191,9 @@ class AvaliadorCA:
             # vazio e viraram_1 + viraram_0 são as mudanças, então os dois saem
             # destas listas.
             "cavernas": {nome: {"notas_por_semente": [float(t.notas[melhor]) for t in ts],
+                                # Média das sementes em cada passo, de onde sai a
+                                # escolha da iteração: a curva da nota no CA.
+                                "notas_por_passo": por_caverna[nome].tolist(),
                                 "fim": [t.fim for t in ts],
                                 "vazios": [t.vazios for t in ts],
                                 "mudancas": [t.mudancas for t in ts]}

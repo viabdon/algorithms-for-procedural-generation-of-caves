@@ -34,6 +34,12 @@ def formatar_genes(genes: dict) -> str:
     return " ".join(f"{nome}={valor:.4g}" if isinstance(valor, float) else f"{nome}={valor}"
                     for nome, valor in genes.items())
 
+def descrever_vazio(minimo: float, maximo: float | None) -> str:
+    """A faixa de vazio aceita em texto; maximo None ou inf = sem limite de cima."""
+    if maximo is None or not math.isfinite(maximo):
+        return f"vazio aceito a partir de {minimo:.0f}"
+    return f"vazio aceito de {minimo:.0f} a {maximo:.0f}"
+
 def formatar_nota(nota: float) -> str:
     return f"{nota:+.3f}" if math.isfinite(nota) else "cortado"
 
@@ -171,18 +177,22 @@ class Painel:
 
     def caverna(self, nome: str, origem: str, forma: tuple, campo_min: float, campo_max: float,
                 positivos: int, faixa: tuple[float, float], copia: float,
-                aviso: str | None = None):
+                aviso: str | None = None, cheia: float | None = None):
         """
             Duas linhas da etapa de carga: de onde veio o campo da caverna, a
-            grade, os voxels positivos do alvo, a faixa de vazio aceita e a
-            cópia pura. aviso: uma terceira linha, em amarelo, se vier.
+            grade, os voxels positivos do alvo, a faixa de vazio aceita, a
+            cópia pura (a nota máxima, 1) e a grade cheia (a régua das notas
+            negativas). aviso: uma terceira linha, em amarelo, se vier.
         """
         e = self.estilo
         grade = "x".join(str(lado) for lado in forma)
         self.escrever(f"  {e.pintar(nome, NEGRITO)}  {origem}")
         self.escrever(f"      grade {grade}, campo de {campo_min:+.2f} a {campo_max:+.2f}, "
-                      f"{positivos} voxels positivos; vazio aceito de {faixa[0]:.0f} a "
-                      f"{faixa[1]:.0f}; cópia pura {e.nota(copia)}")
+                      f"{positivos} voxels positivos; {descrever_vazio(*faixa)}")
+        regua = f"      cópia pura {e.nota(copia)}"
+        if cheia is not None:
+            regua += f", grade cheia {e.nota(cheia)}"
+        self.escrever(regua)
         if aviso:
             self.escrever("      " + e.icone("⚠️") + e.pintar(aviso, AMARELO))
 
@@ -231,7 +241,9 @@ class Painel:
         e = self.estilo
         notas = np.array([a.nota for a in grupo])
         validas = notas[np.isfinite(notas)]
-        media = e.nota(float(validas.mean())) if validas.size else "  -   "
+        # Mediana, não média: as notas vão de 1 a cerca de -4000, e um candidato
+        # que enche a grade puxaria a média da geração inteira para lá.
+        mediana = e.nota(float(np.median(validas))) if validas.size else "  -   "
         tempo = time.perf_counter() - self.inicio_bloco
         largura = len(str(self.orcamento))
         if validas.size == len(grupo):
@@ -246,7 +258,7 @@ class Painel:
             f"{self.avaliados:>{largura}}/{self.orcamento} | {e.icone('🏆')}melhor "
             f"{e.nota(self.melhor.nota, NEGRITO)} ({formatar_genes(self.melhor.genes)}) | "
             f"{e.icone('✅')}válidos {e.pintar(f'{validas.size}/{len(grupo)}', cor_validos)} | "
-            f"{e.icone('📊')}média {media} | {e.icone('⏱')}{tempo:.1f} s{recorde}")
+            f"{e.icone('📊')}mediana {mediana} | {e.icone('⏱')}{tempo:.1f} s{recorde}")
         self.melhor_no_resumo = self.melhor.nota
         self.inicio_bloco = time.perf_counter()
         self.lote = []
@@ -316,6 +328,12 @@ class Painel:
         colunas += [("reservadas", 10, lambda item: item["nota_reservada_media"], False,
                      (NEGRITO,)),
                     ("pior seed", 9, lambda item: item["reservadas"]["pior_semente"], False, ())]
+        # A nota vai de 1 a cerca de -4000: cada coluna cresce até caber o seu
+        # maior número, para a tabela não desalinhar.
+        colunas = [(titulo, max(largura, *(len(formatar_desvio(valor(item)) if desvio
+                                               else formatar_nota(valor(item)))
+                                           for item in lista)), valor, desvio, codigos)
+                   for titulo, largura, valor, desvio, codigos in colunas]
 
         # Com emoji, a medalha ocupa a coluna do número nos 3 primeiros (2 de largura + espaço).
         self.escrever(e.pintar(f"{'#':>3} " + " ".join(f"{n:>15}" for n in genes)
@@ -342,15 +360,20 @@ class Painel:
         # Alinha pelo texto visível: os códigos de cor não aparecem na tela.
         return " " * max(largura - len(formatar_nota(nota)), 0) + self.estilo.nota(nota, *codigos)
 
-    def referencias(self, copias: dict[str, float], destino: str):
+    def referencias(self, copias: dict[str, float], destino: str,
+                    cheias: dict[str, float] | None = None):
         """
             A nota de referência de cada caverna e onde o resultado foi gravado.
             copias: nota da cópia pura (peso > 0 vira vazio, sem rodar o CA) por
                     caverna; com o alvo igual ao peso, ela é 1.
+            cheias: nota da grade toda vazia por caverna, a régua das negativas.
         """
         e = self.estilo
         self.escrever()
         notas = ", ".join(f"{nome} {e.nota(nota)}" for nome, nota in copias.items())
         self.escrever(f"{e.icone('📊')}referência: cópia pura (peso > 0 vira vazio, sem rodar "
                       f"o CA): {notas}")
+        if cheias:
+            notas = ", ".join(f"{nome} {e.nota(nota)}" for nome, nota in cheias.items())
+            self.escrever(f"   grade cheia (tudo vazio): {notas}")
         self.escrever(f"{e.icone('📁')}gravado em {e.pintar(destino, CIANO)}")

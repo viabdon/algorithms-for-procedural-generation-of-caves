@@ -1,12 +1,12 @@
-# optimization/genetic — ajuste genético do CA guiado por SDF
+# cellular_automata/genetico — ajuste genético do CA guiado por SDF
 
 Procura os hiperparâmetros do Cellular Automata guiado por SDF que fazem a
-caverna gerada cair em cima do campo de uma ou mais cavernas reais
-voxelizadas (por padrão, só o Elaphes 64³). O algoritmo genético (GA) propõe
-as combinações, o CA gera uma caverna para cada uma, em cada caverna real, e
-uma nota diz o quanto cada caverna gerada acertou o campo daquela caverna.
-**No fim ele devolve a lista dos melhores parâmetros com as notas** (os 10
-primeiros, por padrão).
+caverna gerada cair em cima do campo de cavernas reais voxelizadas (todas as
+que estiverem em `1_entrada/`). O algoritmo genético (GA) propõe as
+combinações, o CA gera uma caverna para cada uma, em cada caverna real, e uma
+nota diz o quanto cada caverna gerada acertou o campo daquela caverna. **No
+fim ele devolve a lista dos melhores parâmetros com as notas** (os 10
+primeiros, por padrão), num arquivo de texto e num relatório com figuras.
 
 Existe também uma **busca aleatória** (`--metodo aleatoria`, ou
 `uv run poe busca-aleatoria`). Ela **não é um algoritmo genético**: só sorteia
@@ -15,35 +15,79 @@ avaliador, sem seleção, cruzamento nem mutação. Serve de controle: se o GA
 não achar notas melhores que o sorteio, a seleção e a herança não estão
 ajudando.
 
+O GA é só do CA: até 22/11/2026 ele morava em `src/cavegen/optimization/genetic/`
+como um módulo genérico de otimização, e agora mora na área do CA.
+
+## O pipeline
+
+Cada etapa lê a pasta da anterior e escreve na seguinte:
+
 ```
-SDF da caverna com ln(1 + |d|) ──┬──> peso do CA ──┐
-  (um campo por caverna)         │                 ├─> CA (sempre 40 passos) ─> caverna gerada
-semente (chance_inicial, seed) ──┼─────────────────┘                                │
-                                 └──> alvo da nota <────────────────────────────────┘
-                                          │
-              nota em cada caverna ─> média entre as cavernas ─> GA escolhe os próximos
+1_entrada/      as grades de superfície das cavernas reais, 64³ (você põe aqui)
+    │  etapa 2, campos.py: o SDF de cada grade, com ln(1 + |d|), escala 1, sem limiar
+2_campos/       um campo por caverna: o peso que guia o CA e o alvo que dá a nota
+    │  etapa 3, busca.py: o GA (ou a busca aleatória) roda o CA nos campos
+    │  etapa 4, resultados.py: a lista legível e as figuras
+3_resultados/   ga_NNN.npz (tudo), ga_NNN_melhores.md (lista) e ga_NNN_relatorio.html (figuras)
 ```
 
+```bash
+uv run poe ga                                   # o fluxo inteiro, com todas as cavernas da entrada
+uv run poe ga --cavernas elaphes --orcamento 40 # só uma caverna, orçamento pequeno
+uv run poe ga-campos [--forcar]                 # só a etapa 2
+uv run poe ga-busca [--cavernas ...]            # só a etapa 3 (os campos precisam estar em dia)
+uv run poe ga-resultados [ga_012]               # só a etapa 4 (padrão: a última execução)
+```
+
+- **Entrada** (`1_entrada/`): um `.npz` por caverna, com `surface_voxels`
+  (1 = parede observada) e `metadata`, no formato da voxelização do projeto.
+  O nome da caverna é o do arquivo sem `_surface_64` (`elaphes_surface_64.npz`
+  vira `elaphes`). Para pôr outra caverna, basta copiar a grade dela para cá.
+  Hoje há duas, **copiadas** de onde a voxelização as grava
+  (`data/processed/references/elaphes_surface_64.npz` e
+  `indian_tunnel_temp/npz/indian_tunnel_surface_64.npz`): são arquivos de 2 KB,
+  fora do Git, e os originais continuam sendo a entrada padrão das ferramentas
+  de SDF e do Indian Tunnel. O sha256 de cada grade fica gravado no campo e no
+  resultado, então a origem não se perde.
+- **Campos** (`2_campos/`): a etapa 2 chama a ferramenta do SDF
+  (`cavegen.tools.sdf.sdf.gravar_campo`, a mesma de sempre, sem nada
+  reimplementado). Um campo é **refeito** quando falta, quando a grade da
+  entrada mudou (o sha256 dela, gravado no campo, não bate) ou quando a versão
+  do cálculo do SDF (`VERSAO_SDF`) mudou; senão é **reaproveitado**.
+  `--forcar` refaz todos.
+- **Busca**: sem `--cavernas`, usa todas as cavernas da entrada; com
+  `--cavernas elaphes indian_tunnel`, só essas. Rodada sozinha, ela recusa um
+  campo que falte ou esteja desatualizado e diz para rodar a etapa 2.
+- **Resultados** (`3_resultados/`): ver "Os resultados", abaixo.
+
+As três pastas ficam no Git só com um `.gitkeep`: as grades são dados, os
+campos são regenerados e os resultados são execuções.
+
 > **Execuções antigas não são comparáveis.** `ga_001` a `ga_010`, em
-> `results/`, usaram o alvo antigo (SDF do Elaphes com limiar −3 e log, 5.201
-> voxels positivos, vazio aceito de 2.600,5 a 26.005), 3 seeds de ajuste,
+> `3_resultados/`, usaram o alvo antigo (SDF do Elaphes com limiar −3 e log,
+> 5.201 voxels positivos, vazio aceito de 2.600,5 a 26.005), 3 seeds de ajuste,
 > parada antecipada e só o Elaphes. A partir de 22/11/2026 o alvo é o próprio
 > campo do peso, as seeds de ajuste são 5, o CA roda sempre as 40 iterações e
 > pode haver várias cavernas (ver `docs/methodology-adjustments.md`). As
 > notas antigas e novas medem coisas diferentes e não devem ser postas lado a
-> lado. Os arquivos antigos ficam como estão, também com os campos antigos
-> (`peso`, `alvo`, `nota_teto_trivial`...).
+> lado. Os arquivos antigos ficam como estão, com os campos antigos (`peso`,
+> `alvo`, `nota_teto_trivial`...), e a etapa 4 recusa esse formato dizendo por
+> quê. `ga_011` já é do formato novo, mas foi gravado antes da nota por passo
+> (a figura da trajetória dele mostra só o vazio).
 
 ## Arquivos
 
 | arquivo | o que tem |
 |---|---|
+| `pipeline.py` | o fluxo inteiro: etapa 2, etapa 3 e etapa 4, em sequência |
+| `campos.py` | etapa 2: as cavernas da entrada, o campo de cada uma e quando refazê-lo |
+| `busca.py` | etapa 3: carrega os campos, roda a busca, confere nas seeds reservadas, grava o npz |
+| `resultados.py` | etapa 4: lê o npz, grava a lista legível e o relatório, imprime o resumo |
+| `figuras.py` | as figuras em Plotly, a partir do npz, sem depender de interface |
 | `algoritmo.py` | motor genérico do GA e a busca aleatória de controle; não conhece o CA |
 | `aptidao.py` | a nota (`Alvo`), a faixa de vazio aceita (`Cortes`), a cópia pura e o resumo entre cavernas |
 | `ca.py` | o cromossomo do CA (`GENES_CA`), a caverna (`Caverna`) e o avaliador que roda o CA nas cavernas e seeds |
-| `executar.py` | linha de comando: carrega as cavernas, roda a busca, confere nas seeds reservadas, grava o resultado |
 | `painel.py` | mostra o andamento no terminal (etapas, gerações, candidato atual, ranking) |
-| `results/` | um `ga_NNN.npz` por execução (fora do Git) |
 
 O motor (`algoritmo.py`) recebe só uma lista de genes e uma função de
 avaliação; o que é específico do CA fica em `ca.py`.
@@ -134,10 +178,10 @@ iterações; não são o mesmo espaço de busca das seguintes.**
 
 O SDF (*signed distance field*) dá a cada voxel a sua distância até a
 superfície da caverna, com um sinal que diz de que lado ele está. A
-ferramenta [`tools/sdf`](../../../../tools/sdf/README.md) faz isso em três
+ferramenta [`cavegen/tools/sdf`](../../../tools/sdf/README.md) faz isso em três
 passos, a partir da grade de superfície voxelizada (1 = parede observada):
 
-1. **Inundação** ([`tools/flood_fill`](../../../../tools/flood_fill/README.md)):
+1. **Inundação** ([`cavegen/tools/flood_fill`](../../../tools/flood_fill/README.md)):
    a água entra pela beirada da grade e se espalha pelos voxels que não são
    parede. O que ela alcança é **externo**; a parede é a **borda**; o que não
    é parede e a água não alcança é **interno**.
@@ -180,7 +224,7 @@ Mas `ln(d)` sozinho não serve, por dois motivos:
 O resultado, `sinal(d) · ln(1 + |d|)`, mantém o zero na borda, o sinal de
 cada lado e a ordem dos voxels (quem estava mais longe continua mais longe),
 só que comprimida. Valores reais do Elaphes 64³, escala 1, sem limiar
-(`tools/sdf/npz/elaphes_surface_64_sdf_log1.npz`):
+(`2_campos/elaphes_surface_64_sdf_log1.npz`):
 
 | região | d (voxels) | `sinal(d) · ln(1 + \|d\|)` | voxels com esse d |
 |---|---|---|---|
@@ -204,7 +248,7 @@ vizinhos ainda decidem.
 
 A ferramenta do SDF também desloca o zero (limiar) antes do log; o GA **não
 usa** o limiar desde 22/11/2026. A ordem limiar → log e o que acontece na
-ordem inversa estão no [README do `tools/sdf`](../../../../tools/sdf/README.md#3-manipulação-limiar-e-log).
+ordem inversa estão no [README do `cavegen/tools/sdf`](../../../tools/sdf/README.md#3-manipulação-limiar-e-log).
 
 ### 3. A nota de uma caverna
 
@@ -216,7 +260,10 @@ nota = soma(alvo nos voxels vazios) / soma(alvo onde ele é positivo)
   soma o valor do alvo em cada um. Vazio no interno soma (+0,69 a +1,10),
   vazio na borda não muda nada (0), vazio no externo **desconta** (−0,69 a
   −4,16). Sem o desconto, encher a grade inteira acertaria todo o interno e
-  ganharia a nota máxima; com ele, encher a grade do Elaphes dá −4.033.
+  ganharia a nota máxima; com ele, encher a grade do Elaphes dá −4.033
+  (quatro mil; −4.045,6 no Indian Tunnel). Esse valor fica gravado em cada
+  execução (`nota_grade_cheia`) e sai no painel, como régua das notas
+  negativas.
 - **O denominador** é o máximo que o numerador pode alcançar: vazio em todo
   voxel positivo e em nenhum negativo. No Elaphes ele vale 210,35 (a soma
   dos 292 internos); no Indian Tunnel, 191,63.
@@ -224,7 +271,9 @@ nota = soma(alvo nos voxels vazios) / soma(alvo onde ele é positivo)
   melhor que dá para fazer é somar todos os positivos sem descontar nada.
   Dividir um pelo outro dá 1 nesse caso, 0 com a grade toda rocha (nenhum
   vazio, nada somado) e um número negativo quando o vazio fora pesa mais que
-  o de dentro. Não há piso: a nota pode ser muito negativa.
+  o de dentro. O piso é o vazio só no externo, 1 abaixo da grade cheia
+  (−4.034,2 no Elaphes): a nota pode ser muito negativa, e as notas de uma
+  execução vão de perto de +1 a perto de −4.000.
 - **Por que a nota sai "quebrada"** (0,543 e não 10 mil pontos): ela é a
   **fração do máximo possível**. 0,543 quer dizer que a caverna gerada somou
   54,3% do que a caverna perfeita somaria, já descontado o vazio fora. A
@@ -235,35 +284,40 @@ nota = soma(alvo nos voxels vazios) / soma(alvo onde ele é positivo)
 - Um exemplo de equilíbrio: no Elaphes, um voxel vazio em d = −1 (−0,69)
   cancela exatamente um voxel vazio em d = +1 (+0,69).
 
-### 4. A faixa de vazio aceita
+### 4. O vazio mínimo aceito
 
-Antes da nota, o vazio total da caverna gerada precisa estar numa faixa
-relativa ao **número de voxels positivos do alvo** (não à grade):
+Antes da nota, o vazio total da caverna gerada precisa passar de um mínimo
+relativo ao **número de voxels positivos do alvo** (não à grade):
 
 ```
-0,5 × positivos ≤ vazio ≤ 5 × positivos      (Cortes: fator_minimo, fator_maximo)
+vazio ≥ 0,5 × positivos      (Cortes: fator_minimo; fator_maximo = None)
 ```
 
-Fora dela, a nota daquele passo é `-inf` (`NOTA_MINIMA`), que nunca vence.
+Abaixo dele, a nota daquele passo é `-inf` (`NOTA_MINIMA`), que nunca vence.
 
 | caverna | voxels positivos | vazio aceito |
 |---|---|---|
-| Elaphes 64³ | 292 | de 146 a 1.460 |
-| Indian Tunnel 64³ | 265 | de 132,5 a 1.325 |
+| Elaphes 64³ | 292 | a partir de 146 |
+| Indian Tunnel 64³ | 265 | a partir de 132,5 |
 
 Por que existe: sem o mínimo, uma grade toda rocha (nota 0) venceria qualquer
-caverna que escavasse um pouco fora da forma (nota negativa). Sem o máximo,
-nada impediria cavernas muito maiores que a forma de competir. A caverna
-perfeita (interno + borda: 292 + 783 = 1.075 voxels no Elaphes) cabe na
-faixa. A faixa **não interrompe o CA**: ele roda as 40 iterações e a faixa só
-decide a nota de cada passo.
+caverna que escavasse um pouco fora da forma (nota negativa). O mínimo **não
+interrompe o CA**: ele roda as 40 iterações e o mínimo só decide a nota de
+cada passo.
 
-> **Atenção (22/11/2026).** Com o alvo sem limiar, a faixa encolheu de
-> 2.600,5–26.005 para 146–1.460 voxels no Elaphes (de 1%–10% para
-> 0,06%–0,56% da grade). Na execução curta de validação, a maior parte dos
-> candidatos foi cortada: eles enchem a grade ou morrem, e só passam pela
-> faixa de forma transitória. Rever os fatores ou as faixas dos genes é
-> decisão pendente do Felipe.
+**Até 22/11/2026 havia também um máximo** (5 × positivos: 1.460 voxels no
+Elaphes). Ele saiu por decisão do Felipe: com o alvo igual ao peso, a própria
+nota já pune o excesso de vazio (encher a grade dá −4.033), e o máximo
+transformava a maioria dos candidatos em `-inf`, sem direção para a seleção.
+Na validação curta com ele (orçamento 40), só 5 de 31 candidatos tinham nota;
+sem ele, na mesma execução, 23 de 29. `Cortes(0.5, 5.0)` ainda reproduz a
+regra antiga, e as execuções gravadas com ela continuam legíveis (o
+`faixa_vazio` delas tem os dois limites; o das novas tem `null` no máximo).
+
+Com o máximo fora, as notas ficam em escalas muito diferentes (de +1 a cerca
+de −4.000). O painel e a lista dos melhores mostram a nota de verdade, com as
+colunas largas o bastante; as figuras usam uma escala log simétrica (ver
+[Os resultados](#os-resultados)).
 
 **Até 22/11/2026 havia parada antecipada**: o CA parava antes das 40
 iterações se o vazio estivesse acima do máximo sem diminuir, abaixo do mínimo
@@ -273,8 +327,13 @@ tempo não importa, e é melhor que a nota de cada passo venha da grade de
 verdade. A parada por convergência também saiu: com o corte em 0,01% (26
 células em 64³), ela repetia a nota do passo em que parou mesmo quando ainda
 mudavam algumas células, e sem ela o código fica mais simples. A
-penalização continua igual: encher ou esvaziar a grade inteira dá `-inf` em
-todo passo.
+penalização continuou igual, e esvaziar a grade inteira dá `-inf` em todo
+passo. Encher a grade, desde a saída do máximo, não é mais cortado: o passo
+cheio vale a nota da grade cheia, mas como a iteração escolhida é a de maior
+nota (seção 5), um candidato que enche aos poucos leva a nota do passo menos
+cheio, quase sempre o 1. Na validação (`ga_013`), 18 dos 23 candidatos com
+nota escolheram a iteração 1: 13 deles terminam a iteração 40 com mais de
+100 mil voxels de vazio (de 262 mil), e os outros morrem.
 
 ### 5. Seeds, média e escolha da iteração
 
@@ -314,7 +373,7 @@ bit fora da busca.
 
 ### 6. Várias cavernas: média, mínimo, máximo e desvio
 
-Com `--cavernas`, o mesmo candidato é avaliado em todas as cavernas. Cada
+O mesmo candidato é avaliado em todas as cavernas da busca. Cada
 uma tem o seu campo (peso e alvo) e a sua faixa de vazio, relativa aos
 positivos dela: cavernas de tamanhos diferentes têm faixas diferentes. Na
 iteração escolhida, o resumo entre as cavernas é:
@@ -329,7 +388,7 @@ Por que mostrar mais que a média: uma média alta pode esconder uma caverna
 que encaixa perfeitamente e puxa a média para cima, enquanto as outras ficam
 medianas. O objetivo é qualidade proporcional entre as cavernas.
 
-**Não é teste de generalização.** Todas as cavernas de `--cavernas` entram na
+**Não é teste de generalização.** Todas as cavernas escolhidas entram na
 busca, e a conferência nas seeds reservadas usa as mesmas cavernas (só o
 ruído inicial muda). O resultado mede robustez entre as cavernas da busca;
 para dizer que os parâmetros generalizam para outra caverna, ela teria de
@@ -348,29 +407,30 @@ tinha o melhor passo do Elaphes na iteração 23 (+0,172); com o Indian Tunnel
 junto, a iteração escolhida virou a 19, onde o Elaphes vale −0,972.
 
 **O que a caverna precisa ter.** O arquivo tem que ser o SDF com log de
-escala 1 e sem limiar, como o `tools/sdf` grava; outro limiar ou outro log
+escala 1 e sem limiar, como a etapa 2 grava; outro limiar ou outro log
 param a execução dizendo qual caverna. O SDF precisa de pelo menos um voxel
 positivo (senão a nota dividiria por zero), e a grade precisa ser cúbica
 (a semente do CA é um cubo); nos dois casos o erro diz qual caverna e por
 quê. A mesma caverna duas vezes também é recusada, mesmo com outro nome
-(mesmo sha256), porque pesaria em dobro na média. Uma grade cúbica de outro lado (32³, por exemplo) roda, mas o painel
+(mesmo sha256), porque pesaria em dobro na média. Uma grade cúbica de
+outro lado (32³, por exemplo) roda, mas o painel
 avisa: o protocolo é 64³, e um voxel de 32³ é duas vezes maior por lado,
 então a mesma sensibilidade não quer dizer a mesma coisa nas duas.
 
 **Grades de superfície que já existem no projeto** (22/11/2026):
 
-| caverna | grade | onde | SDF com log 1 |
+| caverna | grade | de onde veio | no GA |
 |---|---|---|---|
-| Elaphes | 64³, 1.049 voxels de superfície | `data/processed/references/elaphes_surface_64.npz` | `tools/sdf/npz/elaphes_surface_64_sdf_log1.npz` |
-| Indian Tunnel (NASA) | 64³, 1.145 voxels de superfície | `indian_tunnel_temp/npz/indian_tunnel_surface_64.npz` | `tools/sdf/npz/indian_tunnel_surface_64_sdf_log1.npz` |
-| Elaphes (do Pablo) | 32³, 245 voxels de superfície | `data/processed/references/elaphes_surface_32_pablo.npz` | não gerado: é a mesma caverna em outra resolução |
+| Elaphes | 64³, 1.049 voxels de superfície | `data/processed/references/elaphes_surface_64.npz` | copiada para `1_entrada/` |
+| Indian Tunnel (NASA) | 64³, 1.145 voxels de superfície | `indian_tunnel_temp/npz/indian_tunnel_surface_64.npz` | copiada para `1_entrada/` |
+| Elaphes (do Pablo) | 32³, 245 voxels de superfície | `data/processed/references/elaphes_surface_32_pablo.npz` | fora: é a mesma caverna em outra resolução |
 
 No Indian Tunnel, o interno tem 265 voxels, dos quais 98 são buracos fechados
 do oco do túnel (o túnel tem só 6 voxels de altura e o teto encosta no chão
 em partes; ver `indian_tunnel_temp/README.md`).
 
-Para pôr outra caverna: gere o SDF da grade de superfície dela com a
-ferramenta do SDF e passe o nome (ou o caminho) em `--cavernas`.
+Para pôr outra caverna: copie a grade de superfície dela para `1_entrada/`;
+na próxima execução o pipeline gera o campo e a inclui.
 
 ### 7. Por que o alvo é o mesmo campo do peso
 
@@ -403,52 +463,55 @@ cópia pura e saiu.
 
 ## Como usar
 
-O campo de cada caverna é gerado uma vez com a ferramenta do SDF. Se algum
-faltar, o `executar.py` para e diz o comando.
-
 ```bash
-uv run python -m tools.sdf.sdf --log 1                                    # Elaphes
-uv run python -m tools.sdf.sdf indian_tunnel_temp/npz/indian_tunnel_surface_64.npz --log 1
-```
-
-Depois, pelo atalho do Poe (as opções da tabela abaixo vão direto depois do
-nome):
-
-```bash
-uv run poe ga                                      # GA, orçamento 400, só o Elaphes
-uv run poe ga --cavernas elaphes indian_tunnel     # GA nas duas cavernas
+uv run poe ga                                      # GA, orçamento 400, todas as cavernas da entrada
+uv run poe ga --cavernas elaphes                   # só o Elaphes
 uv run poe ga --orcamento 200 --seed 2 --top 5
-uv run poe busca-aleatoria --orcamento 200         # controle, não é GA
+uv run poe busca-aleatoria --orcamento 200         # o mesmo fluxo com a busca de controle (não é GA)
 ```
 
-O atalho só chama `python -m cavegen.optimization.genetic.executar`, que
-também pode ser rodado direto.
-
-O terminal mostra as quatro etapas enquanto roda (execução curta de
-validação, 22/11/2026):
+O atalho chama `python -m cavegen.generators.cellular_automata.genetico.pipeline`,
+que também pode ser rodado direto. O terminal mostra a etapa 2 (o que foi
+gerado ou reaproveitado), as quatro partes da busca e onde ficaram os
+relatórios (execução curta de validação, 22/11/2026):
 
 ```
+== Etapa 2: campos (SDF com log x1, sem limiar) ==
+  elaphes: reaproveitado (elaphes_surface_64_sdf_log1.npz)
+  indian_tunnel: reaproveitado (indian_tunnel_surface_64_sdf_log1.npz)
+
+== Etapa 3: busca ==
+
 [1/4] Carregando as cavernas (o campo de cada uma é o peso e o alvo dela)
-  elaphes  tools/sdf/npz/elaphes_surface_64_sdf_log1.npz
-      grade 64x64x64, campo de -4.16 a +1.10, 292 voxels positivos; vazio aceito de 146 a 1460; cópia pura +1.000
-  indian_tunnel  tools/sdf/npz/indian_tunnel_surface_64_sdf_log1.npz
-      grade 64x64x64, campo de -3.89 a +1.10, 265 voxels positivos; vazio aceito de 132 a 1325; cópia pura +1.000
+  elaphes  src/cavegen/generators/cellular_automata/genetico/2_campos/elaphes_surface_64_sdf_log1.npz
+      grade 64x64x64, campo de -4.16 a +1.10, 292 voxels positivos; vazio aceito a partir de 146
+      cópia pura +1.000, grade cheia -4033.246
+  indian_tunnel  src/cavegen/generators/cellular_automata/genetico/2_campos/indian_tunnel_surface_64_sdf_log1.npz
+      grade 64x64x64, campo de -3.89 a +1.10, 265 voxels positivos; vazio aceito a partir de 132
+      cópia pura +1.000, grade cheia -4045.606
   genes chance_inicial [0.2, 0.8, de 0.02 em 0.02], sensibilidade [1, 20]
   seeds de ajuste [1, 2, 3, 4, 5]; reservadas 101 a 110 (10 seeds); 40 iterações sempre
 
 [2/4] Busca genética: 40 candidatos, população 20, elite 2, seed 0
-  geração   0 | 20/40 | melhor -0.073 (chance_inicial=0.5 sensibilidade=13) | válidos 3/20 | média -3.098 | 123.1 s
-  candidato 23/40 · geração 1 · chance_inicial=0.68 sensibilidade=13 -> cortado (no fim: vazio_demais) · melhor -0.073
+  geração   0 | 20/40 | melhor -0.073 (chance_inicial=0.5 sensibilidade=13) | válidos 15/20 | mediana -2848.781 | 123.9 s
+  candidato 23/40 · geração 1 · chance_inicial=0.68 sensibilidade=13 -> -1243.096 · melhor -0.073
 
 [3/4] Conferindo os 10 melhores nas 10 seeds reservadas, em 2 caverna(s)
    3/5 chance_inicial=0.66 sensibilidade=15: ajuste -0.577, reservadas -0.249 (elaphes -0.345, indian_tunnel -0.153), pior seed -2.184
 
 [4/4] Gravando o resultado
+(... a tabela dos melhores ...)
+
+== Etapa 4: resultados ==
+  lista dos melhores  src/cavegen/generators/cellular_automata/genetico/3_resultados/ga_013_melhores.md
+  relatório           src/cavegen/generators/cellular_automata/genetico/3_resultados/ga_013_relatorio.html  (abra no navegador)
 ```
 
 - **geração**: uma linha por geração completa, com a melhor nota vista até
-  ali, quantos da população não foram cortados, a média deles e o tempo da
-  geração. Na busca aleatória, que não tem gerações, a linha sai a cada lote
+  ali, quantos da população não foram cortados, a mediana deles e o tempo da
+  geração. Mediana, e não média: as notas vão de +1 a cerca de −4.000, e um
+  candidato que enche a grade puxaria a média da geração inteira para lá.
+  As colunas das tabelas crescem até caber o maior número. Na busca aleatória, que não tem gerações, a linha sai a cada lote
   de 20 candidatos.
 - **candidato**: a linha de baixo, reescrita no lugar a cada candidato, com os
   genes e a nota (ou `cortado`, com onde o vazio terminou nas seeds que
@@ -469,13 +532,14 @@ Unicode), ficam só as cores.
 
 | opção | padrão | o que é |
 |---|---|---|
+| `--cavernas` | todas as da entrada | nomes das cavernas de `1_entrada/` (na etapa 3 sozinha, também um caminho `.npz` de campo) |
+| `--forcar` | não | refaz todos os campos, mesmo os em dia (pipeline e etapa 2) |
 | `--metodo` | `genetico` | `genetico` (o GA) ou `aleatoria` (a busca aleatória de controle) |
-| `--cavernas` | `elaphes` | nomes ou caminhos `.npz`; um nome vira `tools/sdf/npz/<nome>_surface_64_sdf_log1.npz` |
 | `--orcamento` | 400 | candidatos avaliados, contando repetidos |
 | `--populacao` | 20 | cromossomos por geração (só no GA) |
 | `--seed` | 0 | semente da **busca**, não do CA |
-| `--saida` | `results/` desta pasta | onde gravar o `ga_NNN.npz` |
 | `--top` | 10 | quantos melhores parâmetros listar no fim |
+| `--entrada`, `--campos`, `--saida` | `1_entrada/`, `2_campos/`, `3_resultados/` | as pastas do fluxo |
 
 No fim o terminal mostra a lista dos melhores parâmetros, sem repetir
 combinação e sem os cortados. O título diz o critério da ordem. Com uma
@@ -493,12 +557,23 @@ Com várias, a nota de ajuste é a média entre as cavernas, seguida do mínimo,
 do máximo e do desvio entre elas e da nota de cada uma:
 
 ```
-5 melhores parâmetros, ordenados pela média entre as 2 cavernas nas 5 seeds de ajuste:
+10 melhores parâmetros, ordenados pela média entre as 2 cavernas nas 5 seeds de ajuste:
   mín, máx e desvio: entre as cavernas; reservadas: média entre as cavernas nas 10 seeds reservadas; pior seed: a menor nota entre elas
-  #  chance_inicial   sensibilidade iteracoes média ajuste     mín     máx desvio elaphes indian_tunnel reservadas pior seed
-  1             0.5              13        18       -0.073  -0.173  +0.028  0.100  -0.173        +0.028    cortado   cortado
-  3            0.66              15        19       -0.577  -0.972  -0.182  0.395  -0.972        -0.182     -0.249    -2.184
+  #  chance_inicial   sensibilidade iteracoes média ajuste      mín      máx  desvio  elaphes indian_tunnel reservadas pior seed
+  1             0.5              13        18       -0.073   -0.173   +0.028   0.100   -0.173        +0.028    cortado   cortado
+  2            0.66              15        19       -0.577   -0.972   -0.182   0.395   -0.972        -0.182     -0.249    -2.184
+ 10             0.8              15        40     -540.946 -657.194 -424.697 116.248 -424.697      -657.194   -568.425  -752.550
 ```
+
+Como ler notas tão diferentes (de `ga_013`, 22/11/2026, sem o limite de
+cima): +1 é a cópia pura, 0 a grade sem vazio, e a grade cheia fica perto de
+−4.000 (o valor de cada caverna sai no cabeçalho). Abaixo de −1, já há mais
+vazio fora da forma do que a forma inteira vale. Média, mínimo e desvio entre
+as cavernas estão na mesma unidade da nota: o desvio de 116 na linha 10 é
+pequeno perto de −541 (as duas cavernas concordam que o parâmetro é ruim); o
+de 0,100 na linha 1 é grande perto de −0,073 (uma caverna fica positiva e a
+outra negativa). As duas cavernas têm quase a mesma grade cheia (−4.033 e
+−4.046), então nenhuma domina a média por ter um piso mais fundo.
 
 `reservadas` é a média entre as cavernas nas 10 seeds reservadas; `pior seed`
 é a menor nota de todas as seeds reservadas em todas as cavernas. Um
@@ -512,53 +587,148 @@ rótulo.
 **Tempo.** Nesta máquina, cada candidato leva cerca de 3,1 s por caverna (5
 seeds × 40 iterações em 64³): 3,1 s com o Elaphes, 6,1 s com o Elaphes e o
 Indian Tunnel. No orçamento 400, o tempo depende de quantos candidatos se
-repetem (o cache não refaz o CA): as execuções antigas do GA tiveram de 93 a
-185 candidatos únicos, o que dá de 5 a 10 min por caverna; a busca aleatória
-repete menos (cerca de 300 únicos entre os 620 pontos da grade), cerca de 15
-min por caverna.
+repetem (o cache não refaz o CA): as execuções do GA tiveram de 93 a 185
+candidatos únicos (`ga_011`: 97), o que dá de 5 a 10 min por caverna; a
+busca aleatória repete menos (cerca de 300 únicos entre os 620 pontos da
+grade), cerca de 15 min por caverna. A etapa 2 leva poucos segundos por
+caverna, e só quando o campo precisa ser refeito.
 
-### O que fica no `ga_NNN.npz`
+## Os resultados
 
-| campo | conteúdo |
-|---|---|
-| `genes_nomes`, `genes` | cromossomo de cada avaliação, na ordem em que foi feita |
-| `notas`, `iteracoes`, `geracao` | nota (média entre as cavernas), melhor iteração e geração de cada avaliação |
-| `melhor_acumulado` | melhor nota vista até cada avaliação: a curva GA × busca aleatória |
-| `reaproveitadas` | candidatos repetidos que vieram do cache |
-| `detalhes` | JSON por avaliação: `entre_cavernas` (média, mínimo, máximo, desvio e a nota de cada caverna) e, em `cavernas`, por caverna: a nota de cada seed na iteração escolhida, `fim` (onde o vazio terminou em cada seed), e o vazio e as mudanças em cada passo |
-| `melhores` | a lista dos melhores: posição, genes, iterações, `nota_ajuste` (o critério), `ajuste` (o resumo entre as cavernas), `nota_reservada_media` e `reservadas` (o resumo nas reservadas, a pior seed e a nota de cada seed em cada caverna) |
-| `campeao`, `nota_reservada_media` | o primeiro da lista, com o resumo de ajuste e das reservadas |
-| `nota_copia_pura` | a cópia pura de cada caverna (1 quando o alvo é o peso) |
-| `cavernas` | por caverna: `nome`, arquivo (`origem`), `sha256`, `convencao`, `limiar`, `escala_log`, `forma`, `referencia_alvo` (voxels positivos) e `faixa_vazio` |
-| `criterio_ranking` | o critério da ordem, por extenso |
-| `config`, `genes_limites`, `cortes`, `max_iteracoes`, `borda`, `modo_peso`, `sementes_*`, `seed`, `ambiente` | tudo o que é preciso para refazer a execução (inclui o commit) |
+Cada execução deixa três arquivos em `3_resultados/`, com o mesmo número:
 
-Os campos extras são strings JSON:
+| arquivo | o que é | como abrir |
+|---|---|---|
+| `ga_NNN_melhores.md` | os N melhores parâmetros (padrão 10) numa tabela de texto, com o resumo da execução e como testar uma linha no CA | qualquer editor de texto; no VS Code, a pré-visualização do Markdown mostra a tabela formatada |
+| `ga_NNN_relatorio.html` | as figuras da execução e a mesma tabela | o navegador (o Plotly vem da internet, como nos outros HTML do projeto) |
+| `ga_NNN.npz` | o registro completo da execução, para análise e reprodução | Python, ou `uv run poe ga-resultados ga_NNN`, que imprime o resumo sem escrever código |
+
+A lista e a tabela do relatório saem do npz por uma função só
+(`resultados.tabela_dos_melhores`), e a etapa 4 refaz os dois de qualquer
+execução no formato novo:
+
+```bash
+uv run poe ga-resultados                      # a última execução
+uv run poe ga-resultados ga_012               # uma execução (ou só o número: 12)
+uv run poe ga-resultados 12 --comparar 13     # põe a curva de outra execução na primeira figura
+```
+
+Com `--comparar`, a etapa avisa (no terminal e no relatório) quando as
+execuções não são comparáveis: cavernas ou campos, orçamento, seeds de
+ajuste, faixa de vazio, iterações ou faixas dos genes diferentes. A curva
+sai mesmo assim, porque comparar orçamentos diferentes pode ser de propósito.
+
+**A lista dos melhores.** Uma linha por parâmetro: posição, `chance_inicial`,
+`sensibilidade`, iterações, a nota média entre as cavernas (o critério da
+ordem), a nota de cada caverna, o mínimo e o desvio entre elas, e nas seeds
+reservadas a média e a pior seed. A tabela do terminal e a do HTML são a
+mesma informação; a lista em Markdown existe para abrir sem navegador e sem
+código. Para testar uma linha no CA: importe o campo da caverna como peso
+(`uv run python -m cavegen.generators.cellular_automata.pesos <campo em 2_campos/>`)
+e, no menu do CA (`uv run poe menu-ca`), use a chance inicial, a
+sensibilidade, as iterações, a borda `nearest` e esse peso no modo completo.
+O menu sorteia a matriz inicial sem seed fixa, então a caverna sai diferente
+das seeds de ajuste: a nota da tabela é a média de 5 grades.
+
+**As figuras do relatório** (todas em `figuras.py`, uma função por figura):
+
+| figura | o que mostra | função |
+|---|---|---|
+| Melhor nota ao longo das avaliações | se a busca ainda sobe no fim do orçamento; com `--comparar`, o GA contra a busca aleatória na mesma figura | `figura_melhor_acumulado` |
+| Mapa das notas pelos dois genes | a nota de cada combinação, com a chance inicial num eixo e a sensibilidade no outro: quase o espaço de busca inteiro. X vermelho é cortado pela faixa de vazio; célula vazia nunca foi pedida; a estrela é o campeão. A cor vai de −10.000 a +1 em log simétrico, fixa, com o zero no meio da paleta divergente: a mesma cor quer dizer a mesma nota em qualquer execução, e positivo nunca se confunde com negativo | `figura_mapa_dos_genes` |
+| Nota de cada caverna nos melhores | as cavernas lado a lado, com a média e o desvio entre elas: quem é consistente e quem só vai bem numa | `figura_notas_por_caverna` |
+| Notas por geração | a distribuição das notas em cada geração (na busca aleatória, em cada lote de sorteios) e a parte cortada | `figura_notas_por_geracao` |
+| O campeão ao longo das iterações do CA | a nota de cada passo em cada caverna e a média, com a iteração escolhida marcada, e embaixo o vazio de cada seed com a faixa aceita sombreada (sem limite de cima, do mínimo até a grade cheia) | `figura_trajetoria` (outro da lista: `posicao=`) |
+| Ajuste × seeds reservadas | a nota nas seeds da busca contra a nota em seeds que ela nunca viu; abaixo da diagonal ou com X, o parâmetro foi bem só nas grades da busca | `figura_ajuste_x_reservadas` |
+
+**A escala das notas nas figuras (22/11/2026).** Sem o limite de cima do
+vazio, as notas de uma execução vão de perto de +1 a perto de −4.000, e o que
+importa ler fica entre −1 e +1. Num eixo linear, um único candidato que enche
+a grade achataria todos os outros numa linha. Por isso todo eixo de nota (e a
+cor do mapa) usa a escala log simétrica
+
+```
+y = sinal(nota) · log10(1 + |nota| / 0,1)
+```
+
+Perto do zero (|nota| bem menor que 0,1) ela é quase linear e guarda o sinal;
+longe dele, cada década (−1, −10, −100, −1.000) ocupa o mesmo espaço. As
+alternativas foram descartadas: cortar o eixo esconderia os candidatos que
+enchem a grade (são a maioria em várias gerações) e mudaria de uma execução
+para outra; o log comum não aceita nota negativa nem zero. As marcas dos
+eixos e o hover mostram a nota de verdade, e o relatório explica a escala
+acima das figuras. Na figura da nota por caverna, a barra de erro é
+média ± desvio em nota de verdade, por isso fica assimétrica no eixo
+comprimido. Nas caixas das notas por geração, a mediana e os quartis caem nos
+mesmos candidatos (a compressão só cresce).
+
+As duas últimas foram acrescentadas além do pedido inicial: a trajetória
+mostra por que um campeão é frágil (o vazio só atravessa a faixa), e o
+ajuste × reservadas é a leitura direta de quanto a nota generaliza para
+grades novas. `figuras_da_execucao` devolve todas, na ordem, com título e
+legenda: é o que uma aba do Streamlit chamaria, sem refazer nada. Para gerar
+uma figura sozinha:
 
 ```python
-import json
-import numpy as np
+from cavegen.generators.cellular_automata.genetico import figuras, resultados
 
-with np.load("src/cavegen/optimization/genetic/results/ga_011.npz") as r:
-    melhores = json.loads(str(r["melhores"]))
-for m in melhores:
-    print(m["posicao"], m["genes"], m["iteracoes"], m["nota_ajuste"],
-          m["ajuste"]["por_caverna"], m["nota_reservada_media"])
+execucao = resultados.ler_execucao("src/cavegen/generators/cellular_automata/genetico/3_resultados/ga_012.npz")
+figuras.figura_mapa_dos_genes(execucao).write_html("mapa.html", include_plotlyjs="cdn")
 ```
+
+### O que é o `ga_NNN.npz`, em linguagem simples
+
+É um arquivo compactado do NumPy com várias "gavetas" (campos), cada uma
+com um nome. Ele guarda **tudo** da execução: cada candidato que a busca
+pediu, a nota dele, os detalhes de cada caverna e seed, a lista dos melhores,
+a configuração e a máquina. Serve para analisar a execução depois e para
+refazê-la exatamente. Algumas gavetas são números (arrays); as outras são
+texto no formato JSON (dicionários e listas), que precisa ser decodificado.
+Não é preciso abri-lo para saber os melhores: a lista em Markdown e o
+relatório já saem dele.
+
+| campo | o que guarda | para que serve |
+|---|---|---|
+| `metodo` | `genetico` ou `aleatoria` | saber qual busca rodou |
+| `genes_nomes`, `genes` | os nomes dos genes e, para cada candidato pedido (na ordem), o valor de cada gene | refazer o mapa do espaço de busca |
+| `notas` | a nota de cada candidato (média entre as cavernas; `-inf` se cortado) | a mesma ordem de `genes` |
+| `iteracoes`, `geracao` | a iteração escolhida e a geração de cada candidato | a distribuição por geração |
+| `melhor_acumulado` | a melhor nota vista até cada candidato | a curva GA × busca aleatória |
+| `reaproveitadas` | quantos candidatos se repetiram (vieram do cache) | saber o custo de verdade |
+| `detalhes` (JSON) | por candidato: `entre_cavernas` (média, mínimo, máximo, desvio, nota de cada caverna) e, em `cavernas`, por caverna: a nota de cada seed na iteração escolhida, a nota de cada passo (`notas_por_passo`, a média das seeds), onde o vazio terminou em cada seed (`fim`), e o vazio e as mudanças em cada passo | a trajetória de qualquer candidato |
+| `melhores` (JSON) | a lista dos melhores: posição, genes, iterações, `nota_ajuste` (o critério), `ajuste` (o resumo entre as cavernas), `nota_reservada_media` e `reservadas` (o resumo nas seeds reservadas, a pior seed e a nota de cada seed em cada caverna) | a lista legível sai daqui |
+| `campeao`, `nota_reservada_media` (JSON) | o primeiro da lista, com o ajuste e as reservadas | a leitura rápida |
+| `nota_copia_pura` (JSON) | a cópia pura de cada caverna (1 quando o alvo é o peso) | a régua da nota |
+| `cavernas` (JSON) | por caverna: `nome`, a grade de entrada (`entrada`) e o `sha256_entrada` dela, o arquivo do campo (`origem`) e o `sha256` dele, a versão do cálculo (`versao_sdf`), se o campo foi conferido com a grade da entrada (`conferido_com_entrada`: sim quando a caverna veio por nome, não quando veio um `.npz` direto), `convencao`, `limiar`, `escala_log`, `forma`, `referencia_alvo` (voxels positivos), `faixa_vazio` (o mínimo e o máximo de vazio aceitos, em voxels; o máximo é `null` desde 22/11/2026) e `nota_grade_cheia` (a nota de tudo vazio, a régua das notas negativas; só nas execuções a partir de 22/11/2026, depois da saída do máximo) | saber exatamente de qual arquivo e de qual versão veio cada caverna |
+| `criterio_ranking` (JSON) | o critério da ordem, por extenso | ler o ranking sem adivinhar |
+| `config`, `genes_limites`, `cortes`, `max_iteracoes`, `borda`, `modo_peso`, `sementes_ajuste`, `sementes_reservadas`, `seed`, `ambiente` (JSON) | os parâmetros do GA, as faixas dos genes, a faixa de vazio, o CA, as seeds, a semente da busca e a máquina, as versões e o commit | refazer a execução |
+
+O jeito mais curto de ler, sem decodificar nada à mão:
+
+```python
+from cavegen.generators.cellular_automata.genetico.resultados import ler_execucao
+
+execucao = ler_execucao("src/cavegen/generators/cellular_automata/genetico/3_resultados/ga_012.npz")
+for m in execucao["melhores"]:
+    print(m["posicao"], m["genes"], m["iteracoes"], m["nota_ajuste"], m["ajuste"]["por_caverna"])
+```
+
+À mão, com o NumPy: `np.load(caminho)["notas"]` para um array, e
+`json.loads(str(np.load(caminho)["melhores"]))` para um campo JSON.
 
 ### Usar em código
 
 ```python
-from cavegen.optimization.genetic.algoritmo import ConfiguracaoGA, evoluir
-from cavegen.optimization.genetic.ca import GENES_CA, AvaliadorCA
-from cavegen.optimization.genetic.executar import (
+from cavegen.generators.cellular_automata.genetico.algoritmo import ConfiguracaoGA, evoluir
+from cavegen.generators.cellular_automata.genetico.busca import (
     SEMENTES_AJUSTE,
-    caminho_da_caverna,
     carregar_caverna,
+    resolver_cavernas,
 )
+from cavegen.generators.cellular_automata.genetico.ca import GENES_CA, AvaliadorCA
 
-cavernas = [carregar_caverna(caminho_da_caverna(nome))[0]
-            for nome in ("elaphes", "indian_tunnel")]
+# Os campos em dia de 2_campos/ (rode a etapa 2 antes), de todas as cavernas da entrada.
+cavernas = [carregar_caverna(caminho)[0] for caminho in resolver_cavernas(None)]
 avaliador = AvaliadorCA(cavernas, SEMENTES_AJUSTE)
 nota, detalhes = avaliador({"chance_inicial": 0.5, "sensibilidade": 13})
 print(nota, detalhes["iteracoes"], detalhes["entre_cavernas"])
@@ -609,20 +779,25 @@ seeds)`) segue como proposta em aberto, separada desta mudança.
 ## Testes
 
 ```bash
-uv run python -m unittest tests/test_genetic.py tests/test_genetic_revisor.py tests/test_genetic_painel.py -v
+uv run python -m unittest tests/test_genetic.py tests/test_genetic_revisor.py tests/test_genetic_painel.py tests/test_genetico_pipeline.py -v
 ```
 
 `test_genetic.py` cobre o motor, a nota, a faixa de vazio, a cópia pura, o
 resumo entre cavernas, a caverna, o avaliador (sem parada antecipada, com a
-penalização preservada, várias cavernas) e o executor (5 seeds, `--cavernas`,
+penalização preservada, várias cavernas) e a busca (5 seeds, `--cavernas`,
 erros por caverna); `test_genetic_painel.py`, o observador e o painel.
 `test_genetic_revisor.py` tem os testes adversariais do revisor (gene inteiro
 com limite fracionário, orçamento exato, cache, tudo cortado sem NaN,
 seeds reservadas fora da busca, reprodutibilidade do campeão gravado).
+`test_genetico_pipeline.py` roda o pipeline com duas cavernas sintéticas 16³:
+campos gerados, reaproveitados e refeitos (grade mudou, versão mudou,
+`--forcar`), escolha de cavernas, a busca recusando campo desatualizado, a
+rastreabilidade gravada, a lista em Markdown e as figuras a partir do npz.
 
 ## Mais contexto
 
 - Decisões e justificativas: `docs/methodology-adjustments.md`, blocos
-  "Ajuste genético do CA" e "Revisão do ajuste genético do CA".
+  "Ajuste genético do CA", "Revisão do ajuste genético do CA" e "O GA na área
+  do CA, em pipeline".
 - Tarefas e critérios de aceite: `docs/tarefas-felipe-sdf-ca.md`.
-- O SDF, o limiar, o log e a ordem entre eles: [`tools/sdf/README.md`](../../../../tools/sdf/README.md).
+- O SDF, o limiar, o log e a ordem entre eles: [`cavegen/tools/sdf/README.md`](../../../tools/sdf/README.md).

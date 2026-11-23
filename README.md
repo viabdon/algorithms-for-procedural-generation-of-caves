@@ -170,8 +170,11 @@ uv run poe test-um tests/test_volume.py     # um módulo, teste por teste
 uv run poe menu-ca                          # menu do CA
 uv run poe menu-rw                          # menu do Random Walk
 uv run poe ui                               # bancada Streamlit do CA
-uv run poe ga                               # algoritmo genético do CA, etapa por etapa
-uv run poe busca-aleatoria                  # busca aleatória do CA (controle do GA, só sorteia)
+uv run poe ga                               # GA do CA, fluxo inteiro: campos, busca e resultados
+uv run poe busca-aleatoria                  # o mesmo fluxo com a busca aleatória (controle, só sorteia)
+uv run poe ga-campos                        # só a etapa dos campos (SDF de cada caverna da entrada)
+uv run poe ga-busca                         # só a busca, nos campos já gerados
+uv run poe ga-resultados                    # resumo, lista dos melhores e figuras da última execução
 ```
 
 Os comandos abaixo são verificações leves que não exigem os datasets externos:

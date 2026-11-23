@@ -21,8 +21,8 @@ from cavegen.generators.cellular_automata.generator import (
     ModoPeso,
     neighbor_counts,
 )
-from cavegen.optimization.genetic import ca as modulo_ca
-from cavegen.optimization.genetic.algoritmo import (
+from cavegen.generators.cellular_automata.genetico import ca as modulo_ca
+from cavegen.generators.cellular_automata.genetico.algoritmo import (
     ConfiguracaoGA,
     Gene,
     busca_aleatoria,
@@ -30,14 +30,14 @@ from cavegen.optimization.genetic.algoritmo import (
     evoluir,
     mutar,
 )
-from cavegen.optimization.genetic.aptidao import NOTA_MINIMA, Cortes
-from cavegen.optimization.genetic.ca import (
+from cavegen.generators.cellular_automata.genetico.aptidao import NOTA_MINIMA, Cortes
+from cavegen.generators.cellular_automata.genetico.ca import (
     GENES_CA,
     MAX_ITERACOES,
     AvaliadorCA,
     Caverna,
 )
-from cavegen.optimization.genetic.painel import Estilo, Painel, motivos_do_corte
+from cavegen.generators.cellular_automata.genetico.painel import Estilo, Painel, motivos_do_corte
 from cavegen.sdf.manipulacao import comprimir_log
 
 # Funções do gerador global que não podem ser usadas no caminho do GA.
@@ -75,7 +75,7 @@ def sem_gerador_global():
 
 
 def rodar_executar(pasta: Path, *extra: str) -> Path:
-    from cavegen.optimization.genetic import executar
+    from cavegen.generators.cellular_automata.genetico import busca as executar
 
     if not (pasta / "esfera_sdf_log1.npz").exists():
         gravar_esfera(pasta / "esfera_sdf_log1.npz")
@@ -239,8 +239,10 @@ class ConsistenciaIteracoesRevisorTests(unittest.TestCase):
         sementes = (1, 2, 3, 4, 5)
         maximo = 12
         fins = set()
+        # Com o limite de cima (Cortes(0.5, 5.0)), para passar pelos dois lados da
+        # faixa; o padrão desde 22/11/2026 só tem o de baixo.
         avaliador = AvaliadorCA([Caverna("a", campo_esfera(5.0)), Caverna("b", campo_esfera(6.0))],
-                                sementes, max_iteracoes=maximo)
+                                sementes, max_iteracoes=maximo, cortes=Cortes(0.5, 5.0))
         for genes in self.GENES:
             trajetorias = avaliador.trajetorias(genes)
             fins.update(t.fim for ts in trajetorias.values() for t in ts)
@@ -279,14 +281,14 @@ class ConsistenciaIteracoesRevisorTests(unittest.TestCase):
 
 class ExecutarRevisorTests(unittest.TestCase):
     def test_sementes_de_ajuste_e_reservadas_sao_disjuntas(self):
-        from cavegen.optimization.genetic import executar
+        from cavegen.generators.cellular_automata.genetico import busca as executar
 
         self.assertFalse(set(executar.SEMENTES_AJUSTE) & set(executar.SEMENTES_RESERVADAS))
         self.assertEqual(len(executar.SEMENTES_AJUSTE), 5)
         self.assertEqual(len(executar.SEMENTES_RESERVADAS), 10)
 
     def test_busca_so_usa_sementes_de_ajuste_e_reservadas_so_depois(self):
-        from cavegen.optimization.genetic import executar
+        from cavegen.generators.cellular_automata.genetico import busca as executar
 
         usadas = []
         original = modulo_ca.generate_seed_matrix
@@ -573,7 +575,8 @@ class PainelRevisorTests(unittest.TestCase):
                 self.assertEqual(len({largura_na_tela(linha) for linha in linhas}), 1, linhas)
 
     def test_estilo_para_fora_do_terminal_nunca_liga_nem_chama_o_console(self):
-        with mock.patch("cavegen.optimization.genetic.painel._ativar_ansi") as ativar:
+        alvo = "cavegen.generators.cellular_automata.genetico.painel._ativar_ansi"
+        with mock.patch(alvo) as ativar:
             estilo = Estilo.para(io.StringIO())
         self.assertFalse(estilo.cores or estilo.emojis)
         ativar.assert_not_called()
@@ -597,7 +600,7 @@ class ExecutarGradeRevisorTests(unittest.TestCase):
         self.assertTrue(all(m["genes"]["chance_inicial"] in GRADE_CHANCE for m in melhores))
 
     def test_executar_so_imprime_pelo_painel_e_sai_puro_fora_do_terminal(self):
-        from cavegen.optimization.genetic import executar
+        from cavegen.generators.cellular_automata.genetico import busca as executar
 
         do_painel = io.StringIO()
         original = executar.Painel
@@ -641,7 +644,7 @@ def gravar_campo(caminho: Path, campo: np.ndarray) -> Path:
 
 def rodar_main_com_painel(*argv: str) -> tuple[Path, str]:
     """Roda o executar.main e devolve o destino e tudo o que o painel escreveu."""
-    from cavegen.optimization.genetic import executar
+    from cavegen.generators.cellular_automata.genetico import busca as executar
 
     do_painel = io.StringIO()
     original = executar.Painel
@@ -658,7 +661,7 @@ def rodar_main_com_painel(*argv: str) -> tuple[Path, str]:
 
 def erro_do_main(*argv: str) -> str | None:
     """Mensagem do parser.error, ou None se o main rodou até o fim."""
-    from cavegen.optimization.genetic import executar
+    from cavegen.generators.cellular_automata.genetico import busca as executar
 
     erro = io.StringIO()
     with (mock.patch("cavegen.profiling.resource_tracker.registrar_execucao"),
@@ -700,9 +703,12 @@ class VariasCavernasRevisorTests(unittest.TestCase):
         a, b = Caverna("a", campo_esfera(5.0)), Caverna("b", campo_esfera(6.0))
         minuscula = Caverna("minuscula", campo_esfera(1.0))
         vistos = {"finito": 0, "cortado": 0, "cortado_so_pela_minuscula": 0}
+        # A minúscula só corta pelo limite de cima, então ele entra aqui: o que se
+        # testa são os invariantes da nota, valham para qualquer faixa.
+        cortes = Cortes(0.5, 5.0)
         for cavernas in ((a, b), (a, minuscula)):
-            avaliador = AvaliadorCA(cavernas, (1, 2, 3, 4, 5), max_iteracoes=15)
-            so_a = AvaliadorCA((a,), (1, 2, 3, 4, 5), max_iteracoes=15)
+            avaliador = AvaliadorCA(cavernas, (1, 2, 3, 4, 5), max_iteracoes=15, cortes=cortes)
+            so_a = AvaliadorCA((a,), (1, 2, 3, 4, 5), max_iteracoes=15, cortes=cortes)
             with warnings.catch_warnings():
                 warnings.simplefilter("error", RuntimeWarning)
                 busca = busca_aleatoria(GENES_CA, avaliador, 14, seed=11)
@@ -781,7 +787,7 @@ class ExecutarCavernasRevisorTests(unittest.TestCase):
         self.assertEqual(contagem["a"], contagem["b"])
 
     def test_caverna_cubica_fora_do_protocolo_roda_com_aviso_so_nela(self):
-        from cavegen.optimization.genetic import executar
+        from cavegen.generators.cellular_automata.genetico import busca as executar
 
         pequena = gravar_campo(self.pasta / "pequena_sdf_log1.npz",
                                comprimir_log(esfera_sdf(lado=12, raio=4.0), 1.0))
@@ -794,7 +800,9 @@ class ExecutarCavernasRevisorTests(unittest.TestCase):
         avisos = [i for i, linha in enumerate(linhas) if "fora do protocolo" in linha]
         self.assertEqual(len(avisos), 1, texto)
         self.assertIn("grade 12³", linhas[avisos[0]])
-        self.assertIn("grade 12x12x12", linhas[avisos[0] - 1])
+        # Antes do aviso: a linha da grade e a da régua (cópia pura, grade cheia).
+        self.assertIn("grade 12x12x12", linhas[avisos[0] - 2])
+        self.assertIn("grade cheia", linhas[avisos[0] - 1])
         with np.load(destino) as r:
             formas = [c["forma"] for c in json.loads(str(r["cavernas"]))]
             self.assertEqual(formas, [[16, 16, 16], [12, 12, 12]])

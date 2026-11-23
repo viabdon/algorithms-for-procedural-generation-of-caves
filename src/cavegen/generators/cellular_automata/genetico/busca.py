@@ -1,35 +1,34 @@
-"""Roda o ajuste do CA (GA ou busca aleatória de controle) nas cavernas e grava o resultado.
+"""Etapa 3 do pipeline do GA: a busca (GA ou busca aleatória de controle) nos campos.
 
-    uv run python -m cavegen.optimization.genetic.executar                     # GA, só o Elaphes
-    uv run python -m cavegen.optimization.genetic.executar --metodo aleatoria  # busca aleatória
-    uv run python -m cavegen.optimization.genetic.executar --cavernas elaphes indian_tunnel
-    uv run python -m cavegen.optimization.genetic.executar --orcamento 100 --seed 2
+    uv run python -m cavegen.generators.cellular_automata.genetico.busca                    # GA
+    uv run python -m cavegen.generators.cellular_automata.genetico.busca --metodo aleatoria
+    uv run python -m cavegen.generators.cellular_automata.genetico.busca --cavernas elaphes
+    uv run python -m cavegen.generators.cellular_automata.genetico.busca --orcamento 100 --seed 2
+
+Lê os campos de 2_campos/ (etapa 2, campos.py) e grava 3_resultados/ga_NNN.npz.
+Sem --cavernas, usa todas as cavernas de 1_entrada/; um nome escolhe uma delas,
+e o campo dela precisa estar em dia com a grade (senão, rode a etapa 2). Um
+caminho .npz é um campo usado como está. O fluxo inteiro, com a etapa 2 antes e
+os relatórios da etapa 4 depois, é o pipeline.py.
 
 Cada caverna tem um campo só, o SDF dela com ln(1 + |d|), escala 1 e sem
-limiar, que é o peso do CA e o alvo da nota. Ele é gerado uma vez com a
-ferramenta do SDF:
+limiar, que é o peso do CA e o alvo da nota. Ele entra no CA exatamente como
+está no arquivo. O resultado grava, por caverna, a grade de entrada e o sha256
+dela, o arquivo e o sha256 do campo e a versão do cálculo do SDF (`cavernas`).
 
-    uv run python -m tools.sdf.sdf --log 1                         # Elaphes (padrão)
-    uv run python -m tools.sdf.sdf <grade_de_superficie.npz> --log 1
-
-Em --cavernas, um nome (elaphes) vira tools/sdf/npz/<nome>_surface_64_sdf_log1.npz;
-um caminho .npz é usado como está. O campo entra no CA exatamente como está no
-arquivo, e o arquivo, o hash e a manipulação de cada caverna ficam gravados no
-resultado (`cavernas`).
-
-No fim, mostra e grava a lista dos melhores parâmetros (--top, padrão 10),
-ordenada pela média das notas entre as cavernas: cada combinação uma vez só,
-com a nota de cada caverna, o mínimo, o máximo e o desvio entre elas, nas
-sementes de ajuste e nas reservadas. Cada execução grava results/ga_NNN.npz ao
-lado deste arquivo, com a configuração inteira, todas as avaliações, essa lista
-e a nota da cópia pura de cada caverna. O consumo de recursos da busca inteira
-vai para a planilha do track_resources.
+No fim, mostra a lista dos melhores parâmetros (--top, padrão 10), ordenada
+pela média das notas entre as cavernas: cada combinação uma vez só, com a nota
+de cada caverna, o mínimo, o máximo e o desvio entre elas, nas sementes de
+ajuste e nas reservadas. O npz guarda a configuração inteira, todas as
+avaliações, essa lista e a nota da cópia pura de cada caverna; o consumo de
+recursos da busca inteira vai para a planilha do track_resources.
 """
 from __future__ import annotations
 
 import argparse
 import hashlib
 import json
+import math
 import os
 import platform
 import subprocess
@@ -40,16 +39,14 @@ from pathlib import Path
 import numpy as np
 import scipy
 
-from cavegen.generators.cellular_automata.pesos import RAIZ_DO_PROJETO, caminho_legivel
-from cavegen.generators.cellular_automata.storage import build_path, next_id
-from cavegen.optimization.genetic.algoritmo import (
+from cavegen.generators.cellular_automata.genetico.algoritmo import (
     ConfiguracaoGA,
     ResultadoBusca,
     busca_aleatoria,
     evoluir,
 )
-from cavegen.optimization.genetic.aptidao import Cortes, nota_da_copia_pura
-from cavegen.optimization.genetic.ca import (
+from cavegen.generators.cellular_automata.genetico.aptidao import Cortes, nota_da_copia_pura
+from cavegen.generators.cellular_automata.genetico.ca import (
     BORDA,
     GENES_CA,
     MAX_ITERACOES,
@@ -57,20 +54,23 @@ from cavegen.optimization.genetic.ca import (
     AvaliadorCA,
     Caverna,
 )
-from cavegen.optimization.genetic.painel import Painel
+from cavegen.generators.cellular_automata.genetico.campos import (
+    CAMPOS_DIR,
+    ENTRADA_DIR,
+    caminho_do_campo,
+    cavernas_da_entrada,
+    escolher,
+    nome_da_caverna,
+    situacao,
+)
+from cavegen.generators.cellular_automata.genetico.campos import COMANDO as COMANDO_CAMPOS
+from cavegen.generators.cellular_automata.genetico.painel import Painel
+from cavegen.generators.cellular_automata.pesos import RAIZ_DO_PROJETO, caminho_legivel
+from cavegen.generators.cellular_automata.storage import build_path, next_id
 from cavegen.profiling.resource_tracker import track_resources
 
-NPZ_SDF = RAIZ_DO_PROJETO / "tools" / "sdf" / "npz"
-# O tools/sdf grava o campo da grade <nome>_surface_64.npz como
-# <nome>_surface_64_sdf_log1.npz quando roda com --log 1 e sem limiar.
-SUFIXO_GRADE = "_surface_64"
-SUFIXO_CAMPO = "_sdf_log1"
-CAVERNAS_PADRAO = ("elaphes",)
-CAMPO_ELAPHES = NPZ_SDF / f"elaphes{SUFIXO_GRADE}{SUFIXO_CAMPO}.npz"
-COMANDO_ELAPHES = "uv run python -m tools.sdf.sdf --log 1"
-COMANDO_SDF = "uv run python -m tools.sdf.sdf <grade_de_superficie.npz> --log 1"
 LADO_DO_PROTOCOLO = 64
-RESULTS_DIR = Path(__file__).resolve().parent / "results"
+RESULTS_DIR = Path(__file__).resolve().parent / "3_resultados"
 PREFIXO = "ga"
 # Uma seed é só o número que inicializa o sorteador da matriz inicial; a
 # porcentagem de vazio é o gene chance_inicial. Todo candidato roda nas mesmas
@@ -85,36 +85,65 @@ SEMENTES_RESERVADAS = tuple(range(101, 111))
 TOP_PADRAO = 10
 CRITERIO = "média das notas entre as cavernas, nas seeds de ajuste"
 
-def caminho_da_caverna(caverna: str) -> Path:
+def resolver_cavernas(pedidas: list[str] | None, entrada: Path = ENTRADA_DIR,
+                     campos: Path = CAMPOS_DIR) -> list[Path]:
     """
-        Arquivo do campo de uma caverna. Um .npz é usado como está; um nome
-        (como "elaphes") vira tools/sdf/npz/<nome>_surface_64_sdf_log1.npz.
+        Os campos que a busca lê, na ordem pedida. Sem pedido, todas as cavernas
+        da entrada. Um nome é uma caverna da entrada, e o campo dela precisa
+        estar em dia com a grade; um .npz é um campo usado como está. Erro
+        (ValueError) diz qual caverna e o que fazer.
     """
-    if caverna.lower().endswith(".npz"):
-        return Path(caverna)
-    return NPZ_SDF / f"{caverna}{SUFIXO_GRADE}{SUFIXO_CAMPO}.npz"
-
-def nome_da_caverna(caminho: Path) -> str:
-    """Rótulo da caverna: o nome do arquivo sem _sdf_log1 e sem _surface_64 (elaphes)."""
-    nome = Path(caminho).stem
-    for sufixo in (SUFIXO_CAMPO, SUFIXO_GRADE):
-        nome = nome.removesuffix(sufixo)
-    return nome
+    disponiveis = None
+    if pedidas is None:
+        disponiveis = cavernas_da_entrada(entrada)
+        pedidas = list(escolher(disponiveis))
+    caminhos = []
+    for pedida in pedidas:
+        if pedida.lower().endswith(".npz"):
+            caminho = Path(pedida)
+            if not caminho.exists():
+                raise ValueError(f"{caminho} não existe. Gere os campos com: {COMANDO_CAMPOS}")
+        else:
+            if disponiveis is None:
+                disponiveis = cavernas_da_entrada(entrada)
+            grade = escolher(disponiveis, [pedida])[pedida]
+            caminho = caminho_do_campo(grade, campos)
+            motivo = situacao(grade, caminho)
+            if motivo is not None:
+                raise ValueError(f"O campo de {pedida} não está em dia ({motivo}). Rode a etapa "
+                                 f"2: {COMANDO_CAMPOS}")
+        caminhos.append(caminho)
+    nomes = [nome_da_caverna(c) for c in caminhos]
+    if len(set(nomes)) != len(nomes):
+        raise ValueError(f"--cavernas tem caverna repetida: {nomes}")
+    return caminhos
 
 def carregar_campo(caminho: Path) -> tuple[np.ndarray, dict]:
     """
-        Lê o 'sdf' de um npz do tools/sdf e os campos que descrevem a
-        manipulação que a ferramenta fez nele (limiar e log), mais o sha256 do
-        arquivo para saber depois exatamente qual campo entrou.
+        Lê o 'sdf' de um npz da ferramenta do SDF e o que descreve o campo: a
+        manipulação (limiar e log), o sha256 do arquivo e, se o campo os tem, a
+        grade de entrada de onde veio, o sha256 dela e a versão do cálculo.
+        Assim o resultado diz exatamente qual campo, de qual grade, entrou.
     """
     with np.load(caminho) as arquivo:
+        if "sdf" not in arquivo.files:
+            # O engano provável: a grade de 1_entrada/ no lugar do campo de 2_campos/.
+            raise ValueError(f"{caminho_legivel(Path(caminho))} não é um campo (não tem 'sdf'"
+                             f"; tem {', '.join(arquivo.files)}). Os campos ficam em 2_campos/"
+                             f" e saem da etapa 2: {COMANDO_CAMPOS}")
+
+        def texto(nome):
+            return str(arquivo[nome]) if nome in arquivo.files else None
+
         campo = arquivo["sdf"].astype(np.float32)
         info = {"origem": caminho_legivel(Path(caminho)),
                 "sha256": hashlib.sha256(Path(caminho).read_bytes()).hexdigest(),
-                "convencao": str(arquivo["convencao"]) if "convencao" in arquivo.files else "",
+                "convencao": texto("convencao") or "",
                 "limiar": float(arquivo["limiar"]) if "limiar" in arquivo.files else 0.0,
                 "escala_log": (float(arquivo["escala_log"])
-                               if "escala_log" in arquivo.files else None)}
+                               if "escala_log" in arquivo.files else None),
+                "entrada": texto("entrada"), "sha256_entrada": texto("sha256_entrada"),
+                "versao_sdf": int(arquivo["versao"]) if "versao" in arquivo.files else None}
     return campo, info
 
 def carregar_caverna(caminho: Path) -> tuple[Caverna, dict]:
@@ -128,7 +157,7 @@ def carregar_caverna(caminho: Path) -> tuple[Caverna, dict]:
         log = "sem log" if info["escala_log"] is None else f"log x{info['escala_log']:g}"
         raise ValueError(f"A caverna {nome} ({info['origem']}) tem limiar {info['limiar']:g} e "
                          f"{log}, mas o GA usa o SDF com log x1 e sem limiar. Gere com: "
-                         f"{COMANDO_SDF}")
+                         f"{COMANDO_CAMPOS}")
     return Caverna(nome, campo), info
 
 def ambiente() -> dict:
@@ -213,11 +242,14 @@ def main(argv=None) -> Path:
     parser.add_argument("--metodo", choices=("genetico", "aleatoria"), default="genetico",
                         help="genetico: o algoritmo genético; aleatoria: a busca aleatória de "
                              "controle, que só sorteia (sem seleção nem cruzamento)")
-    parser.add_argument("--cavernas", nargs="+", default=list(CAVERNAS_PADRAO),
-                        metavar="CAVERNA",
-                        help="nomes (elaphes, indian_tunnel) ou npz do tools/sdf com log 1 e sem "
-                             "limiar; o campo de cada caverna é o peso e o alvo dela "
-                             "(padrão: elaphes)")
+    parser.add_argument("--cavernas", nargs="+", metavar="CAVERNA",
+                        help="nomes de cavernas da entrada (elaphes, indian_tunnel) ou npz de "
+                             "campos com log 1 e sem limiar; o campo de cada caverna é o peso e "
+                             "o alvo dela (padrão: todas as cavernas da entrada)")
+    parser.add_argument("--entrada", type=Path, default=ENTRADA_DIR,
+                        help="pasta das grades de superfície (etapa 1)")
+    parser.add_argument("--campos", type=Path, default=CAMPOS_DIR,
+                        help="pasta dos campos (etapa 2)")
     parser.add_argument("--orcamento", type=int, default=ConfiguracaoGA.orcamento)
     parser.add_argument("--populacao", type=int, default=ConfiguracaoGA.tamanho_populacao)
     parser.add_argument("--seed", type=int, default=0, help="semente da busca (não do CA)")
@@ -228,14 +260,13 @@ def main(argv=None) -> Path:
     if args.top < 1:
         parser.error("--top precisa ser pelo menos 1.")
 
-    caminhos = [caminho_da_caverna(c) for c in args.cavernas]
-    for caminho in caminhos:
-        if not caminho.exists():
-            comando = COMANDO_ELAPHES if caminho == CAMPO_ELAPHES else COMANDO_SDF
-            parser.error(f"{caminho} não existe. Gere o SDF da caverna com: {comando}")
-    nomes = [nome_da_caverna(c) for c in caminhos]
-    if len(set(nomes)) != len(nomes):
-        parser.error(f"--cavernas tem caverna repetida: {nomes}")
+    try:
+        caminhos = resolver_cavernas(args.cavernas, args.entrada, args.campos)
+        # Por nome, o campo foi conferido com a grade da entrada; um .npz direto, não.
+        conferidos = [not str(p).lower().endswith(".npz")
+                      for p in (args.cavernas or [None] * len(caminhos))]
+    except ValueError as erro:
+        parser.error(str(erro))
 
     config = ConfiguracaoGA(tamanho_populacao=args.populacao, orcamento=args.orcamento)
     genetico = args.metodo == "genetico"
@@ -268,7 +299,7 @@ def main(argv=None) -> Path:
         painel.caverna(caverna.nome, info["origem"], caverna.peso.shape,
                        float(caverna.peso.min()), float(caverna.peso.max()),
                        caverna.alvo.referencia, caverna.alvo.faixa(cortes),
-                       copias[caverna.nome], aviso)
+                       copias[caverna.nome], aviso, caverna.alvo.nota_da_grade_cheia())
     faixas = ", ".join(descrever_gene(g) for g in GENES_CA)
     painel.escrever(f"  genes {faixas}")
     painel.escrever(f"  seeds de ajuste {list(SEMENTES_AJUSTE)}; reservadas "
@@ -306,10 +337,14 @@ def main(argv=None) -> Path:
         "max_iteracoes": MAX_ITERACOES, "borda": BORDA.value, "modo_peso": MODO_PESO.value,
         "sementes_ajuste": list(SEMENTES_AJUSTE),
         "sementes_reservadas": list(SEMENTES_RESERVADAS),
-        "cavernas": [{"nome": caverna.nome, **info, "forma": list(caverna.peso.shape),
+        "cavernas": [{"nome": caverna.nome, **info, "conferido_com_entrada": conferido,
+                      "forma": list(caverna.peso.shape),
                       "referencia_alvo": caverna.alvo.referencia,
-                      "faixa_vazio": list(caverna.alvo.faixa(cortes))}
-                     for caverna, info in carregadas],
+                      # Sem limite de cima, o máximo fica null (o JSON não tem inf).
+                      "faixa_vazio": [v if math.isfinite(v) else None
+                                      for v in caverna.alvo.faixa(cortes)],
+                      "nota_grade_cheia": caverna.alvo.nota_da_grade_cheia()}
+                     for (caverna, info), conferido in zip(carregadas, conferidos, strict=True)],
         "criterio_ranking": CRITERIO,
         "campeao": {"genes": campeao.genes, "nota_ajuste": campeao.nota,
                     "iteracoes": campeao.detalhes["iteracoes"], "ordem": campeao.ordem,
@@ -324,7 +359,8 @@ def main(argv=None) -> Path:
 
     painel.tabela_melhores(melhores, [gene.nome for gene in GENES_CA], avaliador.nomes,
                            len(SEMENTES_AJUSTE), len(SEMENTES_RESERVADAS))
-    painel.referencias(copias, caminho_legivel(destino))
+    painel.referencias(copias, caminho_legivel(destino),
+                       {c.nome: c.alvo.nota_da_grade_cheia() for c in cavernas})
     return destino
 
 if __name__ == "__main__":

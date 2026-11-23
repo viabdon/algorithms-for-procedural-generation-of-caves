@@ -67,7 +67,12 @@ __pycache__/
 /src/cavegen/generators/cellular_automata/plots
 /src/cavegen/generators/cellular_automata/seeds
 /src/cavegen/generators/cellular_automata/pesos
-/src/cavegen/optimization/genetic/results
+# GA do CA: as pastas do pipeline ficam (com .gitkeep), o conteúdo não. As cavernas
+# de entrada são dados, os campos são regenerados e os resultados são execuções.
+/src/cavegen/generators/cellular_automata/genetico/1_entrada/*
+/src/cavegen/generators/cellular_automata/genetico/2_campos/*
+/src/cavegen/generators/cellular_automata/genetico/3_resultados/*
+!/src/cavegen/generators/cellular_automata/genetico/*/.gitkeep
 
 # Random Walk
 /src/cavegen/generators/random_walk/npz

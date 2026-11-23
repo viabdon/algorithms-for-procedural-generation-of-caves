@@ -1,4 +1,4 @@
-"""Nota de uma caverna gerada contra o campo-alvo, a faixa de vazio aceita e o
+"""Nota de uma caverna gerada contra o campo-alvo, o vazio mínimo aceito e o
 resumo das notas entre as cavernas.
 
 A nota é a soma do campo-alvo nos voxels vazios da caverna, dividida pela soma
@@ -13,7 +13,7 @@ dentro. Multiplicar o alvo por uma constante não muda a nota (ela aparece em
 cima e embaixo).
 
 O alvo de cada caverna é o mesmo campo do peso: o SDF dela comprimido com
-ln(1 + |d|), sem deslocar o zero (`tools/sdf/sdf.py --log 1`). Ele fica fixo
+ln(1 + |d|), sem deslocar o zero (`cavegen/tools/sdf/sdf.py --log 1`). Ele fica fixo
 durante toda a busca. A explicação completa, com os números do Elaphes, está no
 README do módulo.
 """
@@ -32,16 +32,27 @@ class Cortes:
     """
         Faixa de vazio aceita, relativa aos voxels positivos do alvo (não à grade).
         fator_minimo: vazio abaixo de fator_minimo x positivos do alvo é pouco.
-        fator_maximo: vazio acima de fator_maximo x positivos do alvo é demais.
+        fator_maximo: vazio acima de fator_maximo x positivos do alvo é demais;
+                      None (o padrão desde 22/11/2026) = sem limite de cima.
         Fora da faixa, a nota do passo é NOTA_MINIMA. A faixa não interrompe o
         CA: ele roda todas as iterações, e ela só decide a nota de cada passo.
+
+        Só o mínimo fica porque a grade vazia tem nota 0 e, sem ele, ganharia
+        de todo candidato com nota negativa. O excesso de vazio a própria nota
+        já pune (encher a grade do Elaphes dá -4033), e o limite de cima
+        cortava a maioria dos candidatos, sem dar direção à seleção. Atenção:
+        a iteração escolhida é a de maior nota, então um candidato que enche a
+        grade aos poucos leva a nota do passo menos cheio (quase sempre o 1),
+        não a da grade cheia.
     """
     fator_minimo: float = 0.5
-    fator_maximo: float = 5.0
+    fator_maximo: float | None = None
 
     def __post_init__(self):
-        if not 0 < self.fator_minimo < 1 < self.fator_maximo:
-            raise ValueError("Os fatores precisam de 0 < mínimo < 1 < máximo.")
+        if not 0 < self.fator_minimo < 1:
+            raise ValueError("O fator mínimo precisa de 0 < mínimo < 1.")
+        if self.fator_maximo is not None and not self.fator_maximo > 1:
+            raise ValueError("O fator máximo precisa ser maior que 1 (ou None, sem limite).")
 
     def como_dict(self) -> dict:
         return asdict(self)
@@ -76,8 +87,18 @@ class Alvo:
         return float(self.campo[vazio].sum(dtype=np.float64)) / self.soma_positiva
 
     def faixa(self, cortes: Cortes) -> tuple[float, float]:
-        """Quantidade de vazio aceita: (mínimo, máximo), em voxels."""
-        return cortes.fator_minimo * self.referencia, cortes.fator_maximo * self.referencia
+        """Quantidade de vazio aceita: (mínimo, máximo), em voxels; máximo inf sem limite."""
+        maximo = math.inf if cortes.fator_maximo is None else cortes.fator_maximo * self.referencia
+        return cortes.fator_minimo * self.referencia, maximo
+
+    def nota_da_grade_cheia(self) -> float:
+        """
+            Nota de tudo vazio (no Elaphes, -4033): a régua para ler uma nota
+            negativa, já que ela depende da caverna. Não é o piso: vazio só no
+            lado negativo dá 1 a menos (a nota da grade cheia soma o 1 da
+            parte positiva).
+        """
+        return float(self.campo.sum(dtype=np.float64)) / self.soma_positiva
 
     def dentro_da_faixa(self, vazios: int, cortes: Cortes) -> bool:
         minimo, maximo = self.faixa(cortes)
