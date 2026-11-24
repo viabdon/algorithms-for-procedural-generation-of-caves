@@ -4,10 +4,10 @@
 
 O porte nasceu no protótipo `random_walk_temp/` (`101aa24`, `2cf8f8c`, `a58155e`) e foi migrado para o pacote sem mudança de lógica. Este documento reúne o conteúdo do README do protótipo, com comandos e caminhos atualizados. A pasta foi apagada; o histórico continua no Git.
 
-O projeto base é um projeto **Unity (C#)**, não Python, e **não gera voxels**: ele gera uma malha de tubos em volta dos caminhos. Por isso a caminhada foi portada para Python e a malha foi trocada por uma voxelização direta.
+O projeto base, escrito em C#, gera uma malha de tubos em volta dos caminhos. Por isso a caminhada foi portada para Python e a malha foi trocada por uma voxelização direta.
 
 ```text
-external/3D-Cave-Generation/.../SampleScene.unity    cena com os grafos de waypoints (fora do Git)
+Cena original com os grafos de waypoints (fonte externa usada na exportação)
   -> exportar_cena.py   exporta uma vez os grafos para configs/random_walk/<caverna>.yaml
   -> cena.py            lê waypoints, ligações e parâmetros do YAML
   -> caminhada.py       random walk ponderado entre os waypoints ligados
@@ -34,7 +34,7 @@ external/3D-Cave-Generation/.../SampleScene.unity    cena com os grafos de waypo
 
 Na cena há quatro objetos com o `CaveGenerator`. Os waypoints foram postos à mão sobre os modelos FBX de cavernas reais (`Assets/Models/`), e cada um tem um `Linker` com a lista dos waypoints ligados a ele:
 
-| caverna | waypoints | ligações | extensão x, y, z (unidades Unity) | radius |
+| caverna | waypoints | ligações | extensão x, y, z (unidades do projeto base) | radius |
 |---|---|---|---|---|
 | Example | 19 | 18 | 223 × 8 × 287 | 7,5 |
 | Knotlow Cavern | 72 | 71 | 674 × 448 × 1935 | 7 |
@@ -51,18 +51,18 @@ No C#, `weight` é `float` com `[Range(.1f, 1f)]`, e `k` e `spacer` são `int` c
 
 ### 1. Exportação e leitura da cena (`exportar_cena.py`, `cena.py`)
 
-`exportar_cena.py` é um script de uso único. Ele lê o YAML da cena Unity sem depender da Unity e grava um arquivo por caverna em `configs/random_walk/`: waypoints (nome e posição nos eixos da Unity, com y para cima), ligações por índice e parâmetros `weight`, `k`, `spacer`, `radius` e `segments`, além da origem (repositório, commit, cena e ordem na cena). Os objetos `nodes` de todas as cavernas estão na origem, sem rotação e com escala 1, então a posição local dos waypoints já é a do mundo; o script confere isso e para com erro se mudar.
+`exportar_cena.py` é um script de uso único. Ele lê o YAML da cena original e grava um arquivo por caverna em `configs/random_walk/`: waypoints (nome e posição nos eixos da cena original, com y para cima), ligações por índice e parâmetros `weight`, `k`, `spacer`, `radius` e `segments`, além da origem (repositório, commit, cena e ordem na cena). Os objetos `nodes` de todas as cavernas estão na origem, sem rotação e com escala 1, então a posição local dos waypoints já é a do mundo; o script confere isso e para com erro se mudar.
 
 Conferido na migração: o grafo de cada YAML é idêntico ao lido da cena nas quatro cavernas.
 
-`cena.py` lê esses YAMLs. Daqui em diante o gerador não depende da Unity nem do projeto base.
+`cena.py` lê esses YAMLs. O gerador usa diretamente os quatro grafos versionados.
 
 ### 2. Caminhada (`caminhada.py`)
 
 Porte direto de `WeightedRandomWalk.cs` e `PathGenerator.cs`, incluindo o corte de laços (repetido duas vezes, como no original). Duas mudanças, as duas por reprodutibilidade:
 
-- o sorteio usa `numpy_rng(seed)`; o original usa o `UnityEngine.Random` sem semente, então nunca gera duas vezes a mesma caverna;
-- as contas são em `float64` (a Unity usa `float32`).
+- o sorteio usa `numpy_rng(seed)`; o original usa o gerador aleatório do original não fixa a semente;
+- as contas são em `float64` (o original usa `float32`).
 
 Há também uma trava de segurança: a caminhada levanta `RuntimeError` se passar de 100.000 pontos sem chegar ao destino (no original o `while` não tem limite). A trava não muda nenhuma caminhada que termina.
 
@@ -70,7 +70,7 @@ Conferido: mesma seed dá o mesmo caminho, e todo caminho começa no waypoint de
 
 ### 3. Voxelização (`voxelizacao.py`)
 
-Em vez da malha de tubos, escava direto na grade uma cápsula de raio `r` em volta de cada trecho. Eixos: `depth = z`, `height = y` e `width = x` da Unity (o y da Unity é para cima). A caverna inteira é encaixada no cubo com a mesma escala nos três eixos, centralizada e com 2 voxels de folga (`MARGEM`). Por isso a grade precisa ser cúbica e com lado maior que 5.
+Em vez da malha de tubos, escava direto na grade uma cápsula de raio `r` em volta de cada trecho. Eixos: `depth = z`, `height = y` e `width = x` do arquivo de origem (y aponta para cima). A caverna inteira é encaixada no cubo com a mesma escala nos três eixos, centralizada e com 2 voxels de folga (`MARGEM`). Por isso a grade precisa ser cúbica e com lado maior que 5.
 
 A classificação auxiliar usa os códigos da inundação (0 fora, 1 borda, 2 interno), mas não precisa de flood fill: o tubo já é o vazio da caverna, então borda é o vazio que encosta em rocha por alguma face (fora da grade conta como rocha) e interno é o resto.
 

@@ -28,11 +28,16 @@ from pathlib import Path
 
 import numpy as np
 import plotly.graph_objects as go
-from scipy.ndimage import binary_fill_holes, convolve
+from scipy.ndimage import convolve
 
-from cavegen.generators.cellular_automata.plot import (
+from cavegen.tools.flood_fill import inundar
+
+from cavegen.tools.plot_volumes import (
     caixa_wireframe,
+    dados_da_matriz,
+    trace_da_nuvem,
     camera_isometrica,
+    cena_plotly,
     gizmo_eixos,
 )
 
@@ -61,16 +66,6 @@ KERNEL_FACES[1, 1, 0] = KERNEL_FACES[1, 1, 2] = 1
 PALETA = "Magma"
 NOMES = {BORDA: "borda (1)", INTERNO: "interno (2)"}
 ESCALA = ["0 vazio", "1 borda", "2 interno"]
-
-def inundar(cheio: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
-    """
-        Devolve (agua, buracos_fechados): os vazios ligados ao lado de fora da
-        grade e os vazios que a água não alcança.
-        cheio: matriz booleana (depth, height, width).
-    """
-    buracos_fechados = binary_fill_holes(cheio) & ~cheio
-    agua = ~cheio & ~buracos_fechados
-    return agua, buracos_fechados
 
 def classificar_por_inundacao(cheio: np.ndarray, agua: np.ndarray) -> np.ndarray:
     """
@@ -105,32 +100,16 @@ def trace_do_rotulo(classificacao: np.ndarray, rotulo: int, com_escala: bool) ->
         rotulo: valor plotado nesse trace.
         com_escala: desenha a barra de cores (só um dos traces precisa).
     """
-    indices = np.argwhere(classificacao == rotulo)
-    x, y, z = indices[:, 2], indices[:, 0], indices[:, 1]
-    escala = dict(
-        title=dict(text="inundação", font=dict(color="white", size=12)),
-        tickvals=list(range(len(ESCALA))), ticktext=ESCALA,
-        x=-0.06, xanchor="left", len=0.75, thickness=14,
-        bgcolor="black", outlinecolor="white", outlinewidth=1,
-        tickfont=dict(color="white", size=11),
+    x, y, z = dados_da_matriz(classificacao == rotulo)
+    trace = trace_da_nuvem(
+        x, y, z, np.full(x.size, rotulo), 4, PALETA, (VAZIO, INTERNO),
+        opacidade(rotulo), "inundação", com_escala,
     )
+    if com_escala:
+        trace.marker.colorbar.update(tickvals=list(range(len(ESCALA))), ticktext=ESCALA)
+    trace.hovertemplate = f"(%{{x}}, %{{y}}, %{{z}})<br>{NOMES[rotulo]}<extra></extra>"
+    return trace
 
-    return go.Scatter3d(
-        x=x, y=y, z=z,
-        mode="markers",
-        marker=dict(
-            size=4,
-            color=np.full(x.size, rotulo),
-            colorscale=PALETA,
-            cmin=VAZIO,
-            cmax=INTERNO,
-            opacity=opacidade(rotulo),
-            showscale=com_escala,
-            colorbar=escala if com_escala else None,
-        ),
-        hovertemplate=f"(%{{x}}, %{{y}}, %{{z}})<br>{NOMES[rotulo]}<extra></extra>",
-        showlegend=False,
-    )
 
 def figura(classificacao: np.ndarray, titulo: str) -> go.Figure:
     """
@@ -150,22 +129,13 @@ def figura(classificacao: np.ndarray, titulo: str) -> go.Figure:
     for trace in caixa_wireframe(minimos, maximos, olho) + gizmo_eixos(minimos, maximos):
         fig.add_trace(trace)
 
-    eixo_limpo = dict(
-        showgrid=False, zeroline=False, showticklabels=False, showbackground=False,
-        showspikes=False, title="", visible=False,
-    )
     fig.update_layout(
         title=dict(text=titulo, font=dict(color="white", size=14), x=0.5),
         paper_bgcolor="black",
         plot_bgcolor="black",
         width=950, height=800,
         margin=dict(l=110, r=10, t=50, b=10),
-        scene=dict(
-            xaxis=eixo_limpo, yaxis=eixo_limpo, zaxis=eixo_limpo,
-            bgcolor="black",
-            aspectmode="data",
-            camera=dict(eye=olho),
-        ),
+        scene=cena_plotly(olho),
     )
     return fig
 

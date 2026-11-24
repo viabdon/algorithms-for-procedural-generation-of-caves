@@ -4,7 +4,7 @@ Experimento de um Random Walk que monta a caverna sem pontos marcados à mão. �
 
 ## Motivação
 
-O Random Walk do projeto base foi feito para a Unity, e nele alguém marca os pontos que a caminhada deve seguir. O projeto não vai trabalhar com a Unity, e, se é preciso marcar os pontos à mão, a caverna deixa de ser procedural.
+No Random Walk do projeto base, alguém marca os pontos que a caminhada deve seguir. Este experimento investiga como gerar também esses pontos de forma procedural.
 
 A ideia aqui é tornar esses pontos automáticos: eles são sorteados e se organizam sozinhos em veios, sem nenhuma marcação manual.
 

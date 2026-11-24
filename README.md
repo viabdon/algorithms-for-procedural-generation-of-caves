@@ -19,8 +19,8 @@ A arquitetura prioriza um pipeline científico **offline-first**:
 1. Python gera volumes 3D booleanos em ZYX, persiste NPZ e calcula métricas e CSV.
 2. Random Walk e Cellular Automata básico formam o benchmark inicial, com
    domínio, resolução, sementes e orçamento documentados.
-3. Malhas extraídas dos volumes gerados por Marching Cubes permitem inspeção
-   na Unity; gRPC é posterior.
+3. O Plotly permite inspecionar os resultados em HTML. A pesquisa compara a estrutura
+   dos volumes e o custo dos algoritmos de geração. As métricas são calculadas nos voxels.
 4. GAN, PCGRL e PCGARL estão em planejamento; o pacote contém um protótipo de CA
    com peso espacial. O ajuste genético de parâmetros de CA e Random Walk
    está planejado; seus espaços de busca e orçamento ainda serão definidos.
@@ -97,10 +97,8 @@ cavegen-tcc/
 ├── docs/                 # Arquitetura, roadmap e decisões metodológicas
 ├── models/               # Checkpoints de modelos treinados
 ├── notebooks/colab/      # Notebooks de treino e prototipação no Colab
-├── proto/                # Arquivos .proto para a fase gRPC
 ├── results/              # CSVs, figuras, meshes e relatórios de profiling
-├── src/cavegen/          # Pacote Python principal
-└── unity/                # Visualizador Unity e futura integração gRPC
+└── src/cavegen/          # Pacote Python principal
 ```
 
 ## Instalação local mínima com uv
@@ -548,11 +546,18 @@ Substitua a entrada pelo `volume_path` registrado no CSV da execução desejada.
 
 ## Visualização de volumes
 
-O menu próprio do CA (`uv run python -m cavegen.generators.cellular_automata.menu`)
-e o do Random Walk (`uv run python -m cavegen.generators.random_walk.menu`)
-fornecem opções de visualização. `plots/plot_plotly.py` permanece disponível;
-`plots/matriz.py`, `plots/plot_matplotlib.py` e `fatia.py` foram removidos
-na versão integrada e não são comandos disponíveis.
+Para visualizar um `Volume3D` do benchmark, use o caminho do NPZ que consta
+na coluna `volume_path` do CSV. O comando grava um HTML interativo do Plotly
+ao lado do volume. Abra o HTML no navegador. Acima de 120.000 voxels de ar,
+a figura mostra uma amostra. As métricas usam o volume completo.
+
+```bash
+uv run python -m cavegen.tools.plot_volumes caminho/do/volume.npz
+```
+
+Para os resultados numerados dos menus, use `uv run poe menu-ca` ou
+`uv run poe menu-rw`. As figuras desses menus incluem os dados próprios
+de cada gerador, como o histórico do CA ou os caminhos do Random Walk.
 
 ## Interfaces legadas e frentes futuras
 
@@ -563,7 +568,6 @@ na versão integrada e não são comandos disponíveis.
 | Treino GAN | `uv run python -m cavegen.training.train_gan` | Placeholder: encerra com mensagem, sem treinar. |
 | Treino PCGRL | `uv run python -m cavegen.training.train_pcgrl` | Placeholder: encerra com mensagem, sem treinar. |
 | Colab | [Orientações de notebooks](notebooks/colab/README.md) | Sequência planejada; os notebooks sugeridos ainda precisam ser criados. |
-| Unity e gRPC | `unity/`, `proto/caves.proto`, `cavegen.datastream.grpc_adapter` | Há contrato/serialização, mas não um aplicativo Unity ou servidor gRPC integrado para executar. |
 | Menu experimental do CA | `uv run python -m cavegen.generators.cellular_automata.menu` | Disponível no pacote, com API própria; integração ao benchmark pendente. |
 | Reconstrução e linha central do Elaphes | Branch `experiment/elaphes-meshing` | Comandos e artefatos descritos na documentação daquela branch; não são etapas exigidas na avaliação atual. |
 
@@ -617,7 +621,7 @@ ser transferidos separadamente quando necessários à reprodução.
    ambiente pequeno e auditoria de dados conforme o [plano neural](docs/plano-redes-neurais.md).
 3. A dupla acorda métricas, seeds, orçamento, hardware e esquema comum antes
    da coleta final, separando custo de treino, ajuste e geração.
-4. Parsing adicional, algoritmo evolutivo e inspeção na Unity seguem o
+4. Parsing adicional e ajuste evolutivo seguem o
    [roadmap](docs/roadmap.md), conforme disponibilidade e prioridades.
 
 ## Observação sobre benchmarks
@@ -626,8 +630,7 @@ As métricas finais devem ser calculadas em ambiente controlado e reportadas com
 
 - tempo de treinamento;
 - tempo de inferência/geração;
-- custo de renderização/visualização;
-- custo de integração, caso gRPC seja usado.
+- custo de visualização com Plotly.
 
 Não misture resultados de Colab, máquina local e ROCm na mesma tabela principal sem identificá-los como ambientes distintos.
 

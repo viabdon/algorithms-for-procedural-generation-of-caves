@@ -20,9 +20,10 @@ from pathlib import Path
 import numpy as np
 import plotly.graph_objects as go
 
-from cavegen.generators.cellular_automata.plot import (
+from cavegen.tools.plot_volumes import (
     caixa_wireframe,
     camera_isometrica,
+    cena_plotly,
     gizmo_eixos,
 )
 from cavegen.generators.random_walk.plot import figura_classificacao
@@ -171,10 +172,6 @@ def figura_progressao(rede: Rede, cabecalho: str) -> go.Figure:
             args=[{"visible": visiveis}, {"title.text": titulos[etapa]}],
         ))
 
-    eixo_limpo = dict(
-        showgrid=False, zeroline=False, showticklabels=False, showbackground=False,
-        showspikes=False, title="", visible=False,
-    )
     fig.update_layout(
         title=dict(text=titulos[0], font=dict(color=COR_TEXTO, size=14), x=0.5),
         paper_bgcolor="black",
@@ -185,13 +182,7 @@ def figura_progressao(rede: Rede, cabecalho: str) -> go.Figure:
                     x=0.01, y=0.97, itemsizing="constant"),
         # uirevision fixo: mudar de etapa não mexe na câmera que você girou.
         uirevision="etapas",
-        scene=dict(
-            xaxis=eixo_limpo, yaxis=eixo_limpo, zaxis=eixo_limpo,
-            bgcolor="black",
-            aspectmode="data",
-            camera=dict(eye=olho),
-            uirevision="etapas",
-        ),
+        scene=dict(cena_plotly(olho), uirevision="etapas"),
         sliders=[dict(
             active=0, steps=passos, pad=dict(t=10, b=10), len=0.9, x=0.05,
             font=dict(color=COR_TEXTO, size=12),

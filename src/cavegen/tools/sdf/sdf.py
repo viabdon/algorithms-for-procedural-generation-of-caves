@@ -55,12 +55,16 @@ import plotly.graph_objects as go
 from scipy.ndimage import distance_transform_edt
 
 from cavegen.generators.cellular_automata.pesos import caminho_legivel
-from cavegen.generators.cellular_automata.plot import (
+from cavegen.tools.plot_volumes import (
     caixa_wireframe,
+    dados_da_matriz,
+    trace_da_nuvem,
     camera_isometrica,
+    cena_plotly,
     gizmo_eixos,
 )
 from cavegen.sdf.manipulacao import manipular_sdf
+from cavegen.tools.sdf import CORTE_NEGATIVO, corte_do_campo, opacidade
 from cavegen.tools.flood_fill.inundacao import (
     BORDA,
     INTERNO,
@@ -80,10 +84,6 @@ CONVENCAO = "interno positivo, externo negativo, borda 0; distância em voxels"
 # cavegen.sdf.manipulacao), gravada em todo npz. Suba quando qualquer um mudar:
 # o pipeline do GA refaz os campos de versão antiga, e só por ela sabe da mudança.
 VERSAO_SDF = 1
-
-# Distância, do lado de fora da borda, em que a opacidade chega a 0: o que está
-# além disso não é plotado.
-CORTE_NEGATIVO = -10.0
 
 PALETA = "Tropic"
 
@@ -150,6 +150,11 @@ def sdf_da_superficie(cheio: np.ndarray) -> tuple[np.ndarray, np.ndarray, np.nda
     agua, _ = inundar(cheio)
     classificacao = classificar_por_inundacao(cheio, agua)
 
+    return sdf_da_classificacao(classificacao)
+
+
+def sdf_da_classificacao(classificacao: np.ndarray) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """Devolve SDF, borda e interior da grade já classificada em 0, 1 e 2."""
     borda = binarizar_borda(classificacao)
     interno = classificacao == INTERNO
     return aplicar_sinal(distancia_ate_borda(borda), interno), borda, interno
@@ -195,26 +200,6 @@ def gravar_campo(entrada: Path, limiar: float = 0.0, escala_log: float | None = 
     )
     return destino
 
-def corte_do_campo(limiar: float = 0.0, escala_log: float | None = None) -> float:
-    """
-        Valor do campo a CORTE_NEGATIVO voxels da borda, do lado de fora. Como as
-        manipulações só crescem, o que passa do corte no campo é o que passava
-        no SDF base.
-        limiar, escala_log: os de manipular_sdf.
-    """
-    corte = np.array([CORTE_NEGATIVO], dtype=np.float32)
-    return float(manipular_sdf(corte, limiar, escala_log)[0])
-
-def opacidade(valor: float, maximo: float, corte: float = CORTE_NEGATIVO) -> float:
-    """
-        Rampa linear: o corte fica 100% transparente e o valor mais positivo
-        fica opaco.
-        valor: nível do campo.
-        maximo: maior valor do campo.
-        corte: valor do campo onde a opacidade é 0.
-    """
-    return (valor - corte) / (maximo - corte)
-
 def regiao(valor: float, valor_da_borda: float = 0.0) -> str:
     """
         Nome da região de um nível do campo, para o hover.
@@ -242,34 +227,17 @@ def trace_do_nivel(sdf: np.ndarray, valor: float, maximo: float, com_escala: boo
         corte: base da escala de cor e da opacidade.
         valor_da_borda: quanto vale a borda no campo, para o hover.
     """
-    indices = np.argwhere(sdf == valor)
-    x, y, z = indices[:, 2], indices[:, 0], indices[:, 1]
-    marcas = list(range(int(np.ceil(corte)), int(np.floor(maximo)) + 1))
-    escala = dict(
-        title=dict(text="SDF (voxels)", font=dict(color="white", size=12)),
-        tickvals=marcas,
-        x=-0.06, xanchor="left", len=0.75, thickness=14,
-        bgcolor="black", outlinecolor="white", outlinewidth=1,
-        tickfont=dict(color="white", size=11),
+    x, y, z = dados_da_matriz(sdf == valor)
+    trace = trace_da_nuvem(
+        x, y, z, np.full(x.size, valor), 4, PALETA, (corte, maximo),
+        opacidade(valor, maximo, corte), "SDF (voxels)", com_escala,
     )
+    if com_escala:
+        trace.marker.colorbar.tickvals = list(range(int(np.ceil(corte)), int(np.floor(maximo)) + 1))
     nome = regiao(valor, valor_da_borda)
+    trace.hovertemplate = f"(%{{x}}, %{{y}}, %{{z}})<br>{nome}: {valor:.2f}<extra></extra>"
+    return trace
 
-    return go.Scatter3d(
-        x=x, y=y, z=z,
-        mode="markers",
-        marker=dict(
-            size=4,
-            color=np.full(x.size, valor),
-            colorscale=PALETA,
-            cmin=corte,
-            cmax=maximo,
-            opacity=opacidade(valor, maximo, corte),
-            showscale=com_escala,
-            colorbar=escala if com_escala else None,
-        ),
-        hovertemplate=f"(%{{x}}, %{{y}}, %{{z}})<br>{nome}: {valor:.2f}<extra></extra>",
-        showlegend=False,
-    )
 
 def figura(sdf: np.ndarray, titulo: str, corte: float = CORTE_NEGATIVO,
            valor_da_borda: float = 0.0) -> go.Figure:
@@ -296,22 +264,13 @@ def figura(sdf: np.ndarray, titulo: str, corte: float = CORTE_NEGATIVO,
     for trace in caixa_wireframe(minimos, maximos, olho) + gizmo_eixos(minimos, maximos):
         fig.add_trace(trace)
 
-    eixo_limpo = dict(
-        showgrid=False, zeroline=False, showticklabels=False, showbackground=False,
-        showspikes=False, title="", visible=False,
-    )
     fig.update_layout(
         title=dict(text=titulo, font=dict(color="white", size=14), x=0.5),
         paper_bgcolor="black",
         plot_bgcolor="black",
         width=950, height=800,
         margin=dict(l=110, r=10, t=50, b=10),
-        scene=dict(
-            xaxis=eixo_limpo, yaxis=eixo_limpo, zaxis=eixo_limpo,
-            bgcolor="black",
-            aspectmode="data",
-            camera=dict(eye=olho),
-        ),
+        scene=cena_plotly(olho),
     )
     return fig
 

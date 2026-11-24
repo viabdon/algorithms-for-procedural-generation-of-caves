@@ -120,7 +120,7 @@ diário sem quebrar o padrão.
 | [Dia 6](#dia-6--pesquisando-sdf-da-superfície-para-a-matriz-voxelizada) | Pesquisando SDF: da superfície para a matriz voxelizada | Cellular Automata 3D, Random Walk 3D | Ideia de usar o SDF de uma caverna de Random Walk como matriz de peso pro CA (reforçar voxels perto dela, apagar bolsões distantes); estudo da base do Signed Distance Field, a falta (até agora) de literatura aplicando SDF direto em matriz voxelizada em vez de malha, e o custo inviável da busca ingênua por distâncias em 2D e, pior, em 3D |
 | [Dia 7](#dia-7--flood-fill-pra-separar-dentro-e-fora-e-a-mediatriz-como-atalho-pra-distância-euclidiana) | Flood fill pra separar dentro e fora, e a mediatriz como atalho pra distância euclidiana | Geral (SDF) | Flood fill escolhido pra classificar interior/exterior no Elaphes depois de comparar com vizinhos de face e CA de preenchimento (trata os 26 voxels de buraco fechado sem mexer no lado de fora e sem parâmetros, mas depende da parede externa estar fechada) e a mediatriz como ideia pra cortar comparações no cálculo da distância euclidiana |
 | [Dia 8](#dia-8--ca-guiado-pelo-sdf-do-elaphes-segue-o-contorno-sem-copiar-a-caverna) | CA guiado pelo SDF do Elaphes: segue o contorno sem copiar a caverna | Cellular Automata 3D | SDF do Elaphes calculado (inundação + EDT exata do scipy) e somado como peso à contagem de vizinhos do CA: o vazio fica confinado ao entorno da caverna e a sensibilidade controla a espessura (IoU máximo 0,49 em s = 13), seguindo o contorno sem copiar. Próximo passo: trocar o Elaphes pelo SDF de uma caverna de Random Walk |
-| [Dia 9](#dia-9--ca-guiado-pelo-sdf-de-um-random-walk-100-procedural) | CA guiado pelo SDF de um Random Walk 100% procedural | Random Walk 3D, Cellular Automata 3D | Sem Unity não dá pra marcar waypoints à mão, então um Random Walk modificado (`temp_rw/`), auxiliar do CA e sem substituir o do TCC base, sorteia pontos e os organiza por regras; o SDF dele enviesa o CA, que dá assimetria aos túneis e muda de textura com a seed. O túnel estreito (raio 1,5) deixa o peso fraco e a caverna se parte (4,6 pedaços contra 1,7 do Elaphes); próximo passo: engrossar o túnel |
+| [Dia 9](#dia-9--ca-guiado-pelo-sdf-de-um-random-walk-100-procedural) | CA guiado pelo SDF de um Random Walk 100% procedural | Random Walk 3D, Cellular Automata 3D | O fluxo em Python parte de waypoints já marcados, então um Random Walk modificado (`temp_rw/`), auxiliar do CA e sem substituir o do TCC base, sorteia pontos e os organiza por regras; o SDF dele enviesa o CA, que dá assimetria aos túneis e muda de textura com a seed. O túnel estreito (raio 1,5) deixa o peso fraco e a caverna se parte (4,6 pedaços contra 1,7 do Elaphes); próximo passo: engrossar o túnel |
 
 ## Dúvidas em aberto
 
@@ -729,9 +729,8 @@ portado pra Python. Ele está aqui dentro porque a proposta do nosso TCC é
 justamente fazer a análise comparativa dele com os algoritmos que ainda não
 tinham sido implementados, e ele continua no repositório como o Random Walk
 da comparação. Só que ele caminha entre waypoints marcados à mão sobre
-modelos de cavernas reais numa cena da Unity, então só gera as cavernas que
-já vêm com esses pontos marcados. A gente não vai fazer a portabilidade pra
-Unity, então não tem como marcar waypoints novos manualmente. E, como o
+modelos de cavernas reais na cena original, então só gera as cavernas que
+já vêm com esses pontos marcados. No nosso fluxo em Python, a gente usa esses pontos já exportados. E, como o
 Cellular Automata vai seguir de fato um Random Walk, eu queria que esse guia
 fosse 100% procedural, sem interferência de ser humano.
 

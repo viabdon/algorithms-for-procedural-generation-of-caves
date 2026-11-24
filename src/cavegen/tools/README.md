@@ -18,6 +18,16 @@ comparados.
 | [`sdf/`](sdf/README.md) | SDF de uma grade de superfície, com o sinal vindo do `flood_fill/`, manipulável (limiar e log) e com plot | `random_walk_points/`, `indian_tunnel_temp/`, o peso padrão do CA |
 | [`random_walk_points/`](random_walk_points/README.md) | Random Walk com pontos sorteados, cuja rede vira peso do CA | o CA, pelos pesos |
 
+## Reutilização no projeto
+
+Antes de implementar uma operação, procure sua implementação em `cavegen.tools`.
+Os geradores, a datastream e os experimentos importam dali o cálculo compartilhado.
+Quando outro fluxo precisar de uma operação existente, extraia a parte comum para
+`tools` e preserve as convenções e interfaces específicas de cada consumidor.
+
+`plot_volumes.py` fornece as funções Plotly compartilhadas e gera HTML a partir de volumes do
+benchmark com `python -m cavegen.tools.plot_volumes caminho/do/volume.npz`.
+
 ## Como rodar
 
 Como módulo do pacote (`-m`):

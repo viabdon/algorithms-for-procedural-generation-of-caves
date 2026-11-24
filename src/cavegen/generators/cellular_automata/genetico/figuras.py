@@ -33,7 +33,7 @@ from cavegen.generators.cellular_automata.genetico.resultados import (
     nomes_das_cavernas,
     tabela_dos_melhores,
 )
-from cavegen.generators.cellular_automata.plot import (
+from cavegen.tools.plot_volumes import (
     CONTRASTE_MINIMO_LINHA,
     contraste_no_preto,
 )

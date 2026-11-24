@@ -6,7 +6,7 @@
 
 ```text
 gerador -> Volume3D booleano em ZYX -> NPZ -> métricas e CSV em Python
-        -> malha opcional por Marching Cubes -> Unity
+        -> inspeção dos resultados com Plotly
 ```
 
 `True` significa ar; `False`, sólido. As medições finais usarão `64³` em ZYX. Cada comparação deve declarar parâmetros, sementes, repetições, hardware e orçamento; escala física só deve ser atribuída aos voxels se houver conversão conhecida. Marching Cubes visualiza volumes gerados e não reconstrói a point cloud.
@@ -27,7 +27,7 @@ acordam o protocolo de avaliação, sementes, hardware e versão do esquema.
    custo e metadados para consolidar registros brutos e sumários por condição.
 3. Pablo especifica MDP e recompensa de RL, audita dados e limites da GAN e
    confirma a abordagem adversarial. Ver [plano neural](docs/plano-redes-neurais.md).
-4. Busca evolutiva dos clássicos, parsing adicional e Unity seguem conforme
+4. Busca evolutiva dos clássicos e parsing adicional seguem conforme
    disponibilidade e prioridade, com orçamento e sementes documentados.
 
 Ver [tarefas de Pablo](docs/tarefas-pablo-reconstrucao-modelos.md),
@@ -36,5 +36,7 @@ Ver [tarefas de Pablo](docs/tarefas-pablo-reconstrucao-modelos.md),
 ## Delimitação da referência real
 
 Os pontos do Elaphes representam parede observada. A grade diagnóstica `32³` contém 245 voxels de superfície; o complemento mistura interior, exterior e áreas não observadas. As malhas experimentais não forneceram um interior validado: houve bordas, defeitos topológicos, auto-interseções ou extrapolação. A linha central serviu à inspeção, mas não estabeleceu o sinal do SDF. Não calcular IoU volumétrica contra o scan nem apresentar ocupação ou largura do vazio real como medidas observadas. Inspeção qualitativa e eventual comparação de superfície alinhada e toleranciada podem ser relatadas com limites explícitos.
+
+Para operações compartilhadas entre geradores e experimentos, consulte e reutilize as [ferramentas do pacote](src/cavegen/tools/README.md).
 
 Mudanças Python com contrato observável exigem testes em `tests/`; antes de concluí-las, executar a suíte e uma importação ou exemplo pertinente.

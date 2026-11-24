@@ -13,10 +13,12 @@ from cavegen.generators.cellular_automata.generator import BorderTreatment, neig
 from cavegen.generators.cellular_automata.plot import (
     MAX_VIZINHOS,
     MIN_VIZINHOS,
+    opacidade_por_vizinhos,
+)
+from cavegen.tools.plot_volumes import (
     cores_das_linhas,
     dados_da_matriz,
     figura_volumetrica,
-    opacidade_por_vizinhos,
     trace_da_linha,
 )
 

@@ -20,10 +20,7 @@ from cavegen.generators.cellular_automata.pesos import PESOS_DIR, importar_sdf, 
 from cavegen.tools.random_walk_points.results import RESULTS_DIR, load_result
 from cavegen.tools.sdf.sdf import (
     CONVENCAO,
-    INTERNO,
-    aplicar_sinal,
-    binarizar_borda,
-    distancia_ate_borda,
+    sdf_da_classificacao,
 )
 
 PASTA_NPZ = Path(__file__).resolve().parent / "npz"
@@ -33,8 +30,8 @@ def calcular_sdf(classificacao: np.ndarray) -> np.ndarray:
         SDF de uma grade classificada: interno positivo, externo negativo, borda 0.
         classificacao: matriz com 0 fora, 1 borda e 2 interno.
     """
-    borda = binarizar_borda(classificacao)
-    return aplicar_sinal(distancia_ate_borda(borda), classificacao == INTERNO)
+    sdf, _, _ = sdf_da_classificacao(classificacao)
+    return sdf
 
 def gravar_sdf(result_id: int, directory: Path = RESULTS_DIR, saida: Path = PASTA_NPZ) -> Path:
     """

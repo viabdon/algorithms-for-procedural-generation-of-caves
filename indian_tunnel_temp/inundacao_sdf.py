@@ -25,9 +25,7 @@ from cavegen.tools.flood_fill.inundacao import figura as figura_inundacao
 from cavegen.tools.sdf.sdf import (
     CONVENCAO,
     CORTE_NEGATIVO,
-    aplicar_sinal,
-    binarizar_borda,
-    distancia_ate_borda,
+    sdf_da_classificacao,
 )
 from cavegen.tools.sdf.sdf import figura as figura_sdf
 
@@ -61,9 +59,7 @@ def main():
     print(f"inundação: cheios {int(cheio.sum())}, borda {n_borda}, interno {n_interno} "
           f"({buracos} buracos fechados) -> {saida_inundacao.name}")
 
-    borda = binarizar_borda(classificacao)
-    interno = classificacao == INTERNO
-    sdf = aplicar_sinal(distancia_ate_borda(borda), interno)
+    sdf, borda, interno = sdf_da_classificacao(classificacao)
 
     saida_sdf = entrada.with_name(entrada.stem + "_sdf.npz")
     np.savez_compressed(
