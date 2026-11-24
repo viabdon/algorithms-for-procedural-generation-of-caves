@@ -25,6 +25,9 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+centreline = [
+  "robust-laplacian==1.1.0",
+]
 ml = [
   "torch>=2.2",
   "stable-baselines3>=2.3",

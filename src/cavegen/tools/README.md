@@ -28,6 +28,20 @@ Quando outro fluxo precisar de uma operação existente, extraia a parte comum p
 `plot_volumes.py` fornece as funções Plotly compartilhadas e gera HTML a partir de volumes do
 benchmark com `python -m cavegen.tools.plot_volumes caminho/do/volume.npz`.
 
+`cavegen.tools.centreline.estimate_centreline` estima um grafo por contração
+laplaciana e árvore geradora mínima. A função recebe lotes XYZ e retorna os nós,
+as arestas por índice e os metadados em memória. Para usá-la, instale o extra
+com `uv sync --locked --extra centreline` e importe a função e seus parâmetros:
+
+```python
+from cavegen.tools.centreline import ExtractionSettings, estimate_centreline
+
+nodes, edges, metadata = estimate_centreline(batches_xyz, ExtractionSettings())
+```
+
+Se os lotes foram deslocados para uma origem local, informe essa origem em
+`source_offset` para receber os nós nas coordenadas originais.
+
 ## Como rodar
 
 Como módulo do pacote (`-m`):
