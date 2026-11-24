@@ -11,6 +11,7 @@ from cavegen.datastream.crop_planner import propose_crops
 from cavegen.datastream.gallery_crop import prepare_crop, process_crop
 from cavegen.datastream.menu import main
 from cavegen.datastream.ply import iter_ply_xyz, read_ply_header
+from cavegen.tools.centreline import ExtractionSettings, estimate_centreline
 
 
 def straight_cloud(length, y=0):
@@ -133,6 +134,27 @@ def test_menu_estimates_missing_centreline_and_namespaces_both_outputs(tmp_path,
         )
         assert record["retained_points"] > 0
         assert "linha_central_estimada" in record["review_reasons"]
+
+
+def test_shared_centreline_recovers_original_xyz_from_local_batches():
+    pytest.importorskip("robust_laplacian")
+    points = straight_cloud(24)
+    offset = np.array([700_000, 9_000_000, 500])
+    batches = (points[start:start + 1300] for start in range(0, len(points), 1300))
+    nodes, edges, provenance = estimate_centreline(
+        batches, ExtractionSettings(), source_offset=offset,
+    )
+    local_nodes = nodes - offset
+    assert np.ptp(local_nodes[:, 0]) > 15
+    assert np.linalg.norm(local_nodes[:, 1:], axis=1).max() < .6
+    assert len(edges) == len(nodes) - 1
+    assert provenance["points_read"] == len(points)
+
+
+def test_shared_centreline_rejects_invalid_xyz_batches():
+    pytest.importorskip("robust_laplacian")
+    with pytest.raises(ValueError, match="lote.*XYZ"):
+        estimate_centreline([np.zeros((32, 2))], ExtractionSettings())
 
 
 def test_u_shape_uses_station_to_keep_the_opposite_arm_out(tmp_path):

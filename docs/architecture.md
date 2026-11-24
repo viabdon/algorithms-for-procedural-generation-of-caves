@@ -7,10 +7,10 @@ O fluxo principal parte dos geradores e é executado em Python. A reconstrução
 ```text
 gerador -> Volume3D (bool[D,H,W], ZYX) -> NPZ
         -> métricas e CSV em Python
-        -> malha de visualização por Marching Cubes -> Unity
+        -> visualização interativa do volume com Plotly
 ```
 
-`True`/`1` significa ar e `False`/`0`, sólido. A grade final de medição é `64³` em ZYX. Sementes, parâmetros, hardware e orçamento devem acompanhar cada experimento; tamanho físico do voxel só pode ser declarado se houver uma escala conhecida. Marching Cubes extrai malhas dos volumes gerados; não reconstrói a nuvem real. Unity serve à inspeção, e gRPC fica para depois do benchmark científico.
+`True`/`1` significa ar e `False`/`0`, sólido. A grade final de medição é `64³` em ZYX. Sementes, parâmetros, hardware e orçamento devem acompanhar cada experimento; tamanho físico do voxel só pode ser declarado se houver uma escala conhecida. Marching Cubes extrai malhas dos volumes gerados; não reconstrói a nuvem real. A geração do HTML pelo Plotly ocorre depois da medição do gerador.
 
 ## Contrato público do SDF de volumes gerados
 
@@ -59,7 +59,7 @@ O gerador público de Random Walk passou a ser o random walk ponderado por waypo
 
 | Etapa | Contrato | Estado |
 | --- | --- | --- |
-| Grafos de waypoints | `configs/random_walk/<caverna>.yaml`, exportados uma vez da cena Unity por `exportar_cena.py`; eixos da Unity | Implementado; quatro cavernas, grafo idêntico ao da cena |
+| Grafos de waypoints | `configs/random_walk/<caverna>.yaml`, exportados uma vez da cena original por `exportar_cena.py`, nos eixos do projeto base | Implementado; quatro cavernas, grafo idêntico ao da cena |
 | Caminhada | `gerar_caminhos(grafo, rng) -> (pontos, inicios)`, porte de `WeightedRandomWalk.cs`/`PathGenerator.cs` com `numpy_rng` | Implementado; testes com tradução literal do C# como oráculo |
 | Voxelização | Cápsulas de raio `raio_voxels` (padrão 1,5) em grade cúbica, encaixe com a mesma escala e margem de 2 voxels | Implementado |
 | Gerador | `generate_random_walk(shape, seed, caverna, weight, k, spacer, raio_voxels) -> Volume3D` e `RandomWalkGenerator`; grade cúbica com lado > 5 | Implementado |
@@ -75,13 +75,13 @@ O PLY do Elaphes contém pontos de parede observada. A grade diagnóstica `32³`
 
 Os experimentos de amostragem, Screened Poisson, linha central, orientação de normais e espessamento estão preservados na branch `experiment/elaphes-meshing` e em artefatos locais. Nenhuma malha avaliada validou conjuntamente fechamento, ausência de auto-interseções, conectividade e aderência à nuvem. Não há classificação interior/exterior nem SDF real confiável para o benchmark. A conclusão vale para os testes feitos no Elaphes, sem demonstrar impossibilidade geral. Ball Pivoting, Alpha Shapes, winding numbers e fechos controlados permanecem hipóteses sem comparação concluída nesse conjunto.
 
-Na branch `CA`, `sdf_temp/` calcula flood fill e distância euclidiana à borda da grade de superfície `64³`. O campo também usa interior positivo, exterior negativo e distância em voxels, mas seu "interno" pode ser espessura de parede ou buracos fechados; entradas abertas tornam o ar do túnel alcançável pelo exterior. Compartilhar sinal e unidade com o contrato sintético não torna as classes semanticamente equivalentes. O campo serve ao ensaio de peso espacial, mas não valida `VOID` real, distância física ou IoU volumétrica.
+As ferramentas em `cavegen.tools.flood_fill` e `cavegen.tools.sdf` calculam inundação e distância euclidiana à borda da grade de superfície `64³`. O campo também usa interior positivo, exterior negativo e distância em voxels, mas seu "interno" pode ser espessura de parede ou buracos fechados; entradas abertas tornam o ar do túnel alcançável pelo exterior. Compartilhar sinal e unidade com o contrato sintético não torna as classes semanticamente equivalentes. O campo serve ao ensaio de peso espacial, mas não valida `VOID` real, distância física ou IoU volumétrica.
 
 O scan pode apoiar inspeção qualitativa e propriedades efetivamente observáveis. Métricas de superfície exigiriam regiões alinhadas e comparáveis, tolerância e distinção entre parede medida e geometria extrapolada. IoU de superfície não substitui automaticamente IoU volumétrica.
 
 ## Extensões
 
-Uma variante de CA com peso espacial já existe na branch `CA`. O ensaio com o campo do Elaphes demonstra o efeito do peso na regra, sem fornecer avaliação de semelhança volumétrica real. A extensão guiada requer campo procedural com semântica e unidade documentadas, independente do scan de teste. Peso zero já foi verificado contra o CA básico; ainda falta comparar resultados sob protocolo comum. Está planejado ajustar geneticamente parâmetros de CA e Random Walk, com orçamento e sementes de avaliação reservadas, custo de busca separado e controle por busca simples de mesmo orçamento.
+Uma variante de CA com peso espacial já existe na branch `CA`. O ensaio com o campo do Elaphes demonstra o efeito do peso na regra, sem fornecer avaliação de semelhança volumétrica real. A extensão guiada requer campo procedural com semântica e unidade documentadas, independente do scan de teste. Peso zero já foi verificado contra o CA básico; ainda falta comparar resultados sob protocolo comum. Está planejado ajustar geneticamente parâmetros de CA e Random Walk, com orçamento e sementes de avaliação reservadas, custo de busca separado e controle por busca simples de mesmo orçamento. Para o GA do CA, decidido em 12/11/2026, o peso e o alvo da aptidão vêm do mesmo Elaphes, o que é assumido como exceção à independência acima e exige o controle de cópia pura do peso ([ajustes metodológicos](methodology-adjustments.md#3-extensões-condicionadas-e-neurais)).
 
 Uma GAN requer volumes de treino com semântica válida; dados sintéticos verificam a infraestrutura, mas não sustentam alegação de aprendizagem de cavernas reais. O código atual implementa G/D, treino e inferência a partir de checkpoint, sem modelo treinado nas referências. A variante neural usa TSDF discreto nos centros, com interface entre centros e recuperação por sinal, distinta do contrato histórico de borda zero acima; ver o [plano neural](plano-redes-neurais.md). PCGRL ainda depende de ambiente pequeno, recompensa e definição do MDP.
 

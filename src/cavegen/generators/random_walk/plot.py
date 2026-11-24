@@ -14,9 +14,11 @@ from pathlib import Path
 import numpy as np
 import plotly.graph_objects as go
 
-from cavegen.generators.cellular_automata.plot import (
+from cavegen.tools.plot_volumes import (
     caixa_wireframe,
+    dados_da_matriz,
     camera_isometrica,
+    cena_plotly,
     figura_volumetrica,
     gizmo_eixos,
 )
@@ -58,22 +60,13 @@ def figura_caminhos(grafo: Grafo, pontos: np.ndarray, inicios: np.ndarray,
     for trace in caixa_wireframe(minimos, maximos, olho) + gizmo_eixos(minimos, maximos):
         fig.add_trace(trace)
 
-    eixo_limpo = dict(
-        showgrid=False, zeroline=False, showticklabels=False, showbackground=False,
-        showspikes=False, title="", visible=False,
-    )
     fig.update_layout(
         title=dict(text=titulo, font=dict(color="white", size=14), x=0.5),
         paper_bgcolor="black",
         plot_bgcolor="black",
         width=950, height=800,
         margin=dict(l=10, r=10, t=50, b=10),
-        scene=dict(
-            xaxis=eixo_limpo, yaxis=eixo_limpo, zaxis=eixo_limpo,
-            bgcolor="black",
-            aspectmode="data",
-            camera=dict(eye=olho),
-        ),
+        scene=cena_plotly(olho),
     )
     return fig
 
@@ -86,10 +79,10 @@ def figura_classificacao(classificacao: np.ndarray, titulo: str) -> go.Figure:
     """
     lado = classificacao.shape[0]
     vazio = classificacao != 0
-    vivas = np.argwhere(vazio)
+    x, y, z = dados_da_matriz(vazio)
     valores = classificacao[vazio]
     return figura_volumetrica(
-        vivas[:, 2], vivas[:, 0], vivas[:, 1], valores, titulo,
+        x, y, z, valores, titulo,
         minimos=[-0.5] * 3, maximos=[lado - 0.5] * 3,
         rotulo_escala="1 borda, 2 interno", limites_cor=(BORDA, INTERNO), paleta="Magma",
         opacidades=np.where(valores == INTERNO, 1.0, 0.35),

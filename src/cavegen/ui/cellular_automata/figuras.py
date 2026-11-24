@@ -11,12 +11,15 @@ from plotly.subplots import make_subplots
 
 from cavegen.generators.cellular_automata.generator import BorderTreatment, neighbor_counts
 from cavegen.generators.cellular_automata.plot import (
-    COR_CAIXA,
     MAX_VIZINHOS,
     MIN_VIZINHOS,
+    opacidade_por_vizinhos,
+)
+from cavegen.tools.plot_volumes import (
+    cores_das_linhas,
     dados_da_matriz,
     figura_volumetrica,
-    opacidade_por_vizinhos,
+    trace_da_linha,
 )
 
 ALTURA_3D = 720
@@ -47,7 +50,8 @@ def celulas_visiveis(matriz: np.ndarray) -> np.ndarray:
 
 
 def figura_3d(matriz: np.ndarray, border_treatment: str, modo: str = "vizinhos",
-              paleta: str = "Purp", so_superficie: bool = True, titulo: str = "") -> go.Figure:
+              paleta: str = "Purp", so_superficie: bool = True, titulo: str = "",
+              com_escala: bool = True) -> go.Figure:
     """
         Nuvem 3D de um passo do CA, nos modos de cor do plot.py.
         matriz: matriz binária do passo.
@@ -56,6 +60,7 @@ def figura_3d(matriz: np.ndarray, border_treatment: str, modo: str = "vizinhos",
         paleta: uma das PALETAS do plot.py.
         so_superficie: desenha só as células visíveis (ver celulas_visiveis).
         titulo: texto no topo da figura.
+        com_escala: desenha a barra de cores à esquerda do cubo.
     """
     vivas = np.asarray(matriz, dtype=bool)
     desenhadas = celulas_visiveis(vivas) if so_superficie else vivas
@@ -81,9 +86,12 @@ def figura_3d(matriz: np.ndarray, border_treatment: str, modo: str = "vizinhos",
         paleta=paleta,
         opacidades=opacidades,
     )
+    if not com_escala:
+        # Sem a barra, a margem esquerda que ela ocupava volta para o cubo.
+        figura.update_traces(marker_showscale=False, selector=dict(type="scatter3d"))
     # uirevision fixo: o plotly mantém a câmera do usuário entre redesenhos.
     figura.update_layout(width=None, height=ALTURA_3D, uirevision="cubo",
-                         margin=dict(l=60, r=0, t=40, b=0))
+                         margin=dict(l=60 if com_escala else 0, r=0, t=40, b=0))
     return figura
 
 
@@ -118,9 +126,11 @@ def figura_cortes(paineis: list, eixo: str) -> go.Figure:
                 hovertemplate="x=%{x} y=%{y}<br>%{z}<extra></extra>",
             )
         else:
-            # SDF: interno positivo (azul), externo negativo (vermelho), zero no meio.
+            # A paleta vai do mínimo (vermelho) ao máximo (azul) do corte. Com zmid=0 o
+            # plotly espelhava o extremo mais longe do zero e gastava metade da escala
+            # num lado sem valores, como o positivo de um peso só negativo.
             trace = go.Heatmap(
-                z=corte, colorscale="RdBu", zmid=0,
+                z=corte, colorscale="RdBu",
                 colorbar=dict(title="peso", thickness=12, len=0.8),
                 hovertemplate="x=%{x} y=%{y}<br>peso=%{z:.2f}<extra></extra>",
             )
@@ -135,39 +145,49 @@ def figura_cortes(paineis: list, eixo: str) -> go.Figure:
     return figura
 
 
-def figura_evolucao(historico, total_celulas: int, passo_atual: int | None = None) -> go.Figure:
+def figura_evolucao(historico, total_celulas: int, passo_atual: int | None = None,
+                    viraram_1=None, viraram_0=None, paleta: str = "Purp") -> go.Figure:
     """
-        Células vivas por iteração, com o passo escolhido destacado.
+        Células por iteração, como o painel de histórico do plot.py: vivas e, quando
+        conhecidas, as que viraram 1 e 0. O passo escolhido fica destacado.
         historico: células vivas em cada passo, do 0 (seed) ao último.
-        total_celulas: tamanho do volume, para o eixo em porcentagem.
+        total_celulas: tamanho do volume, para mostrar a porcentagem no hover.
         passo_atual: passo marcado em destaque, ou None.
+        viraram_1, viraram_0: células que mudaram em cada iteração, ou None.
+        paleta: de onde saem as cores das linhas, a mesma da nuvem.
     """
     historico = np.asarray(historico)
     passos = np.arange(historico.size)
-    porcentagem = 100 * historico / total_celulas
+    com_transicoes = viraram_1 is not None and viraram_0 is not None
+    cor_vivas, cor_1, cor_0 = cores_das_linhas(paleta)
 
-    figura = go.Figure(go.Scatter(
-        x=passos, y=porcentagem,
-        mode="lines+markers",
-        line=dict(color=COR_CAIXA, width=2),
-        marker=dict(color=COR_CAIXA, size=8, line=dict(color="black", width=2)),
-        customdata=historico,
-        hovertemplate="iteracao %{x}<br>%{customdata:,d} celulas vivas"
-                      "<br>%{y:.1f}% do volume<extra></extra>",
-        showlegend=False,
-    ))
+    figura = go.Figure(trace_da_linha(passos, historico, "celulas vivas", cor_vivas, "circle",
+                                      "solid", total_celulas, com_transicoes))
+    if com_transicoes:
+        # A transição acontece entre dois passos: a primeira chega no passo 1.
+        iteracoes = np.arange(1, np.asarray(viraram_1).size + 1)
+        figura.add_trace(trace_da_linha(iteracoes, np.asarray(viraram_1), "viraram 1", cor_1,
+                                        "triangle-up", "dash", total_celulas, True))
+        figura.add_trace(trace_da_linha(iteracoes, np.asarray(viraram_0), "viraram 0", cor_0,
+                                        "triangle-down", "dot", total_celulas, True))
+
     if passo_atual is not None:
+        # A linha vertical marca o passo nas três curvas; o anel verde, nas vivas.
+        figura.add_vline(x=passo_atual, line=dict(color=COR_VAZIO, width=1, dash="dot"))
         figura.add_trace(go.Scatter(
-            x=[passo_atual], y=[porcentagem[passo_atual]], mode="markers",
-            marker=dict(color=COR_VAZIO, size=14, line=dict(color="black", width=2)),
+            x=[passo_atual], y=[historico[passo_atual]], mode="markers",
+            marker=dict(color="rgba(0,0,0,0)", size=16, line=dict(color=COR_VAZIO, width=2)),
             hoverinfo="skip", showlegend=False,
         ))
 
     figura.update_layout(
         template="plotly_dark", paper_bgcolor="black", plot_bgcolor="black",
-        height=320, margin=dict(l=50, r=10, t=10, b=40),
+        height=420, margin=dict(l=60, r=10, t=10, b=40),
         xaxis=dict(title="iterações", tickformat="d",
                    dtick=max(1, int(np.ceil(passos.size / 10))), gridcolor="#333333"),
-        yaxis=dict(title="% de vazio", gridcolor="#333333", ticksuffix="%"),
+        yaxis=dict(title="celulas" if com_transicoes else "celulas vivas", tickformat=",d",
+                   gridcolor="#333333"),
+        legend=dict(orientation="h", x=0, y=1.02, yanchor="bottom",
+                    font=dict(color="white", size=12), bgcolor="rgba(0,0,0,0)"),
     )
     return figura

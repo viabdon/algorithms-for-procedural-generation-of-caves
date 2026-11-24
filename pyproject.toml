@@ -20,11 +20,8 @@ dependencies = [
   "pandas>=2.0",
   "psutil>=5.9",
   "pyyaml>=6.0",
-  "typer>=0.12",
-  "rich>=13.0",
-  "pyspark>=4.1.2",
-  "matplotlib>=3.10.9",
   "plotly>=6.0",
+  "matplotlib>=3.10.9",
   "laspy>=2.5,<3",
 ]
 
@@ -58,4 +55,23 @@ where = ["src"]
 
 [tool.ruff]
 line-length = 100
-src = ["src"]
+src = ["src", "."]
+
+[dependency-groups]
+dev = [
+    "poethepoet>=0.49.0",
+    "rich>=13.0",
+]
+
+# Atalhos de comando: uv run poe <tarefa>. Sem nome de tarefa, lista todas.
+[tool.poe.tasks]
+test = { cmd = "python tests/rodar.py", help = "Roda a suite completa com relatorio (--detalhe mostra tudo)" }
+test-um = { cmd = "python tests/rodar.py --detalhe", help = "Roda um modulo: poe test-um tests/test_volume.py" }
+menu-ca = { cmd = "python -m cavegen.generators.cellular_automata.menu", help = "Abre o menu do CA" }
+menu-rw = { cmd = "python -m cavegen.generators.random_walk.menu", help = "Abre o menu do Random Walk" }
+ga = { cmd = "python -m cavegen.generators.cellular_automata.genetico.pipeline", help = "Roda o GA do CA inteiro: campos, busca e resultados (aceita --cavernas, --forcar, --orcamento, --top, --seed...)" }
+busca-aleatoria = { cmd = "python -m cavegen.generators.cellular_automata.genetico.pipeline --metodo aleatoria", help = "Roda o fluxo com a busca aleatoria do CA, o controle do GA: so sorteia, sem selecao nem cruzamento (mesmas opcoes)" }
+ga-campos = { cmd = "python -m cavegen.generators.cellular_automata.genetico.campos", help = "Etapa 2 do GA: gera os campos que faltam ou estao desatualizados (--forcar refaz todos)" }
+ga-busca = { cmd = "python -m cavegen.generators.cellular_automata.genetico.busca", help = "Etapa 3 do GA: so a busca, nos campos ja gerados" }
+ga-resultados = { cmd = "python -m cavegen.generators.cellular_automata.genetico.resultados", help = "Etapa 4 do GA: resumo, lista dos melhores e figuras de uma execucao (padrao: a ultima)" }
+ui = { cmd ="uv run --extra ui streamlit run src/cavegen/ui/cellular_automata/app.py", help = "Abre a bancada Streamlit do CA" }

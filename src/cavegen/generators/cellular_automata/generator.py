@@ -15,17 +15,46 @@ class BorderTreatment(Enum):
         Valores aceitos para o tratamento de borda.
         ZEROS: fora da matriz conta como 0, a borda tende a fechar.
         ONES: fora da matriz conta como 1, a borda tende a abrir.
-        RANDOM: fora da matriz sorteia 0 ou 1 a cada vizinho consultado.
+        RANDOM: fora da matriz sorteia 0 ou 1 a cada vizinho consultado. Não é
+                reproduzível (usa o gerador global) e fica fora do ajuste genético.
+        NEAREST: fora da matriz repete a célula de borda mais próxima. Não empurra
+                 para 0 nem para 1, então a caverna que chega na beirada continua
+                 do lado de fora, e a rocha continua rocha.
     """
     ZEROS = "zeros"
     ONES = "ones"
     RANDOM = "random"
+    NEAREST = "nearest"
 
-def cellular_automata(matrix: np.ndarray, sensitivity: int, border_treatment: BorderTreatment, iterations: int, progress=None, peso=None) -> tuple[np.ndarray, np.ndarray]:
+class ModoPeso(Enum):
+    """
+        Como o peso entra na contagem de vizinhos.
+        COMPLETO: soma o peso inteiro, positivo e negativo.
+        SO_NEGATIVO: zera o positivo antes de somar. O peso só atrapalha o vazio
+                     de nascer fora da forma; dentro dela (peso >= 0) o CA segue a
+                     regra dele sem ajuda, como o CA básico.
+    """
+    COMPLETO = "completo"
+    SO_NEGATIVO = "so_negativo"
+
+def contar_transicoes(anterior: np.ndarray, seguinte: np.ndarray) -> tuple[int, int]:
+    """
+        Conta as células que mudaram de um passo para o outro.
+        Devolve (viraram_1, viraram_0).
+        anterior, seguinte: matrizes binárias de dois passos seguidos.
+    """
+    return int(np.count_nonzero(seguinte > anterior)), int(np.count_nonzero(seguinte < anterior))
+
+def cellular_automata(matrix: np.ndarray, sensitivity: int, border_treatment: BorderTreatment, iterations: int, progress=None, peso=None, modo_peso: ModoPeso = ModoPeso.COMPLETO) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """
         Aplica o autômato celular sobre a matriz, repetindo o passo N vezes.
-        Devolve a matriz final e a quantidade de células vivas em cada passo,
-        começando pela matriz inicial (passo 0), então o histórico tem iterations + 1 valores.
+        Devolve (final, historico, viraram_1, viraram_0).
+        final: matriz depois da última iteração.
+        historico: células vivas em cada passo, começando pela matriz inicial
+                   (passo 0), então tem iterations + 1 valores.
+        viraram_1, viraram_0: células que mudaram em cada iteração. Têm iterations
+                   valores: o primeiro é a mudança do passo 0 para o passo 1. O
+                   histórico sozinho não mostra isso, porque só vê o saldo.
         matrix: matriz binária inicial.
         sensitivity: mínimo de vizinhos para a célula virar 1.
         border_treatment: membro de BorderTreatment, ou a string equivalente.
@@ -33,27 +62,48 @@ def cellular_automata(matrix: np.ndarray, sensitivity: int, border_treatment: Bo
         progress: função opcional chamada ao fim de cada passo com (passo, iterations).
         peso: matriz opcional do mesmo formato, somada à contagem de vizinhos em
               todo passo (ver aplicar_peso). Sem peso, é o autômato básico.
+        modo_peso: membro de ModoPeso, ou a string equivalente.
     """
     border_treatment = BorderTreatment(border_treatment)
+    peso = preparar_peso(peso, modo_peso)
     historico = [int(matrix.sum())]
+    viraram_1, viraram_0 = [], []
 
     for i in range(iterations):
-        matrix = iterate(matrix, sensitivity, border_treatment, peso)
+        seguinte = iterate(matrix, sensitivity, border_treatment, peso)
+        para_1, para_0 = contar_transicoes(matrix, seguinte)
+        viraram_1.append(para_1)
+        viraram_0.append(para_0)
+        matrix = seguinte
         historico.append(int(matrix.sum()))
         if progress is not None:
             progress(i + 1, iterations)
 
-    return matrix, np.array(historico, dtype=np.int64)
+    return (matrix, np.array(historico, dtype=np.int64),
+            np.array(viraram_1, dtype=np.int64), np.array(viraram_0, dtype=np.int64))
 
-def iterate(matrix: np.ndarray, sensitivity: int, border_treatment: BorderTreatment, peso=None) -> np.ndarray:
+def preparar_peso(peso, modo_peso: ModoPeso = ModoPeso.COMPLETO):
+    """
+        Devolve o peso como ele entra na contagem, conforme o modo.
+        peso: matriz de peso, ou None (CA básico, em qualquer modo).
+        modo_peso: membro de ModoPeso, ou a string equivalente.
+    """
+    modo_peso = ModoPeso(modo_peso)
+    if peso is None or modo_peso is ModoPeso.COMPLETO:
+        return peso
+    return np.minimum(peso, 0)
+
+def iterate(matrix: np.ndarray, sensitivity: int, border_treatment: BorderTreatment, peso=None, modo_peso: ModoPeso = ModoPeso.COMPLETO) -> np.ndarray:
     """
         Executa um único passo do autômato, gerando a matriz seguinte.
         matrix: matriz binária do passo anterior.
         sensitivity: mínimo de vizinhos para a célula virar 1.
         border_treatment: membro de BorderTreatment, ou a string equivalente.
         peso: matriz opcional somada à contagem de vizinhos (ver aplicar_peso).
+        modo_peso: membro de ModoPeso, ou a string equivalente (ver preparar_peso).
     """
     vizinhos = neighbor_counts(matrix, border_treatment)
+    peso = preparar_peso(peso, modo_peso)
     if peso is not None:
         vizinhos = aplicar_peso(vizinhos, peso)
 
@@ -99,6 +149,9 @@ def aplicar_moldura(matrix: np.ndarray, border_treatment: BorderTreatment) -> np
         border_treatment: membro de BorderTreatment, ou a string equivalente.
     """
     border_treatment = BorderTreatment(border_treatment)
+    if border_treatment is BorderTreatment.NEAREST:
+        return np.pad(np.asarray(matrix, dtype=np.int16), 1, mode="edge")
+
     tamanho_com_moldura = tuple(dimensao + 2 for dimensao in matrix.shape)
 
     if border_treatment is BorderTreatment.RANDOM:

@@ -97,7 +97,10 @@ registram os limites e os experimentos preservados.
   esteja montado ou que as três extrações históricas tenham terminado.
 - [ ] Validar guia procedural independente do scan antes de comparar CA guiado;
   o SDF da parede voxelizada não é SDF validado do ar real.
-- [ ] Inspecionar volumes e malhas na Unity quando útil. gRPC e ROCm continuam
-  posteriores ao núcleo científico.
+- [ ] Inspecionar os volumes gerados no Plotly. A avaliação de ROCm fica para depois do benchmark principal.
 - [ ] Atualizar a escrita do TCC após análise, registrando protocolo e decisões
   durante o trabalho; não apresentar hipóteses como resultados confirmados.
+
+## Após a conclusão do TCC
+
+O porte da visualização para Unity fica como trabalho futuro. No TCC, a inspeção usa Plotly e a comparação dos algoritmos usa as métricas calculadas nos volumes em Python.

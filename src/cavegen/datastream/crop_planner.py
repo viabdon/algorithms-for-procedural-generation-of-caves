@@ -10,15 +10,12 @@ from tempfile import TemporaryDirectory
 import numpy as np
 
 from cavegen.datastream.centreline import CentrelineIndex, Passage, passages_from_graph, read_graph
-from cavegen.datastream.centreline_extraction import (
-    ExtractionSettings,
-    generate_centreline,
-    source_anchor,
-)
+from cavegen.datastream.centreline_extraction import generate_centreline, source_anchor
 from cavegen.datastream.crop_preview import ply_header
 from cavegen.datastream.gallery_crop import CROP_FORMATS
 from cavegen.datastream.point_cloud import iter_point_cloud_xyz
 from cavegen.datastream.progress import report_point_progress
+from cavegen.tools.centreline import ExtractionSettings
 
 
 class _Sample:

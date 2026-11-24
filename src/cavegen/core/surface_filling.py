@@ -5,7 +5,8 @@ air. Unobserved gaps and open entrances let the exterior reach the cavity.
 """
 
 import numpy as np
-from scipy.ndimage import binary_fill_holes, generate_binary_structure
+
+from cavegen.tools.flood_fill import inundar
 
 EXTERIOR = 0
 SURFACE = 1
@@ -26,7 +27,7 @@ def classify_surface_by_flood_fill(surface: np.ndarray) -> np.ndarray:
         raise ValueError("surface must be a nonempty 3D grid.")
     if surface.dtype != np.bool_:
         raise TypeError("surface must have boolean dtype.")
-    enclosed = binary_fill_holes(surface, structure=generate_binary_structure(3, 1)) & ~surface
+    _, enclosed = inundar(surface)
     classification = np.zeros(surface.shape, dtype=np.uint8)
     classification[surface] = SURFACE
     classification[enclosed] = INTERIOR

@@ -31,12 +31,14 @@ __pycache__/
 /results/volumes/*
 /models/checkpoints/*
 
-# Experimento do SDF: só o código e a documentação são versionados. A entrada
-# vem do PLY em data/, as saídas são regeneradas e os artigos são das editoras.
-/sdf_temp/articles/
-/sdf_temp/entrada/
-/sdf_temp/npz/
-/sdf_temp/plots/
+# Ferramentas de src/cavegen/tools/: só o código e a documentação são versionados.
+# A entrada (data/processed/references) vem do PLY em data/, as saídas são
+# regeneradas e os artigos são das editoras.
+/src/cavegen/tools/flood_fill/npz/
+/src/cavegen/tools/flood_fill/plots/
+/src/cavegen/tools/sdf/articles/
+/src/cavegen/tools/sdf/npz/
+/src/cavegen/tools/sdf/plots/
 
 # Projeto base do Random Walk (Unity, de outro TCC): só para refazer a exportação
 # dos waypoints para configs/random_walk/
@@ -45,6 +47,11 @@ __pycache__/
 # Experimento do Indian Tunnel: a nuvem fica em data/raw/nasa, as saídas são regeneradas
 /indian_tunnel_temp/npz/
 /indian_tunnel_temp/plots/
+
+# Random Walk com pontos sorteados (src/cavegen/tools/): as saídas são regeneradas
+/src/cavegen/tools/random_walk_points/npz/
+/src/cavegen/tools/random_walk_points/results/
+/src/cavegen/tools/random_walk_points/plots/
 
 # Keep directory placeholders
 !.gitkeep
@@ -68,6 +75,12 @@ __pycache__/
 /src/cavegen/generators/cellular_automata/plots
 /src/cavegen/generators/cellular_automata/seeds
 /src/cavegen/generators/cellular_automata/pesos
+# GA do CA: as pastas do pipeline ficam (com .gitkeep), o conteúdo não. As cavernas
+# de entrada são dados, os campos são regenerados e os resultados são execuções.
+/src/cavegen/generators/cellular_automata/genetico/1_entrada/*
+/src/cavegen/generators/cellular_automata/genetico/2_campos/*
+/src/cavegen/generators/cellular_automata/genetico/3_resultados/*
+!/src/cavegen/generators/cellular_automata/genetico/*/.gitkeep
 
 # Random Walk
 /src/cavegen/generators/random_walk/npz

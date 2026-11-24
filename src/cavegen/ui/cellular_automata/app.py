@@ -14,7 +14,11 @@ nada da interface.
 import numpy as np
 import streamlit as st
 
-from cavegen.generators.cellular_automata.generator import BorderTreatment
+from cavegen.generators.cellular_automata.generator import (
+    BorderTreatment,
+    ModoPeso,
+    preparar_peso,
+)
 from cavegen.generators.cellular_automata.menu import (
     EXPLICACAO_BORDAS,
     ITERACOES_PADRAO,
@@ -45,6 +49,7 @@ from cavegen.ui.cellular_automata.dados import (
     historico_dos_passos,
     rodar_passo_a_passo,
     salvar,
+    transicoes_dos_passos,
 )
 from cavegen.ui.cellular_automata.figuras import (
     EIXOS_CORTE,
@@ -71,6 +76,13 @@ AJUDA_ITERACOES = ("Quantas vezes o passo se repete. Cada passo suaviza as pared
                    "volume costuma estabilizar entre 3 e 5.")
 AJUDA_PESO = ("Matriz somada à contagem de vizinhos antes da sensibilidade. Negativo "
               "(fora da caverna) tira vizinhos, positivo (dentro) dá vizinhos.")
+AJUDA_MODO_PESO = ("Completo soma o peso inteiro. Só negativo zera a parte positiva: fora "
+                   "da forma o vazio custa a nascer, dentro dela o CA segue a regra dele "
+                   "sem ajuda, como o CA básico.")
+EXPLICACAO_MODOS_PESO = {
+    ModoPeso.COMPLETO: "positivo e negativo",
+    ModoPeso.SO_NEGATIVO: "zera o positivo",
+}
 AJUDA_SUPERFICIE = ("Desenha só as células vivas que encostam em rocha ou na borda. As "
                     "do miolo ficam escondidas de qualquer jeito, e tirá-las alivia o navegador.")
 
@@ -94,12 +106,12 @@ def carregar_resultado(result_id: int) -> dict:
 
 @st.cache_resource(max_entries=16, show_spinner="montando a nuvem 3D...")
 def nuvem_3d(chave: int, passo: int, _matriz, borda: str, modo: str, paleta: str,
-             so_superficie: bool):
+             so_superficie: bool, com_escala: bool = True):
     """
         figura_3d guardada por (execução, passo, visual). O underscore em _matriz
         tira a matriz do hash: quem identifica o volume é a chave da execução.
     """
-    return figura_3d(_matriz, borda, modo, paleta, so_superficie)
+    return figura_3d(_matriz, borda, modo, paleta, so_superficie, com_escala=com_escala)
 
 
 # --- rótulos -----------------------------------------------------------------
@@ -112,12 +124,20 @@ def rotulo_seed(seed_id: int) -> str:
 def rotulo_peso(peso_id) -> str:
     if peso_id is None:
         return "nenhum (CA básico)"
-    return f"{peso_id:03d} · {load_peso_info(peso_id)['origem']}"
+    info = load_peso_info(peso_id)
+    escala = f" · log x{info['escala_log']:g}" if info["escala_log"] is not None else ""
+    return f"{peso_id:03d} · {info['origem']}{escala}"
+
+
+def sufixo_modo_peso(modo_peso) -> str:
+    # O modo completo é o de sempre: só o só negativo aparece no rótulo.
+    return " (só negativo)" if modo_peso == ModoPeso.SO_NEGATIVO.value else ""
 
 
 def rotulo_resultado(result_id: int) -> str:
     info = load_result_info(result_id)
-    peso = f" · peso {info['peso_id']:03d}" if "peso_id" in info else ""
+    peso = (f" · peso {info['peso_id']:03d}{sufixo_modo_peso(info['modo_peso'])}"
+            if "peso_id" in info else "")
     return (f"{result_id:03d} · {info['size']}³ · seed {info['seed_id']:03d} · "
             f"s={info['sensitivity']} · {info['border_treatment']} · "
             f"it={info['iterations']}{peso}")
@@ -128,7 +148,8 @@ def descricao(execucao: Execucao) -> str:
         seed = f"seed sorteada (p={execucao.one_probability})"
     else:
         seed = f"seed {execucao.seed_id:03d}"
-    peso = f" · peso {execucao.peso_id:03d}" if execucao.peso_id is not None else ""
+    peso = (f" · peso {execucao.peso_id:03d}{sufixo_modo_peso(execucao.modo_peso)}"
+            if execucao.peso_id is not None else "")
     return (f"{execucao.lado}³ · {seed} · sensibilidade {execucao.sensitivity} · "
             f"borda {execucao.border_treatment} · {execucao.iterations} iterações{peso}")
 
@@ -152,15 +173,18 @@ def rodar(config: dict) -> None:
         seed, config["sensibilidade"], config["borda"], config["iteracoes"], peso,
         progress=lambda passo, total: barra.progress(passo / total,
                                                      text=f"passo {passo}/{total}"),
+        modo_peso=config["modo_peso"],
     )
     barra.empty()
 
+    viraram_1, viraram_0 = transicoes_dos_passos(passos)
     abrir(Execucao(
         seed=passos[0], final=passos[-1], historico=historico_dos_passos(passos),
+        viraram_1=viraram_1, viraram_0=viraram_0,
         sensitivity=config["sensibilidade"], border_treatment=config["borda"].value,
         iterations=config["iteracoes"], passos=passos, seed_id=config["seed_id"],
         one_probability=config["probabilidade"], peso_id=config["peso_id"],
-        segundos=segundos,
+        modo_peso=config["modo_peso"].value, segundos=segundos,
     ))
 
 
@@ -177,10 +201,12 @@ def abrir_gravado(result_id: int) -> None:
     abrir(Execucao(
         seed=carregar_seed(seed_id).astype(bool) if tem_seed else None,
         final=final, historico=np.asarray(historico),
+        viraram_1=dados["viraram_1_history"], viraram_0=dados["viraram_0_history"],
         sensitivity=dados["sensitivity"], border_treatment=dados["border_treatment"],
         iterations=dados["iterations"], seed_id=seed_id,
         one_probability=load_seed_info(seed_id)["one_probability"] if tem_seed else None,
-        peso_id=dados.get("peso_id"), result_id=result_id,
+        peso_id=dados.get("peso_id"),
+        modo_peso=dados.get("modo_peso", ModoPeso.COMPLETO.value), result_id=result_id,
     ))
 
 
@@ -216,6 +242,13 @@ def barra_lateral() -> None:
                                help=AJUDA_PESO, label_visibility="collapsed")
         if not compativeis:
             st.caption(f"nenhum peso {lado}³ gravado.")
+        if peso_id is not None:
+            modos_peso = list(ModoPeso)
+            modo_peso = st.radio("modo do peso", modos_peso, horizontal=True,
+                                 format_func=lambda m: m.value, help=AJUDA_MODO_PESO,
+                                 captions=[EXPLICACAO_MODOS_PESO[m] for m in modos_peso])
+        else:
+            modo_peso = ModoPeso.COMPLETO
 
         st.subheader("3. Autômato")
         sensibilidade = st.slider("sensibilidade", 0, MAX_VIZINHOS, SENSIBILIDADE_PADRAO,
@@ -248,7 +281,8 @@ def barra_lateral() -> None:
 
     if clicou_rodar:
         rodar(dict(seed_id=seed_id, lado=int(lado), probabilidade=float(probabilidade),
-                   peso_id=peso_id, sensibilidade=int(sensibilidade), borda=borda,
+                   peso_id=peso_id, modo_peso=modo_peso,
+                   sensibilidade=int(sensibilidade), borda=borda,
                    iteracoes=int(iteracoes)))
     if clicou_salvar:
         seed_id_gravada, result_id = salvar(execucao)
@@ -312,11 +346,11 @@ def aba_3d(execucao: Execucao) -> None:
                                         else -1), width="stretch", key="nuvem_final")
 
 
-def figura_do_passo(execucao: Execucao, passo: int):
+def figura_do_passo(execucao: Execucao, passo: int, com_escala: bool = True):
     matriz = execucao.final if passo < 0 else execucao.passos[passo]
     return nuvem_3d(st.session_state.chave, passo, matriz, execucao.border_treatment,
                     st.session_state.modo, st.session_state.paleta,
-                    st.session_state.superficie)
+                    st.session_state.superficie, com_escala)
 
 
 @st.fragment
@@ -334,27 +368,38 @@ def aba_cortes(execucao: Execucao) -> None:
     paineis.append((f"resultado (passo {execucao.iterations})",
                     fatia(execucao.final, eixo, indice), "binario"))
     if execucao.peso_id is not None:
-        paineis.append((f"peso {execucao.peso_id:03d}",
-                        fatia(carregar_peso(execucao.peso_id), eixo, indice), "peso"))
+        # O corte mostra o peso como ele entrou na contagem, já com o modo aplicado.
+        peso = preparar_peso(carregar_peso(execucao.peso_id), execucao.modo_peso)
+        paineis.append((f"peso {execucao.peso_id:03d}{sufixo_modo_peso(execucao.modo_peso)}",
+                        fatia(peso, eixo, indice), "peso"))
 
     st.plotly_chart(figura_cortes(paineis, eixo), width="stretch")
-    st.caption("verde = vazio (caverna), cinza = rocha. No peso, azul é dentro da "
-               "caverna de referência e vermelho é fora.")
+    st.caption("verde = vazio (caverna), cinza = rocha. No peso, a cor vai do menor valor "
+               "do corte (vermelho, fora da caverna de referência) ao maior (azul); o "
+               "branco fica no meio da faixa, não no zero.")
 
 
 @st.fragment
 def aba_evolucao(execucao: Execucao) -> None:
+    linhas = dict(viraram_1=execucao.viraram_1, viraram_0=execucao.viraram_0,
+                  paleta=st.session_state.paleta)
     if execucao.passos is None:
-        st.plotly_chart(figura_evolucao(execucao.historico, execucao.total_celulas),
+        st.plotly_chart(figura_evolucao(execucao.historico, execucao.total_celulas, **linhas),
                         width="stretch")
         st.caption("Resultado lido de arquivo: só o passo final está gravado. Rode de "
                    "novo pela barra lateral para navegar pelos passos.")
         return
 
-    passo = st.slider("passo", 0, execucao.iterations, execucao.iterations)
-    st.plotly_chart(figura_evolucao(execucao.historico, execucao.total_celulas, passo),
-                    width="stretch")
-    st.plotly_chart(figura_do_passo(execucao, passo), width="stretch", key="nuvem_passo")
+    # Linha à esquerda e nuvem à direita: o passo destacado e o volume ficam lado a lado.
+    coluna_linha, coluna_nuvem = st.columns([2, 3], vertical_alignment="center")
+    with coluna_linha:
+        passo = st.slider("passo", 0, execucao.iterations, execucao.iterations)
+        st.plotly_chart(figura_evolucao(execucao.historico, execucao.total_celulas, passo,
+                                        **linhas), width="stretch")
+    with coluna_nuvem:
+        # A barra de vizinhos já aparece na aba 3D; aqui ela só tiraria largura do cubo.
+        st.plotly_chart(figura_do_passo(execucao, passo, com_escala=False), width="stretch",
+                        key="nuvem_passo")
 
 
 def main() -> None:

@@ -16,24 +16,40 @@
 
     Fora da grade conta como água, então voxel cheio na borda da grade é 1.
 
-    uv run python sdf_temp/inundacao.py
+    É uma ferramenta à parte: inundar() e classificar_por_inundacao() servem a
+    qualquer grade booleana, e o SDF (cavegen/tools/sdf) chama as duas para decidir o
+    sinal. O script grava a classificação e o plot de uma grade de superfície
+    (o npz com "surface_voxels"); sem argumento, a do Elaphes 64³.
+
+    uv run python -m cavegen.tools.flood_fill.inundacao [superficie.npz]
 """
+import sys
 from pathlib import Path
 
 import numpy as np
 import plotly.graph_objects as go
-from scipy.ndimage import binary_fill_holes, convolve
+from scipy.ndimage import convolve
 
-from cavegen.generators.cellular_automata.plot import (
+from cavegen.tools.flood_fill import inundar
+
+from cavegen.tools.plot_volumes import (
     caixa_wireframe,
+    dados_da_matriz,
+    trace_da_nuvem,
     camera_isometrica,
+    cena_plotly,
     gizmo_eixos,
 )
 
 PASTA = Path(__file__).resolve().parent
-ENTRADA = PASTA / "entrada" / "elaphes_surface_64.npz"
-SAIDA_NPZ = PASTA / "npz" / "elaphes_surface_64_inundacao.npz"
-SAIDA_PLOT = PASTA / "plots" / "elaphes_surface_64_inundacao.html"
+# src/cavegen/tools/flood_fill -> a raiz do projeto fica 4 pastas acima.
+RAIZ_DO_PROJETO = PASTA.parents[3]
+PASTA_NPZ = PASTA / "npz"
+PASTA_PLOTS = PASTA / "plots"
+
+# Grade de superfície do Elaphes, já sem o outlier: a entrada padrão daqui e do SDF.
+SUPERFICIE_ELAPHES = (RAIZ_DO_PROJETO / "data" / "processed" / "references"
+                      / "elaphes_surface_64.npz")
 
 VAZIO = 0
 BORDA = 1
@@ -50,16 +66,6 @@ KERNEL_FACES[1, 1, 0] = KERNEL_FACES[1, 1, 2] = 1
 PALETA = "Magma"
 NOMES = {BORDA: "borda (1)", INTERNO: "interno (2)"}
 ESCALA = ["0 vazio", "1 borda", "2 interno"]
-
-def inundar(cheio: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
-    """
-        Devolve (agua, buracos_fechados): os vazios ligados ao lado de fora da
-        grade e os vazios que a água não alcança.
-        cheio: matriz booleana (depth, height, width).
-    """
-    buracos_fechados = binary_fill_holes(cheio) & ~cheio
-    agua = ~cheio & ~buracos_fechados
-    return agua, buracos_fechados
 
 def classificar_por_inundacao(cheio: np.ndarray, agua: np.ndarray) -> np.ndarray:
     """
@@ -94,32 +100,16 @@ def trace_do_rotulo(classificacao: np.ndarray, rotulo: int, com_escala: bool) ->
         rotulo: valor plotado nesse trace.
         com_escala: desenha a barra de cores (só um dos traces precisa).
     """
-    indices = np.argwhere(classificacao == rotulo)
-    x, y, z = indices[:, 2], indices[:, 0], indices[:, 1]
-    escala = dict(
-        title=dict(text="inundação", font=dict(color="white", size=12)),
-        tickvals=list(range(len(ESCALA))), ticktext=ESCALA,
-        x=-0.06, xanchor="left", len=0.75, thickness=14,
-        bgcolor="black", outlinecolor="white", outlinewidth=1,
-        tickfont=dict(color="white", size=11),
+    x, y, z = dados_da_matriz(classificacao == rotulo)
+    trace = trace_da_nuvem(
+        x, y, z, np.full(x.size, rotulo), 4, PALETA, (VAZIO, INTERNO),
+        opacidade(rotulo), "inundação", com_escala,
     )
+    if com_escala:
+        trace.marker.colorbar.update(tickvals=list(range(len(ESCALA))), ticktext=ESCALA)
+    trace.hovertemplate = f"(%{{x}}, %{{y}}, %{{z}})<br>{NOMES[rotulo]}<extra></extra>"
+    return trace
 
-    return go.Scatter3d(
-        x=x, y=y, z=z,
-        mode="markers",
-        marker=dict(
-            size=4,
-            color=np.full(x.size, rotulo),
-            colorscale=PALETA,
-            cmin=VAZIO,
-            cmax=INTERNO,
-            opacity=opacidade(rotulo),
-            showscale=com_escala,
-            colorbar=escala if com_escala else None,
-        ),
-        hovertemplate=f"(%{{x}}, %{{y}}, %{{z}})<br>{NOMES[rotulo]}<extra></extra>",
-        showlegend=False,
-    )
 
 def figura(classificacao: np.ndarray, titulo: str) -> go.Figure:
     """
@@ -139,27 +129,22 @@ def figura(classificacao: np.ndarray, titulo: str) -> go.Figure:
     for trace in caixa_wireframe(minimos, maximos, olho) + gizmo_eixos(minimos, maximos):
         fig.add_trace(trace)
 
-    eixo_limpo = dict(
-        showgrid=False, zeroline=False, showticklabels=False, showbackground=False,
-        showspikes=False, title="", visible=False,
-    )
     fig.update_layout(
         title=dict(text=titulo, font=dict(color="white", size=14), x=0.5),
         paper_bgcolor="black",
         plot_bgcolor="black",
         width=950, height=800,
         margin=dict(l=110, r=10, t=50, b=10),
-        scene=dict(
-            xaxis=eixo_limpo, yaxis=eixo_limpo, zaxis=eixo_limpo,
-            bgcolor="black",
-            aspectmode="data",
-            camera=dict(eye=olho),
-        ),
+        scene=cena_plotly(olho),
     )
     return fig
 
 def main():
-    dados = np.load(ENTRADA)
+    entrada = Path(sys.argv[1]) if len(sys.argv) > 1 else SUPERFICIE_ELAPHES
+    saida_npz = PASTA_NPZ / f"{entrada.stem}_inundacao.npz"
+    saida_plot = PASTA_PLOTS / f"{entrada.stem}_inundacao.html"
+
+    dados = np.load(entrada)
     cheio = dados["surface_voxels"].astype(bool)
 
     agua, buracos_fechados = inundar(cheio)
@@ -169,25 +154,24 @@ def main():
     interno = int((classificacao == INTERNO).sum())
     buracos = int(buracos_fechados.sum())
 
-    SAIDA_NPZ.parent.mkdir(exist_ok=True)
+    PASTA_NPZ.mkdir(exist_ok=True)
     np.savez_compressed(
-        SAIDA_NPZ,
+        saida_npz,
         classificacao=classificacao,
         agua=agua.astype(np.uint8),
         buracos_fechados=buracos_fechados.astype(np.uint8),
         metadata=dados["metadata"],
     )
 
-    largura = cheio.shape[2]
-    titulo = (f"Elaphes {largura}^3 - inundação: {borda} borda, {interno} interno "
+    titulo = (f"{entrada.stem} - inundação: {borda} borda, {interno} interno "
               f"({buracos} deles eram buracos fechados)")
-    SAIDA_PLOT.parent.mkdir(exist_ok=True)
-    figura(classificacao, titulo).write_html(SAIDA_PLOT, include_plotlyjs="cdn")
+    PASTA_PLOTS.mkdir(exist_ok=True)
+    figura(classificacao, titulo).write_html(saida_plot, include_plotlyjs="cdn")
 
     print(f"cheios: {int(cheio.sum())}, água: {int(agua.sum())}, buracos fechados: {buracos}")
     print(f"borda (1): {borda}, interno (2): {interno}")
-    print(f"npz salvo em {SAIDA_NPZ}")
-    print(f"figura salva em {SAIDA_PLOT}")
+    print(f"npz salvo em {saida_npz}")
+    print(f"figura salva em {saida_plot}")
 
 if __name__ == "__main__":
     main()

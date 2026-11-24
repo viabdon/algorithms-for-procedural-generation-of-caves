@@ -15,7 +15,13 @@ from pathlib import Path
 
 import numpy as np
 
-from cavegen.generators.cellular_automata.generator import BorderTreatment, iterate
+from cavegen.generators.cellular_automata.generator import (
+    BorderTreatment,
+    ModoPeso,
+    contar_transicoes,
+    iterate,
+    preparar_peso,
+)
 from cavegen.generators.cellular_automata.results import (
     RESULTS_DIR,
     next_result_id,
@@ -32,8 +38,11 @@ class Execucao:
         final: matriz depois da última iteração.
         historico: células vivas em cada passo, do 0 (seed) ao último.
         passos: matriz de cada passo; None quando o volume veio de um arquivo.
+        viraram_1, viraram_0: células que mudaram em cada iteração; None num
+                              resultado gravado antes das transições existirem.
         seed_id: None enquanto a seed sorteada na hora não foi gravada.
         one_probability: chance de 1 da seed, quando conhecida.
+        modo_peso: valor de ModoPeso; só tem efeito quando há peso_id.
         segundos: duração do laço do CA; None quando veio de um arquivo.
         result_id: None enquanto o resultado não foi gravado.
     """
@@ -44,9 +53,12 @@ class Execucao:
     border_treatment: str
     iterations: int
     passos: list | None = None
+    viraram_1: np.ndarray | None = None
+    viraram_0: np.ndarray | None = None
     seed_id: int | None = None
     one_probability: float | None = None
     peso_id: int | None = None
+    modo_peso: str = ModoPeso.COMPLETO.value
     segundos: float | None = None
     result_id: int | None = None
 
@@ -60,7 +72,8 @@ class Execucao:
 
 
 def rodar_passo_a_passo(seed: np.ndarray, sensitivity: int, border_treatment: BorderTreatment,
-                        iterations: int, peso=None, progress=None) -> tuple[list, float]:
+                        iterations: int, peso=None, progress=None,
+                        modo_peso: ModoPeso = ModoPeso.COMPLETO) -> tuple[list, float]:
     """
         Repete o passo do CA guardando a matriz de cada iteração.
         É o mesmo laço de cellular_automata, só que sem descartar os passos do meio.
@@ -72,8 +85,11 @@ def rodar_passo_a_passo(seed: np.ndarray, sensitivity: int, border_treatment: Bo
         iterations: quantas vezes o passo é repetido.
         peso: matriz opcional somada à contagem de vizinhos.
         progress: função opcional chamada ao fim de cada passo com (passo, iterations).
+        modo_peso: membro de ModoPeso, ou a string equivalente (ver preparar_peso).
     """
     border_treatment = BorderTreatment(border_treatment)
+    # Preparado uma vez fora do laço, como em cellular_automata.
+    peso = preparar_peso(peso, modo_peso)
     matriz = np.asarray(seed).astype(int)
     passos = [matriz.astype(bool)]
 
@@ -93,6 +109,17 @@ def historico_dos_passos(passos: list) -> np.ndarray:
         passos: matrizes de cada passo.
     """
     return np.array([int(passo.sum()) for passo in passos], dtype=np.int64)
+
+
+def transicoes_dos_passos(passos: list) -> tuple[np.ndarray, np.ndarray]:
+    """
+        Células que viraram 1 e 0 em cada iteração, como cellular_automata devolve.
+        passos: matrizes de cada passo.
+    """
+    contagens = np.array([contar_transicoes(anterior, seguinte)
+                          for anterior, seguinte in zip(passos, passos[1:])],
+                         dtype=np.int64).reshape(-1, 2)
+    return contagens[:, 0], contagens[:, 1]
 
 
 def salvar(execucao: Execucao, seeds_dir: Path = SEEDS_DIR,
@@ -118,8 +145,15 @@ def salvar(execucao: Execucao, seeds_dir: Path = SEEDS_DIR,
             one_probability=execucao.one_probability,
         )
 
-    # Resultados do CA básico não levam peso_id, igual ao run_and_save.
-    extras = {"peso_id": execucao.peso_id} if execucao.peso_id is not None else {}
+    # Resultados do CA básico não levam peso_id nem modo_peso, igual ao run_and_save.
+    extras = {}
+    if execucao.peso_id is not None:
+        extras["peso_id"] = execucao.peso_id
+        extras["modo_peso"] = ModoPeso(execucao.modo_peso).value
+    # Um volume lido de arquivo não tem os passos, então fica sem as transições.
+    if execucao.passos is not None:
+        extras["viraram_1_history"], extras["viraram_0_history"] = transicoes_dos_passos(
+            execucao.passos)
 
     results_dir.mkdir(parents=True, exist_ok=True)
     result_id = next_result_id(results_dir)

@@ -2,20 +2,23 @@ from pathlib import Path
 
 import numpy as np
 
+from cavegen.core.seed import numpy_rng
 from cavegen.generators.cellular_automata.storage import build_path, next_id, storage_dir, used_ids
 
 # Pasta onde as seeds do CA sao gravadas, ao lado deste arquivo.
 SEEDS_DIR = storage_dir("seeds")
 SEED_PREFIX = "seed"
 
-def generate_seed_matrix(size: int, one_probability: float) -> np.ndarray:
+def generate_seed_matrix(size: int, one_probability: float, seed: int | None = None) -> np.ndarray:
     """
         Gera uma matriz binária cúbica (size x size x size).
         size: tamanho de cada lado da matriz.
         one_probability: chance (entre 0 e 1) de cada célula nascer como 1.
+        seed: semente do sorteio (numpy_rng). A mesma semente dá a mesma matriz;
+              sem semente, cada chamada sorteia uma matriz nova.
     """
     shape = (size, size, size)
-    matrix = np.random.rand(*shape) < one_probability
+    matrix = numpy_rng(seed).random(shape) < one_probability
     return matrix.astype(int)
 
 def used_seed_ids(directory: Path = SEEDS_DIR) -> set:

@@ -120,6 +120,7 @@ diário sem quebrar o padrão.
 | [Dia 6](#dia-6--pesquisando-sdf-da-superfície-para-a-matriz-voxelizada) | Pesquisando SDF: da superfície para a matriz voxelizada | Cellular Automata 3D, Random Walk 3D | Ideia de usar o SDF de uma caverna de Random Walk como matriz de peso pro CA (reforçar voxels perto dela, apagar bolsões distantes); estudo da base do Signed Distance Field, a falta (até agora) de literatura aplicando SDF direto em matriz voxelizada em vez de malha, e o custo inviável da busca ingênua por distâncias em 2D e, pior, em 3D |
 | [Dia 7](#dia-7--flood-fill-pra-separar-dentro-e-fora-e-a-mediatriz-como-atalho-pra-distância-euclidiana) | Flood fill pra separar dentro e fora, e a mediatriz como atalho pra distância euclidiana | Geral (SDF) | Flood fill escolhido pra classificar interior/exterior no Elaphes depois de comparar com vizinhos de face e CA de preenchimento (trata os 26 voxels de buraco fechado sem mexer no lado de fora e sem parâmetros, mas depende da parede externa estar fechada) e a mediatriz como ideia pra cortar comparações no cálculo da distância euclidiana |
 | [Dia 8](#dia-8--ca-guiado-pelo-sdf-do-elaphes-segue-o-contorno-sem-copiar-a-caverna) | CA guiado pelo SDF do Elaphes: segue o contorno sem copiar a caverna | Cellular Automata 3D | SDF do Elaphes calculado (inundação + EDT exata do scipy) e somado como peso à contagem de vizinhos do CA: o vazio fica confinado ao entorno da caverna e a sensibilidade controla a espessura (IoU máximo 0,49 em s = 13), seguindo o contorno sem copiar. Próximo passo: trocar o Elaphes pelo SDF de uma caverna de Random Walk |
+| [Dia 9](#dia-9--ca-guiado-pelo-sdf-de-um-random-walk-100-procedural) | CA guiado pelo SDF de um Random Walk 100% procedural | Random Walk 3D, Cellular Automata 3D | O fluxo em Python parte de waypoints já marcados, então um Random Walk modificado (`temp_rw/`), auxiliar do CA e sem substituir o do TCC base, sorteia pontos e os organiza por regras; o SDF dele enviesa o CA, que dá assimetria aos túneis e muda de textura com a seed. O túnel estreito (raio 1,5) deixa o peso fraco e a caverna se parte (4,6 pedaços contra 1,7 do Elaphes); próximo passo: engrossar o túnel |
 
 ## Dúvidas em aberto
 
@@ -146,6 +147,7 @@ a resposta ficou registrada.
 | "A mediatriz entra de fato como otimização no cálculo do SDF?" | [Dia 7](#dia-7--flood-fill-pra-separar-dentro-e-fora-e-a-mediatriz-como-atalho-pra-distância-euclidiana) |
 | "Um CA guiado pelo SDF de uma caverna de Random Walk chega tão perto de uma caverna real quanto o guiado pelo Elaphes?" | [Dia 8](#dia-8--ca-guiado-pelo-sdf-do-elaphes-segue-o-contorno-sem-copiar-a-caverna) |
 | "Que sensibilidade (ou escala do peso) equilibra seguir o guia sem copiá-lo?" | [Dia 8](#dia-8--ca-guiado-pelo-sdf-do-elaphes-segue-o-contorno-sem-copiar-a-caverna) |
+| "Um túnel mais grosso no Random Walk procedural deixa o CA guiado por ele conectado?" | [Dia 9](#dia-9--ca-guiado-pelo-sdf-de-um-random-walk-100-procedural) |
 
 ### Respondidas
 
@@ -707,6 +709,72 @@ Ainda não sei se os resultados vão ser tão bons quanto com o Elaphes.
 
 > "Que sensibilidade (ou escala do peso) equilibra seguir o guia sem
 > copiá-lo?"
+
+---
+
+## Dia 9 — CA guiado pelo SDF de um Random Walk 100% procedural
+
+**Algoritmo:** Random Walk 3D, Cellular Automata 3D (SDF como peso)
+**Commits relacionados:** `df9b27b`, `fe3fd04` (RW do TCC base no pacote);
+`748e387` (RW com pontos sorteados)
+
+### Tipo A — Narrativa
+
+O Dia 8 terminou com uma pergunta: e se o guia do CA for uma caverna feita
+pelo Random Walk em vez de uma caverna real? Foi o que eu fiz agora.
+
+O Random Walk principal do projeto é o do TCC em que o nosso se baseia, o
+[3D-Cave-Generation](https://github.com/freitasga/3D-Cave-Generation),
+portado pra Python. Ele está aqui dentro porque a proposta do nosso TCC é
+justamente fazer a análise comparativa dele com os algoritmos que ainda não
+tinham sido implementados, e ele continua no repositório como o Random Walk
+da comparação. Só que ele caminha entre waypoints marcados à mão sobre
+modelos de cavernas reais na cena original, então só gera as cavernas que
+já vêm com esses pontos marcados. No nosso fluxo em Python, a gente usa esses pontos já exportados. E, como o
+Cellular Automata vai seguir de fato um Random Walk, eu queria que esse guia
+fosse 100% procedural, sem interferência de ser humano.
+
+Por isso criei um segundo Random Walk, modificado, no `temp_rw/`. Ele não
+substitui o do TCC base: é um código auxiliar do CA, assim como o SDF.
+Ficam as duas opções: o Random Walk do TCC base, que segue as cavernas
+reais pelos pontos marcados, e o procedural, que serve de guia pro CA. Em
+vez de waypoints marcados, ele sorteia pontos aleatórios na grade e organiza
+esses pontos sozinho, seguindo regras: parte dos pontos vira source e parte
+vira target, cada source caminha até o target mais próximo com a mesma
+caminhada do projeto base, um veio central desce do nó mais alto até o mais
+baixo pelo menor ângulo de desvio, e os veios soltos se ligam a ele. As
+etapas estão detalhadas no `temp_rw/README.md`. É um teste, ainda não
+validado metodologicamente, e fica fora da pipeline.
+
+Com a caverna do Random Walk voxelizada, calculei o SDF dela pela mesma
+pipeline do Elaphes (inundação e distância euclidiana até a borda) e usei
+esse SDF como peso do CA.
+
+Os resultados foram interessantes. O Random Walk sozinho já faz cavernas
+muito boas, mas fica aquela questão dos túneis com espessuras muito
+parecidas. É exatamente aí que entra a especialidade do Cellular Automata,
+que é deixar uma assimetria nos túneis. Mesmo usando o mesmo SDF pra
+enviesar, consigo cavernas com formatos e texturas diferentes, porque o CA
+agrega as células dependendo da seed. Ou seja, a seed ainda influencia o
+resultado mesmo com o caminho já determinado pelo Random Walk, seja ele
+feito à mão ou proceduralmente, como o meu.
+
+Notei alguns pontos que não ficaram conectados. Em 10 seeds do CA (s = 12,
+4 iterações), a caverna guiada pelo Random Walk se partiu em 4,6 pedaços na
+média, contra 1,7 da guiada pelo Elaphes. Acho que foi porque o SDF ficou
+muito estreito: o Random Walk escava um túnel com raio de 1,5 voxel.
+Normalmente o SDF deixa o centro da caverna com peso alto, e assim o CA
+sempre consegue seguir o caminho. Num túnel tão estreito, o centro não fica
+longe da borda, então o peso não sobe muito (no peso do CA, o centro do
+Elaphes chega a 2,2 e o do Random Walk só a 1,76), e o CA acaba se perdendo
+e não enviesa tanto. Tenho ideias pra modificar o Random Walk e deixar o
+túnel um pouco mais grosso, pra que o SDF gerado a partir dele tenha um peso
+mais considerável.
+
+### Tipo C — Dúvidas em aberto
+
+> "Um túnel mais grosso no Random Walk procedural deixa o CA guiado por ele
+> conectado?"
 
 ---
 
