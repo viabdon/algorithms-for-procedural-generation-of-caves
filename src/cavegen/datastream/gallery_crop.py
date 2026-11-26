@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable, Iterable
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 import json
 import os
 from pathlib import Path
@@ -15,7 +15,7 @@ import numpy as np
 
 from cavegen.tools.flood_fill.auxiliary_caps import propose_auxiliary_caps
 from cavegen.core.volume import Volume3D
-from cavegen.datastream.gallery_leaks import analyze_leak, seed_component, touches_boundary
+from cavegen.datastream.gallery_leaks import analyze_leak, recover_seed, seed_component, touches_boundary
 from cavegen.datastream.gallery_reports import (
     REPORT_FOLDER, SUMMARY_FILE, audit_flood_fill, check, write_failed_report, write_report,
 )
@@ -25,6 +25,7 @@ from cavegen.datastream.surface_io import load_surface_npz, save_surface_npz
 from cavegen.datastream.voxel_io import load_volume_npz, save_volume_npz
 
 CROP_FORMATS = frozenset({".xyz", ".ply", ".f32", ".las"})
+DEFAULT_SEED_SEARCH_RADIUS = 4
 
 
 @dataclass(frozen=True)
@@ -147,6 +148,9 @@ def prepare_crop(path: Path, *, repository: Path = Path(".")) -> GalleryCrop:
     radius = spec.get("auxiliary_cap_radius_voxels", 0)
     if type(radius) is not int or not 0 <= radius <= 8:
         raise ValueError("auxiliary_cap_radius_voxels deve ser um inteiro entre 0 e 8.")
+    seed_radius = spec.get("seed_search_radius_voxels", DEFAULT_SEED_SEARCH_RADIUS)
+    if type(seed_radius) is not int or not 0 <= seed_radius <= 8:
+        raise ValueError("seed_search_radius_voxels deve ser um inteiro entre 0 e 8.")
 
     sections = spec.get("sections")
     if not isinstance(sections, list) or len(sections) != 2:
@@ -296,6 +300,29 @@ def process_crop(
         _reject_crop(crop, record, checks, "Uma tampa ficou vazia ou sem contato voxelizado com a parede.",
                      outcome="invalid_cap")
     outcome, air = seed_component(barrier, crop.seed_zyx)
+    relocated = False
+    if outcome == "seed_blocked":
+        radius = crop.config.get("seed_search_radius_voxels", DEFAULT_SEED_SEARCH_RADIUS)
+        if radius and diagnostic_progress is not None:
+            diagnostic_progress("Semente na barreira. Buscando uma posição interna próxima.")
+        seed, mode = recover_seed(crop, surface, caps, radius) if radius else (None, "disabled")
+        original = crop.config["seed_xyz"]
+        record["seed_search"] = {
+            "mode": mode, "radius_voxels": radius, "original_zyx": list(crop.seed_zyx),
+            "original_xyz": original,
+        }
+        if seed is not None:
+            xyz = crop.origin_xyz + (np.array(seed[::-1]) + 0.5) * crop.voxel_size
+            record["seed_search"].update(
+                selected_xyz=xyz.tolist(), displacement=float(np.linalg.norm(xyz - original)),
+            )
+            record["seed_zyx"] = list(seed)
+            checks.append(check("original_seed_state", "blocked", voxel=crop.seed_zyx))
+            crop = replace(crop, seed_zyx=seed, config={**crop.config, "seed_xyz": xyz.tolist()})
+            outcome, air = seed_component(barrier, seed)
+            relocated = True
+            if diagnostic_progress is not None:
+                diagnostic_progress(f"Semente alternativa selecionada em ZYX {seed}.")
     checks.append(check("seed_outside_barrier", outcome != "seed_blocked", True, voxel=crop.seed_zyx))
     if outcome == "seed_blocked":
         _reject_crop(crop, record, checks, "A semente caiu na barreira. Revise sua localização na galeria.",
@@ -321,6 +348,7 @@ def process_crop(
     checks.extend(audit_flood_fill(
         surface, caps, repair, crop.seed_zyx, air, auxiliary=auxiliary,
         expected_original="exterior" if outcome == "leaking" else "interior",
+        require_cap_contact=relocated,
     ))
     if air is None:
         _reject_crop(crop, record, checks, "A semente ficou conectada ao exterior e o reparo não foi verificado.",

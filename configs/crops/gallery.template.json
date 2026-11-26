@@ -27,6 +27,7 @@
     }
   ],
   "seed_xyz": null,
+  "seed_search_radius_voxels": 4,
   "leak_diagnostics": {
     "raw_source": null,
     "centreline": null

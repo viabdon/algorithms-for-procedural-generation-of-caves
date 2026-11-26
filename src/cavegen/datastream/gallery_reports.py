@@ -13,7 +13,7 @@ from typing import TYPE_CHECKING
 from uuid import uuid4
 
 import numpy as np
-from scipy.ndimage import generate_binary_structure, label
+from scipy.ndimage import binary_dilation, generate_binary_structure, label
 
 from cavegen.core.surface_filling import EXTERIOR, INTERIOR, classify_surface_by_flood_fill
 from cavegen.datastream.surface_io import load_surface_npz
@@ -57,6 +57,7 @@ def audit_flood_fill(
     *,
     expected_original: str,
     auxiliary: np.ndarray | None = None,
+    require_cap_contact: bool = False,
 ) -> list[dict]:
     """Flood from the grid boundary, independently of the repair search from the seed."""
     original = surface | caps.any(axis=0)
@@ -80,6 +81,10 @@ def audit_flood_fill(
     isolated = (labels == labels[seed]) if state == "interior" else np.zeros_like(air)
     checks.append(check("candidate_air_component", "match" if np.array_equal(isolated, air) else "mismatch",
                         "match", count=int(np.count_nonzero(isolated))))
+    if require_cap_contact:
+        adjacent = binary_dilation(isolated)
+        for name, cap in zip(("air_reaches_initial_cap", "air_reaches_final_cap"), caps):
+            checks.append(check(name, bool((adjacent & cap).any()), True))
     overlap = int(np.count_nonzero(repair & (original | air)))
     checks.append(check("repair_overlap", overlap, 0, count=overlap))
     for index, name in enumerate(("remove_initial_cap", "remove_final_cap")):
@@ -217,6 +222,15 @@ def write_report(
         **{key: leak["parameters"][key] if leak is not None else None for key in PROBE_PARAMETERS},
         "numpy": np.__version__, "scipy": version("scipy"), "scikit_image": version("scikit-image"),
     }
+    search = record.get("seed_search", {})
+    summary.update(
+        seed_search=search.get("mode"),
+        seed_search_radius_voxels=search.get("radius_voxels"),
+        seed_displacement=search.get("displacement"),
+        **_coords(search.get("original_zyx", (None,) * 3), "zyx", "original_seed_"),
+        **_coords(search.get("original_xyz", (None,) * 3), "xyz", "original_seed_local_"),
+        **_coords(search.get("selected_xyz", (None,) * 3), "xyz", "selected_seed_local_"),
+    )
     _write_csv(folder / SUMMARY_FILE, tuple(summary), [summary])
     _write_csv(folder / "checks.csv", CHECK_COLUMNS, checks)
     if leak is not None:
@@ -270,6 +284,7 @@ def replay_checks(folder: Path) -> Path:
             surface, masks["caps"], repair, tuple(interior.metadata["seed_zyx"]), interior.data,
             auxiliary=masks.get("auxiliary_caps"),
             expected_original="exterior" if repair.any() or np.any(masks.get("auxiliary_caps", False)) else "interior",
+            require_cap_contact=bool(interior.metadata.get("seed_search", {}).get("selected_xyz")),
         )
     reports = folder / REPORT_FOLDER
     legacy = folder / LEGACY_REPORT_FOLDER

@@ -10,10 +10,12 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 import numpy as np
-from scipy.ndimage import binary_closing, binary_dilation, binary_propagation, generate_binary_structure
+from scipy.ndimage import (
+    binary_closing, binary_dilation, binary_propagation, distance_transform_edt, generate_binary_structure, label,
+)
 from skimage.graph import MCP
 
-from cavegen.core.surface_filling import INTERIOR, classify_surface_by_flood_fill
+from cavegen.core.surface_filling import EXTERIOR, INTERIOR, classify_surface_by_flood_fill
 from cavegen.datastream.centreline import Passage, passages_from_graph, read_graph
 from cavegen.datastream.point_cloud import iter_point_cloud_xyz
 
@@ -157,7 +159,7 @@ class _WindowScan:
         length = np.linalg.norm(tangent)
         return self.points[step], tangent / length if length else None
 
-    def _barrier(self, start, end):
+    def _planes(self, start, end):
         lo, forward = self._point_normal(start)
         hi, backward = self._point_normal(end)
         if forward is None or backward is None:
@@ -166,7 +168,11 @@ class _WindowScan:
         tolerance = self.crop.voxel_size
         if np.any((spine - lo) @ forward < -tolerance) or np.any((spine - hi) @ backward > tolerance):
             return None  # A transverse plane would cut the tested centreline again.
-        return self.surface | self._plane(lo, forward) | self._plane(hi, backward)
+        return self._plane(lo, forward), self._plane(hi, backward)
+
+    def _barrier(self, start, end):
+        planes = self._planes(start, end)
+        return None if planes is None else self.surface | planes[0] | planes[1]
 
     def original_cuts(self):
         start, end = self.crop.sections
@@ -213,6 +219,65 @@ class _WindowScan:
     def trace(self, window):
         barrier = self._barrier(*window)
         return _escape_path(barrier, tuple(self.trials[window]["seed_zyx"]))
+
+
+def _enclosed_seeds(interior, caps, candidates):
+    labels, _ = label(interior, structure=CONNECTIVITY)
+    touching = [np.unique(labels[binary_dilation(cap, structure=CONNECTIVITY)]) for cap in caps]
+    shared = np.intersect1d(*touching)
+    values = labels[tuple(candidates.T)]
+    eligible = np.isin(values, shared[shared != 0])
+    if len(np.unique(values[eligible])) > 1:
+        return None
+    return eligible
+
+
+def recover_seed(crop: GalleryCrop, surface: np.ndarray, caps: np.ndarray, radius: int):
+    """Find a nearby enclosed seed, or a leaky seed supported by a sealed local window."""
+    center = np.array(crop.seed_zyx)
+    axes = [np.arange(max(0, i - radius), min(n, i + radius + 1))
+            for i, n in zip(crop.seed_zyx, surface.shape)]
+    candidates = np.stack(np.meshgrid(*axes, indexing="ij"), axis=-1).reshape(-1, 3)
+    distances = np.sum((candidates - center) ** 2, axis=1)
+    barrier = surface | caps.any(axis=0)
+    local = (distances <= radius ** 2) & ~barrier[tuple(candidates.T)]
+    xyz = (candidates[:, ::-1] + 0.5) * crop.voxel_size
+    local &= np.all((xyz >= crop.selection_min_local) & (xyz < crop.selection_max_local), axis=1)
+    for section in crop.sections:
+        local &= (xyz - section.point) @ section.normal > crop.config["plane_tolerance"]
+    candidates, distances = candidates[local], distances[local]
+    if not len(candidates):
+        return None, "no_candidate"
+
+    classification = classify_surface_by_flood_fill(barrier)
+    eligible = _enclosed_seeds(classification == INTERIOR, caps, candidates)
+    if eligible is None:
+        return None, "ambiguous_interior"
+    mode = "enclosed"
+    if not eligible.any():
+        mode = "provisional"
+        scan = _WindowScan(crop, surface, _scan_context(crop).passage)
+        span = min(MIN_WINDOW_VOXELS, len(scan.stations) - 1)
+        if span < 2:
+            return None, "no_candidate"
+        origin = np.asarray(crop.config["seed_xyz"]) - crop.origin_xyz
+        closest = int(np.argmin(np.linalg.norm(scan.points - origin, axis=1)))
+        exterior = classification[tuple(candidates.T)] == EXTERIOR
+        for start in range(max(0, closest - radius - span + 1),
+                           min(len(scan.stations) - span, closest + radius + 1)):
+            planes = scan._planes(start, start + span)
+            if planes is None:
+                continue
+            window = classify_surface_by_flood_fill(surface | planes[0] | planes[1])
+            supported = _enclosed_seeds(window == INTERIOR, planes, candidates)
+            if supported is not None:
+                eligible |= supported & exterior
+    if not eligible.any():
+        return None, "no_candidate"
+
+    nearest = candidates[eligible & (distances == distances[eligible].min())]
+    clearance = distance_transform_edt(~barrier)[tuple(nearest.T)]
+    return tuple(int(i) for i in nearest[clearance.argmax()]), mode
 
 
 def _escape_path(barrier: np.ndarray, seed: tuple[int, int, int]) -> list[tuple[int, int, int]]:

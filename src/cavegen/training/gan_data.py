@@ -56,9 +56,10 @@ class ReferenceDataset(Dataset):
         self.arrays, self.tensors = [], []
         for row in self.rows:
             data, metadata, key = read_reference(Path(root) / row["path"])
-            if key != "data" or metadata.get("semantic") not in (CANDIDATE_SEMANTIC, VALID_SEMANTIC):
+            semantic = CANDIDATE_SEMANTIC if "gallery_evidence" in row else metadata.get("semantic")
+            if key != "data" or semantic not in (CANDIDATE_SEMANTIC, VALID_SEMANTIC):
                 raise ValueError("Observed surfaces cannot be GAN air references")
-            if metadata.get("semantic") == CANDIDATE_SEMANTIC and not allow_candidate_proxy:
+            if semantic == CANDIDATE_SEMANTIC and not allow_candidate_proxy:
                 raise ValueError("Candidate flood-fill air: explicitly enable the proxy experiment")
             metrics = evaluate_structure(Volume3D(data))
             if metrics.largest_component_voxels < 64 or (metrics.distance_max or 0) < 2:

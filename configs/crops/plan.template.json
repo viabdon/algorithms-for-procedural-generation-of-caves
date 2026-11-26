@@ -16,6 +16,7 @@
   },
   "count": 6,
   "section_overrides": [],
+  "section_search_radius_voxels": 8,
   "voxel_size": null,
   "batch_size": 65536,
   "padding_voxels": 2

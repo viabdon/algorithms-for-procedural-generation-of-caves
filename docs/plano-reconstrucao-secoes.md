@@ -270,6 +270,12 @@ registra as estações e a cobertura em `plan.json` e os contornos em
 `crop.json`. A opção **6** permite revisar os contornos e a opção **3**
 permite verificar o fechamento depois de voxelizar.
 
+A busca no planejador também pode comparar a cobertura por setor
+antes e depois dos filtros e escolher uma estação próxima com
+contorno sustentado. O campo `section_reviews` do `plan.json`
+registra os candidatos e preserva os cortes fixados acima.
+[Revisão automática dos contornos](planejamento-recortes-voxelizacao.md#revisão-de-contornos-no-planejador)
+
 Os testes sintéticos confirmaram o descarte de um grupo lateral separado,
 a fronteira compartilhada entre recortes, a rejeição de dois contornos
 aptos e a preservação da ordem dos cortes. No LAS real, foi confirmada a

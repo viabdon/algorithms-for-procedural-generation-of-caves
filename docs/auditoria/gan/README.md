@@ -1,5 +1,11 @@
 # Auditoria dos voxels de referência para a GAN
 
+O relatório técnico explica a preparação dos recortes, os consertos e
+o estado atual das referências para a GAN. O histórico reúne as
+rodadas e indica onde conferir a evidência por recorte.
+[Relatório de voxelização](relatorio-voxelizacao.md) ·
+[Histórico das rodadas](historico-voxelizacao.md)
+
 Auditoria executada em **15/11/2026**, sem treinamento. Código reprodutível:
 [`reference_data.py`](../../../src/cavegen/training/reference_data.py).
 O [manifesto completo](reference_audit.json) contém hashes SHA-256 dos nove
@@ -9,8 +15,8 @@ também no Colab. Nenhum arquivo de referência foi modificado.
 
 ## Conclusão da auditoria
 
-**Os interiores disponíveis não são adequados para investigar geração de
-cavernas.** São consistentes com o algoritmo de flood fill aplicado às
+**Os interiores da voxelização global de 15/11 não são adequados para
+investigar geração de cavernas.** São consistentes com o flood fill aplicado às
 superfícies, mas praticamente todo o vazio esperado está ausente. Isso é um
 problema dos alvos de aprendizado; trocar a função de perda não o resolve.
 
@@ -184,3 +190,138 @@ Foi criado `.venv-gan`, ignorado pelo Git, usando Python 3.12; a extração dos
 PDFs usou `pypdf` nesse ambiente disponível, sem reinstalar/modificar o
 ambiente persistente ausente. O inventário dos artigos consultados está em
 [`papers.json`](papers.json). Textos extraídos ficam apenas em `tmp/`, ignorado.
+
+## Voxelização por recortes no fold inicial
+
+Os lotes de preparação usam voxels de 16 cm e mantêm as partições de
+`holdout_indian_tunnel`. Cascade de Môtiers usa o LAS MainGallery de
+5 cm para treino. Markov Spodmol usa o LAS MainGallery de 5 cm para
+validação. Indian Tunnel é reservado para teste. O plano Full 10x usa
+uma linha central estimada. A comparação Full 1x reaproveita esse
+grafo para testar a nuvem de maior densidade com a mesma divisão inicial.
+
+Os planos em `data/processed/crop_plans/` registram as fontes, os
+cortes e os alertas. Em `data/processed/reference_sections/`, o
+`lote.csv` de cada plano inclui cada recorte tentado, o volume salvo ou
+o motivo do bloqueio. Nos planos revisados, a busca tentou estações
+próximas com suporte angular e contorno conectado, mantendo a escala e
+os cortes compartilhados. Cada configuração permite tampas auxiliares
+com raio de até quatro voxels, conforme o piloto de Archamps.
+
+| Levantamento | Recortes por plano | Volumes no plano inicial | Volumes no plano revisado | 64³ com triagem mínima no revisado |
+| --- | ---: | ---: | ---: | ---: |
+| Cascade de Môtiers, MainGallery 5 cm | 63 | 12 | 14 | 14 |
+| Markov Spodmol, MainGallery 5 cm | 65 | 10 | 11 | 8 |
+| Indian Tunnel, Full 10x | 32 | 1 | 2 | 0 |
+| Indian Tunnel, Full 1x | 32 | 1 | — | — |
+
+Os planos inicial e revisado são versões da mesma nuvem. A tabela
+compara os lotes individualmente. No plano revisado, os intervalos que
+fecharam somam 108,2 m de linha central em Cascade, 75,3 m em Markov
+e 11,0 m em Indian Tunnel. A soma é uma medida de cobertura dos
+recortes que fecharam ao longo do grafo usado no plano.
+
+A Full 1x fechou o mesmo recorte que a Full 10x no plano inicial,
+`ramo_002_007`. A grade Full 1x é 72×64×100 e usou 11 voxels de
+tampa sintética. As duas variantes iniciais deixaram 25 recortes sem
+contorno completo. O aumento da densidade preservou o resultado nesse
+trecho e deixou a cobertura geral do plano inicial pendente.
+
+Os volumes mantêm a grade nativa. Os que excedem 64³ precisam de uma
+decisão sobre a entrada da GAN e continuam disponíveis como referência
+geométrica para revisão. Os lotes ainda incluem intervalos com tampas
+ausentes, passagens próximas ou vazamentos sem fechamento verificado.
+Os manifests de treino continuam vinculados à auditoria dos volumes
+globais até a revisão dos recortes.
+
+### Cortes e bifurcações em Cascade de Môtiers
+
+O grafo da MainGallery tem 24 nós de bifurcação e 49 cadeias entre
+bifurcações ou extremidades. O plano de 63 recortes deu prioridade
+aos trechos mais longos e cobriu cerca de 410 m em 19 cadeias.
+Pedir 63 recortes foi uma escolha operacional para seções de cerca de
+8 m nas passagens mais longas. O grafo usado no piloto de Archamps
+PostEtroiture representa uma única cadeia.
+
+No plano revisado, 19 recortes ficaram sem contorno de extremidade,
+3 tiveram semente bloqueada e 27 vazaram com alerta de passagem
+próxima ou retorno. O bloqueio de fechamento automático nesses 27
+protege conexões possivelmente reais. Todos vazaram mesmo com planos
+temporários cobrindo as extremidades. Na rota principal registrada,
+a distância mínima a um nó de bifurcação variou de 1,16 a 18,64 m.
+Essas distâncias ajudam a localizar a inspeção. A origem física da
+fuga depende da conferência com os pontos observados.
+
+Para os cortes sem contorno, testar uma nova estação ou recentrar a
+estimativa do raio no plano existente. Em Archamps, o percentil 75
+calcula um raio por setor angular. A revisão da estação determina
+onde fica o corte. Um corte interno deve manter a mesma posição e
+o mesmo contorno nos dois recortes vizinhos.
+
+Um ensaio de recentragem no mesmo plano recuperou 11 dos 19 contornos
+testados em Cascade e fechou mais dois volumes a 16 cm, `ramo_016_002`
+e `ramo_027_002`, ambos em 64³. Em Markov, recuperou 4 dos 18 contornos
+testados e fechou `ramo_017_007` em 64×74×64. Em Indian Tunnel,
+os 26 contornos testados permaneceram pendentes. Os candidatos do
+ensaio ficam em `contornos_16cm`. Para revisão manual em Cascade,
+`revisao_cortes.csv` lista as estações e os recortes vizinhos e
+`revisao_fugas.csv` aponta para as provas dos 27 vazamentos.
+
+### Comparação experimental com voxels de 28 cm
+
+Uma busca numérica por orientações compactas em Indian Tunnel
+encontrou caixas de 11,13 a 12,20 m considerando apenas os centros
+dos voxels de ar dos volumes fechados a 16 cm. A maior dimensão
+permaneceu acima dos 10,24 m disponíveis em 64³ a 16 cm nas
+orientações testadas.
+
+A condição experimental de 28 cm revoxelizou os mesmos PLYs e
+preservou as posições e os contornos das extremidades. Ela usou
+a mesma escala nas quatro cavernas e limitou a tampa auxiliar
+a dois voxels de raio. Em `mesmos_cortes_28cm`, 5/6 recortes de
+Archamps, 16/63 de Cascade, 13/65 de Markov e 2/32 de Indian
+Tunnel fecharam. Passaram na triagem mínima em 64³ respectivamente
+5, 14, 13 e 2 recortes. O ar dessas amostras alcança ambas as tampas.
+
+Os dois trechos de Indian Tunnel comparáveis apresentaram IoU
+de aproximadamente 0,91 com a grade de 16 cm, medida pela
+interseção física dos voxels nas duas grades. Em Cascade e Markov
+houve amostras comparáveis com IoU abaixo de 0,65. A resolução de
+28 cm permite uma entrada cúbica comum neste ensaio. A escolha da
+escala e a validação dos interiores continuam pendentes para o
+conjunto de referência da GAN.
+
+### Reextração de cortes pendentes e auditoria para a GAN
+
+O ensaio `cortes_refitos_16cm` buscou contornos na nuvem de origem
+até 2,56 m antes ou depois de cada estação pendente. Testou recentragem
+de até 0,96 m no plano e exigiu pelo menos 14 setores com suporte.
+Quando houve um contorno aceito, o mesmo plano foi usado nos dois
+lados do corte e os recortes afetados foram reextraídos. Os alertas
+de passagem próxima continuaram ativos.
+
+| Caverna | Cortes com contorno aceito | Recortes reextraídos | Volume que fechou |
+| --- | ---: | ---: | --- |
+| Cascade de Môtiers | 19 de 19 | 19 | `ramo_027_002`, 64³ |
+| Markov Spodmol | 12 de 18 | 13 | `ramo_017_007`, 64×73×64 |
+| Indian Tunnel | 2 de 26 | 1 | Nenhum |
+
+Os dois volumes fechados são novas versões de recortes já recuperados
+no teste de recentragem. Os resultados reforçam a necessidade de
+investigar as fugas e a semente após acertar as extremidades.
+
+Para auditar um conjunto experimental, use
+`python -m cavegen.training.gallery_reference_data` com os diretórios
+dos planos relativos a `data/processed/reference_sections`. Defina
+`--resolution` e `--voxel-size` para uma grade cúbica e uma escala
+comuns. A auditoria refaz o flood fill com a superfície e as máscaras,
+verifica o contato com as duas tampas e registra os hashes da evidência.
+O loader exige `allow_candidate_proxy=True` para esses interiores.
+
+A execução local em `data/processed/experiments/gan_piloto_28cm/`
+auditou 36 volumes do ensaio de 28 cm e reteve 34 na triagem numérica
+64³. No fold `holdout_indian_tunnel`, são 19 de treino, 13 de validação
+e 2 de teste. Os hashes e a separação por caverna foram rechecados nos
+quatro folds. O manifesto experimental mantém o status
+`gallery_proxy_pending_review`. A cobertura parcial e a sensibilidade
+à escala continuam pendentes para definir o conjunto de treino.

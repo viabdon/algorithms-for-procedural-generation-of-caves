@@ -108,7 +108,8 @@ def test_crop_outputs_and_selection_are_independent_of_batch_size(gallery, tmp_p
         process_crop(first)
 
 
-def test_small_lateral_gap_is_repaired_without_mutating_observations(gallery, tmp_path):
+@pytest.mark.parametrize("blocked_seed", [False, True])
+def test_small_lateral_gap_is_repaired_without_mutating_observations(gallery, tmp_path, blocked_seed):
     path, spec, source, wall = gallery
     # A long enough test gallery has both sealed and leaking overlapping probes.
     wall = np.zeros((18, *wall.shape[1:]), dtype=bool)
@@ -117,6 +118,8 @@ def test_small_lateral_gap_is_repaired_without_mutating_observations(gallery, tm
     missing = (8, 3, 4)
     wall[missing] = False
     spec.update(shape_zyx=[18, 10, 10], selection_max_xyz=[9, 9, 17], seed_xyz=[4.5, 4.5, 8.5])
+    if blocked_seed:
+        spec["seed_xyz"] = [4.5, 3.5, 6.5]
     spec["sections"][1]["point_xyz"][2] = 15.5
     path.write_text(json.dumps(spec))
     np.savetxt(source, np.argwhere(wall)[:, ::-1] + 0.5)
@@ -130,7 +133,7 @@ def test_small_lateral_gap_is_repaired_without_mutating_observations(gallery, tm
         np.testing.assert_array_equal(np.argwhere(masks["repair"]), [missing])
         assert not (air & (wall | masks["caps"].any(axis=0) | masks["repair"])).any()
         rerun = classify_surface_by_flood_fill(wall | masks["caps"].any(axis=0) | masks["repair"])
-        assert rerun[crop.seed_zyx] == INTERIOR
+        assert rerun[tuple(record["seed_zyx"])] == INTERIOR
     assert record["repair_voxels"] == 1
     reports = crop.destination / "relatorio_volume"
     summary = read_rows(reports / "summary.csv")[0]
@@ -151,6 +154,12 @@ def test_small_lateral_gap_is_repaired_without_mutating_observations(gallery, tm
     replay = {row["check"]: row for row in read_rows(replay_checks(crop.destination))}
     assert replay["remove_repair_voxel"] == ablation
     assert replay["candidate_air_component"]["result"] == "match"
+    if blocked_seed:
+        assert record["seed_search"]["mode"] == "provisional"
+        assert record["seed_search"]["original_zyx"] == list(crop.seed_zyx)
+        assert record["seed_zyx"] == [6, 4, 4]
+        assert replay["air_reaches_initial_cap"]["passed"] == "True"
+        assert replay["air_reaches_final_cap"]["passed"] == "True"
 
 
 def test_large_lateral_opening_is_reported_without_an_interior(gallery, tmp_path, monkeypatch, capsys):
@@ -192,13 +201,61 @@ def test_cap_gap_runs_double_cap_probe(gallery, tmp_path):
 def test_blocked_seed_reports_failed_precondition(gallery, tmp_path):
     path, spec, _, _ = gallery
     spec["seed_xyz"] = [4.5, 3.5, 4.5]
+    spec["seed_search_radius_voxels"] = 0
     path.write_text(json.dumps(spec))
     crop = prepare_crop(path, repository=tmp_path)
     with pytest.raises(ValueError, match="semente caiu na barreira"):
         process_crop(crop)
     (attempt,) = crop.destination.with_name("10x10x10_sem_volume").iterdir()
-    assert read_rows(attempt / "summary.csv")[0]["outcome"] == "seed_blocked"
+    summary = read_rows(attempt / "summary.csv")[0]
+    assert summary["outcome"] == "seed_blocked"
+    assert summary["seed_search"] == "disabled"
     assert read_rows(attempt / "checks.csv")[-1]["passed"] == "False"
+    assert not crop.destination.exists()
+
+
+def test_blocked_seed_recovers_only_inside_the_enclosed_gallery(gallery, tmp_path):
+    path, spec, _, _ = gallery
+    spec["seed_xyz"] = [4.5, 3.5, 4.5]
+    path.write_text(json.dumps(spec))
+    crop = prepare_crop(path, repository=tmp_path)
+    record = process_crop(crop)
+    assert record["seed_zyx"] == [4, 4, 4]
+    assert record["config"]["seed_xyz"] == spec["seed_xyz"]
+    assert record["seed_search"]["mode"] == "enclosed"
+    assert record["seed_search"]["displacement"] == 1
+    assert json.loads(path.read_text())["seed_xyz"] == spec["seed_xyz"]
+    replay = {row["check"]: row for row in read_rows(replay_checks(crop.destination))}
+    assert replay["outside_fill_final"]["result"] == "interior"
+    summary = read_rows(crop.destination / "relatorio_volume" / "summary.csv")[0]
+    assert (summary["original_seed_y"], summary["seed_y"]) == ("3", "4")
+
+
+def test_blocked_seed_with_unrepaired_opening_does_not_publish_a_volume(gallery, tmp_path):
+    path, spec, source, wall = gallery
+    spec["seed_xyz"] = [4.5, 6.5, 4.5]
+    path.write_text(json.dumps(spec))
+    wall[2:8, 3, 3:7] = False
+    np.savetxt(source, np.argwhere(wall)[:, ::-1] + 0.5)
+    crop = prepare_crop(path, repository=tmp_path)
+    with pytest.raises(ValueError, match="exterior"):
+        process_crop(crop)
+    (attempt,) = crop.destination.with_name("10x10x10_sem_volume").iterdir()
+    assert read_rows(attempt / "summary.csv")[0]["seed_search"] == "provisional"
+    assert not crop.destination.exists()
+
+
+def test_blocked_seed_does_not_accept_an_enclosed_pocket_touching_one_cap(gallery, tmp_path):
+    path, spec, source, wall = gallery
+    spec["seed_search_radius_voxels"] = 1
+    path.write_text(json.dumps(spec))
+    wall[4, 4:6, 3:7] = True
+    np.savetxt(source, np.argwhere(wall)[:, ::-1] + 0.5)
+    crop = prepare_crop(path, repository=tmp_path)
+    with pytest.raises(ValueError, match="semente caiu na barreira"):
+        process_crop(crop)
+    (attempt,) = crop.destination.with_name("10x10x10_sem_volume").iterdir()
+    assert read_rows(attempt / "summary.csv")[0]["seed_search"] == "no_candidate"
     assert not crop.destination.exists()
 
 

@@ -65,7 +65,11 @@ se alguma abertura correspondia à continuação de uma passagem.
    CPU e salva `centreline.npz` no plano. Para esse modo, instale o extra
    com `uv sync --locked --extra centreline`. Com grafo pronto, o planejador
    percorre a nuvem duas vezes para estimar seções e extrair pontos. A
-   geração da linha central acrescenta uma leitura em lotes.
+   geração da linha central acrescenta uma leitura em lotes. Com
+   `section_search_radius_voxels` maior que zero, há uma leitura
+   adicional para comparar a nuvem original com o filtro por ramo e
+   testar outras estações. O modelo de plano usa oito voxels.
+   [Revisão de contornos](planejamento-recortes-voxelizacao.md#revisão-de-contornos-no-planejador)
 3. Quando quiser visualizar, use a opção **6** e informe a pasta do plano,
    seu `plan.json` ou o `cloud.ply` de um dos recortes. Escolha **1** para
    agrupar os recortes com pontos em um único `recortes.html`, com
@@ -120,6 +124,14 @@ relevantes deixam o contorno em branco para revisão. A margem
 `padding_voxels` se aplica à grade, separada do raio que seleciona pontos.
 Trechos que excedem 64 células em algum eixo na escala escolhida recebem
 um alerta. Revise todos os candidatos antes do flood fill.
+
+Para planejar uma lista explícita de ramos, use `passages` com os
+índices originais do grafo, a partir de 1. Por exemplo, use
+`"passages": [3, 7]` e `"count": 2` para produzir um recorte de cada
+ramo. Use um `count` maior para dividir os ramos selecionados, respeitando
+o mínimo de oito voxels úteis por trecho após as margens. Cada ramo
+solicitado precisa comportar ao menos um recorte. Omitir `passages`
+mantém a priorização automática dos intervalos mais longos.
 
 Em uma cópia do plano, use `section_overrides` para fixar cortes examinados
 na nuvem original. `passage` começa em 1, como em `passagem_001`. `cut`
@@ -182,10 +194,14 @@ enquanto recuperar pontos excluídos exige uma nova extração.
   voxel à metade. A `plane_tolerance` deve ser pequena frente ao voxel.
 - `seed_xyz` marca um ponto revisado dentro da passagem. O flood fill
   percorre voxels livres por seis vizinhos de face. No recorte, o código
-  parte da semente e verifica se a componente alcança a borda. Semente
-  ocupada, barreira na borda e tampas sem contato com a parede exigem
-  correção da configuração. Para uma semente livre conectada ao exterior,
-  o menu inicia o diagnóstico automático.
+  parte da semente e verifica se a componente alcança a borda. Se a
+  semente estiver ocupada, `seed_search_radius_voxels` limita a busca
+  automática por outra posição (padrão 4, zero desativa). O volume
+  com semente reposicionada exige confirmação pelo exterior e contato
+  com as duas tampas. Barreira na borda, tampas sem contato com a parede
+  e busca sem candidata exigem revisão. Para uma semente livre
+  conectada ao exterior, o menu inicia o diagnóstico automático.
+  [Busca automática da semente](planejamento-recortes-voxelizacao.md#busca-automática-quando-a-semente-cai-na-barreira)
 - `batch_size` limita o lote de leitura. `progress_every` define a
   frequência do aviso em pontos lidos, com `0` para desativar.
   A nuvem é percorrida uma vez por recorte.
@@ -240,7 +256,7 @@ tentativas. Quando há uma amostra da fuga, a visualização se chama
 
 | Arquivo | O que registra |
 | --- | --- |
-| `summary.csv` | Uma linha por execução, com fonte, método, versões de bibliotecas, parâmetros, grade, estado da comparação e desfecho. |
+| `summary.csv` | Uma linha por execução, com fonte, método, versões de bibliotecas, parâmetros, grade, busca da semente, estado da comparação e desfecho. |
 | `checks.csv` | Checagens de superfície, margem, contato, semente, comparação do ar e retirada de tampas ou de voxels de reparo. |
 | `probes.csv` | Planos completos, deslocamentos das tampas e janelas da busca com intervalo físico e estado da semente. |
 | `bins.csv` | Bins suspeitos em ZYX, centro XYZ na origem da fonte, contagens do PLY e do original, apoio geométrico e remendo publicado. |

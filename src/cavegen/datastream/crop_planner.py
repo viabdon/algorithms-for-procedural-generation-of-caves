@@ -24,9 +24,9 @@ from cavegen.tools.centreline import ExtractionSettings
 class _Sample:
     """Keep a uniform, bounded sample by retaining the smallest random keys."""
 
-    def __init__(self, limit: int):
+    def __init__(self, limit: int, columns: int = 4):
         self.limit = limit
-        self.rows = np.empty((0, 4))
+        self.rows = np.empty((0, columns))
         self.keys = np.empty(0)
 
     def add(self, rows, rng):
@@ -63,7 +63,7 @@ class _Window:
     start: _Boundary
     end: _Boundary
     folder: Path
-    samples: _Sample = field(default_factory=lambda: _Sample(12000))
+    samples: _Sample = field(default_factory=lambda: _Sample(12000, columns=5))
     reasons: list[str] = field(default_factory=list)
     radius: float = 0.0
     count: int = 0
@@ -71,7 +71,17 @@ class _Window:
     hi: np.ndarray = field(default_factory=lambda: np.full(3, -np.inf))
 
 
-def _allocate(passages: list[Passage], count: int, size: float):
+@dataclass
+class _SectionProbe:
+    station: float
+    point: np.ndarray
+    direction: np.ndarray
+    u: np.ndarray
+    counts: np.ndarray = field(default_factory=lambda: np.zeros((4, 16), dtype=np.int64))
+    samples: _Sample = field(default_factory=lambda: _Sample(4096, columns=2))
+
+
+def _allocate(passages: list[Passage], count: int, size: float, selection: list[int] | None = None):
     limits = []
     for path in passages:
         # Keep a section margin from junctions; end sections can use samples on both sides.
@@ -80,7 +90,17 @@ def _allocate(passages: list[Passage], count: int, size: float):
                        length - size * (3 if path.junctions[1] else 1)))
     usable = np.array([end - start for start, end in limits])
     allocation = np.zeros(len(passages), dtype=int)
-    for _ in range(count):
+    if selection is not None:
+        if max(selection) > len(passages):
+            raise ValueError("A lista de passagens aponta para uma passagem inexistente.")
+        selected = np.asarray(selection) - 1
+        short = selected[usable[selected] < 8 * size]
+        if len(short):
+            names = ", ".join(str(i + 1) for i in short)
+            raise ValueError(f"Passagens com menos de oito voxels úteis: {names}.")
+        allocation[selected] = 1
+        usable[allocation == 0] = -np.inf
+    for _ in range(count - int(allocation.sum())):
         # Prioritize the longest current interval, with shorter-than-eight-voxel proposals excluded.
         score = usable / np.maximum(allocation, 1)
         score[usable < (allocation + 1) * 8 * size] = -np.inf
@@ -91,10 +111,14 @@ def _allocate(passages: list[Passage], count: int, size: float):
     return limits, allocation
 
 
+def _angular_bins(uv: np.ndarray) -> np.ndarray:
+    angles = np.mod(np.arctan2(uv[:, 1], uv[:, 0]), 2 * np.pi)
+    return np.floor(angles / (2 * np.pi / 16)).astype(int).clip(0, 15)
+
+
 def _angular_radii(uv: np.ndarray, size: float) -> np.ndarray:
     radius = np.linalg.norm(uv, axis=1)
-    angles = np.mod(np.arctan2(uv[:, 1], uv[:, 0]), 2 * np.pi)
-    bins = np.floor(angles / (2 * np.pi / 16)).astype(int).clip(0, 15)
+    bins = _angular_bins(uv)
     radii = np.full(16, np.nan)
     for i in range(16):
         observed = radius[(bins == i) & (radius > size)]
@@ -132,22 +156,42 @@ def _fit_contour(uv: np.ndarray, size: float, connected: bool) -> tuple[np.ndarr
     return max(radii_by_component, key=lambda radii: np.count_nonzero(np.isfinite(radii))), False
 
 
+def _section_frame(path: Passage, station: float, size: float):
+    point = path.at(station)
+    direction = path.at(station + size) - path.at(station - size)
+    norm = np.linalg.norm(direction)
+    if norm <= 1e-12:
+        return None
+    direction /= norm
+    axis = np.eye(3)[np.argmin(np.abs(direction))]
+    u = axis - (axis @ direction) * direction
+    return point, direction, u / np.linalg.norm(u)
+
+
+def _set_boundary(boundary, station, frame, radii, complete):
+    boundary.station = station
+    boundary.point, boundary.direction, boundary.u = frame
+    supported = np.flatnonzero(np.isfinite(radii))
+    boundary.coverage = len(supported)
+    boundary.competing_contours = not complete and _has_angular_support(radii)
+    if complete:
+        theta = (np.arange(16) + 0.5) * (2 * np.pi / 16)
+        r = np.interp(np.arange(16), supported, radii[supported], period=16)
+        boundary.polygon = np.column_stack((r * np.cos(theta), r * np.sin(theta)))
+    else:
+        boundary.polygon = np.empty((0, 2))
+
+
 def _fit_boundary(boundary: _Boundary, path: Passage, size: float) -> None:
     samples = boundary.samples.rows[:, :3]
     best = None
     shifts = (0.0,) if boundary.fixed else (0.0, -size, size)
     for shift in shifts:
         station = np.clip(boundary.nominal + shift, size / 2, path.stations[-1] - size / 2)
-        point = path.at(station)
-        direction = path.at(station + size) - path.at(station - size)
-        norm = np.linalg.norm(direction)
-        if norm <= 1e-12:
+        frame = _section_frame(path, station, size)
+        if frame is None:
             continue
-        direction /= norm
-        # Pick the global axis least parallel to the normal to orient U.
-        axis = np.eye(3)[np.argmin(np.abs(direction))]
-        u = axis - (axis @ direction) * direction
-        u /= np.linalg.norm(u)
+        point, direction, u = frame
         v = np.cross(direction, u)
         delta = samples - point
         near = np.abs(delta @ direction) <= 2 * size
@@ -158,15 +202,96 @@ def _fit_boundary(boundary: _Boundary, path: Passage, size: float) -> None:
         if best is not None and score <= best:
             continue
         best = score
-        boundary.station, boundary.point, boundary.direction, boundary.u = station, point, direction, u
-        boundary.coverage = len(supported)
-        boundary.competing_contours = not complete and _has_angular_support(radii)
-        if complete:
-            theta = (np.arange(16) + 0.5) * (2 * np.pi / 16)
-            r = np.interp(np.arange(16), supported, radii[supported], period=16)
-            boundary.polygon = np.column_stack((r * np.cos(theta), r * np.sin(theta)))
+        _set_boundary(boundary, station, frame, radii, complete)
+
+
+def _section_probes(groups, passages, size, steps):
+    for owner, (boundaries, _) in groups.items():
+        path = passages[owner]
+        lower = (2 if path.junctions[0] else 0.5) * size
+        upper = path.stations[-1] - (2 if path.junctions[1] else 0.5) * size
+        for cut, boundary in enumerate(boundaries):
+            probes = []
+            offsets = [0, *(offset for step in range(1, steps + 1) for offset in (-step, step))]
+            for offset in ([0] if boundary.fixed else offsets):
+                station = boundary.station + offset * size
+                if offset and not lower <= station <= upper:
+                    continue
+                frame = _section_frame(path, station, size)
+                if frame is not None:
+                    probes.append(_SectionProbe(station, *frame))
+            yield owner, cut, probes
+
+
+def _measure_section_probes(batches, probes, index, size, context):
+    rng = np.random.default_rng(17)
+    search_radius = np.hypot(context, 2 * size)
+    for xyz in batches:
+        if not len(xyz):
+            continue
+        tree = cKDTree(xyz)
+        owners, along, _ = index.locate(xyz)
+        for owner, _, trials in probes:
+            for trial in trials:
+                nearby = np.asarray(tree.query_ball_point(trial.point, search_radius), dtype=np.intp)
+                delta = xyz[nearby] - trial.point
+                uv = delta @ np.column_stack((trial.u, np.cross(trial.direction, trial.u)))
+                radius = np.linalg.norm(uv, axis=1)
+                slab = (np.abs(delta @ trial.direction) <= 2 * size) & (radius <= context)
+                nearby, uv, radius = nearby[slab], uv[slab], radius[slab]
+                filtered = (owners[nearby] == owner) & (np.abs(along[nearby] - trial.station) <= 4 * size)
+                bins = _angular_bins(uv)
+                for row, keep in enumerate((np.ones(len(bins), dtype=bool), radius > size,
+                                            filtered, filtered & (radius > size))):
+                    trial.counts[row] += np.bincount(bins[keep], minlength=16)
+                trial.samples.add(uv[filtered], rng)
+
+
+def _review_sections(groups, passages, index, size, spec, batches):
+    probes = list(_section_probes(groups, passages, size, spec["section_search_radius_voxels"]))
+    _measure_section_probes(batches, probes, index, size, spec["section_search_context"])
+    reviews = []
+    for owner, cut, trials in probes:
+        boundaries = groups[owner][0]
+        boundary = boundaries[cut]
+        before = boundary.station
+        lo = boundaries[cut - 1].station + 8 * size if cut else -np.inf
+        hi = boundaries[cut + 1].station - 8 * size if cut + 1 < len(boundaries) else np.inf
+        selected = best = None
+        records = []
+        for trial in trials:
+            uv = trial.samples.rows
+            radii, complete = _fit_contour(uv, size, connected=True)
+            coverage = int(np.isfinite(radii).sum())
+            fits = bool(lo - 1e-10 * size <= trial.station <= hi + 1e-10 * size)
+            records.append({
+                "station": trial.station, "spacing_ok": fits,
+                "raw_bins": trial.counts[0].tolist(),
+                "raw_bins_above_min_radius": trial.counts[1].tolist(),
+                "filtered_bins": trial.counts[2].tolist(),
+                "filtered_bins_above_min_radius": trial.counts[3].tolist(),
+                "connected_bins_supported": coverage, "connected_complete": complete,
+            })
+            if fits and complete and selected is None:
+                selected = trial, radii
+            if trial.station == before:
+                best = trial, radii
+        if boundary.fixed:
+            outcome = "fixed"
+        elif selected is not None:
+            trial, radii = selected
+            _set_boundary(boundary, trial.station, (trial.point, trial.direction, trial.u), radii, True)
+            outcome = "refit" if trial.station == before else "moved"
         else:
-            boundary.polygon = np.empty((0, 2))
+            if best is not None:
+                trial, radii = best
+                _set_boundary(boundary, trial.station, (trial.point, trial.direction, trial.u), radii, False)
+            outcome = "pending"
+        reviews.append({
+            "passage": int(owner) + 1, "cut": cut, "original_station": before,
+            "selected_station": boundary.station, "outcome": outcome, "trials": records,
+        })
+    return reviews
 
 
 def _section(boundary: _Boundary, *, end: bool) -> dict:
@@ -255,9 +380,23 @@ def read_plan_config(config: Path) -> dict:
         value = spec.setdefault(key, default)
         if type(value) is not int or value < minimum:
             raise ValueError(f"{key} deve ser um inteiro ≥ {minimum}.")
+    selection = spec.get("passages")
+    if selection is not None and (
+        not isinstance(selection, list) or not selection
+        or any(type(passage) is not int or passage < 1 for passage in selection)
+        or len(set(selection)) != len(selection) or len(selection) > spec["count"]
+    ):
+        raise ValueError("Informe passagens distintas por índice positivo e um count que cubra a lista.")
     size = spec.get("voxel_size")
     if type(size) not in (int, float) or not np.isfinite(size) or size <= 0:
         raise ValueError("voxel_size deve ser positivo e finito.")
+    steps = spec.get("section_search_radius_voxels", 0)
+    if type(steps) is not int or not 0 <= steps <= 16:
+        raise ValueError("section_search_radius_voxels deve ser um inteiro entre 0 e 16.")
+    if steps:
+        context = spec.setdefault("section_search_context", max(5.0, 4 * size))
+        if type(context) not in (int, float) or not np.isfinite(context) or context <= size:
+            raise ValueError("section_search_context deve ser finito e maior que um voxel.")
     overrides = spec.get("section_overrides", [])
     if not isinstance(overrides, list):
         raise ValueError("section_overrides deve ser uma lista.")
@@ -348,10 +487,12 @@ def propose_crops(
         nodes, edges = read_graph(graph)
         origin = nodes[0].copy()
         passages = passages_from_graph(nodes - origin, edges)
-        limits, allocation = _allocate(passages, spec["count"], size)
+        limits, allocation = _allocate(passages, spec["count"], size, spec.get("passages"))
         if not allocation.any():
             raise ValueError("Nenhuma passagem comporta oito voxels de comprimento com essa escala.")
         spacing = size / 2
+        search_steps = spec.get("section_search_radius_voxels", 0)
+        search_margin = (search_steps + 1) * size if search_steps else 0.0
         index = CentrelineIndex(passages, spacing)
         rng = np.random.default_rng(17)
         groups = {}
@@ -365,24 +506,38 @@ def propose_crops(
             owners, along, radial = index.locate(xyz)
             for owner in np.intersect1d(np.unique(owners), list(groups)):
                 part = owners == owner
-                points, station = np.column_stack((xyz[part], radial[part])), along[part]
+                station = along[part]
+                points = np.column_stack((xyz[part], radial[part], station))
                 boundaries, windows = groups[owner]
                 for boundary in boundaries:
-                    boundary.samples.add(points[np.abs(station - boundary.nominal) <= 4 * size], rng)
+                    near = np.abs(station - boundary.nominal) <= 4 * size
+                    boundary.samples.add(points[near, :4], rng)
                 for window in windows:
-                    inside = (station >= window.start.nominal) & (station <= window.end.nominal)
+                    inside = (
+                        (station >= window.start.nominal - search_margin)
+                        & (station <= window.end.nominal + search_margin)
+                    )
                     window.samples.add(points[inside], rng)
 
-        for owner, (boundaries, windows) in groups.items():
-            path = passages[owner]
+        for owner, (boundaries, _) in groups.items():
             for boundary in boundaries:
-                _fit_boundary(boundary, path, size)
+                _fit_boundary(boundary, passages[owner], size)
             if any(b.fixed for b in boundaries) and np.any(
                 np.diff([b.station for b in boundaries]) < 8 * size
             ):
                 raise ValueError("Os cortes ajustados ficaram separados por menos de oito voxels.")
+
+        section_reviews = None
+        if search_steps:
+            batches = _source_batches(source, origin, spec["batch_size"], progress, "revisar_secoes")
+            section_reviews = _review_sections(groups, passages, index, size, spec, batches)
+
+        for owner, (boundaries, windows) in groups.items():
+            path = passages[owner]
             for window in windows:
                 rows = window.samples.rows
+                if search_steps:
+                    rows = rows[(rows[:, 4] >= window.start.station) & (rows[:, 4] <= window.end.station)]
                 if not len(rows):
                     window.reasons.append("sem_apoio_amostral_no_trecho")
                     continue
@@ -469,6 +624,8 @@ def propose_crops(
             "source_origin_xyz": origin.tolist(),
             "parameters": spec, "requested": spec["count"], "proposed": len(records), "crops": records,
         }
+        if section_reviews is not None:
+            manifest["section_reviews"] = section_reviews
         (staged / "plan.json").write_text(
             json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
         )

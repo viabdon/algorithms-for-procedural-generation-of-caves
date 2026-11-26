@@ -195,6 +195,41 @@ def test_reviewed_cuts_reject_a_detached_cluster_and_share_displaced_station(tmp
     ).tolist()
 
 
+def test_automatic_section_review_compares_the_source_and_updates_both_neighbours(tmp_path):
+    points = straight_cloud(12)
+    wall = points[(abs(points[:, 0] - 6) > 1.05) | (points[:, 2] <= 0)]
+    close_to_axis = points[abs(points[:, 0] - 6) < 0.4] * [1, .1, .1]
+    station, angle = np.meshgrid(np.linspace(0, .7, 60), np.linspace(1.22, 1.43, 45))
+    detached = np.column_stack((station.ravel(), 3 * np.cos(angle.ravel()), 3 * np.sin(angle.ravel())))
+    config, _ = setup_plan(
+        tmp_path, np.vstack((wall, close_to_axis, detached)), [[0, 0, 0], [12, 0, 0]],
+    )
+    baseline = propose_crops(config, tmp_path / "base")
+    assert "tampa_com_cobertura_insuficiente" in baseline["crops"][0]["review_reasons"]
+    spec = json.loads(config.read_text())
+    spec.update(section_search_radius_voxels=8)
+    config.write_text(json.dumps(spec))
+    output = tmp_path / "auto"
+    manifest = propose_crops(config, output)
+    first, second = [json.loads((output / c["crop_id"] / "crop.json").read_text())
+                     for c in manifest["crops"]]
+    begin, shared, end = manifest["section_reviews"]
+    assert begin["outcome"] == end["outcome"] == "refit"
+    assert np.linalg.norm(first["sections"][0]["polygon_uv"], axis=1).max() < 1.1
+    assert shared["outcome"] == "moved"
+    original, *other_trials = shared["trials"]
+    assert not original["connected_complete"]
+    assert sum(original["raw_bins"]) > sum(original["raw_bins_above_min_radius"])
+    assert sum(original["filtered_bins"]) > sum(original["filtered_bins_above_min_radius"])
+    winner = next(t for t in other_trials if t["station"] == shared["selected_station"])
+    assert winner["spacing_ok"] and winner["connected_complete"]
+    assert first["proposal"]["cut_stations"][-1] == second["proposal"]["cut_stations"][0]
+    assert first["sections"][-1]["point_xyz"] == second["sections"][0]["point_xyz"]
+    np.testing.assert_allclose(first["sections"][-1]["inward_normal_xyz"],
+                               -np.array(second["sections"][0]["inward_normal_xyz"]))
+    assert read_ply_header(output / first["crop_id"] / "cloud.ply").vertex_count > 0
+
+
 def test_reviewed_connected_cut_keeps_two_complete_contours_pending(tmp_path):
     inner = straight_cloud(12)
     outer = inner * [1, 3.5, 3.5]
@@ -223,3 +258,22 @@ def test_section_override_cannot_cross_the_next_cut(tmp_path):
     with pytest.raises(ValueError, match="em ordem"):
         propose_crops(config, output)
     assert not output.exists()
+
+
+def test_plan_targets_shorter_passages_without_renumbering_graph(tmp_path):
+    main_gallery = straight_cloud(14)
+    side_gallery = straight_cloud(4)[:, [1, 0, 2]] + [6, 0, 0]
+    nodes = [[0, 0, 0], [6, 0, 0], [14, 0, 0], [6, 4, 0], [6, 0, 1]]
+    config, _ = setup_plan(tmp_path, np.concatenate((main_gallery, side_gallery)), nodes, count=3)
+    np.savez(tmp_path / "graph.npz", nodes_xyz=nodes, edges=[[0, 1], [1, 2], [1, 3], [1, 4]])
+    spec = json.loads(config.read_text())
+    config.write_text(json.dumps(dict(spec, passages=[2, 3])))
+    plan = propose_crops(config, tmp_path / "selecionados")
+    assert [row["crop_id"] for row in plan["crops"]] == [
+        "ramo_002_001", "ramo_002_002", "ramo_003_001",
+    ]
+    assert all(row["retained_points"] > 0 for row in plan["crops"])
+
+    config.write_text(json.dumps(dict(spec, passages=[3, 4])))
+    with pytest.raises(ValueError, match="menos de oito voxels úteis: 4"):
+        propose_crops(config, tmp_path / "curto")

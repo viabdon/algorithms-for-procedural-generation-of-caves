@@ -9,7 +9,7 @@ mesmo plano pela sequência de contração laplaciana e árvore geradora mínima
 do ensaio exploratório do Elaphes. O piloto agora diagnostica fugas com duas
 tampas móveis e valida remendos locais em uma máscara separada. Os primeiros
 resultados reais estão registrados na
-[evolução do piloto em Archamps](plano-reconstrucao-secoes.md#evolucao-do-piloto-em-archamps).
+[evolução do piloto em Archamps](plano-reconstrucao-secoes.md#evolução-do-piloto-em-archamps).
 A reconstrução mais ampla por interpolação e a validação geométrica
 sistemática continuam em aberto.
 
@@ -21,11 +21,10 @@ no piloto são adaptações experimentais do projeto.
 
 ## Busca de cortes com melhor cobertura
 
-**Próxima prioridade do piloto.** Ampliar a busca pela posição dos cortes
-quando a seção original e os ajustes locais de um voxel deixam o contorno
-sem suporte suficiente. Antes de rodar a voxelização em lote de Archamps,
-o primeiro ensaio deve tratar os dois limites compartilhados abaixo, no
-plano de PostEtroiture a 2 mm, com voxels de 16 cm.
+O piloto de Archamps ampliou a busca pela posição dos cortes quando a
+seção original e os ajustes locais de um voxel deixaram o contorno sem
+suporte suficiente. A tabela registra o ponto de partida no plano de
+PostEtroiture a 2 mm, com voxels de 16 cm.
 
 | Posição ao longo da linha central | Extremidades afetadas | Cobertura registrada |
 | --- | --- | --- |
@@ -40,9 +39,9 @@ volta. A extensão foi observada na prévia dos pontos do PLY, antes da
 voxelização. [Registro da inspeção do 001](plano-reconstrucao-secoes.md#contorno-da-tampa-inicial-do-001)
 
 No limite **005/006**, a inspeção confirmou a ausência da tampa final
-do 005 e da inicial do 006. Os dois JSONs registram a mesma posição e
-deixam o contorno em branco por cobertura insuficiente. Antes de deslocar
-esse limite, comparar a cobertura angular na faixa do LAS original e
+do 005 e da inicial do 006. Os dois JSONs originais registravam a mesma
+posição e deixavam o contorno em branco por cobertura insuficiente.
+Antes de deslocar esse limite, comparar a cobertura angular na faixa do LAS original e
 nos pontos selecionados para ajustar o contorno. A comparação deve usar
 o mesmo plano para investigar se a cobertura já era baixa na faixa
 observada ou se diminuiu durante a seleção. [Registro da inspeção do 005/006](plano-reconstrucao-secoes.md#limite-005006-sem-tampas)
@@ -73,11 +72,13 @@ observada ou se diminuiu durante a seleção. [Registro da inspeção do 005/006
    dentro da faixa permitida, registrar as sondagens e manter o corte
    pendente de revisão.
 4. **Aplicar o mesmo corte aos dois vizinhos.** Reextrair ambos do LAS
-   com a mesma posição de corte e orientações voltadas para o interior de
-   cada trecho. Recalcular a caixa, a margem e a grade de cada um. Manter o
-   tamanho físico de voxel e registrar quando algum eixo exceder a grade
-   de referência de 64 células. Preservar o plano inicial como controle e
-   salvar a variante em um novo plano dentro do mesmo fold.
+   com o mesmo plano e contorno, usando normais voltadas para o interior
+   de cada trecho. Se o corte B mudar para B′, os intervalos A–B e B–C
+   passam a ser A–B′ e B′–C. A e C ficam nas mesmas estações. Um ajuste
+   explícito deve manter a ordem dos cortes e pelo menos oito voxels
+   entre eles, ou 1,28 m a 16 cm. Recalcular a caixa, a margem e a grade
+   de cada vizinho na mesma escala. Preservar o plano inicial como
+   controle e salvar a variante em um novo plano dentro do mesmo fold.
 5. **Confirmar o fechamento.** Voxelizar os vizinhos e verificar o resultado
    pelo flood fill e pelos relatórios da pipeline. Registrar separadamente
    a qualidade do contorno e a conectividade do interior. O 003 passou na
@@ -98,9 +99,47 @@ O ensaio termina quando os dois limites compartilhados e a tampa inicial
 do 001 tiverem uma decisão registrada. Nas seções aprovadas, anexar
 o resultado da voxelização dos recortes afetados. Nas seções pendentes,
 registrar a faixa explorada e a razão da rejeição.
-Depois disso, a etapa seguinte será planejar e executar em
-background os recortes pendentes de PreEtroiture e PostEtroiture e
-consolidar seus resumos em um CSV por caverna.
+
+No plano revisado de Archamps, o corte 001/002 passou de 8,76 m para
+9,24 m e o corte 005/006 passou de 42,34 m para 43,62 m. Os PLYs foram
+reextraídos e as duas tampas de cada corte passaram a ter contorno.
+O histórico detalha o fechamento posterior e os lotes dos demais
+levantamentos.
+[Ajustes aplicados em Archamps](plano-reconstrucao-secoes.md#como-os-ajustes-foram-aplicados-no-planejador) ·
+[Histórico dos lotes](auditoria/gan/historico-voxelizacao.md)
+
+### Revisão de contornos no planejador
+
+A opção **5** da Datastream executa a revisão quando
+`section_search_radius_voxels` é maior que zero. O modelo de plano
+usa **8 voxels**. Configurações antigas sem esse campo e configurações
+com valor zero usam o planejamento inicial. A revisão acrescenta uma
+leitura da nuvem original antes de extrair os PLYs.
+
+1. Em cada estação candidata, projetar a faixa de dois voxels de
+   cada lado do plano. O alcance transversal `section_search_context`
+   usa as unidades da nuvem e tem como padrão o maior valor entre
+   cinco unidades e quatro voxels.
+2. Contar os pontos nos 16 setores antes e depois de aplicar a
+   atribuição ao ramo e a proximidade de quatro voxels ao longo
+   da linha central. Em ambas as contagens, registrar quantos
+   pontos restam após exigir raio maior que um voxel. Essa comparação
+   distingue falta de observação de perda de suporte nos filtros,
+   como ocorreu no 005/006.
+3. Ajustar o contorno pelo percentil 75 por setor em uma amostra
+   dos pontos filtrados, com o modo de componentes conectados.
+   A estação precisa ter um único componente com pelo menos
+   14 setores sustentados e lacunas angulares isoladas. A revisão
+   tenta a estação atual primeiro e depois deslocamentos crescentes,
+   um voxel por vez em ambas as direções. Entre estações válidas,
+   usa a de menor deslocamento compatível com o espaçamento dos vizinhos.
+4. Registrar em `plan.json`, campo `section_reviews`, a estação
+   inicial, a adotada, as contagens e o desfecho de cada tentativa.
+   Cortes fixados em `section_overrides` entram na comparação na
+   estação indicada e preservam a configuração manual. Se a busca
+   ficar sem um contorno aceito, o corte segue pendente. Os dois
+   recortes de um corte recuperado recebem a mesma seção e são
+   extraídos com o novo limite.
 
 ## Separação dos dados antes dos recortes
 
@@ -190,11 +229,35 @@ centro a meio voxel e índice por
 por ZYX. A voxelização global continua usando o encaixe por arredondamento
 e spans `N-1` do normalizador.
 
-Pontos fora da região final serão filtrados, não acumulados artificialmente
-nas faces da grade. Registrar uma tolerância numérica para os planos, conforme
-precisão e escala, e testá-la. Para trechos adjacentes sem sobreposição,
-atribuir o plano compartilhado a um deles por regra explícita; para janelas
-sobrepostas, registrar a sobreposição e não contá-las como fontes independentes.
+A extração usa os dois planos para filtrar os pontos. Os vizinhos
+usam lados opostos do plano compartilhado, com uma pequena tolerância
+numérica que pode preservar pontos sobre o limite em ambos os PLYs.
+Para ajustar o contorno, é possível consultar uma faixa de pontos nos
+dois lados do plano. Essa faixa serve de contexto para o ajuste. O
+plano continua sendo a fronteira do volume de cada vizinho.
+
+### Como a grade cresce ao mover um corte
+
+Para cada eixo, a caixa do recorte abrange os pontos retidos, os
+vértices das tampas e a semente. O planejador acrescenta a margem
+`padding_voxels` de cada lado, divide a extensão resultante pelo
+tamanho do voxel e arredonda para cima. A grade tem pelo menos
+**64 células por eixo**. A margem padrão é de **dois voxels por lado**.
+Um ponto mais externo ou um contorno mais largo pode aumentar a
+dimensão se a geometria com margem ultrapassar o espaço disponível.
+
+Em Archamps PostEtroiture, o `ramo_001_005` tinha aproximadamente
+**9,18 m** de extensão em X e cabia em `64×64×64`. Quando o corte
+005/006 foi de 42,34 m para 43,62 m, a nova tampa final passou a
+definir o limite inferior em X. A extensão nesse eixo chegou a
+**10,12 m**. Com os **0,64 m** de margem total, foram necessários
+**68 voxels de 16 cm**. A dimensão maior aparece por último em
+`64×64×68` porque a ordem da grade é **ZYX**.
+
+Esse cálculo ocorre durante o planejamento. Ao voxelizar um
+`crop.json` com grade já definida, a Datastream verifica a margem
+e registra erro se a parede ou uma tampa tocar a borda.
+[Cálculo da grade no planejador](../src/cavegen/datastream/crop_planner.py)
 
 Ao comparar 64³/128³/256³, manter domínio físico, seções e tampas e mudar a
 amostragem da grade. Para o treino, preferir tamanho físico de voxel e domínio
@@ -224,6 +287,33 @@ evidência nos bins e revalidar o recorte inteiro com as tampas originais.
 Áreas sem suporte permanecem para revisão. O exterior da galeria
 delimitada pode conter cavidades além do trecho estudado.
 
+### Busca automática quando a semente cai na barreira
+
+A opção **3** procura voxels livres dentro da seleção e dos dois
+planos do recorte. O raio `seed_search_radius_voxels` é medido a
+partir do voxel da semente original e vale quatro voxels por padrão,
+ou 64 cm a 16 cm. O valor zero desativa a busca.
+
+A primeira busca usa o flood fill a partir da borda para identificar
+um componente interno único na vizinhança, em contato com as duas
+tampas. A pipeline escolhe a posição mais próxima elegível e usa a
+distância à barreira para desempatar. Se o trecho estiver aberto,
+ela pode escolher uma semente provisória em um componente que fecha
+entre dois planos temporários de uma janela local. A semente
+provisória aciona o diagnóstico e as mesmas regras de reparo do
+recorte inteiro, incluindo o bloqueio de fechamento automático em
+passagens ambíguas.
+
+Para salvar um volume com semente reposicionada, a reclassificação
+pelo exterior precisa reproduzir a máscara de ar a partir da nova
+posição e confirmar contato com as duas tampas originais. O
+`crop.json` conserva a semente pedida. O `run.json` e o
+`summary.csv` registram a busca, as posições e o deslocamento
+quando há uma candidata. O resultado permanece pendente de revisão
+geométrica. O ensaio anterior olhava apenas para interiores já
+fechados e ficou sem candidata nos 14 casos avaliados.
+[Ensaio anterior com as sementes](auditoria/gan/historico-voxelizacao.md#sementes-cortes-compartilhados-e-junções)
+
 ## 5. Manifesto e organização
 
 O piloto identifica cada recorte pela caverna, levantamento, ID e resolução.
@@ -251,7 +341,7 @@ ficam no diretório do plano descrito no [guia do piloto](preparacao-volumes.md#
 Uma tentativa rejeitada guarda CSVs em `<resolucao>_sem_volume/<tentativa>/`
 ao lado da pasta esperada para o volume. A opção 4 monta a visualização a
 partir do NPZ local comprimido quando há busca por vazamento. As janelas
-da busca ficam em memória. Ver o [guia de reprodução](preparacao-volumes.md#relatorio-por-recorte-e-reproducao).
+da busca ficam em memória. Ver o [guia de reprodução](preparacao-volumes.md#relatório-por-recorte-e-reprodução).
 
 Para integrar o piloto ao treino, estender o manifesto para registrar:
 

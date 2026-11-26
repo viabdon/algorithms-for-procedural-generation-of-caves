@@ -166,3 +166,69 @@ def test_audit_cli_still_emits_report_when_splits_are_impossible(tmp_path):
     main(["--root", str(root), "--origins", str(origins), "--output", str(output)])
     assert len(json.loads((output / "reference_audit.json").read_text())["records"]) == 8
     assert json.loads((output / "splits.json").read_text())["folds"] == []
+
+
+def write_gallery_plans(root):
+    plans = []
+    for i, group in enumerate(("archamps", "cascadedemotiers", "indian_tunnel", "markovspodmol")):
+        plan = f"{group}/MainGallery/fold/proxy"
+        plans.append(plan)
+        path = root / plan / "gallery" / "16x16x16"
+        upper = 9 + i
+        solid = np.zeros((16,) * 3, dtype=bool)
+        solid[2:upper, 2:upper, 2:upper] = True
+        air = np.zeros_like(solid)
+        air[3:upper-1, 3:upper-1, 3:upper-1] = True
+        wall = solid & ~air
+        caps = np.zeros((2, *solid.shape), dtype=bool)
+        caps[0, 2] = wall[2]
+        caps[1, upper-1] = wall[upper-1]
+        auxiliary = np.zeros_like(solid)
+        auxiliary[4, 2, 4] = True
+        metadata = {
+            "config": {"cave": group, "survey": "MainGallery", "crop_id": "gallery",
+                       "plan_id": "proxy", "voxel_size": 0.28},
+            "seed_zyx": [4, 4, 4], "status": "pending_review",
+        }
+        save_surface_npz(wall & ~caps.any(axis=0) & ~auxiliary, path / "surface.npz", metadata)
+        np.savez_compressed(path / "masks.npz", caps=caps, repair=np.zeros_like(solid),
+                            auxiliary_caps=auxiliary)
+        save_volume_npz(Volume3D(air, metadata), path / "interior.npz")
+    return plans
+
+
+def test_gallery_audit_replays_caps_and_binds_evidence_to_splits(tmp_path):
+    from cavegen.training.gallery_reference_data import audit_gallery_references
+
+    plans = write_gallery_plans(tmp_path)
+    audit = audit_gallery_references(tmp_path, plans, resolution=16, voxel_size=0.28)
+    assert len(audit["records"]) == 4
+    assert all(row["eligible_proxy"] and row["review_status"] == "pending_review"
+               for row in audit["records"])
+    splits = make_splits(audit)
+    samples = verify_splits(splits, tmp_path, "holdout_indian_tunnel")
+    assert {sample["split"] for sample in samples} == {"train", "validation", "test"}
+    assert len([sample for sample in samples if sample["split"] == "test"]) == 1
+
+    evidence = (tmp_path / samples[0]["path"]).with_name("masks.npz")
+    with np.load(evidence) as masks:
+        changed = dict(masks.items())
+    changed["auxiliary_caps"].fill(False)
+    np.savez_compressed(evidence, **changed)
+    with pytest.raises(ValueError, match="Changed gallery evidence"):
+        verify_splits(splits, tmp_path, "holdout_indian_tunnel")
+    broken = audit_gallery_references(tmp_path, plans, resolution=16, voxel_size=0.28)
+    assert sum(not row["eligible_proxy"] for row in broken["records"]) == 1
+
+
+def test_gallery_proxy_cli_checks_native_size_and_preserves_audit(tmp_path):
+    from cavegen.training.gallery_reference_data import main
+
+    plans = write_gallery_plans(tmp_path)
+    output = tmp_path / "audit"
+    with pytest.raises(SystemExit, match="1"):
+        main(["--root", str(tmp_path), "--plans", *plans, "--resolution", "64",
+              "--voxel-size", "0.28", "--output", str(output)])
+    audit = json.loads((output / "reference_audit.json").read_text())
+    assert all("incompatible_native_shape" in row["issues"] for row in audit["records"])
+    assert not (output / "splits.json").exists()

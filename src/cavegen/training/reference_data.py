@@ -19,6 +19,7 @@ from cavegen.metrics import evaluate_structure
 SCHEMA = "gan-reference-audit-v1"
 CANDIDATE_SEMANTIC = "true_means_enclosed_unobserved_voxel"
 VALID_SEMANTIC = "true_means_cave_air"
+GALLERY_EVIDENCE = ("surface.npz", "masks.npz")
 
 
 def sha256_file(path: str | Path) -> str:
@@ -191,7 +192,9 @@ def make_splits(audit: dict) -> dict:
                       "samples": [{"path": r["path"], "group": r["group"],
                                    "sha256": r["sha256"], "voxel_sha256": r["voxel_sha256"],
                                    "geometry_screen_passed": r["geometry_screen_passed"],
-                                   "candidate": r["candidate"], "split": assignments[r["group"]]}
+                                   "candidate": r["candidate"], "split": assignments[r["group"]],
+                                   **({"gallery_evidence": r["gallery_evidence"]}
+                                      if "gallery_evidence" in r else {})}
                                   for r in records]})
     result = {"schema": "gan-cave-splits-v1", "audit_id": audit["audit_id"],
               "unit_of_independence": "cave", "folds": folds,
@@ -228,7 +231,18 @@ def verify_splits(splits: dict, root: str | Path, fold_id: str) -> list[dict]:
         data, metadata, key = read_reference(path)
         if key != "data" or voxel_hash(data) != row["voxel_sha256"]:
             raise ValueError("Reference voxel identity mismatch")
-        if cave_group(metadata.get("source_path", row["path"])) != row["group"]:
+        if "gallery_evidence" in row:
+            evidence = row["gallery_evidence"]
+            if not isinstance(evidence, dict) or set(evidence) != set(GALLERY_EVIDENCE) or not row.get("candidate"):
+                raise ValueError("Invalid gallery evidence")
+            for name in GALLERY_EVIDENCE:
+                artifact = (path.parent / name).resolve()
+                if not artifact.is_relative_to(root) or sha256_file(artifact) != evidence[name]:
+                    raise ValueError(f"Changed gallery evidence: {row['path']} ({name})")
+            group = metadata.get("config", {}).get("cave")
+        else:
+            group = cave_group(metadata.get("source_path", row["path"]))
+        if group != row["group"]:
             raise ValueError("Cave group disagrees with source provenance")
     if set(group_splits.values()) != {"train", "validation", "test"}:
         raise ValueError("All three partitions must be nonempty")
