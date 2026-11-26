@@ -10,7 +10,7 @@ import pytest
 from cavegen.core.surface_filling import INTERIOR, classify_surface_by_flood_fill
 from cavegen.datastream.crop_preview import ply_header
 from cavegen.datastream.gallery_crop import prepare_crop, process_crop
-from cavegen.datastream.gallery_reports import replay_checks
+from cavegen.datastream.gallery_reports import find_report, replay_checks
 from cavegen.datastream.menu import main
 from cavegen.datastream.surface_io import load_surface_npz
 from cavegen.datastream.voxel_io import load_volume_npz
@@ -88,8 +88,10 @@ def test_crop_outputs_and_selection_are_independent_of_batch_size(gallery, tmp_p
     assert record["partition"] == "train"
     assert record["status"] == "pending_review"
     assert json.loads((first.destination / "run.json").read_text()) == record
-    reports = first.destination / "diagnostics"
+    reports = first.destination / "relatorio_volume"
     assert read_rows(reports / "summary.csv")[0]["outcome"] == "sealed_without_repair"
+    assert find_report(first.destination) == reports / "summary.csv"
+    assert replay_checks(first.destination).parent == reports
     assert not (reports / "bins.csv").exists()
     checks = {row["check"]: row for row in read_rows(reports / "checks.csv")}
     assert checks["outside_fill_final"]["result"] == "interior"
@@ -130,7 +132,7 @@ def test_small_lateral_gap_is_repaired_without_mutating_observations(gallery, tm
         rerun = classify_surface_by_flood_fill(wall | masks["caps"].any(axis=0) | masks["repair"])
         assert rerun[crop.seed_zyx] == INTERIOR
     assert record["repair_voxels"] == 1
-    reports = crop.destination / "diagnostics"
+    reports = crop.destination / "relatorio_volume"
     summary = read_rows(reports / "summary.csv")[0]
     assert summary["outcome"] == "repaired"
     assert summary["raw_comparison"] == "source_not_in_plan"
@@ -159,8 +161,9 @@ def test_large_lateral_opening_is_reported_without_an_interior(gallery, tmp_path
     with pytest.raises(ValueError, match="exterior"):
         process_crop(crop)
     assert not crop.destination.exists()
-    reports = crop.destination.with_name("10x10x10.diagnostics")
+    reports = crop.destination.with_name("10x10x10_sem_volume")
     (attempt,) = reports.iterdir()
+    assert find_report(crop.destination) == find_report(reports) == attempt / "summary.csv"
     summary = read_rows(attempt / "summary.csv")[0]
     assert summary["outcome"] == "escape_path_without_supported_voxels"
     assert not any(row["published"] == "True" for row in read_rows(attempt / "bins.csv"))
@@ -168,7 +171,7 @@ def test_large_lateral_opening_is_reported_without_an_interior(gallery, tmp_path
     answers = iter(["2", "4", str(crop.destination), "0", "0"])
     monkeypatch.setattr("builtins.input", lambda _: next(answers))
     main()
-    html = attempt / "leak_diagnostics.html"
+    html = attempt / "vazamento.html"
     assert str(html) in capsys.readouterr().out
     assert "Caminho de fuga" in html.read_text(encoding="utf-8")
 
@@ -180,7 +183,7 @@ def test_cap_gap_runs_double_cap_probe(gallery, tmp_path):
     crop = prepare_crop(path, repository=tmp_path)
     with pytest.raises(ValueError, match="exterior"):
         process_crop(crop)
-    (attempt,) = crop.destination.with_name("10x10x10.diagnostics").iterdir()
+    (attempt,) = crop.destination.with_name("10x10x10_sem_volume").iterdir()
     probes = read_rows(attempt / "probes.csv")
     assert (probes[0]["probe"], probes[0]["outcome"]) == ("full_end_planes", "sealed")
     assert sum(row["probe"] == "double_cap" for row in probes) == 48
@@ -193,7 +196,7 @@ def test_blocked_seed_reports_failed_precondition(gallery, tmp_path):
     crop = prepare_crop(path, repository=tmp_path)
     with pytest.raises(ValueError, match="semente caiu na barreira"):
         process_crop(crop)
-    (attempt,) = crop.destination.with_name("10x10x10.diagnostics").iterdir()
+    (attempt,) = crop.destination.with_name("10x10x10_sem_volume").iterdir()
     assert read_rows(attempt / "summary.csv")[0]["outcome"] == "seed_blocked"
     assert read_rows(attempt / "checks.csv")[-1]["passed"] == "False"
     assert not crop.destination.exists()
@@ -241,7 +244,7 @@ def test_compare_bins_with_georeferenced_original(gallery, tmp_path):
     source.write_bytes(ply_header(len(xyz)) + xyz.astype("<f8").tobytes())
     crop = prepare_crop(path, repository=tmp_path)
     record = process_crop(crop)
-    reports = crop.destination / "diagnostics"
+    reports = crop.destination / "relatorio_volume"
     summary = read_rows(reports / "summary.csv")[0]
     assert record["repair_voxels"] == 1
     assert summary["axis_source"] == "plan_centreline"
@@ -264,13 +267,13 @@ def test_menu_previews_and_requires_explicit_confirmation(gallery, tmp_path, mon
 
     answers = iter(["2", "3", "1", str(path), "PROCESSAR", "0", "0"])
     main()
-    assert "Ar candidato: 32 m³" in capsys.readouterr().out
+    assert "Ar candidato: 32 m³ | Reparo local: 0 voxels | Tampas sintéticas: 0 voxels" in capsys.readouterr().out
     assert (crop.destination / "run.json").exists()
 
     answers = iter(["2", "4", str(crop.destination), "0", "0"])
     main()
-    output = crop.destination / "fatias_plotly.html"
-    volume = crop.destination / "volume_plotly.html"
+    output = crop.destination / "fatias.html"
+    volume = crop.destination / "volume.html"
     menu_output = capsys.readouterr().out
     assert str(output) in menu_output
     assert str(volume) in menu_output
@@ -316,9 +319,9 @@ def test_menu_voxelizes_subfolders_with_progress_per_crop(gallery, tmp_path, mon
     assert output.index("[1/3 ramo_001_001] Voxelizando") < output.index("[3/3 ramo_001_003] Voxelizando")
     for label in ("[1/3 ramo_001_001]", "[3/3 ramo_001_003]"):
         assert f"{label} Pontos lidos: 40" in output
-        assert f"{label} Pontos processados: 100 | Retidos: 96" in output
+        assert f"{label} Pontos lidos: 100 | Retidos: 96" in output
     assert "[2/3 ramo_001_002] Não foi possível concluir:" in output
-    assert "2 processados, 0 pulados, 1 com erro" in output
+    assert "2 volumes salvos, 0 pulados, 1 sem volume" in output
     for name in ("ramo_001_001", "ramo_001_003"):
         assert (results / name / "10x10x10/interior.npz").exists()
 
@@ -326,7 +329,7 @@ def test_menu_voxelizes_subfolders_with_progress_per_crop(gallery, tmp_path, mon
     main()
     output = capsys.readouterr().out
     assert "[1/3 ramo_001_001] Pulado: Já existe uma execução" in output
-    assert "0 processados, 2 pulados, 1 com erro" in output
+    assert "0 volumes salvos, 2 pulados, 1 sem volume" in output
 
 
 def test_auxiliary_caps_preserve_measured_surface_and_replay(gallery, tmp_path):
@@ -346,3 +349,20 @@ def test_auxiliary_caps_preserve_measured_surface_and_replay(gallery, tmp_path):
     checks = {row["check"]: row for row in read_rows(replay_checks(crop.destination))}
     assert checks["remove_auxiliary_caps"]["result"] == "exterior"
     assert checks["candidate_air_component"]["result"] == "match"
+
+
+@pytest.mark.parametrize("suffix", [".diagnostics", "_tentativas_sem_volume"])
+def test_find_reports_in_legacy_folders(tmp_path, suffix):
+    volume = tmp_path / "64x64x64"
+    history = tmp_path / f"64x64x64{suffix}"
+    attempt = history / "20260101T000000Z-failed"
+    attempt.mkdir(parents=True)
+    failure = attempt / "summary.csv"
+    failure.touch()
+    assert find_report(volume) == find_report(history) == failure
+
+    reports = volume / "diagnostics"
+    reports.mkdir(parents=True)
+    success = reports / "summary.csv"
+    success.touch()
+    assert find_report(volume) == success

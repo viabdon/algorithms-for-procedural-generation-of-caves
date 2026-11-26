@@ -151,7 +151,7 @@ reexecutado com a mesma versão do fluxo e reproduziu, voxel a voxel, os
 8.132 voxels do resultado anterior, sem acionar o reparo.
 
 Para reproduzir a afirmação, compare as linhas `outside_fill_without_repair`,
-`outside_fill_final` e `remove_repair_voxel` em `diagnostics/checks.csv`.
+`outside_fill_final` e `remove_repair_voxel` em `relatorio_volume/checks.csv`.
 A primeira e a terceira registram `exterior`. A segunda registra `interior`.
 O algoritmo das ablações usa a inundação a partir da borda e compara
 a componente com o ar encontrado pela busca a partir da semente.
@@ -402,7 +402,7 @@ O `plan.json` identifica a nuvem de 2 mm, a linha central, o fold e o
 tamanho do voxel. Nas pastas `ramo_001_001`, `ramo_001_005` e
 `ramo_001_006`, conferir `proposal.cut_stations` e
 `proposal.section_bins_supported` nos `crop.json` e os contornos em
-`preview_individual_tampas.html`. Esses artefatos permanecem locais.
+`recorte.html`. Esses artefatos permanecem locais.
 Para recriar as vistas a partir dos PLYs, usar a opção 6 no
 [menu de preparação](preparacao-volumes.md#propor-e-extrair-recortes-pela-linha-central).
 

@@ -93,3 +93,20 @@ class DatastreamMenuTests(unittest.TestCase):
         with patch('builtins.input', side_effect=EOFError), redirect_stdout(StringIO()) as log:
             main()
         self.assertIn('Menu encerrado', log.getvalue())
+
+
+def test_whole_cloud_menu_prints_reproducible_relative_paths(tmp_path, monkeypatch, capsys):
+    monkeypatch.chdir(tmp_path)
+    source = tmp_path / "nuvem local.xyz"
+    source.write_text("0 0 0\n1 1 1\n")
+    folder = tmp_path / "saidas"
+    answers = iter(["1", str(source), "8", str(folder), "", "", "", "n", "1", "0"])
+    monkeypatch.setattr("builtins.input", lambda _: next(answers))
+
+    main()
+
+    receipt = json.loads((folder / "surface.command.json").read_text())
+    assert receipt["working_directory"] == str(tmp_path)
+    assert "--input 'nuvem local.xyz'" in receipt["command_shell"]
+    assert "--output saidas/surface.npz" in capsys.readouterr().out
+    assert (folder / "surface.npz").is_file()

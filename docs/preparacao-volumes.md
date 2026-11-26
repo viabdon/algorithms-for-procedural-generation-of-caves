@@ -13,12 +13,12 @@ escolha **2 — Preparar recortes por galeria**. A opção **1** do submenu list
 as nuvens do HD (a pasta pode ser alterada). Copie o
 [modelo JSON](../configs/crops/gallery.template.json) para um arquivo por
 trecho. A opção **2** confere a configuração e mostra o destino e a partição
-sem ler os pontos. A opção **3 — Voxelizar recortes em CPU** oferece
+sem ler os pontos. A opção **3 — Voxelizar recortes** oferece
 dois modos de entrada.
 
-- **1 — Voxelizar um recorte separado (crop.json)** recebe o arquivo do
+- **1 — Um recorte (crop.json)** recebe o arquivo do
   trecho, como `ramo_001_001/crop.json`.
-- **2 — Voxelizar conjunto de recortes em subpastas** recebe a pasta do
+- **2 — Recortes em lote (pasta ou plan.json)** recebe a pasta do
   plano ou seu `plan.json`. O menu procura `crop.json` nas subpastas
   imediatas e percorre os recortes em ordem de nome da pasta. Os avisos
   mostram a posição no conjunto, o identificador do recorte e a
@@ -29,8 +29,8 @@ Digite `PROCESSAR` para confirmar a execução. O processamento testa
 o fechamento original e inicia o
 [diagnóstico de vazamento](#quando-o-flood-fill-encontra-o-exterior)
 se alcançar a borda pela semente. Na opção **4**, informe a pasta da execução para salvar
-`fatias_plotly.html` com as três fatias ortogonais pela semente e
-`volume_plotly.html` com a vista 3D dos voxels. Na vista 3D, clique na
+`fatias.html` com as três fatias ortogonais pela semente e
+`volume.html` com a vista 3D dos voxels. Na vista 3D, clique na
 legenda para alternar superfície observada, ar candidato e tampas. A
 superfície e o ar aparecem ao abrir, e as tampas começam ocultas.
 
@@ -68,10 +68,10 @@ se alguma abertura correspondia à continuação de uma passagem.
    geração da linha central acrescenta uma leitura em lotes.
 3. Quando quiser visualizar, use a opção **6** e informe a pasta do plano,
    seu `plan.json` ou o `cloud.ply` de um dos recortes. Escolha **1** para
-   agrupar os recortes com pontos em um único `preview_plano_tampas.html`, com
+   agrupar os recortes com pontos em um único `recortes.html`, com
    uma cor por trecho e até 60.000 pontos distribuídos entre eles. Na
    legenda, clique no nome para mostrar ou ocultar o trecho. Escolha **2**
-   para salvar um `preview_individual_tampas.html` ao lado de cada PLY em uma só
+   para salvar um `recorte.html` ao lado de cada PLY em uma só
    execução, com até 60.000 pontos por recorte. Abra os HTMLs no navegador.
    Use **Mostrar tampas** para sobrepor todos os contornos disponíveis ou
    alterne uma extremidade pela legenda. Os contornos vêm do `crop.json` e
@@ -230,10 +230,13 @@ a metodologia e os critérios ainda pendentes antes de usar os volumes no treino
 
 ### Relatório por recorte e reprodução
 
-Cada execução concluída grava `<resolucao>/diagnostics/`. Se uma checagem
+Cada execução concluída grava `<resolucao>/relatorio_volume/`. Se uma checagem
 de superfície, margem, contato, semente ou fechamento impedir a publicação,
-o menu aponta para `<resolucao>.diagnostics/<tentativa>/summary.csv`.
-Cada tentativa fica disponível e a falha fica sem NPZ de interior.
+o menu aponta para `<resolucao>_sem_volume/<tentativa>/summary.csv`.
+O nome curto `_sem_volume` identifica o histórico ao lado da pasta da
+resolução. A opção 4 também reconhece as pastas antigas de relatórios e
+tentativas. Quando há uma amostra da fuga, a visualização se chama
+`vazamento.html`.
 
 | Arquivo | O que registra |
 | --- | --- |
@@ -267,7 +270,7 @@ salvos, sem reler a nuvem, execute na raiz do projeto:
 .venv/bin/python -m cavegen.datastream.gallery_reports CAMINHO_DA_RESOLUCAO
 ```
 
-O comando grava `diagnostics/checks_replay.csv`. Para repetir também a
+O comando grava `relatorio_volume/checks_replay.csv`. Para repetir também a
 localização da fuga e as contagens do PLY e do original, use uma cópia
 do `crop.json` na mesma pasta, preservando o `crop_id` e usando um
 `plan_id` diferente no modo **3 → 1**. Em Python, é possível reaproveitar o
@@ -304,9 +307,11 @@ inteira e solicita:
 5. Lote de leitura, padrão 65.536 pontos, e intervalo de progresso,
    padrão 1.000.000 de pontos; `0` desativa os avisos por pontos.
 6. Uso do flood fill, habilitado por padrão no menu.
-7. Execução em primeiro plano, em background ou cancelamento.
+7. Execução em primeiro plano, em segundo plano ou cancelamento.
 
-O menu mostra o comando equivalente antes de executar. Para preservar ensaios
+O menu mostra o comando equivalente antes de executar. Caminhos dentro
+da pasta atual aparecem em formato relativo, e o registro do comando
+inclui a pasta de trabalho para reprodução. Para preservar ensaios
 anteriores, recusa uma pasta com arquivos de saída conflitantes: escolha outra
 pasta para uma configuração ou execução diferente. As entradas numéricas e os
 caminhos são conferidos antes do lançamento; o leitor valida o conteúdo durante

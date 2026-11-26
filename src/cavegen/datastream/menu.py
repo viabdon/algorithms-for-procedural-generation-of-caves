@@ -24,6 +24,12 @@ def _path(value: str) -> Path:
     return Path(value).expanduser().absolute()
 
 
+def _short_path(path: Path) -> str:
+    path = path.absolute()
+    cwd = Path.cwd()
+    return str(path.relative_to(cwd) if path.is_relative_to(cwd) else path)
+
+
 def _integer(prompt: str, default: int, minimum: int = 1) -> int:
     while True:
         try:
@@ -40,7 +46,7 @@ def _choice(prompt: str, default: str, choices: tuple[str, ...]) -> str:
         value = _ask(prompt, default).lower()
         if value in choices:
             return value
-        print("Opções: " + ", ".join(choices))
+        print("Escolha " + ", ".join(choices) + ".")
 
 
 def _prepare() -> tuple[list[str], Path]:
@@ -57,7 +63,7 @@ def _prepare() -> tuple[list[str], Path]:
                 break
         except ValueError:
             pass
-        print("Exemplos válidos: 64 ou 32 64 64; dimensões positivas.")
+        print("Use dimensões positivas, como 64 ou 32 64 64.")
     default_folder = Path("data/processed/references") / source.stem / ("x".join(map(str, shape)))
     output_folder = _path(_ask("Pasta de saída", str(default_folder)))
     while True:
@@ -69,13 +75,13 @@ def _prepare() -> tuple[list[str], Path]:
     batch = _integer("Pontos por lote", 65536)
     progress = _integer("Intervalo do progresso em pontos (0 desativa)", 1000000, 0)
     fill = _choice("Inferir interior por flood fill? (s/n)", "s", ("s", "n")) == "s"
-    arguments = ["--input", str(source), "--shape", *map(str, shape),
+    arguments = ["--input", _short_path(source), "--shape", *map(str, shape),
                  "--batch-size", str(batch), "--progress-every", str(progress),
-                 "--output", str(output_folder / "surface.npz")]
+                 "--output", _short_path(output_folder / "surface.npz")]
     if bounds is not None:
-        arguments += ["--bounds", str(bounds)]
+        arguments += ["--bounds", _short_path(bounds)]
     if fill:
-        arguments += ["--interior-output", str(output_folder / "interior.npz")]
+        arguments += ["--interior-output", _short_path(output_folder / "interior.npz")]
     # Interactive runs never silently replace an earlier preparation.
     protected = ["surface.npz", "surface.bounds.json", "surface.run.json", "surface.log",
                  "surface.pid", "surface.command.json"] + (["interior.npz"] if fill else [])
@@ -85,9 +91,9 @@ def _prepare() -> tuple[list[str], Path]:
 
 
 def _print_crop_summary(crop: "GalleryCrop") -> None:
-    print(f"Fonte: {crop.source} | Partição: {crop.partition}")
+    print(f"Nuvem: {_short_path(crop.source)} | Partição: {crop.partition}")
     print(f"Domínio XYZ: {crop.extent_xyz} {crop.config['units']}")
-    print(f"Saída: {crop.destination.absolute()}")
+    print(f"Pasta do volume: {_short_path(crop.destination)}")
 
 
 def _voxelizar_recorte(crop: "GalleryCrop", prefix: str = "") -> None:
@@ -98,12 +104,13 @@ def _voxelizar_recorte(crop: "GalleryCrop", prefix: str = "") -> None:
         diagnostic_progress=lambda message: print(f"{prefix}{message}", flush=True),
     )
     counts = record["counts"]
-    print(f"{prefix}Pontos processados: {counts['read']:,} | Retidos: {counts['retained']:,}")
-    print(f"{prefix}Contagens de seleção: {counts}")
-    if record["repair_voxels"]:
-        print(f"{prefix}Reparo separado para revisão: {record['repair_voxels']} voxels.")
-    print(f"{prefix}Relatório do recorte: {crop.destination / record['diagnostics']}")
-    print(f"{prefix}Ar candidato: {record['candidate_volume']:.3g} {crop.config['units']}³")
+    print(f"{prefix}Pontos lidos: {counts['read']:,} | Retidos: {counts['retained']:,}")
+    print(
+        f"{prefix}Ar candidato: {record['candidate_volume']:.3g} {crop.config['units']}³"
+        f" | Reparo local: {record['repair_voxels']} voxels"
+        f" | Tampas sintéticas: {record['auxiliary_cap_voxels']} voxels"
+    )
+    print(f"{prefix}Relatório do volume: {_short_path(crop.destination / record['diagnostics'])}")
 
 
 def _voxelizar_conjunto(path: Path) -> None:
@@ -117,7 +124,7 @@ def _voxelizar_conjunto(path: Path) -> None:
         raise ValueError(f"Nenhum crop.json encontrado nas subpastas de {root}.")
 
     total = len(configs)
-    print(f"{total} recortes encontrados nas subpastas de {root}.")
+    print(f"{total} recortes encontrados em {_short_path(root)}.")
     if _ask("Digite PROCESSAR para confirmar o conjunto") != "PROCESSAR":
         return
 
@@ -136,13 +143,15 @@ def _voxelizar_conjunto(path: Path) -> None:
         except (OSError, ValueError, TypeError, KeyError) as error:
             failed += 1
             print(f"{prefix}Não foi possível concluir: {error}", flush=True)
-    print(f"Conjunto concluído: {completed} processados, {skipped} pulados, {failed} com erro.")
+    print(f"Lote: {completed} volumes salvos, {skipped} pulados, {failed} sem volume.")
 
 
 def _crop_menu() -> None:
     from cavegen.datastream.gallery_crop import CROP_FORMATS, inspect_crop, prepare_crop
     from cavegen.datastream.crop_planner import default_plan_destination, propose_crops, read_plan_config
     from cavegen.datastream.crop_preview import (
+        CROP_PREVIEW_NAME,
+        PLAN_PREVIEW_NAME,
         preview_manifest,
         write_crop_preview,
         write_individual_crop_previews,
@@ -154,11 +163,11 @@ def _crop_menu() -> None:
     while True:
         print("\nRecortes por galeria")
         print("1. Listar nuvens brutas")
-        print("2. Conferir configuração JSON")
-        print("3. Voxelizar recortes em CPU")
-        print("4. Inspecionar recorte ou diagnóstico de vazamento")
-        print("5. Propor e extrair N recortes pela linha central")
-        print("6. Gerar prévia 3D dos recortes do plano")
+        print("2. Conferir JSON do recorte")
+        print("3. Voxelizar recortes")
+        print("4. Inspecionar volume ou vazamento")
+        print("5. Extrair recortes pela linha central")
+        print("6. Visualizar recortes e tampas")
         print("0. Voltar")
         choice = _choice("Opção", "0", ("0", "1", "2", "3", "4", "5", "6"))
         if choice == "0":
@@ -174,22 +183,22 @@ def _crop_menu() -> None:
                         and "mesh" not in source.relative_to(root).parts
                         and source.is_file()
                     ):
-                        print(source)
+                        print(_short_path(source))
             elif choice == "4":
-                selection = _ask("Pasta da saída, pasta do diagnóstico ou summary.csv (Enter para cancelar)")
+                selection = _ask("Pasta do volume, histórico de tentativas ou summary.csv (Enter para cancelar)")
                 if selection:
                     path = _path(selection)
                     report = find_report(path)
                     if (path / "interior.npz").is_file():
                         slices, volume = inspect_crop(path)
-                        print(f"Fatias no Plotly: {slices}")
-                        print(f"Volume 3D no Plotly: {volume}", flush=True)
+                        print(f"Fatias: {_short_path(slices)}")
+                        print(f"Volume 3D: {_short_path(volume)}", flush=True)
                     elif report is None:
                         raise FileNotFoundError(f"Não há resultado nem diagnóstico em {path}.")
                     if report is not None:
-                        print(f"Relatório do recorte: {report}", flush=True)
+                        print(f"Relatório: {_short_path(report)}", flush=True)
                         if report.suffix == ".json" or report.with_name(PREVIEW_FILE).is_file():
-                            print(f"Diagnóstico local no Plotly: {write_leak_preview(report)}", flush=True)
+                            print(f"Vazamento: {_short_path(write_leak_preview(report))}", flush=True)
             elif choice == "5":
                 plan = _ask("JSON do planejamento (modelo em configs/crops/plan.template.json; Enter para cancelar)")
                 if not plan:
@@ -197,7 +206,7 @@ def _crop_menu() -> None:
                 path = _path(plan)
                 spec = read_plan_config(path)
                 line = _ask("Arquivo de linha central (Enter usa o JSON ou calcula se vazio)")
-                target = _path(_ask("Pasta nova para os recortes", str(default_plan_destination(spec))))
+                target = _path(_ask("Pasta nova para o plano", str(default_plan_destination(spec))))
                 if not line and not spec["centreline"]:
                     print("A linha central será estimada em CPU. O resultado ficará em revisão.")
                 manifest = propose_crops(
@@ -206,9 +215,12 @@ def _crop_menu() -> None:
                 )
                 flagged = sum(bool(crop["review_reasons"]) for crop in manifest["crops"])
                 print(f"Propostos {manifest['proposed']} de {manifest['requested']}. Com alertas: {flagged}.")
-                print(f"Plano e nuvens para revisão: {target}")
+                print(f"Plano gerado: {_short_path(target / 'plan.json')}")
             elif choice == "6":
-                mode = _choice("Prévia (1 todos juntos, 2 um HTML por recorte, 0 voltar)", "1", ("0", "1", "2"))
+                print("1. Recortes juntos")
+                print("2. Um HTML por recorte")
+                print("0. Voltar")
+                mode = _choice("Opção", "1", ("0", "1", "2"))
                 if mode == "0":
                     continue
                 path = _ask("Pasta do plano, plan.json ou PLY de um recorte (Enter para cancelar)")
@@ -217,18 +229,18 @@ def _crop_menu() -> None:
                 source = _path(path)
                 if mode == "2":
                     for output in write_individual_crop_previews(source):
-                        print(f"Prévia para abrir no navegador: {output}")
+                        print(f"Prévia: {_short_path(output)}")
                 else:
                     manifest = preview_manifest(source)
                     default = (
-                        manifest.with_name("preview_plano_tampas.html") if manifest
-                        else source.with_name("preview_tampas.html")
+                        manifest.with_name(PLAN_PREVIEW_NAME) if manifest
+                        else source.with_name(CROP_PREVIEW_NAME)
                     )
-                    output = _path(_ask("Arquivo HTML", str(default)))
-                    print(f"Prévia para abrir no navegador: {write_crop_preview(source, output)}")
+                    output = _path(_ask("Arquivo HTML", _short_path(default)))
+                    print(f"Prévia: {_short_path(write_crop_preview(source, output))}")
             elif choice == "3":
-                print("1. Voxelizar um recorte separado (crop.json)")
-                print("2. Voxelizar conjunto de recortes em subpastas")
+                print("1. Um recorte (crop.json)")
+                print("2. Recortes em lote (pasta ou plan.json)")
                 print("0. Voltar")
                 mode = _choice("Opção", "0", ("0", "1", "2"))
                 if mode == "1":
@@ -239,7 +251,7 @@ def _crop_menu() -> None:
                         if _ask("Digite PROCESSAR para confirmar") == "PROCESSAR":
                             _voxelizar_recorte(crop)
                 elif mode == "2":
-                    path = _ask("Pasta que contém as subpastas dos recortes, ou plan.json (Enter para cancelar)")
+                    path = _ask("Pasta dos recortes ou plan.json (Enter para cancelar)")
                     if path:
                         _voxelizar_conjunto(_path(path))
             else:
@@ -259,8 +271,8 @@ def main() -> None:
     """Ask for a source and parameters, then run or detach the same CLI pipeline."""
     try:
         while True:
-            print("\nPreparação de cavernas — XYZ / PLY / F32 / LAS")
-            print("1. Gerar superfície e, opcionalmente, interior candidato da nuvem inteira")
+            print("\nDatastream — preparação de nuvens e recortes")
+            print("1. Voxelizar nuvem inteira")
             print("2. Preparar recortes por galeria")
             print("0. Sair")
             choice = _choice("Opção", "1", ("0", "1", "2"))
@@ -274,8 +286,7 @@ def main() -> None:
                 command = [sys.executable, "-u", "-m",
                            "cavegen.datastream.run_reference_voxelization", *arguments]
                 print("\nComando equivalente:\n" + shlex.join(command))
-                print("A superfície e o interior serão arquivos separados.")
-                mode = _choice("Execução: 1 primeiro plano, 2 background, 0 cancelar",
+                mode = _choice("Execução (1 primeiro plano, 2 segundo plano, 0 cancelar)",
                                "1", ("0", "1", "2"))
                 if mode == "0":
                     continue
@@ -296,7 +307,7 @@ def main() -> None:
                         )
                     (folder / "surface.pid").write_text(str(process.pid) + "\n", encoding="utf-8")
                     print(f"Processo iniciado: PID {process.pid}")
-                    print("Acompanhar: tail -f " + shlex.quote(str(log_path)))
+                    print("Acompanhar: tail -f " + shlex.quote(_short_path(log_path)))
                     print("O processo continua após fechar o menu e o terminal (Linux).")
             except (OSError, ValueError) as error:
                 print(f"Não foi possível concluir: {error}")

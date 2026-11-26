@@ -10,6 +10,8 @@ from cavegen.datastream.ply import read_ply_header
 from cavegen.datastream.ply_types import PlyProperty
 
 XYZ_PROPERTIES = tuple(PlyProperty(name, "double") for name in ("x", "y", "z"))
+PLAN_PREVIEW_NAME = "recortes.html"
+CROP_PREVIEW_NAME = "recorte.html"
 
 
 def ply_header(count: int) -> bytes:
@@ -137,7 +139,7 @@ def write_crop_preview(source: Path, output: Path, *, max_points: int = 60_000) 
 def write_individual_crop_previews(source: Path, *, max_points: int = 60_000) -> list[Path]:
     """Plot a separate HTML next to each PLY without replacing existing previews."""
     crops, _ = _preview_crops(source)
-    outputs = [path.with_name("preview_individual_tampas.html") for _, path in crops]
+    outputs = [path.with_name(CROP_PREVIEW_NAME) for _, path in crops]
     for output in outputs:
         if output.exists():
             raise FileExistsError(f"Já existe uma prévia individual em {output}.")

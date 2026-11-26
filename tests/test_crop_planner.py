@@ -74,10 +74,10 @@ def test_racine_plan_builds_shared_caps_and_preview_is_a_separate_menu_action(tm
     assert not first.destination.exists()
 
     raw.unlink()
-    html = tmp_path / "preview.html"
-    answers = iter(["2", "6", "1", str(first.source), str(html), "0", "0"])
+    html = output / "recortes.html"
+    answers = iter(["2", "6", "1", str(first.source), "", "0", "0"])
     main()
-    assert "Prévia para abrir" in capsys.readouterr().out
+    assert "Prévia: recortes/recortes.html" in capsys.readouterr().out
     traces = preview_traces(html)
     assert [trace["name"] for trace in traces if trace["mode"] == "markers"] == [
         folder.name for folder in folders
@@ -89,9 +89,9 @@ def test_racine_plan_builds_shared_caps_and_preview_is_a_separate_menu_action(tm
 
     answers = iter(["2", "6", "2", str(output / "plan.json"), "0", "0"])
     main()
-    assert capsys.readouterr().out.count("Prévia para abrir") == 2
+    assert capsys.readouterr().out.count("Prévia:") == 2
     for folder in folders:
-        traces = preview_traces(folder / "preview_individual_tampas.html")
+        traces = preview_traces(folder / "recorte.html")
         assert [trace["name"] for trace in traces] == [
             folder.name, f"Tampa inicial · {folder.name}", f"Tampa final · {folder.name}"
         ]

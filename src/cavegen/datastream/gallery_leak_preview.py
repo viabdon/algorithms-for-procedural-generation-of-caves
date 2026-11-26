@@ -23,7 +23,7 @@ def write_leak_preview(report_path: Path) -> Path:
             report = next(csv.DictReader(stream))
         with np.load(report_path.with_name(PREVIEW_FILE), allow_pickle=False) as arrays:
             focus = dict(arrays)
-        output = report_path.with_name("leak_diagnostics.html")
+        output = report_path.with_name("vazamento.html")
     center = np.array(focus["voxel_zyx"])
     lower = np.array(focus["min_zyx"])
     surface = np.asarray(focus["surface"])

@@ -425,7 +425,7 @@ def inspect_crop(folder: Path) -> tuple[Path, Path]:
             colorbar=dict(tickvals=list(range(len(labels))), ticktext=labels.tolist()),
         ),
     )
-    slices = folder / "fatias_plotly.html"
+    slices = folder / "fatias.html"
     figure.write_html(slices, include_plotlyjs=True)
 
     spatial = go.Figure()
@@ -454,6 +454,6 @@ def inspect_crop(folder: Path) -> tuple[Path, Path]:
             xaxis_title="X (voxel)", yaxis_title="Y (voxel)", zaxis_title="Z (voxel)",
         ),
     )
-    volume = folder / "volume_plotly.html"
+    volume = folder / "volume.html"
     spatial.write_html(volume, include_plotlyjs=True)
     return slices, volume

@@ -230,18 +230,25 @@ O piloto identifica cada recorte pela caverna, levantamento, ID e resolução.
 Uma execução manual bem-sucedida apresenta esta estrutura:
 
 ```text
-data/processed/reference_sections/<caverna>/<levantamento>/<recorte>/<resolucao>/
-    surface.npz       # superfície observada
-    interior.npz      # ar candidato em ZYX
-    masks.npz         # tampas e máscara de reparo local
-    run.json          # configuração efetiva, contagens e status pending_review
-    diagnostics/      # resumo, checagens independentes e evidências da busca em CSV
+data/processed/reference_sections/<caverna>/<levantamento>/<recorte>/
+    <resolucao>/
+        surface.npz
+        interior.npz
+        masks.npz
+        run.json
+        relatorio_volume/
+            summary.csv
+            checks.csv
+    <resolucao>_sem_volume/
+        <tentativa>/
+            summary.csv
+            checks.csv
 ```
 
 Para recortes propostos, o caminho dos volumes também inclui o fold e o ID
 do plano entre o levantamento e o recorte. A nuvem extraída e o grafo gerado
 ficam no diretório do plano descrito no [guia do piloto](preparacao-volumes.md#propor-e-extrair-recortes-pela-linha-central).
-Uma tentativa rejeitada guarda CSVs em `<resolucao>.diagnostics/<tentativa>/`
+Uma tentativa rejeitada guarda CSVs em `<resolucao>_sem_volume/<tentativa>/`
 ao lado da pasta esperada para o volume. A opção 4 monta a visualização a
 partir do NPZ local comprimido quando há busca por vazamento. As janelas
 da busca ficam em memória. Ver o [guia de reprodução](preparacao-volumes.md#relatorio-por-recorte-e-reproducao).

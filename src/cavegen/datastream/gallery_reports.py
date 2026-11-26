@@ -22,7 +22,10 @@ from cavegen.datastream.voxel_io import load_volume_npz
 if TYPE_CHECKING:
     from cavegen.datastream.gallery_crop import GalleryCrop
 
-REPORT_FOLDER = "diagnostics"
+REPORT_FOLDER = "relatorio_volume"
+FAILED_REPORT_SUFFIX = "_sem_volume"
+LEGACY_REPORT_FOLDER = "diagnostics"
+FAILED_REPORT_SUFFIXES = (FAILED_REPORT_SUFFIX, "_tentativas_sem_volume", ".diagnostics")
 SUMMARY_FILE = "summary.csv"
 PREVIEW_FILE = "preview_data.npz"
 CHECK_COLUMNS = ("check", "result", "expected", "passed", "voxel_count", "z", "y", "x")
@@ -221,7 +224,7 @@ def write_report(
 
 
 def write_failed_report(crop: GalleryCrop, record: dict, checks: list[dict], **details) -> Path:
-    root = crop.destination.with_name(f"{crop.destination.name}.diagnostics")
+    root = crop.destination.with_name(f"{crop.destination.name}{FAILED_REPORT_SUFFIX}")
     root.mkdir(parents=True, exist_ok=True)
     attempt = root / f"{datetime.now(timezone.utc):%Y%m%dT%H%M%S%fZ}-{uuid4().hex[:8]}"
     with TemporaryDirectory(dir=root) as staged:
@@ -240,14 +243,19 @@ def find_report(path: Path) -> Path | None:
         return summary if summary.is_file() else None
     if (path / SUMMARY_FILE).is_file():
         return path / SUMMARY_FILE
-    report = path / REPORT_FOLDER / SUMMARY_FILE
-    if report.is_file():
-        return report
-    if not path.is_dir() or path.name.endswith(".diagnostics"):
-        failed = path if path.is_dir() else path.with_name(f"{path.name}.diagnostics")
-        reports = sorted(failed.glob(f"*/{SUMMARY_FILE}"))
-        if reports:
-            return reports[-1]
+    for name in (REPORT_FOLDER, LEGACY_REPORT_FOLDER):
+        report = path / name / SUMMARY_FILE
+        if report.is_file():
+            return report
+    if path.name.endswith(FAILED_REPORT_SUFFIXES):
+        histories = [path]
+    elif path.name:
+        histories = [path.with_name(f"{path.name}{suffix}") for suffix in FAILED_REPORT_SUFFIXES]
+    else:
+        histories = []
+    reports = [report for history in histories for report in history.glob(f"*/{SUMMARY_FILE}")]
+    if reports:
+        return max(reports, key=lambda report: report.parent.name)
     legacy = path / "leak_diagnostics.json" if path.is_dir() else path.with_name(f"{path.name}.leak.json")
     return legacy if legacy.is_file() else None
 
@@ -264,6 +272,9 @@ def replay_checks(folder: Path) -> Path:
             expected_original="exterior" if repair.any() or np.any(masks.get("auxiliary_caps", False)) else "interior",
         )
     reports = folder / REPORT_FOLDER
+    legacy = folder / LEGACY_REPORT_FOLDER
+    if not reports.exists() and (legacy / SUMMARY_FILE).is_file():
+        reports = legacy
     reports.mkdir(exist_ok=True)
     output = reports / "checks_replay.csv"
     _write_csv(output, CHECK_COLUMNS, checks)
