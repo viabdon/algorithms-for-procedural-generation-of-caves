@@ -13,14 +13,43 @@ escolha **2 — Preparar recortes por galeria**. A opção **1** do submenu list
 as nuvens do HD (a pasta pode ser alterada). Copie o
 [modelo JSON](../configs/crops/gallery.template.json) para um arquivo por
 trecho. A opção **2** confere a configuração e mostra o destino e a partição
-sem ler os pontos. A opção **3** roda o processamento em CPU após digitar
-`PROCESSAR`. A execução testa o fechamento original e inicia o
+sem ler os pontos. A opção **3 — Voxelizar recortes em CPU** oferece
+dois modos de entrada.
+
+- **1 — Voxelizar um recorte separado (crop.json)** recebe o arquivo do
+  trecho, como `ramo_001_001/crop.json`.
+- **2 — Voxelizar conjunto de recortes em subpastas** recebe a pasta do
+  plano ou seu `plan.json`. O menu procura `crop.json` nas subpastas
+  imediatas e percorre os recortes em ordem de nome da pasta. Os avisos
+  mostram a posição no conjunto, o identificador do recorte e a
+  contagem de pontos. Ao final, o menu resume os recortes processados,
+  os pulados por terem uma saída existente e os que tiveram erro.
+
+Digite `PROCESSAR` para confirmar a execução. O processamento testa
+o fechamento original e inicia o
 [diagnóstico de vazamento](#quando-o-flood-fill-encontra-o-exterior)
 se alcançar a borda pela semente. Na opção **4**, informe a pasta da execução para salvar
 `fatias_plotly.html` com as três fatias ortogonais pela semente e
 `volume_plotly.html` com a vista 3D dos voxels. Na vista 3D, clique na
 legenda para alternar superfície observada, ar candidato e tampas. A
 superfície e o ar aparecem ao abrir, e as tampas começam ocultas.
+
+Para autorizar tampas sintéticas em um recorte, defina
+`auxiliary_cap_radius_voxels` no seu JSON. O valor padrão 0 desativa a
+etapa. Valores inteiros de 1 a 8 limitam o raio do fechamento morfológico
+em voxels. O ensaio de Archamps usou 4, ou 64 cm na grade de 16 cm.
+O algoritmo só tenta essa etapa quando o reparo local falha e a passagem
+não está marcada como ambígua. Ele testa raios crescentes e retém células
+da borda sintética em contato com o ar da semente. O ar deve alcançar
+ambas as tampas das extremidades e incluir as sementes das janelas que
+fecharam no diagnóstico. O flood fill a partir do exterior verifica o
+resultado salvo.
+
+A opção 4 mostra as tampas auxiliares em vermelho. Em `masks.npz`,
+`auxiliary_caps` marca a hipótese de fechamento, `repair` marca o reparo
+local e `caps` guarda as duas extremidades. O relatório `summary.csv`
+registra as contagens e o raio usado. A revisão geométrica deve verificar
+se alguma abertura correspondia à continuação de uma passagem.
 
 ### Propor e extrair recortes pela linha central
 
@@ -50,7 +79,8 @@ superfície e o ar aparecem ao abrir, e as tampas começam ocultas.
    Um PLY avulso ainda pode ser visualizado individualmente.
 4. Revise o PLY, os alertas, os contornos e a semente do `crop.json`.
    Use a opção **2** para validar a configuração e, após a revisão, a
-   opção **3** para voxelizar e aplicar o flood fill ao PLY. No caso de Elaphes,
+   opção **3** para voxelizar e aplicar o flood fill a um recorte ou ao
+   conjunto do plano. No caso de Elaphes,
    a etapa de recorte pode usar o grafo experimental no seu domínio de
    validade. A voxelização pelo menu exige que a caverna e o fold constem na
    auditoria.
@@ -90,6 +120,31 @@ relevantes deixam o contorno em branco para revisão. A margem
 `padding_voxels` se aplica à grade, separada do raio que seleciona pontos.
 Trechos que excedem 64 células em algum eixo na escala escolhida recebem
 um alerta. Revise todos os candidatos antes do flood fill.
+
+Em uma cópia do plano, use `section_overrides` para fixar cortes examinados
+na nuvem original. `passage` começa em 1, como em `passagem_001`. `cut`
+começa em 0 na extremidade inicial. O corte 1 é compartilhado pelo
+primeiro e pelo segundo recorte da passagem. `station` é a distância
+ao longo da linha central nas unidades do plano. Para manter os recortes
+em ordem, a separação entre cortes tem de ser de pelo menos oito voxels.
+
+```json
+{
+  "section_overrides": [
+    {"passage": 1, "cut": 0, "station": 0.16, "contour": "connected"},
+    {"passage": 1, "cut": 5, "station": 43.620740923070285}
+  ]
+}
+```
+
+Nos cortes fixados, a estimativa usa o plano da estação informada.
+O modo `radial`, padrão, usa os pontos projetados em conjunto.
+O modo `connected` agrupa os pontos em células vizinhas no plano, com
+lado de dois voxels. A tampa usa o único componente que sustenta um
+contorno com pelo menos 14 de 16 faixas angulares e lacunas isoladas.
+Se houver dois contornos aptos, a seção fica pendente com o alerta
+`tampa_com_contornos_concorrentes`. O mesmo plano e polígono são usados
+pelos dois recortes vizinhos, com normais opostas.
 
 Os PLYs contêm apenas XYZ dos pontos retidos, em coordenadas locais, com
 24 bytes por ponto no corpo do arquivo.
@@ -215,7 +270,7 @@ salvos, sem reler a nuvem, execute na raiz do projeto:
 O comando grava `diagnostics/checks_replay.csv`. Para repetir também a
 localização da fuga e as contagens do PLY e do original, use uma cópia
 do `crop.json` na mesma pasta, preservando o `crop_id` e usando um
-`plan_id` diferente na opção **3**. Em Python, é possível reaproveitar o
+`plan_id` diferente no modo **3 → 1**. Em Python, é possível reaproveitar o
 mesmo `crop.json` e trocar apenas o destino com
 `dataclasses.replace(prepare_crop(config), destination=novo_destino)`
 antes de chamar `process_crop`. No caso de Archamps, a rechecagem usou a

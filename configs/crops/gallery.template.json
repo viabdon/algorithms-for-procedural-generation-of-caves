@@ -11,6 +11,7 @@
   "origin_xyz": null,
   "shape_zyx": [64, 64, 64],
   "voxel_size": null,
+  "auxiliary_cap_radius_voxels": 0,
   "sections": [
     {
       "point_xyz": null,

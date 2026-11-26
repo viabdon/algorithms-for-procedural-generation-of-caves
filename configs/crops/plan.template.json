@@ -15,6 +15,7 @@
     "graph_neighbours": 12
   },
   "count": 6,
+  "section_overrides": [],
   "voxel_size": null,
   "batch_size": 65536,
   "padding_voxels": 2

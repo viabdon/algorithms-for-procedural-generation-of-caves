@@ -182,8 +182,8 @@ Ela foi estimada com **16 de 16 faixas angulares**. A tampa final do
 mesmo recorte continua sem contorno no corte **001/002**, a **8,76 m**,
 com **11 de 16 faixas**. São dois problemas distintos no mesmo recorte.
 
-A hipótese é que pontos da galeria e da extensão lateral foram reunidos
-na faixa da mesma seção. O ajuste atual projeta esses pontos do LAS no
+A hipótese inicial foi que pontos da galeria e da extensão lateral foram
+reunidos na faixa da mesma seção. O ajuste radial projeta esses pontos do LAS no
 plano, usa o percentil 75 das distâncias em cada faixa angular e liga os
 raios numa única volta. Quando há superfícies a diferentes distâncias na
 mesma direção, pontos mais afastados podem alongar alguns raios e
@@ -206,14 +206,193 @@ exige os dois contornos, o flood fill e o reparo local ainda não foram
 testados nesses trechos. A falha confirmada ocorreu na estimativa da
 seção, antes de verificar o fechamento da grade.
 
-A origem da baixa cobertura continua pendente. A faixa pode ter trechos
-com poucos pontos no LAS, ou a escolha do plano e a seleção dos pontos
-podem ter deixado parte da passagem fora da estimativa. O ensaio deverá
-comparar as faixas angulares sustentadas na nuvem original e nos pontos
-selecionados para a seção, usando a mesma posição e orientação. Isso
-ajudará a distinguir falta de observações na faixa de efeitos da seleção
-ou do corte. A evidência atual ainda não confirma a extensão lateral
-observada na tampa inicial do 001.
+### Rechecagem no LAS original
+
+No PostEtroiture a 2 mm, a rechecagem manteve o grafo do piloto e comparou
+os pontos do LAS com os pontos que passam pelo filtro por estação. Para
+cada seção, contou observações até 32 cm de cada lado do plano e a até
+5 m do eixo no plano. Esses 5 m delimitam o diagnóstico.
+
+| Corte | Observação no LAS | Correção ensaiada |
+| --- | --- | --- |
+| Início do 001 a 0,16 m | Na quarta faixa angular, o grupo da parede fica entre 1,20 e 1,50 m e outro grupo fica além de 2,80 m na amostra selecionada. O percentil 75 cai no grupo distante e o raio da tampa original chega a 3,22 m nessa faixa. | Manter a estação e usar o único componente conectado que sustenta o contorno. |
+| 001/002 a 8,76 m | Quatro faixas consecutivas ficam vazias no plano, inclusive antes do filtro por estação e do raio mínimo. | Deslocar 48 cm ao longo da linha central, para 9,24 m. A faixa do LAS passa a ter observações nos 16 setores. |
+| 005/006 a 42,34 m | Os setores 12 a 15 têm 2.921, 2.233, 2.285 e 3.078 pontos, respectivamente. Todos estão a até 16 cm do eixo projetado e são excluídos pela condição de raio maior que um voxel. O filtro por estação preserva essas contagens. | Deslocar 1,28 m ao longo da linha central, para 43,62 m. Os 16 setores têm pontos com raio maior que um voxel. |
+
+Os dois defeitos ocorrem na estimativa da seção. O 001 reúne duas
+superfícies em um mesmo setor. O 005/006 perde cobertura quando o raio
+mínimo exclui os pontos que se projetam perto do eixo. Para o 001, a
+correção implementada separa os componentes antes de ajustar o contorno.
+Para o 005/006, o ensaio desloca o plano para recuperar a cobertura.
+
+### Como os ajustes foram aplicados no planejador
+
+A configuração local `piloto_2mm_6_trechos_revisao_tampas.json` é uma
+cópia do plano original. Ela mantém seis trechos, voxels de 16 cm e o
+mesmo LAS e grafo do levantamento. Os caminhos do LAS e do grafo foram
+atualizados para a localização acessível no disco na sessão do ensaio.
+O campo abaixo registra as três decisões. `passage` numera as passagens
+a partir de 1. `cut` numera os cortes a partir de 0.
+
+```json
+{
+  "section_overrides": [
+    {"passage": 1, "cut": 0, "station": 0.16, "contour": "connected"},
+    {"passage": 1, "cut": 1, "station": 9.23614818461406},
+    {"passage": 1, "cut": 5, "station": 43.62074092307029}
+  ]
+}
+```
+
+- **Início do 001.** O planejador fixa o plano em 0,16 m, amostra até
+  16.384 pontos candidatos e projeta no plano os que caem a até dois
+  voxels de cada lado. O modo `connected` agrupa células ocupadas vizinhas
+  de 32 cm de lado, incluindo diagonais. Ele ajusta cada grupo
+  separadamente pelo percentil 75 por setor, mais meio voxel. Cada setor
+  precisa de pelo menos dois pontos além de um voxel de raio. A tampa usa
+  um grupo se ele for o único com pelo menos 14 de 16 setores sustentados
+  e lacunas de no máximo um setor consecutivo. Se houver dois grupos
+  aptos, registra `tampa_com_contornos_concorrentes` e deixa o polígono
+  vazio para revisão.
+- **Limites 001/002 e 005/006.** O planejador fixa o plano na estação
+  escolhida, sem aplicar o deslocamento automático de um voxel.
+  Ele recalcula o contorno radial com os pontos do LAS nesse plano
+  e usa o mesmo corte e polígono nos dois recortes vizinhos, com
+  normais de entrada opostas. O limite do raio de um voxel continua
+  valendo. A extração refaz a seleção dos pontos e a grade com os
+  limites revisados.
+
+O código está em [`crop_planner.py`](../src/cavegen/datastream/crop_planner.py).
+Para reproduzir pelo [menu da datastream](preparacao-volumes.md#propor-e-extrair-recortes-pela-linha-central),
+entre em **Preparar recortes por galeria**, use a opção **5** com a
+configuração revisada e gere o plano em uma pasta nova. O resultado
+registra as estações e a cobertura em `plan.json` e os contornos em
+`crop.json`. A opção **6** permite revisar os contornos e a opção **3**
+permite verificar o fechamento depois de voxelizar.
+
+Os testes sintéticos confirmaram o descarte de um grupo lateral separado,
+a fronteira compartilhada entre recortes, a rejeição de dois contornos
+aptos e a preservação da ordem dos cortes. No LAS real, foi confirmada a
+cobertura nas duas estações deslocadas antes da amostragem do planejador.
+Em um ensaio separado no 005/006, deslocar a origem do ajuste radial
+dentro do plano original recuperou os 16 setores, mas a semente dos dois
+recortes ainda alcançou o exterior no flood fill. Esse ensaio usou os PLYs
+originais e a tampa reestimada.
+
+A primeira execução terminou antes de salvar o novo `plan.json`.
+Uma execução posterior gerou o plano revisado e os seis PLYs. O lote
+de voxelização registrou os resultados abaixo.
+
+| Recorte | Resultado do flood fill e do diagnóstico | Voxels de ar candidato |
+| --- | --- | ---: |
+| 001 | Semente bloqueada pela parede observada no voxel ZYX `[12, 35, 26]`. As duas tampas tocaram a parede. | — |
+| 002 | Fechou com dois voxels de reparo. | 9.893 |
+| 003 | Fechou com dois voxels de reparo. | 7.490 |
+| 004 | Fechou sem reparo. | 8.139 |
+| 005 | A semente alcançou o exterior. O diagnóstico não verificou um reparo. | — |
+| 006 | A semente alcançou o exterior. O diagnóstico não verificou um reparo. | — |
+
+No plano publicado localmente, o corte compartilhado 005/006 em **43,62 m**
+teve **15 de 16 setores** sustentados na amostra do planejador e gerou
+ambas as tampas. Na rota principal (`route=0` em `paths.csv`), a fuga do
+005 permaneceu entre os planos de extremidade e chegou à borda inferior
+da grade. A do 006 cruzou o plano final, a **50,62 m**, e chegou à borda
+da grade. Nenhuma das duas rotas cruzou o plano compartilhado de 43,62 m.
+Cada rota documenta um caminho possível de fuga. A busca das demais
+rotas permanece aberta. Os resultados de 002, 003 e 004 seguem em
+revisão geométrica.
+
+### Ensaios após as falhas de 001, 005 e 006
+
+Na grade original de 16 cm, um novo ponto na linha central do 001, na
+estação **3,898 m**, tirou a semente da parede e revelou um vazamento.
+Nos três recortes completos, o ar alcançou o exterior mesmo com planos
+transversais temporários que cobriam toda a grade nas duas extremidades.
+Num segundo teste, a adição dos voxels ocupados no LAS que estavam
+dentro da caixa e dos planos de corte e faltavam no PLY acrescentou
+32 voxels ao 001, 19 ao 005 e 50 ao 006. Os três continuaram vazando.
+Isso indica que recuperar esses pontos, por si só, é insuficiente. Os
+vazamentos restantes podem passar por áreas sem cobertura no levantamento
+ou por aberturas da própria galeria.
+
+O HTML conjunto exibia 60.000 de 129.291.701 pontos. No LAS, há 15.213
+pontos a até 16 cm da coordenada local aproximada `[4.21, 2.67, -2.49]`,
+marcada na vista da junção 005/006. O vértice mais baixo da tampa
+compartilhada fica perto de `[3.57, 3.48, -3.85]`.
+Ali, o ponto observado mais próximo fica a 15,6 cm. Essas contagens
+ajudam a localizar a parede observada para revisar o contorno inferior.
+
+Nos ensaios abaixo, foram reutilizados os PLYs revisados e as origens das
+grades. As tampas novas dos trechos reduzidos foram ajustadas com uma
+amostra do PLY em cada seção. Os resultados passaram na auditoria por
+flood fill a partir do exterior e voltaram a vazar quando cada tampa foi
+removida isoladamente.
+
+| Recorte | Ensaio que fechou | Voxels de ar candidato |
+| --- | --- | ---: |
+| 001 | Trecho completo a 24 cm, com semente na estação 3,978 m. | 1.616 |
+| 005 | Trecho reduzido de 37,745 m a 39,665 m, a 16 cm. | 1.531 |
+| 005 | Trecho completo a 24 cm, com a semente original. | 3.040 |
+| 006 | Trecho reduzido de 43,621 m a 47,461 m, a 16 cm, com a tampa compartilhada preservada. | 3.756 |
+
+O fechamento dos recortes completos a 24 cm dependeu do alinhamento da
+grade. Ao deslocar a origem 4 cm nos três eixos, as sementes ensaiadas
+do 001 e do 005 ficaram bloqueadas. Com deslocamento de 12 cm, o 005
+voltou a vazar. O 006 completo continuou vazando a 24 cm. Os recortes
+curtos de 16 cm preservam a escala do piloto e servem para localizar
+intervalos que fecham. A referência deve incluir a extensão integral
+dos recortes planejados, inclusive os intervalos com reconstrução pendente.
+
+### Proposta de ensaio com tampas em aberturas incertas
+
+Retomar 001, 005 e 006 com seus limites originais do plano revisado e
+voxels de 16 cm. No 001, revisar a semente em fatias transversais do LAS.
+Quando o reparo local falhar, usar as rotas de fuga para localizar a
+abertura e examinar sua borda na nuvem original e nas seções adjacentes.
+Uma rota pode percorrer o exterior depois de sair da galeria. O ponto
+onde ela chega à borda da grade é insuficiente para posicionar uma tampa.
+
+Se a borda puder ser delimitada, testar uma tampa local sobre a abertura.
+Verificar se há continuação medida de uma passagem do outro lado. Nesse
+caso, incluir a passagem e registrar a conexão entre os domínios. Quando
+a continuação for incerta, marcar o fechamento como hipótese e manter
+uma máscara própria para ele. Se a borda também for incerta, manter o
+trecho no inventário com essa pendência.
+
+Repetir o flood fill por dentro e por fora após cada intervenção e
+verificar a continuidade ao longo de todo o recorte, incluindo as
+passagens observadas. Registrar a área das tampas auxiliares e a extensão
+com interior validado em relação à extensão levantada. Nas métricas de
+parede, excluir as superfícies artificiais. Nas métricas sensíveis ao
+fechamento, como volume e conectividade, comparar hipóteses plausíveis
+e indicar quais conclusões dependem delas.
+
+### Voxelização integral do piloto com fechamentos auxiliares
+
+Os seis recortes de `piloto_2mm_6_trechos_revisao_tampas` fecharam
+nos limites físicos do plano revisado, com voxels de 16 cm. A tabela
+registra voxels adicionados além das duas tampas de extremidade.
+
+| Recorte | Reparo local | Tampa auxiliar sintética | Raio utilizado (voxels) | Ar candidato (voxels) |
+| --- | ---: | ---: | ---: | ---: |
+| 001 | 3 | 0 | 0 | 6.659 |
+| 002 | 2 | 0 | 0 | 9.893 |
+| 003 | 2 | 0 | 0 | 7.490 |
+| 004 | 0 | 0 | 0 | 8.139 |
+| 005 | 0 | 69 | 2 | 12.455 |
+| 006 | 0 | 46 | 4 | 8.022 |
+
+Para repetir os ensaios do 001, 005 e 006, usar uma cópia do
+`crop.json` revisado com `auxiliary_cap_radius_voxels` igual a 4.
+No 001, usar a semente local XYZ `[35.0406, 27.8859, -6.191]`
+na estação de aproximadamente 3,898 m. As execuções locais registram
+esses parâmetros em `crop_auxiliar.json` e no `run.json` da saída.
+
+A auditoria independente reproduziu o componente de ar dos seis
+recortes a partir das máscaras salvas. A retirada das tampas auxiliares
+reabriu o 005 e o 006. Nesses dois volumes, inspecionar no Plotly a
+camada vermelha sobre a superfície observada para avaliar possíveis
+continuações de galeria. A validação geométrica permanece pendente.
 
 ### Arquivos de referência do piloto
 

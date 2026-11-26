@@ -5,8 +5,12 @@ import json
 import shlex
 import subprocess
 import sys
+from typing import TYPE_CHECKING
 
 from cavegen.datastream.run_reference_voxelization import main as voxelize
+
+if TYPE_CHECKING:
+    from cavegen.datastream.gallery_crop import GalleryCrop
 
 
 def _ask(prompt: str, default: str = "") -> str:
@@ -80,8 +84,63 @@ def _prepare() -> tuple[list[str], Path]:
     return arguments, output_folder
 
 
+def _print_crop_summary(crop: "GalleryCrop") -> None:
+    print(f"Fonte: {crop.source} | Partição: {crop.partition}")
+    print(f"Domínio XYZ: {crop.extent_xyz} {crop.config['units']}")
+    print(f"Saída: {crop.destination.absolute()}")
+
+
+def _voxelizar_recorte(crop: "GalleryCrop", prefix: str = "") -> None:
+    from cavegen.datastream.gallery_crop import process_crop
+
+    record = process_crop(
+        crop, progress=lambda count: print(f"{prefix}Pontos lidos: {count:,}", flush=True),
+        diagnostic_progress=lambda message: print(f"{prefix}{message}", flush=True),
+    )
+    counts = record["counts"]
+    print(f"{prefix}Pontos processados: {counts['read']:,} | Retidos: {counts['retained']:,}")
+    print(f"{prefix}Contagens de seleção: {counts}")
+    if record["repair_voxels"]:
+        print(f"{prefix}Reparo separado para revisão: {record['repair_voxels']} voxels.")
+    print(f"{prefix}Relatório do recorte: {crop.destination / record['diagnostics']}")
+    print(f"{prefix}Ar candidato: {record['candidate_volume']:.3g} {crop.config['units']}³")
+
+
+def _voxelizar_conjunto(path: Path) -> None:
+    from cavegen.datastream.gallery_crop import prepare_crop
+
+    root = path.parent if path.name == "plan.json" and path.is_file() else path
+    if not root.is_dir():
+        raise ValueError("Informe uma pasta de recortes ou o plan.json correspondente.")
+    configs = sorted(config for config in root.glob("*/crop.json") if config.is_file())
+    if not configs:
+        raise ValueError(f"Nenhum crop.json encontrado nas subpastas de {root}.")
+
+    total = len(configs)
+    print(f"{total} recortes encontrados nas subpastas de {root}.")
+    if _ask("Digite PROCESSAR para confirmar o conjunto") != "PROCESSAR":
+        return
+
+    completed = skipped = failed = 0
+    for index, config in enumerate(configs, start=1):
+        prefix = f"[{index}/{total} {config.parent.name}] "
+        try:
+            crop = prepare_crop(config)
+            prefix = f"[{index}/{total} {crop.config['crop_id']}] "
+            print(f"{prefix}Voxelizando", flush=True)
+            _voxelizar_recorte(crop, prefix)
+            completed += 1
+        except FileExistsError as error:
+            skipped += 1
+            print(f"{prefix}Pulado: {error}", flush=True)
+        except (OSError, ValueError, TypeError, KeyError) as error:
+            failed += 1
+            print(f"{prefix}Não foi possível concluir: {error}", flush=True)
+    print(f"Conjunto concluído: {completed} processados, {skipped} pulados, {failed} com erro.")
+
+
 def _crop_menu() -> None:
-    from cavegen.datastream.gallery_crop import CROP_FORMATS, inspect_crop, prepare_crop, process_crop
+    from cavegen.datastream.gallery_crop import CROP_FORMATS, inspect_crop, prepare_crop
     from cavegen.datastream.crop_planner import default_plan_destination, propose_crops, read_plan_config
     from cavegen.datastream.crop_preview import (
         preview_manifest,
@@ -96,7 +155,7 @@ def _crop_menu() -> None:
         print("\nRecortes por galeria")
         print("1. Listar nuvens brutas")
         print("2. Conferir configuração JSON")
-        print("3. Processar recorte em CPU")
+        print("3. Voxelizar recortes em CPU")
         print("4. Inspecionar recorte ou diagnóstico de vazamento")
         print("5. Propor e extrair N recortes pela linha central")
         print("6. Gerar prévia 3D dos recortes do plano")
@@ -167,26 +226,29 @@ def _crop_menu() -> None:
                     )
                     output = _path(_ask("Arquivo HTML", str(default)))
                     print(f"Prévia para abrir no navegador: {write_crop_preview(source, output)}")
+            elif choice == "3":
+                print("1. Voxelizar um recorte separado (crop.json)")
+                print("2. Voxelizar conjunto de recortes em subpastas")
+                print("0. Voltar")
+                mode = _choice("Opção", "0", ("0", "1", "2"))
+                if mode == "1":
+                    path = _ask(f"JSON do recorte (modelo em {template}; Enter para cancelar)")
+                    if path:
+                        crop = prepare_crop(_path(path))
+                        _print_crop_summary(crop)
+                        if _ask("Digite PROCESSAR para confirmar") == "PROCESSAR":
+                            _voxelizar_recorte(crop)
+                elif mode == "2":
+                    path = _ask("Pasta que contém as subpastas dos recortes, ou plan.json (Enter para cancelar)")
+                    if path:
+                        _voxelizar_conjunto(_path(path))
             else:
                 path = _ask(f"JSON do recorte (modelo em {template}; Enter para cancelar)")
                 if not path:
                     continue
                 crop = prepare_crop(_path(path))
-                if choice == "2":
-                    print(json.dumps(crop.config, indent=2, ensure_ascii=False))
-                print(f"Fonte: {crop.source} | Partição: {crop.partition}")
-                print(f"Domínio XYZ: {crop.extent_xyz} {crop.config['units']}")
-                print(f"Saída: {crop.destination.absolute()}")
-                if choice == "3" and _ask("Digite PROCESSAR para confirmar") == "PROCESSAR":
-                    record = process_crop(
-                        crop, progress=lambda count: print(f"Pontos lidos: {count:,}", flush=True),
-                        diagnostic_progress=lambda message: print(message, flush=True),
-                    )
-                    print(f"Contagens de seleção: {record['counts']}")
-                    if record["repair_voxels"]:
-                        print(f"Reparo separado para revisão: {record['repair_voxels']} voxels.")
-                    print(f"Relatório do recorte: {crop.destination / record['diagnostics']}")
-                    print(f"Ar candidato: {record['candidate_volume']:.3g} {crop.config['units']}³")
+                print(json.dumps(crop.config, indent=2, ensure_ascii=False))
+                _print_crop_summary(crop)
         except (OSError, ValueError, TypeError, KeyError) as error:
             print(f"Não foi possível concluir: {error}")
         except KeyboardInterrupt:

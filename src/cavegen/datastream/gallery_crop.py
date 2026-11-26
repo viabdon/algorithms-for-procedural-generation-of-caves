@@ -13,6 +13,7 @@ from typing import NoReturn
 from matplotlib.path import Path as PolygonPath
 import numpy as np
 
+from cavegen.tools.flood_fill.auxiliary_caps import propose_auxiliary_caps
 from cavegen.core.volume import Volume3D
 from cavegen.datastream.gallery_leaks import analyze_leak, seed_component, touches_boundary
 from cavegen.datastream.gallery_reports import (
@@ -142,6 +143,10 @@ def prepare_crop(path: Path, *, repository: Path = Path(".")) -> GalleryCrop:
     progress_every = spec.setdefault("progress_every", 1000000)
     if type(progress_every) is not int or progress_every < 0:
         raise ValueError("progress_every deve ser um inteiro não negativo.")
+
+    radius = spec.get("auxiliary_cap_radius_voxels", 0)
+    if type(radius) is not int or not 0 <= radius <= 8:
+        raise ValueError("auxiliary_cap_radius_voxels deve ser um inteiro entre 0 e 8.")
 
     sections = spec.get("sections")
     if not isinstance(sections, list) or len(sections) != 2:
@@ -305,8 +310,16 @@ def process_crop(
         report = analysis.report
         air, repair = analysis.air, analysis.repair
 
+    auxiliary = np.zeros_like(surface)
+    radius = 0
+    if air is None and crop.config.get("auxiliary_cap_radius_voxels", 0) and report["outcome"] != "ambiguous_passage":
+        protected = [tuple(w["seed_zyx"]) for w in report["windows"] if w["outcome"] == "sealed"]
+        auxiliary, air, radius = propose_auxiliary_caps(
+            barrier, caps, crop.seed_zyx, crop.config["auxiliary_cap_radius_voxels"], protected
+        )
+
     checks.extend(audit_flood_fill(
-        surface, caps, repair, crop.seed_zyx, air,
+        surface, caps, repair, crop.seed_zyx, air, auxiliary=auxiliary,
         expected_original="exterior" if outcome == "leaking" else "interior",
     ))
     if air is None:
@@ -320,10 +333,13 @@ def process_crop(
     air_voxels = int(air.sum())
     record.update(
         method=(
+            "synthetic_auxiliary_caps_exterior_flood_fill_6" if radius else
             "reviewed_planar_caps_local_repair_exterior_flood_fill_6" if repair_voxels
             else "reviewed_planar_caps_exterior_flood_fill_6"
         ),
         status="pending_review",
+        auxiliary_cap_voxels=int(auxiliary.sum()),
+        auxiliary_cap_radius_voxels=radius,
         repair_voxels=repair_voxels,
         air_voxels=air_voxels,
         candidate_volume=air_voxels * crop.voxel_size**3,
@@ -333,11 +349,11 @@ def process_crop(
     with TemporaryDirectory(dir=target.parent) as staging:
         folder = Path(staging)
         save_surface_npz(surface, folder / "surface.npz", record)
-        np.savez_compressed(folder / "masks.npz", caps=caps, repair=repair)
+        np.savez_compressed(folder / "masks.npz", caps=caps, repair=repair, auxiliary_caps=auxiliary)
         save_volume_npz(Volume3D(air, metadata=record), folder / "interior.npz")
         write_report(
             folder / REPORT_FOLDER, crop, record, checks,
-            outcome="repaired" if repair_voxels else "sealed_without_repair", leak=report,
+            outcome="synthetic_auxiliary_caps" if radius else "repaired" if repair_voxels else "sealed_without_repair", leak=report,
         )
         (folder / "run.json").write_text(
             json.dumps(record, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
@@ -357,6 +373,7 @@ def inspect_crop(folder: Path) -> tuple[Path, Path]:
     classes[surface] = 1
     with np.load(folder / "masks.npz", allow_pickle=False) as masks:
         caps = masks["caps"].any(axis=0)
+        auxiliary = masks.get("auxiliary_caps", np.zeros_like(surface))
         repair = masks["repair"] if "repair" in masks else np.zeros_like(surface)
     classes[caps] = 2
     classes[interior.data] = 3
@@ -367,6 +384,10 @@ def inspect_crop(folder: Path) -> tuple[Path, Path]:
     if repair.any():
         labels = np.append(labels, "Reparo local")
         colors.append("#A855F7")
+    if auxiliary.any():
+        classes[auxiliary] = len(labels)
+        labels = np.append(labels, "Tampa auxiliar sintética")
+        colors.append("#E11D48")
     colorscale = [
         (edge / len(colors), color)
         for i, color in enumerate(colors)
@@ -415,6 +436,8 @@ def inspect_crop(folder: Path) -> tuple[Path, Path]:
     ]
     if repair.any():
         layers.append(("Reparo local", repair, "#A855F7", 0.95, True))
+    if auxiliary.any():
+        layers.append(("Tampa auxiliar sintética", auxiliary, "#E11D48", 1, True))
     for name, mask, color, opacity, visible in layers:
         z, y, x = mask.nonzero()
         spatial.add_trace(go.Scatter3d(

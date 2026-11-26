@@ -8,6 +8,9 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 
 import numpy as np
+from scipy.sparse import csr_matrix
+from scipy.sparse.csgraph import connected_components
+from scipy.spatial import cKDTree
 
 from cavegen.datastream.centreline import CentrelineIndex, Passage, passages_from_graph, read_graph
 from cavegen.datastream.centreline_extraction import generate_centreline, source_anchor
@@ -42,6 +45,8 @@ class _Sample:
 @dataclass
 class _Boundary:
     nominal: float
+    fixed: bool = False
+    connected_contour: bool = False
     samples: _Sample = field(default_factory=lambda: _Sample(4096))
     station: float = 0.0
     point: np.ndarray = field(default_factory=lambda: np.zeros(3))
@@ -49,6 +54,7 @@ class _Boundary:
     u: np.ndarray = field(default_factory=lambda: np.zeros(3))
     polygon: np.ndarray = field(default_factory=lambda: np.empty((0, 2)))
     coverage: int = 0
+    competing_contours: bool = False
 
 
 @dataclass
@@ -85,10 +91,52 @@ def _allocate(passages: list[Passage], count: int, size: float):
     return limits, allocation
 
 
+def _angular_radii(uv: np.ndarray, size: float) -> np.ndarray:
+    radius = np.linalg.norm(uv, axis=1)
+    angles = np.mod(np.arctan2(uv[:, 1], uv[:, 0]), 2 * np.pi)
+    bins = np.floor(angles / (2 * np.pi / 16)).astype(int).clip(0, 15)
+    radii = np.full(16, np.nan)
+    for i in range(16):
+        observed = radius[(bins == i) & (radius > size)]
+        if len(observed) >= 2:
+            radii[i] = np.quantile(observed, 0.75) + size / 2
+    return radii
+
+
+def _has_angular_support(radii: np.ndarray) -> bool:
+    supported = np.flatnonzero(np.isfinite(radii))
+    if len(supported) < 14:
+        return False
+    gaps = np.diff(np.r_[supported, supported[:1] + 16])
+    return bool(gaps.max() <= 2)
+
+
+def _fit_contour(uv: np.ndarray, size: float, connected: bool) -> tuple[np.ndarray, bool]:
+    if not connected or not len(uv):
+        radii = _angular_radii(uv, size)
+        return radii, _has_angular_support(radii)
+
+    # Link neighbouring occupied cells of the section plane. A detached cluster
+    # must not supply radii for the wall loop surrounding the centreline.
+    cells, inverse = np.unique(np.floor(uv / (2 * size)), axis=0, return_inverse=True)
+    pairs = cKDTree(cells).query_pairs(1, p=np.inf, output_type="ndarray")
+    adjacency = csr_matrix((np.ones(len(pairs), dtype=bool), (pairs[:, 0], pairs[:, 1])),
+                           shape=(len(cells), len(cells)))
+    count, labels = connected_components(adjacency, directed=False)
+    point_labels = labels[inverse]
+    radii_by_component = [_angular_radii(uv[point_labels == i], size) for i in range(count)]
+    supported = [radii for radii in radii_by_component if _has_angular_support(radii)]
+    if supported:
+        # Leave an ambiguous section unclosed, even if each wall has full coverage.
+        return supported[0], len(supported) == 1
+    return max(radii_by_component, key=lambda radii: np.count_nonzero(np.isfinite(radii))), False
+
+
 def _fit_boundary(boundary: _Boundary, path: Passage, size: float) -> None:
     samples = boundary.samples.rows[:, :3]
     best = None
-    for shift in (0.0, -size, size):
+    shifts = (0.0,) if boundary.fixed else (0.0, -size, size)
+    for shift in shifts:
         station = np.clip(boundary.nominal + shift, size / 2, path.stations[-1] - size / 2)
         point = path.at(station)
         direction = path.at(station + size) - path.at(station - size)
@@ -104,23 +152,15 @@ def _fit_boundary(boundary: _Boundary, path: Passage, size: float) -> None:
         delta = samples - point
         near = np.abs(delta @ direction) <= 2 * size
         uv = delta[near] @ np.column_stack((u, v))
-        radius = np.linalg.norm(uv, axis=1)
-        angles = np.mod(np.arctan2(uv[:, 1], uv[:, 0]), 2 * np.pi)
-        bins = np.floor(angles / (2 * np.pi / 16)).astype(int).clip(0, 15)
-        radii = np.full(16, np.nan)
-        for i in range(16):
-            observed = radius[(bins == i) & (radius > size)]
-            if len(observed) >= 2:
-                radii[i] = np.quantile(observed, 0.75) + size / 2
+        radii, complete = _fit_contour(uv, size, boundary.connected_contour)
         supported = np.flatnonzero(np.isfinite(radii))
-        gaps = np.diff(np.r_[supported, supported[:1] + 16])
-        complete = len(supported) >= 14 and gaps.max() <= 2
         score = (complete, len(supported), -abs(shift))
         if best is not None and score <= best:
             continue
         best = score
         boundary.station, boundary.point, boundary.direction, boundary.u = station, point, direction, u
         boundary.coverage = len(supported)
+        boundary.competing_contours = not complete and _has_angular_support(radii)
         if complete:
             theta = (np.arange(16) + 0.5) * (2 * np.pi / 16)
             r = np.interp(np.arange(16), supported, radii[supported], period=16)
@@ -218,7 +258,50 @@ def read_plan_config(config: Path) -> dict:
     size = spec.get("voxel_size")
     if type(size) not in (int, float) or not np.isfinite(size) or size <= 0:
         raise ValueError("voxel_size deve ser positivo e finito.")
+    overrides = spec.get("section_overrides", [])
+    if not isinstance(overrides, list):
+        raise ValueError("section_overrides deve ser uma lista.")
+    seen = set()
+    for override in overrides:
+        if not isinstance(override, dict):
+            raise ValueError("Cada ajuste de seção deve ser um objeto JSON.")
+        passage, cut = override.get("passage"), override.get("cut")
+        station = override.get("station")
+        if type(passage) is not int or passage < 1 or type(cut) is not int or cut < 0:
+            raise ValueError("Informe passage ≥ 1 e cut ≥ 0 como inteiros em section_overrides.")
+        if type(station) not in (int, float) or not np.isfinite(station) or station <= 0:
+            raise ValueError("Informe station positiva e finita em section_overrides.")
+        if override.get("contour", "radial") not in ("radial", "connected"):
+            raise ValueError("contour deve ser radial ou connected em section_overrides.")
+        if (passage, cut) in seen:
+            raise ValueError("Cada corte pode ter apenas um ajuste em section_overrides.")
+        seen.add((passage, cut))
     return spec
+
+
+def _plan_boundaries(spec, passages, limits, allocation, size):
+    boundaries_by_owner = {
+        owner: [_Boundary(s) for s in np.linspace(*limits[owner], allocation[owner] + 1)]
+        for owner in np.flatnonzero(allocation)
+    }
+    adjusted = set()
+    for override in spec.get("section_overrides", []):
+        owner, cut = override["passage"] - 1, override["cut"]
+        station = override["station"]
+        if owner not in boundaries_by_owner or cut >= len(boundaries_by_owner[owner]):
+            raise ValueError("Ajuste de seção aponta para um corte inexistente.")
+        if not size / 2 <= station <= passages[owner].stations[-1] - size / 2:
+            raise ValueError("Ajuste de seção fora dos limites da passagem.")
+        connected = override.get("contour") == "connected"
+        boundaries_by_owner[owner][cut] = _Boundary(
+            station, fixed=True, connected_contour=connected,
+            samples=_Sample(16384 if connected else 4096),
+        )
+        adjusted.add(owner)
+    for owner in adjusted:
+        if np.any(np.diff([b.nominal for b in boundaries_by_owner[owner]]) < 8 * size):
+            raise ValueError("Ajustes de seção devem manter os cortes em ordem e separados por oito voxels.")
+    return boundaries_by_owner
 
 
 def default_plan_destination(spec: dict) -> Path:
@@ -272,8 +355,7 @@ def propose_crops(
         index = CentrelineIndex(passages, spacing)
         rng = np.random.default_rng(17)
         groups = {}
-        for owner in np.flatnonzero(allocation):
-            boundaries = [_Boundary(s) for s in np.linspace(*limits[owner], allocation[owner] + 1)]
+        for owner, boundaries in _plan_boundaries(spec, passages, limits, allocation, size).items():
             windows = []
             for j, (start, end) in enumerate(zip(boundaries, boundaries[1:]), 1):
                 windows.append(_Window(int(owner), start, end, staged / f"ramo_{owner + 1:03d}_{j:03d}"))
@@ -295,6 +377,10 @@ def propose_crops(
             path = passages[owner]
             for boundary in boundaries:
                 _fit_boundary(boundary, path, size)
+            if any(b.fixed for b in boundaries) and np.any(
+                np.diff([b.station for b in boundaries]) < 8 * size
+            ):
+                raise ValueError("Os cortes ajustados ficaram separados por menos de oito voxels.")
             for window in windows:
                 rows = window.samples.rows
                 if not len(rows):
@@ -303,7 +389,9 @@ def propose_crops(
                 caps = (window.start, window.end)
                 support = [np.linalg.norm(b.polygon, axis=1).max(initial=0) for b in caps]
                 window.radius = max(np.quantile(rows[:, 3], 0.99) + size, *support)
-                if any(not len(b.polygon) for b in caps):
+                if any(b.competing_contours for b in caps):
+                    window.reasons.append("tampa_com_contornos_concorrentes")
+                if any(not len(b.polygon) and not b.competing_contours for b in caps):
                     window.reasons.append("tampa_com_cobertura_insuficiente")
                 if index.has_nearby_passage(
                     path, owner, (window.start.station, window.end.station), window.radius

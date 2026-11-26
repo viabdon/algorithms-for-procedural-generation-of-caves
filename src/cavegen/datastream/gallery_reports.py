@@ -53,6 +53,7 @@ def audit_flood_fill(
     air: np.ndarray | None,
     *,
     expected_original: str,
+    auxiliary: np.ndarray | None = None,
 ) -> list[dict]:
     """Flood from the grid boundary, independently of the repair search from the seed."""
     original = surface | caps.any(axis=0)
@@ -62,7 +63,14 @@ def audit_flood_fill(
     if air is None:
         return checks
 
-    final = classify_surface_by_flood_fill(original | repair) if repair.any() else original_classification
+    if auxiliary is None:
+        auxiliary = np.zeros_like(surface)
+    if auxiliary.any():
+        checks.append(check("auxiliary_overlap", int((auxiliary & (original | repair | air)).sum()), 0))
+        without = classify_surface_by_flood_fill(original | repair)
+        checks.append(check("remove_auxiliary_caps", _seed_state(without, seed), "exterior"))
+    additions = repair | auxiliary
+    final = classify_surface_by_flood_fill(original | additions) if additions.any() else original_classification
     state = _seed_state(final, seed)
     checks.append(check("outside_fill_final", state, "interior"))
     labels, _ = label(final == INTERIOR, structure=generate_binary_structure(3, 1))
@@ -72,10 +80,10 @@ def audit_flood_fill(
     overlap = int(np.count_nonzero(repair & (original | air)))
     checks.append(check("repair_overlap", overlap, 0, count=overlap))
     for index, name in enumerate(("remove_initial_cap", "remove_final_cap")):
-        reduced = surface | caps[1 - index] | repair
+        reduced = surface | caps[1 - index] | additions
         checks.append(check(name, _seed_state(classify_surface_by_flood_fill(reduced), seed)))
     for voxel in map(tuple, np.argwhere(repair)):
-        reduced = original | repair
+        reduced = original | additions
         reduced[voxel] = original[voxel]
         state = _seed_state(classify_surface_by_flood_fill(reduced), seed)
         checks.append(check("remove_repair_voxel", state, "exterior", voxel=voxel))
@@ -189,6 +197,8 @@ def write_report(
         "surface_voxels": record.get("surface_voxels"),
         "initial_cap_voxels": record.get("cap_voxels", [None, None])[0],
         "final_cap_voxels": record.get("cap_voxels", [None, None])[1],
+        "auxiliary_cap_voxels": record.get("auxiliary_cap_voxels", 0),
+        "auxiliary_cap_radius_voxels": record.get("auxiliary_cap_radius_voxels", 0),
         "repair_voxels": record.get("repair_voxels"),
         "candidate_air_voxels": record.get("air_voxels"),
         "candidate_volume": record.get("candidate_volume"),
@@ -250,7 +260,8 @@ def replay_checks(folder: Path) -> Path:
         repair = masks["repair"] if "repair" in masks else np.zeros_like(surface)
         checks = audit_flood_fill(
             surface, masks["caps"], repair, tuple(interior.metadata["seed_zyx"]), interior.data,
-            expected_original="exterior" if repair.any() else "interior",
+            auxiliary=masks.get("auxiliary_caps"),
+            expected_original="exterior" if repair.any() or np.any(masks.get("auxiliary_caps", False)) else "interior",
         )
     reports = folder / REPORT_FOLDER
     reports.mkdir(exist_ok=True)

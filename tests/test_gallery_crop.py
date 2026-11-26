@@ -256,13 +256,13 @@ def test_menu_previews_and_requires_explicit_confirmation(gallery, tmp_path, mon
     path, _, _, _ = gallery
     monkeypatch.chdir(tmp_path)
     crop = prepare_crop(path)
-    answers = iter(["2", "2", f'"{path}"', "3", str(path), "", "0", "0"])
+    answers = iter(["2", "2", f'"{path}"', "3", "1", str(path), "", "0", "0"])
     monkeypatch.setattr("builtins.input", lambda _: next(answers))
     main()
     assert "Partição: train" in capsys.readouterr().out
     assert not crop.destination.exists()
 
-    answers = iter(["2", "3", str(path), "PROCESSAR", "0", "0"])
+    answers = iter(["2", "3", "1", str(path), "PROCESSAR", "0", "0"])
     main()
     assert "Ar candidato: 32 m³" in capsys.readouterr().out
     assert (crop.destination / "run.json").exists()
@@ -286,3 +286,63 @@ def test_menu_previews_and_requires_explicit_confirmation(gallery, tmp_path, mon
     assert [trace["type"] for trace in traces] == ["scatter3d"] * 3
     assert [trace["name"] for trace in traces] == ["Superfície observada", "Ar candidato", "Tampas"]
     assert [trace["visible"] for trace in traces] == [True, True, "legendonly"]
+
+
+def test_menu_voxelizes_subfolders_with_progress_per_crop(gallery, tmp_path, monkeypatch, capsys):
+    _, spec, source, _ = gallery
+    monkeypatch.chdir(tmp_path)
+    root = tmp_path / "plano revisado"
+    for name in ("ramo_001_003", "ramo_001_002", "ramo_001_001"):
+        folder = root / name
+        folder.mkdir(parents=True)
+        config = folder / "crop.json"
+        if name.endswith("002"):
+            config.write_text("{")
+        else:
+            config.write_text(json.dumps(dict(spec, crop_id=name, source=str(source), plan_id="revisado")))
+    manifest = root / "plan.json"
+    manifest.write_text("{}")
+    results = tmp_path / "data/processed/reference_sections/cave/survey/pilot/revisado"
+
+    answers = iter(["2", "3", "2", str(root), "", "0", "0"])
+    monkeypatch.setattr("builtins.input", lambda _: next(answers))
+    main()
+    assert not results.exists()
+    assert "3 recortes encontrados" in capsys.readouterr().out
+
+    answers = iter(["2", "3", "2", str(root), "PROCESSAR", "0", "0"])
+    main()
+    output = capsys.readouterr().out
+    assert output.index("[1/3 ramo_001_001] Voxelizando") < output.index("[3/3 ramo_001_003] Voxelizando")
+    for label in ("[1/3 ramo_001_001]", "[3/3 ramo_001_003]"):
+        assert f"{label} Pontos lidos: 40" in output
+        assert f"{label} Pontos processados: 100 | Retidos: 96" in output
+    assert "[2/3 ramo_001_002] Não foi possível concluir:" in output
+    assert "2 processados, 0 pulados, 1 com erro" in output
+    for name in ("ramo_001_001", "ramo_001_003"):
+        assert (results / name / "10x10x10/interior.npz").exists()
+
+    answers = iter(["2", "3", "2", str(manifest), "PROCESSAR", "0", "0"])
+    main()
+    output = capsys.readouterr().out
+    assert "[1/3 ramo_001_001] Pulado: Já existe uma execução" in output
+    assert "0 processados, 2 pulados, 1 com erro" in output
+
+
+def test_auxiliary_caps_preserve_measured_surface_and_replay(gallery, tmp_path):
+    path, spec, source, wall = gallery
+    wall[3:6, 3, 3:6] = False
+    np.savetxt(source, np.argwhere(wall)[:, ::-1] + 0.5)
+    spec["seed_xyz"] = [5.5, 5.5, 5.5]
+    spec["auxiliary_cap_radius_voxels"] = 4
+    path.write_text(json.dumps(spec))
+    crop = prepare_crop(path, repository=tmp_path)
+    record = process_crop(crop)
+    assert record["repair_voxels"] == 0
+    assert record["auxiliary_cap_voxels"] > 0
+    np.testing.assert_array_equal(load_surface_npz(crop.destination / "surface.npz")[0], wall)
+    with np.load(crop.destination / "masks.npz") as masks:
+        assert masks["auxiliary_caps"].sum() == record["auxiliary_cap_voxels"]
+    checks = {row["check"]: row for row in read_rows(replay_checks(crop.destination))}
+    assert checks["remove_auxiliary_caps"]["result"] == "exterior"
+    assert checks["candidate_air_component"]["result"] == "match"

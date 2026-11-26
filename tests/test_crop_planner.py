@@ -161,3 +161,65 @@ def test_incomplete_section_has_no_invented_cap(tmp_path):
     assert record["retained_points"] > 0
     assert "tampa_com_cobertura_insuficiente" in record["review_reasons"]
     assert all(section["polygon_uv"] == [] for section in crop["sections"])
+
+
+def test_reviewed_cuts_reject_a_detached_cluster_and_share_displaced_station(tmp_path):
+    station, angle = np.meshgrid(np.linspace(0, .7, 60), np.linspace(1.22, 1.43, 45))
+    detached = np.column_stack((station.ravel(), 3 * np.cos(angle.ravel()), 3 * np.sin(angle.ravel())))
+    config, _ = setup_plan(
+        tmp_path, np.concatenate((straight_cloud(12), detached)), [[0, 0, 0], [12, 0, 0]],
+    )
+    baseline_folder = tmp_path / "baseline"
+    baseline = propose_crops(config, baseline_folder)
+    old = json.loads((baseline_folder / baseline["crops"][0]["crop_id"] / "crop.json").read_text())
+    assert np.linalg.norm(old["sections"][0]["polygon_uv"], axis=1).max() > 2.5
+
+    spec = json.loads(config.read_text())
+    spec["section_overrides"] = [
+        {"passage": 1, "cut": 0, "station": .25, "contour": "connected"},
+        {"passage": 1, "cut": 1, "station": 6.5},
+    ]
+    config.write_text(json.dumps(spec))
+    reviewed = tmp_path / "reviewed"
+    plan = propose_crops(config, reviewed)
+    first, second = [
+        json.loads((reviewed / record["crop_id"] / "crop.json").read_text())
+        for record in plan["crops"]
+    ]
+    assert np.linalg.norm(first["sections"][0]["polygon_uv"], axis=1).max() < 1.1
+    assert first["proposal"]["section_bins_supported"][0] == 16
+    assert first["proposal"]["cut_stations"][-1] == second["proposal"]["cut_stations"][0] == 6.5
+    assert first["sections"][-1]["point_xyz"] == second["sections"][0]["point_xyz"]
+    assert first["sections"][-1]["polygon_uv"] == (
+        np.asarray(second["sections"][0]["polygon_uv"])[::-1] * [1, -1]
+    ).tolist()
+
+
+def test_reviewed_connected_cut_keeps_two_complete_contours_pending(tmp_path):
+    inner = straight_cloud(12)
+    outer = inner * [1, 3.5, 3.5]
+    config, _ = setup_plan(
+        tmp_path, np.concatenate((inner, outer)), [[0, 0, 0], [12, 0, 0]], count=1,
+    )
+    spec = json.loads(config.read_text())
+    spec["section_overrides"] = [{"passage": 1, "cut": 0, "station": .25, "contour": "connected"}]
+    config.write_text(json.dumps(spec))
+    output = tmp_path / "ambiguous"
+    record, = propose_crops(config, output)["crops"]
+    crop = json.loads((output / record["crop_id"] / "crop.json").read_text())
+
+    assert crop["sections"][0]["polygon_uv"] == []
+    assert record["section_bins_supported"][0] == 16
+    assert "tampa_com_contornos_concorrentes" in record["review_reasons"]
+
+
+def test_section_override_cannot_cross_the_next_cut(tmp_path):
+    config, _ = setup_plan(tmp_path, straight_cloud(12), [[0, 0, 0], [12, 0, 0]])
+    spec = json.loads(config.read_text())
+    spec["section_overrides"] = [{"passage": 1, "cut": 0, "station": 7}]
+    config.write_text(json.dumps(spec))
+    output = tmp_path / "crossed"
+
+    with pytest.raises(ValueError, match="em ordem"):
+        propose_crops(config, output)
+    assert not output.exists()
