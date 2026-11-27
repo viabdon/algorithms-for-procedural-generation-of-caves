@@ -4,7 +4,8 @@ O relatório técnico explica a preparação dos recortes, os consertos e
 o estado atual das referências para a GAN. O histórico reúne as
 rodadas e indica onde conferir a evidência por recorte.
 [Relatório de voxelização](relatorio-voxelizacao.md) ·
-[Histórico das rodadas](historico-voxelizacao.md)
+[Histórico das rodadas](historico-voxelizacao.md) ·
+[Proposta de linha central por random walk](proposta-linha-central-random-walk.md)
 
 ## Manifesto ativo de galerias a 16 cm
 
