@@ -58,7 +58,7 @@ recebem um tratamento separado depois.
 ## Etapa 1: o caminhante
 
 O caminhante começa no ponto 0, numa extremidade do grafo, e avança em
-passos curtos. A cada passo ele avalia as direções possíveis com quatro
+passos curtos. A cada passo ele avalia as direções possíveis com cinco
 pesos:
 
 | Peso | Função |
@@ -67,6 +67,7 @@ pesos:
 | Inércia | Mantém uma angulação próxima da direção anterior, para ele seguir a galeria sem zigue-zague. |
 | Penalidade de ré | Dá um peso alto para voltar no sentido oposto, para ele não refazer o caminho. |
 | Medo das bordas | Afasta o caminhante das direções em que a parede está perto. |
+| Desvio da ramificação | Perto de um nó de ramificação, afasta o caminhante da direção da saída lateral. É menor que o medo das bordas. |
 
 ### Como o caminhante enxerga as bordas
 
@@ -85,16 +86,56 @@ perde peso e a direção oposta ganha. A correção é limitada pela inércia,
 para que o desvio não vire meia-volta. Quando o kernel está equilibrado,
 o caminhante está longe o suficiente das bordas e segue a guia.
 
+O mesmo mecanismo protege contra lacunas da nuvem. Uma falha no
+levantamento é sempre menor que a seção interna da galeria, então mesmo
+perto dela o kernel encontra os pontos da parede em volta. O setor da
+falha continua com mais pontos que o lado interno, e o caminhante tende
+a voltar para o meio da caverna.
+
 O resultado da etapa é a sequência de posições do caminhante, que vira
 o novo eixo da rota principal.
 
-### Ramificações
+### Ramificações na primeira passada
 
-Os nós de ramificação do grafo marcam onde há saídas laterais. A rota
-principal passa por esses pontos sem entrar nelas. Cada ramificação é
-percorrida depois por um caminhante próprio, que parte da rota principal
-e segue o ramo até a ponta. Como ligar esse ramo à rota principal e onde
-fica o novo nó de junção serão definidos nas etapas seguintes.
+Ao chegar numa ramificação, o caminhante encontra um espaço muito aberto
+e o kernel fica com pouca informação. Numa saída lateral pequena de uma
+galeria maior, o espaço extra fica do lado da ramificação. É por isso que
+a contração puxa o eixo para lá, e o caminhante seria puxado da mesma
+forma.
+
+O grafo atual já indica onde estão os nós de ramificação e para que lado
+sai cada ramo. Perto de um desses nós, a direção da saída lateral recebe
+o peso de desvio da ramificação. O caminhante não precisa ir para o lado
+oposto; ele só evita a direção do ramo e continua a linha principal. Esse
+peso é menor que o medo das bordas, para que uma parede próxima continue
+mandando no passo.
+
+```text
+          |  rota principal
+          |
+          +-----  ramificação: direção penalizada
+          |
+          |  o caminhante continua por aqui
+```
+
+### Checkpoints e segunda passada
+
+Cada nó de ramificação que o caminhante atravessa vira um checkpoint.
+O checkpoint guarda a posição em que ele passou pela junção e as direções
+dos ramos que ficaram para trás, tiradas do grafo atual.
+
+A primeira passada percorre toda a rota principal, de uma ponta à outra.
+Depois o caminhante volta a cada checkpoint e percorre os ramos que ainda
+não foram visitados. Nessa segunda passada, os pesos se invertem:
+
+- a direção do ramo, como o grafo atual o encontrou, passa a ser a guia;
+- os trechos já percorridos são penalizados, para que ele não refaça a
+  rota principal nem outro ramo.
+
+Um ramo que tenha suas próprias ramificações gera novos checkpoints, e o
+processo se repete até não sobrar ramo do grafo sem percurso. O ponto do
+checkpoint na rota principal é o candidato natural para o novo nó de
+junção.
 
 ## Etapas 2 e 3
 
@@ -114,10 +155,17 @@ serão definidas, depois de ver a etapa 1 em casos reais.
 - **Limiar de borda**: separar os pontos de ruído do interior da parede
   real. A densidade varia entre levantamentos (LAS de 5 cm, Indian
   Tunnel Full 1x e 10x).
-- **Lacunas na nuvem**: um setor vazio pode ser uma oclusão e não espaço
-  livre. Sem proteção, o caminhante sai da caverna por uma lacuna. A guia
-  da linha central e uma distância máxima ao grafo são candidatas a
-  limitar isso.
+- **Lacunas na nuvem**: o argumento de que a falha é menor que a seção
+  vale para as lacunas comuns. Vale conferir nos casos reais as entradas
+  abertas e as oclusões grandes do Indian Tunnel, onde a falha pode
+  chegar perto do calibre da galeria.
+- **Alcance do desvio da ramificação**: a que distância do nó o peso
+  começa a agir e como medir a direção do ramo no grafo (tangente no nó
+  ou média dos primeiros metros, já que o próprio grafo está deslocado
+  perto da junção).
+- **Rota principal versus ramo**: numa junção em Y simétrico, os dois
+  ramos têm calibre parecido e a escolha da rota principal decide qual
+  deles é penalizado.
 - **Critério de parada**: chegar à extremidade final, ficar preso entre
   paredes ou se afastar demais do grafo.
 
