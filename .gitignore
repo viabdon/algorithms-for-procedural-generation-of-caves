@@ -31,6 +31,9 @@ __pycache__/
 /results/volumes/*
 /models/checkpoints/*
 
+# Rascunho local dos resultados parciais do artigo
+/docs/relatorios/resultados-parciais-artigo.md
+
 # Ferramentas de src/cavegen/tools/: só o código e a documentação são versionados.
 # A entrada (data/processed/references) vem do PLY em data/, as saídas são
 # regeneradas e os artigos são das editoras.

@@ -606,3 +606,120 @@ O diagnóstico completo ficou em
 Em testes sintéticos, o ajuste corrigiu um eixo que atravessava parede
 quando havia duas âncoras e preservou o eixo original quando faltava uma.
 O ensaio em nuvens reais se restringiu a essas duas junções.
+
+#### Reexecução no inventário de recortes pendentes
+
+Em 27/11/2026, o inventário de 167 recortes sem volume do trecho original
+foi reprocessado a 16 cm com a auditoria dos eixos, a busca de estações
+para ramos curtos e o recentramento por âncoras. A triagem reproduziu
+as mesmas associações do piloto. Dos 167 recortes, 39 ficaram fora da
+busca por distância ao nó, 125 permaneceram associados a junções sem
+volume e três continuaram associados à junção 023 de Cascade de Môtiers.
+
+| Levantamento ou variante | Avaliações de junção | Ramo sem tampa válida | Combinações sem fechamento | Volume reproduzido |
+| --- | ---: | ---: | ---: | ---: |
+| Cascade de Môtiers | 24 | 18 | 5 | 1 |
+| Markov Spodmol | 28 | 24 | 4 | 0 |
+| Archamps PreEtroiture | 2 | 2 | 0 | 0 |
+| Indian Tunnel Full 10x | 7 | 7 | 0 | 0 |
+| Indian Tunnel Full 1x | 1 | 1 | 0 | 0 |
+| **Total** | **62** | **52** | **9** | **1** |
+
+A rodada terminou sem novos volumes. A junção 023 voltou a fechar com
+6.421 voxels de ar e três tampas, e a checagem pelo exterior passou.
+Entre as 61 avaliações que acionaram o recentramento, a busca examinou
+183 ocorrências de ramos incidentes, incluindo ramos que aparecem em
+junções diferentes. Em 123, a janela amostrada não cruzou parede.
+Em 56 faltaram duas âncoras válidas, em três faltou uma candidata em
+pelo menos uma fatia e em uma faltou um trajeto admissível entre as
+âncoras. Nenhum desses ramos teve seu eixo ajustado na rodada.
+
+A busca para ramos curtos encontrou duas tampas candidatas no ramo 26
+da junção 004 de Cascade, a 0,64 m e cerca de 0,775 m do nó. O piloto
+anterior não tinha estações elegíveis para esse ramo. A 004 permaneceu
+sem volume porque os ramos 27 e 28 continuaram sem tampas válidas.
+
+O lote usou `data/processed/experiments/juncoes_auto/inventario_16cm.json`
+com `--recenter-axes` e salvou `resultados.json`,
+`comparacao_com_piloto.json` e a reprodução pelos NPZs em
+`data/processed/experiments/juncoes_auto/recentramento_pendentes_16cm/`.
+
+#### Meta de recortes para o piloto da GAN
+
+A meta para o fold `holdout_indian_tunnel` é reunir 50 recortes
+distintos em grades nativas de 64³ com voxels de 16 cm. A partição
+continua por caverna.
+
+| Partição | Levantamentos | Auditados no manifesto inicial | Meta | Faltam |
+| --- | --- | ---: | ---: | ---: |
+| Treino | Archamps e Cascade de Môtiers | 26 | 30 | 4 |
+| Validação | Markov Spodmol | 8 | 10 | 2 |
+| Teste | Indian Tunnel | 1 | 10 | 9 |
+| **Total** | | **35** | **50** | **15** |
+
+Cada inclusão precisa reproduzir o flood fill pelo exterior, passar nas
+checagens de tampas e na triagem numérica do manifesto. Revisões de um
+mesmo trecho e variantes de densidade da mesma fonte contam uma vez.
+Os volumes de junção ficam registrados separadamente dos recortes de
+galeria que acionaram a busca.
+
+A primeira revisão adicional examina as variantes ainda não testadas
+pelos algoritmos de ramos curtos e recentramento. Em Indian Tunnel,
+24 dos 32 recortes pendentes têm falta de contorno como bloqueio inicial.
+Dez deles estão fora do alcance da busca por junções e ficam como
+prioridade para uma revisão de contornos no próprio trecho.
+
+Os dez recortes para inspeção estão no plano `auto_full10x_16cm_rev`:
+`ramo_001_001` a `ramo_001_008`, `ramo_008_003` e `ramo_009_001`.
+Os dois contornos estão ausentes em cada `crop_validacao.json`.
+A configuração atual de `ramo_001_001` e `ramo_008_003` já prevê
+uma grade de 64³. As outras oito grades excedem 64 em pelo menos
+um eixo e também precisam de revisão para entrar no piloto.
+
+Na conferência do acervo a 16 cm, o `ramo_001_008` de Archamps
+PreEtroiture passou na auditoria em 64³ e estava fora do manifesto
+inicial. Foram encontradas duas versões do mesmo trecho, uma com a
+nuvem original e outra com o PLY extraído. A nova auditoria incluiu
+apenas a versão da nuvem original, já descrita no histórico da busca
+de semente. O manifesto anterior foi preservado. A verificação de
+hashes e de separação por caverna confirmou uma única adição em cada
+um dos quatro folds, com todos os recortes anteriores preservados.
+
+No fold inicial, a revisão passou a **27 de treino, 8 de validação
+e 1 de teste**. Faltam **3, 2 e 9**, respectivamente. O manifesto
+revisado está em
+`data/processed/experiments/gan_piloto_16cm_revisao_recortes/splits.json`.
+
+#### Ensaio complementar com a nuvem Full 1x de Indian Tunnel
+
+A conferência dos planos a 16 cm manteve o mesmo limite de 8 m
+ao nó na triagem. Nas configurações originais, 39 recortes
+ficaram sem junção elegível. Eram 8 de Archamps PreEtroiture,
+4 de Cascade, 12 de Markov e 15 de Indian Tunnel. Esses casos
+dependem de uma revisão no próprio trecho, pois o ajuste de eixos
+e a busca de estações para ramos curtos são chamados por junção.
+
+Entre as variantes de nuvem dos recortes pendentes, a Full 1x
+de Indian Tunnel tinha seis junções ainda sem avaliação com as
+duas rotinas. A rodada complementar usou 15 recortes como entrada
+para avaliar essas seis junções na nuvem mais densa. As cópias das
+configurações preservaram o grafo, a origem, os ramos, as estações e
+o voxel de 16 cm da rodada Full 10x. A junção 012 já tinha sido
+avaliada em Full 1x. Nas revisões disponíveis de Archamps, Cascade e
+Markov, a triagem encontrou os mesmos pares de nuvem e junção
+já avaliados.
+
+As seis junções (001, 002, 003, 004, 007 e 011) terminaram sem
+tampa válida em ao menos um ramo. A Full 1x reproduziu as mesmas
+contagens de tampas candidatas e de rejeições por ramo da Full 10x.
+O ramo curto 15 foi testado nas junções 007 e 011, com seis estações
+por junção rejeitadas por falta de contorno. Em 17 das 18 ocorrências
+de ramos, o eixo amostrado ficou livre da parede. O ramo 6 da
+junção 003 cruzou quatro voxels de parede e ficou sem duas âncoras.
+A rodada terminou sem ajuste de eixo ou novo volume.
+
+O inventário complementar e a triagem dos recortes distantes
+do nó estão em
+`data/processed/experiments/juncoes_auto/inventario_complemento_full1x_16cm/`.
+Os resultados por recorte e a comparação com a Full 10x ficaram em
+`data/processed/experiments/juncoes_auto/complemento_full1x_16cm/`.
