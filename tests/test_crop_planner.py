@@ -8,6 +8,7 @@ import pytest
 
 from cavegen.datastream.centreline import read_graph
 from cavegen.datastream.crop_planner import propose_crops
+from cavegen.datastream.crop_preview import write_crop_preview
 from cavegen.datastream.gallery_crop import prepare_crop, process_crop
 from cavegen.datastream.menu import main
 from cavegen.datastream.ply import iter_ply_xyz, read_ply_header
@@ -82,18 +83,27 @@ def test_racine_plan_builds_shared_caps_and_preview_is_a_separate_menu_action(tm
     assert [trace["name"] for trace in traces if trace["mode"] == "markers"] == [
         folder.name for folder in folders
     ]
-    caps = [trace for trace in traces if trace["mode"] == "lines"]
+    caps = [trace for trace in traces if trace["name"].startswith("Tampa ")]
     assert len(caps) == 4
     assert all(cap["visible"] == "legendonly" for cap in caps)
-    assert "Mostrar tampas" in html.read_text(encoding="utf-8")
+    axes = [trace for trace in traces if trace["name"].startswith("Linha central")]
+    assert [trace["name"] for trace in axes] == [f"Linha central · {folder.name}" for folder in folders]
+    assert all(axis["visible"] == "legendonly" for axis in axes)
+    for label in ("Mostrar tampas", "Mostrar linha central", "Ocultar linha central"):
+        assert label in html.read_text(encoding="utf-8")
 
+    answers = iter(["2", "6", "2", str(first.source), "0", "0"])
+    main()
+    assert capsys.readouterr().out.count("Prévia:") == 1
+    assert not (folders[1] / "recorte.html").exists()
+    (folders[0] / "recorte.html").unlink()
     answers = iter(["2", "6", "2", str(output / "plan.json"), "0", "0"])
     main()
     assert capsys.readouterr().out.count("Prévia:") == 2
     for folder in folders:
         traces = preview_traces(folder / "recorte.html")
         assert [trace["name"] for trace in traces] == [
-            folder.name, f"Tampa inicial · {folder.name}", f"Tampa final · {folder.name}"
+            folder.name, f"Linha central · {folder.name}", f"Tampa inicial · {folder.name}", f"Tampa final · {folder.name}"
         ]
     assert process_crop(first)["air_voxels"] > 0
 
@@ -223,6 +233,13 @@ def test_automatic_section_review_compares_the_source_and_updates_both_neighbour
     assert sum(original["filtered_bins"]) > sum(original["filtered_bins_above_min_radius"])
     winner = next(t for t in other_trials if t["station"] == shared["selected_station"])
     assert winner["spacing_ok"] and winner["connected_complete"]
+    assert winner["section"] == second["sections"][0]
+    assert "section" not in original
+    html = write_crop_preview(output / "plan.json", tmp_path / "candidatas.html")
+    traces = {trace["name"]: trace for trace in preview_traces(html)}
+    assert traces["Contornos candidatos"]["visible"] == "legendonly"
+    assert traces["Estações testadas"]["visible"] == "legendonly"
+    assert "Mostrar candidatas" in html.read_text(encoding="utf-8")
     assert first["proposal"]["cut_stations"][-1] == second["proposal"]["cut_stations"][0]
     assert first["sections"][-1]["point_xyz"] == second["sections"][0]["point_xyz"]
     np.testing.assert_allclose(first["sections"][-1]["inward_normal_xyz"],

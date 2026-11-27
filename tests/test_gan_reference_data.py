@@ -232,3 +232,34 @@ def test_gallery_proxy_cli_checks_native_size_and_preserves_audit(tmp_path):
     audit = json.loads((output / "reference_audit.json").read_text())
     assert all("incompatible_native_shape" in row["issues"] for row in audit["records"])
     assert not (output / "splits.json").exists()
+
+
+def test_gallery_air_window_reproduces_native_air_and_is_bound_to_manifest(tmp_path):
+    from cavegen.training.gallery_reference_data import audit_gallery_references
+    from cavegen.training.reference_data import canonical_hash, gallery_training_air
+
+    plans = write_gallery_plans(tmp_path)
+    folder = tmp_path / plans[0] / "gallery" / "16x16x16"
+    padding = [(0, 0), (0, 0), (3, 4)]
+    air, metadata, _ = read_reference(folder / "interior.npz")
+    surface, _, _ = read_reference(folder / "surface.npz")
+    metadata["seed_zyx"][2] += 3
+    native = np.pad(air, padding)
+    save_volume_npz(Volume3D(native, metadata), folder / "interior.npz")
+    save_surface_npz(np.pad(surface, padding), folder / "surface.npz", metadata)
+    with np.load(folder / "masks.npz") as archive:
+        masks = {name: np.pad(mask, padding if mask.ndim == 3 else [(0, 0), *padding])
+                 for name, mask in archive.items()}
+    np.savez_compressed(folder / "masks.npz", **masks)
+
+    audit = audit_gallery_references(tmp_path, plans, resolution=16, voxel_size=.28, fit_air_grid=True)
+    splits = make_splits(audit)
+    rows = verify_splits(splits, tmp_path, "holdout_indian_tunnel")
+    derived, = [row for row in rows if "air_window" in row]
+    fitted = gallery_training_air(native, derived)
+    zyx = np.argwhere(native) - derived["air_window"]["source_start_zyx"]
+    np.testing.assert_array_equal(np.argwhere(fitted), zyx)
+    derived["air_window"]["source_start_zyx"][2] += 1
+    splits["splits_id"] = canonical_hash({k: v for k, v in splits.items() if k != "splits_id"})
+    with pytest.raises(ValueError, match="air window disagrees"):
+        verify_splits(splits, tmp_path, "holdout_indian_tunnel")

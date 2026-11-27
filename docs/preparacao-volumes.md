@@ -80,7 +80,13 @@ se alguma abertura correspondia à continuação de uma passagem.
    Use **Mostrar tampas** para sobrepor todos os contornos disponíveis ou
    alterne uma extremidade pela legenda. Os contornos vêm do `crop.json` e
    ficam ocultos ao abrir o HTML. Extremidades sem polígono ficam sem contorno.
-   Um PLY avulso ainda pode ser visualizado individualmente.
+   Na coluna à esquerda, use **Mostrar linha central** para ver o eixo entre
+   as estações de cada recorte quando o grafo estiver disponível. **Mostrar candidatas**
+   sobrepõe os contornos tracejados da revisão de cortes e marca as estações
+   testadas cujo polígono não foi salvo. Passe o cursor para ver a estação,
+   a cobertura angular e o resultado da checagem de espaçamento. Os três
+   controles funcionam de forma independente. Um PLY informado no modo **2**
+   gera apenas a prévia individual daquele recorte.
 4. Revise o PLY, os alertas, os contornos e a semente do `crop.json`.
    Use a opção **2** para validar a configuração e, após a revisão, a
    opção **3** para voxelizar e aplicar o flood fill a um recorte ou ao

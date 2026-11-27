@@ -318,6 +318,40 @@ comuns. A auditoria refaz o flood fill com a superfície e as máscaras,
 verifica o contato com as duas tampas e registra os hashes da evidência.
 O loader exige `allow_candidate_proxy=True` para esses interiores.
 
+### Máscara derivada de ar para a grade da GAN
+
+Use `--fit-air-grid` na auditoria de galerias para incluir recortes
+que já fecharam na grade original e cujo ar cabe na grade cúbica
+escolhida. A auditoria reproduz primeiro o flood fill com a parede
+observada, as duas tampas, os reparos e a semente na grade original.
+Depois dessa checagem, o ajuste trabalha somente sobre a máscara
+booleana de ar que será entregue à GAN.
+
+Em eixos maiores que a grade de destino, uma janela de índices inteiros
+mantém todos os voxels de ar e pelo menos duas células livres de ar em
+cada ponta do eixo reduzido. Em eixos menores, o preenchimento falso é
+distribuído entre as pontas. Em eixos que já têm o tamanho pedido, as
+posições são mantidas. Cada voxel de ar passa para exatamente uma
+célula na grade derivada. A escala física e as distâncias entre voxels
+de ar são preservadas. O ajuste permite usar uma grade compacta para
+o modelo mesmo quando a parede observada, as tampas e a margem
+necessária ao flood fill exigem mais espaço.
+
+O manifesto aponta para o NPZ nativo, guarda os hashes das evidências
+da auditoria e registra a forma original, os intervalos ZYX de origem,
+a posição de destino, a contagem de voxels de ar e os hashes binários
+da máscara original e da derivada. O carregador refaz essa transformação
+determinística ao preparar o tensor. As métricas de triagem e a checagem
+de duplicatas usam a máscara efetivamente entregue ao modelo.
+
+Para reproduzir a revisão do piloto, use os mesmos planos da auditoria
+de 16 cm e acrescente `--fit-air-grid`:
+
+```bash
+python -m cavegen.training.gallery_reference_data --plans PLANO_1 PLANO_2 \
+  --resolution 64 --voxel-size 0.16 --fit-air-grid --output PASTA_NOVA
+```
+
 A execução local em `data/processed/experiments/gan_piloto_28cm/`
 auditou 36 volumes do ensaio de 28 cm e reteve 34 na triagem numérica
 64³. No fold `holdout_indian_tunnel`, são 19 de treino, 13 de validação

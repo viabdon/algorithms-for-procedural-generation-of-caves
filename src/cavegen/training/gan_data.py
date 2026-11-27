@@ -13,7 +13,7 @@ from cavegen.training.gan_models import ModelConfig
 from cavegen.core.volume import Volume3D
 from cavegen.metrics import evaluate_structure
 from cavegen.training.reference_data import (
-    CANDIDATE_SEMANTIC, VALID_SEMANTIC, read_reference, verify_splits,
+    CANDIDATE_SEMANTIC, VALID_SEMANTIC, gallery_training_air, read_reference, verify_splits,
 )
 
 
@@ -24,7 +24,7 @@ def encode_volume(data: np.ndarray, config: ModelConfig) -> np.ndarray:
     this is a discrete signed distance surrogate, not a continuous surface SDF.
     """
     if data.dtype != np.bool_ or data.shape != (config.resolution,) * 3:
-        raise ValueError("Expected boolean air at configured native resolution")
+        raise ValueError("Expected boolean air at configured model resolution")
     if config.representation == "occupancy":
         return data.astype(np.float32)
     if not data.any():
@@ -61,6 +61,7 @@ class ReferenceDataset(Dataset):
                 raise ValueError("Observed surfaces cannot be GAN air references")
             if semantic == CANDIDATE_SEMANTIC and not allow_candidate_proxy:
                 raise ValueError("Candidate flood-fill air: explicitly enable the proxy experiment")
+            data = gallery_training_air(data, row)
             metrics = evaluate_structure(Volume3D(data))
             if metrics.largest_component_voxels < 64 or (metrics.distance_max or 0) < 2:
                 raise ValueError(f"Insufficient resolved cave interior: {row['path']}; "

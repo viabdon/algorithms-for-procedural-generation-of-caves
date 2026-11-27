@@ -723,3 +723,148 @@ do nó estão em
 `data/processed/experiments/juncoes_auto/inventario_complemento_full1x_16cm/`.
 Os resultados por recorte e a comparação com a Full 10x ficaram em
 `data/processed/experiments/juncoes_auto/complemento_full1x_16cm/`.
+
+#### Inspeção visual e aberturas documentadas de Indian Tunnel
+
+Na inspeção do Plotly do plano `auto_full10x_16cm_rev`, os trechos
+vistos nas duas pontas exibiram mais descontinuidades na parede. O
+trecho intermediário mostrado no ramo 002 apresentou superfície mais
+contínua. A prévia usa uma amostra da nuvem e a identificação de cada
+abertura física depende da correspondência entre o mapa e os recortes.
+A NASA descreve Indian Tunnel como um tubo de lava com colapsos e
+claraboias e informa que o levantamento CAVES cobriu partes do
+interior. Seu interesse como referência vem de uma origem geológica
+distinta das outras cavernas do piloto.
+[NASA Planetary Pits and Caves Analog Dataset](https://ti.arc.nasa.gov/dataset/caves/)
+
+O mapa da página 4 do suplemento da CMU marca seis locais
+levantados. A entrada norte coincide com o colapso 1. Aparecem
+também a entrada pela escada, os colapsos 2, 3 e 4 e a saída sul.
+O croqui sugere uma divisão perto da entrada pela escada. A
+correspondência com o grafo estimado e com os recortes ainda precisa
+ser estabelecida. As coordenadas UTM da tabela na página 3 são
+dos pontos de estação dos escaneamentos de superfície. O plano
+trabalha nas coordenadas locais da nuvem subterrânea.
+[Suplemento cartográfico do levantamento](https://ti.arc.nasa.gov/dataset/caves/data/COTM_Supplemental_Info.pdf#page=4)
+
+No ramo 002, o traço visto no fim de `ramo_002_002` e no início de
+`ramo_002_003` corresponde ao mesmo corte, fixado a 12,45 m, com
+16 setores sustentados no plano. Nos cortes vizinhos, a busca chegou
+a 14 setores em algumas estações, mas falhou na checagem de contorno
+completo. Já a varredura independente de perfis do ramo 002 encontrou
+suporte entre 33,12 e 34,40 m e desse ensaio saiu o único volume de
+teste em 64³ a 16 cm. A revisão visual do trecho intermediário deve
+considerar tanto a escolha da estação quanto o suporte angular da
+parede.
+
+Na vista individual de `ramo_002_003`, o eixo estimado aparece
+próximo a uma parede lateral e se vê uma descontinuidade na parte
+inferior da nuvem. Para conferir se o recorte tinha retirado esses
+pontos, foram comparadas fatias da Full 10x original e dos PLYs
+vizinhos, com 32 cm de cada lado dos planos e células de 1 m na
+projeção transversal de inspeção. A 17,00 m, a região inferior
+descontínua aparece nas duas fontes. Nessa fatia foram contados
+43.866 pontos na Full 10x e 43.729 nos PLYs. A 22,50 m também
+aparecem lacunas inferiores. A 28,00 m há uma faixa inferior
+contínua nessa escala de inspeção, e a 33,76 m há pontos que
+ligam as duas paredes pela parte inferior. A evidência indica
+lacunas locais de cobertura que variam ao longo do ramo. O mapa
+de superfície documenta os acessos e colapsos e deixa em aberto
+a causa das lacunas no piso. Uma tampa de extremidade e o
+recentramento, por si sós, deixam essa parte da parede sem
+evidência medida.
+
+O HD contém `Section1/IndianTunnel_1.f32` com 11.800.438 pontos
+e `Section2/IndianTunnel_2.f32` com 10.573.581. A amplitude vertical
+nos eixos dos arquivos é de 2,64 m e 1,86 m, respectivamente, e são
+coberturas locais do mesmo levantamento. O ensaio anterior com as
+duas seções junto da Full 10x manteve oito fugas. O arquivo
+`Wall/IndianTunnel_Wall.f32` tem 4.339.760 pontos e corresponde ao
+painel de parede descrito no suplemento, útil para inspecionar
+detalhe de superfície.
+
+Depois da reorganização dos arquivos no HD, a Full 10x está em
+`RAW/IndianTunnel/Full/IndianTunnel_full_10x.f32`. O plano arquivado
+ainda referencia o caminho anterior com `IndianTunnel_cave/`. A
+inspeção usa os PLYs já extraídos e uma nova extração precisa apontar
+para a localização atual da nuvem original.
+
+### Escala física da nuvem Elaphes
+
+A leitura dos primeiros 64 KiB do LAZ original do LIRIS confirmou
+um cabeçalho LAS 1.2 com 94.465.067 pontos e limites XYZ que coincidem
+com os do PLY local até a precisão do registro versionado. O
+cabeçalho não declara um sistema de referência ou uma unidade física.
+Os fatores de escala do LAS decodificam os inteiros armazenados.
+
+O 3D Tiles original do LIRIS usa como translação os mínimos XYZ
+do LAZ e mantém uma transformação linear identidade. A variante
+posicionada em Lyon também aplica apenas translação. Como a
+especificação 3D Tiles 1.0 usa metros para distâncias lineares,
+o vínculo entre os formatos sustenta interpretar os XYZ locais
+do PLY em metros para o piloto de 16 cm.
+[Dados do LIRIS](https://dataset-dl.liris.cnrs.fr/elaphes-cave/)
+[Metadados do 3D Tiles original](https://dataset-dl.liris.cnrs.fr/elaphes-cave/Exp-Cloud-ELAPHS-94M-3DTiles/tileset.json)
+[Especificação OGC 3D Tiles 1.0](https://docs.ogc.org/cs/18-053r2/18-053r2.html)
+
+O capítulo de Hobléa e Philippe descreve a morfologia e o contexto
+cárstico e dá coordenadas e altitudes para duas entradas. Ele pode
+orientar uma conferência com pontos reconhecíveis, mas a evidência
+da escala do PLY vem dos arquivos do levantamento digital.
+[Le contexte karstologique](https://www.persee.fr/doc/mhnly_1627-3516_2001_num_2_1_1316)
+
+O piloto de Elaphes selecionou três recortes nos ramos 003 e 006
+do grafo podado da galeria exploratória. O planejamento usa voxels
+de 16 cm e consulta até oito voxels de cada lado de uma estação
+pendente. A etapa de voxelização usa a busca de semente do fluxo
+padrão e pode tentar tampas auxiliares com raio de até quatro voxels.
+A partição de teste de Elaphes ficou em um inventário local da
+execução, separado dos folds de Indian Tunnel.
+
+Depois da primeira leitura de teste do PLY ASCII, o fluxo passou
+a usar uma cópia binária XYZ do mesmo levantamento para acelerar
+as leituras sucessivas. A conversão conserva a ordem das observações
+e usa a mesma precisão float32 do leitor PLY da Datastream.
+O plano local e os resultados por recorte ficam em
+`data/processed/experiments/elaphes_piloto_binario_16cm/`.
+
+| Recorte de Elaphes | Grade original ZYX | Resultado |
+| --- | --- | --- |
+| `ramo_003_001` | 64×64×76 | Fuga com alerta de passagem próxima ou retorno |
+| `ramo_006_001` | 64³ | Fuga com alerta de passagem próxima ou retorno |
+| `ramo_006_002` | 64³ | 7.334 voxels de ar, sem reparo ou tampa auxiliar |
+
+As seis extremidades tiveram suporte nos 16 setores. No
+`ramo_006_002`, o flood fill pelo exterior voltou a isolar o
+mesmo ar. Remover qualquer uma das duas tampas de extremidade
+reabriu o volume. O `reference_audit.json` local aprovou esse
+recorte na triagem da GAN com sua grade nativa de 16 cm. Ele
+permanece como candidato a teste externo de Elaphes, em produto
+separado do manifesto de Indian Tunnel.
+
+### Ampliação do manifesto com máscaras de ar derivadas
+
+A rodada usou `--fit-air-grid` nos mesmos 11 planos do manifesto
+revisado a 16 cm. Os 36 recortes já aceitos foram preservados e
+entraram mais dois de Archamps. A tabela registra a grade na qual
+cada candidato foi fechado e auditado e a janela de 64³ usada
+somente como entrada da GAN.
+
+| Levantamento | Recorte | Grade original ZYX | Início da janela ZYX | Voxels de ar preservados |
+| --- | --- | --- | --- | ---: |
+| Archamps PostEtroiture | `ramo_001_005` | 64×64×68 | (0, 0, 2) | 12.455 |
+| Archamps PreEtroiture | `ramo_002_007` | 64×64×70 | (0, 0, 3) | 13.796 |
+
+O fold `holdout_indian_tunnel` passa a **29 treino, 8 validação
+e 1 teste**, totalizando 38. Faltam **1, 2 e 9**, respectivamente,
+para a meta de 50. Nos 46 volumes dos planos selecionados, oito
+excederam a janela ou ficariam com margem insuficiente. A varredura
+adicional em outros planos auditou 35 versões já salvas sem encontrar
+outro recorte elegível fora do manifesto. O plano piloto antigo de
+PostEtroiture contém mais de uma versão de um mesmo identificador
+e foi sinalizado na varredura. As seis propostas revisadas de
+PostEtroiture já pertencem aos planos selecionados.
+
+O manifesto e o relatório completo ficam em
+`data/processed/experiments/gan_piloto_16cm_mascaras_ar/`.
+[Método e reprodução da máscara de ar](README.md#máscara-derivada-de-ar-para-a-grade-da-gan)

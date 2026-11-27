@@ -20,6 +20,7 @@ SCHEMA = "gan-reference-audit-v1"
 CANDIDATE_SEMANTIC = "true_means_enclosed_unobserved_voxel"
 VALID_SEMANTIC = "true_means_cave_air"
 GALLERY_EVIDENCE = ("surface.npz", "masks.npz")
+AIR_WINDOW_MARGIN = 2
 
 
 def sha256_file(path: str | Path) -> str:
@@ -36,6 +37,53 @@ def canonical_hash(value: Any) -> str:
 
 def voxel_hash(data: np.ndarray) -> str:
     return hashlib.sha256(str(data.shape).encode() + np.packbits(data).tobytes()).hexdigest()
+
+
+def fit_gallery_air(data: np.ndarray, resolution: int) -> tuple[np.ndarray, dict]:
+    """Window or pad an audited air mask with integer translations and no resampling."""
+    if type(resolution) is not int or resolution <= 0:
+        raise ValueError("Invalid air window resolution")
+    source, target = [], []
+    for axis, extent in enumerate(data.shape):
+        start, stop, pad = 0, extent, 0
+        if extent > resolution:
+            other_axes = tuple(i for i in range(3) if i != axis)
+            occupied = np.flatnonzero(data.any(axis=other_axes))
+            if not occupied.size:
+                raise ValueError("Empty gallery air mask")
+            first, last = int(occupied[0]), int(occupied[-1])
+            lower = max(0, last + AIR_WINDOW_MARGIN + 1 - resolution)
+            upper = min(extent - resolution, first - AIR_WINDOW_MARGIN)
+            if lower > upper:
+                raise ValueError("Gallery air does not fit with exterior margin")
+            start = min(max((first + last + 1 - resolution) // 2, lower), upper)
+            stop = start + resolution
+        elif extent < resolution:
+            pad = (resolution - extent) // 2
+        source.append(slice(start, stop))
+        target.append(slice(pad, pad + stop - start))
+    fitted = np.zeros((resolution,) * 3, dtype=bool)
+    fitted[tuple(target)] = data[tuple(source)]
+    if np.count_nonzero(fitted) != np.count_nonzero(data):
+        raise ValueError("Gallery air window changed the air count")
+    return fitted, {
+        "method": "integer_window_v1", "resolution": resolution, "native_shape_zyx": list(data.shape),
+        "native_voxel_sha256": voxel_hash(data), "source_start_zyx": [s.start for s in source],
+        "source_stop_zyx": [s.stop for s in source], "target_start_zyx": [s.start for s in target],
+        "air_voxels": int(np.count_nonzero(data)),
+    }
+
+
+def gallery_training_air(data: np.ndarray, row: dict) -> np.ndarray:
+    if "air_window" not in row:
+        return data
+    window = row["air_window"]
+    if "gallery_evidence" not in row or not isinstance(window, dict):
+        raise ValueError("Invalid gallery air window")
+    fitted, actual = fit_gallery_air(data, window.get("resolution"))
+    if actual != window:
+        raise ValueError("Gallery air window disagrees with source")
+    return fitted
 
 
 def read_reference(path: str | Path) -> tuple[np.ndarray, dict, str]:
@@ -194,7 +242,8 @@ def make_splits(audit: dict) -> dict:
                                    "geometry_screen_passed": r["geometry_screen_passed"],
                                    "candidate": r["candidate"], "split": assignments[r["group"]],
                                    **({"gallery_evidence": r["gallery_evidence"]}
-                                      if "gallery_evidence" in r else {})}
+                                      if "gallery_evidence" in r else {}),
+                                   **({"air_window": r["air_window"]} if "air_window" in r else {})}
                                   for r in records]})
     result = {"schema": "gan-cave-splits-v1", "audit_id": audit["audit_id"],
               "unit_of_independence": "cave", "folds": folds,
@@ -229,7 +278,7 @@ def verify_splits(splits: dict, root: str | Path, fold_id: str) -> list[dict]:
         if sha256_file(path) != row["sha256"]:
             raise ValueError(f"Changed reference file: {row['path']}")
         data, metadata, key = read_reference(path)
-        if key != "data" or voxel_hash(data) != row["voxel_sha256"]:
+        if key != "data" or voxel_hash(gallery_training_air(data, row)) != row["voxel_sha256"]:
             raise ValueError("Reference voxel identity mismatch")
         if "gallery_evidence" in row:
             evidence = row["gallery_evidence"]

@@ -264,14 +264,19 @@ def _review_sections(groups, passages, index, size, spec, batches):
             radii, complete = _fit_contour(uv, size, connected=True)
             coverage = int(np.isfinite(radii).sum())
             fits = bool(lo - 1e-10 * size <= trial.station <= hi + 1e-10 * size)
-            records.append({
+            record = {
                 "station": trial.station, "spacing_ok": fits,
                 "raw_bins": trial.counts[0].tolist(),
                 "raw_bins_above_min_radius": trial.counts[1].tolist(),
                 "filtered_bins": trial.counts[2].tolist(),
                 "filtered_bins_above_min_radius": trial.counts[3].tolist(),
                 "connected_bins_supported": coverage, "connected_complete": complete,
-            })
+            }
+            if complete:
+                candidate = _Boundary(trial.station)
+                _set_boundary(candidate, trial.station, (trial.point, trial.direction, trial.u), radii, True)
+                record["section"] = _section(candidate, end=False)
+            records.append(record)
             if fits and complete and selected is None:
                 selected = trial, radii
             if trial.station == before:

@@ -13,7 +13,7 @@ from cavegen.core.volume import Volume3D
 from cavegen.datastream.gallery_reports import audit_flood_fill
 from cavegen.metrics import evaluate_structure
 from cavegen.training.reference_data import (
-    GALLERY_EVIDENCE, canonical_hash, make_splits, read_reference, sha256_file, voxel_hash,
+    GALLERY_EVIDENCE, canonical_hash, fit_gallery_air, make_splits, read_reference, sha256_file, voxel_hash,
 )
 
 
@@ -45,7 +45,7 @@ def _check_air(path: Path, data: np.ndarray, metadata: dict) -> list[str]:
 
 
 def audit_gallery_references(
-    root: str | Path, plans: list[str], *, resolution: int, voxel_size: float,
+    root: str | Path, plans: list[str], *, resolution: int, voxel_size: float, fit_air_grid: bool = False,
 ) -> dict:
     """Verify save artifacts and retain members of one native grid and scale."""
     if resolution <= 0 or not np.isfinite(voxel_size) or voxel_size <= 0:
@@ -76,11 +76,19 @@ def audit_gallery_references(
             seen.add(identity)
 
             issues = _check_air(path, data, metadata)
-            metrics = evaluate_structure(Volume3D(data))
-            if data.shape != (resolution,) * 3:
-                issues.append("incompatible_native_shape")
             if config.get("voxel_size") != voxel_size:
                 issues.append("incompatible_voxel_size")
+            native_shape = list(data.shape)
+            window = None
+            if data.shape != (resolution,) * 3:
+                if fit_air_grid and not issues:
+                    try:
+                        data, window = fit_gallery_air(data, resolution)
+                    except ValueError:
+                        issues.append("air_window_exceeds_target_or_margin")
+                else:
+                    issues.append("incompatible_native_shape")
+            metrics = evaluate_structure(Volume3D(data))
             if metrics.largest_component_voxels < 64 or (metrics.distance_max or 0) < 2:
                 issues.append("insufficient_resolved_interior_geometry")
             digest = voxel_hash(data)
@@ -95,7 +103,8 @@ def audit_gallery_references(
                                      for filename in GALLERY_EVIDENCE},
                 "candidate": True, "eligible_proxy": not issues,
                 "geometry_screen_passed": not issues, "issues": issues,
-                "shape_zyx": list(data.shape), "voxel_size": config.get("voxel_size"),
+                "shape_zyx": native_shape, "voxel_size": config.get("voxel_size"),
+                **({"air_window": window} if window else {}),
                 "crop_id": identity[2], "structure": metrics.to_record(),
                 "repair_voxels": metadata.get("repair_voxels"),
                 "auxiliary_cap_voxels": metadata.get("auxiliary_cap_voxels"),
@@ -118,11 +127,14 @@ def main(argv: list[str] | None = None) -> None:
     parser.add_argument("--plans", nargs="+", required=True, help="Plan directories relative to root")
     parser.add_argument("--resolution", type=int, required=True)
     parser.add_argument("--voxel-size", type=float, required=True)
+    parser.add_argument("--fit-air-grid", action="store_true",
+                        help="Fit audited air to the training grid without resampling.")
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args(argv)
     if args.output.exists():
         parser.error("Choose a new output directory for the gallery proxy audit")
-    audit = audit_gallery_references(args.root, args.plans, resolution=args.resolution, voxel_size=args.voxel_size)
+    audit = audit_gallery_references(args.root, args.plans, resolution=args.resolution,
+                                     voxel_size=args.voxel_size, fit_air_grid=args.fit_air_grid)
     args.output.mkdir(parents=True)
     (args.output / "reference_audit.json").write_text(
         json.dumps(audit, ensure_ascii=False, indent=2, allow_nan=False) + "\n", encoding="utf-8"
