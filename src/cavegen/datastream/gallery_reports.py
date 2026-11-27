@@ -83,13 +83,15 @@ def audit_flood_fill(
                         "match", count=int(np.count_nonzero(isolated))))
     if require_cap_contact:
         adjacent = binary_dilation(isolated)
-        for name, cap in zip(("air_reaches_initial_cap", "air_reaches_final_cap"), caps):
-            checks.append(check(name, bool((adjacent & cap).any()), True))
+        for index, cap in enumerate(caps):
+            name = ("initial_cap", "final_cap")[index] if len(caps) == 2 else f"cap_{index + 1}"
+            checks.append(check(f"air_reaches_{name}", bool((adjacent & cap).any()), True))
     overlap = int(np.count_nonzero(repair & (original | air)))
     checks.append(check("repair_overlap", overlap, 0, count=overlap))
-    for index, name in enumerate(("remove_initial_cap", "remove_final_cap")):
-        reduced = surface | caps[1 - index] | additions
-        checks.append(check(name, _seed_state(classify_surface_by_flood_fill(reduced), seed)))
+    for index in range(len(caps)):
+        name = ("initial_cap", "final_cap")[index] if len(caps) == 2 else f"cap_{index + 1}"
+        reduced = surface | caps[np.arange(len(caps)) != index].any(axis=0) | additions
+        checks.append(check(f"remove_{name}", _seed_state(classify_surface_by_flood_fill(reduced), seed)))
     for voxel in map(tuple, np.argwhere(repair)):
         reduced = original | additions
         reduced[voxel] = original[voxel]
@@ -284,7 +286,9 @@ def replay_checks(folder: Path) -> Path:
             surface, masks["caps"], repair, tuple(interior.metadata["seed_zyx"]), interior.data,
             auxiliary=masks.get("auxiliary_caps"),
             expected_original="exterior" if repair.any() or np.any(masks.get("auxiliary_caps", False)) else "interior",
-            require_cap_contact=bool(interior.metadata.get("seed_search", {}).get("selected_xyz")),
+            require_cap_contact=len(masks["caps"]) > 2 or bool(
+                interior.metadata.get("seed_search", {}).get("selected_xyz")
+            ),
         )
     reports = folder / REPORT_FOLDER
     legacy = folder / LEGACY_REPORT_FOLDER

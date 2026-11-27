@@ -316,3 +316,157 @@ radial e o uso da mesma seção nos dois vizinhos. Os resultados dos
 lotes reais foram preservados como referência para uma nova execução.
 [Revisão de contornos](../../planejamento-recortes-voxelizacao.md#revisão-de-contornos-no-planejador) ·
 [Busca automática da semente](../../planejamento-recortes-voxelizacao.md#busca-automática-quando-a-semente-cai-na-barreira)
+
+### Resultado das 58 tentativas com as nuvens originais
+
+A rodada usou os levantamentos originais a 16 cm e retomou os sete
+planos que tinham ficado bloqueados pela ausência do HD. A revisão
+de contornos buscou estações a até oito voxels (1,28 m) em cada
+direção, quando havia espaço suficiente entre cortes. A busca de
+sementes usou raio de quatro voxels (64 cm). A tabela usa o recorte
+como unidade e conta uma vez cada caso do inventário pendente.
+
+| Bloqueio inicial | Tentativas | Volumes reproduzidos pelo exterior | Sem volume |
+| --- | ---: | ---: | ---: |
+| Contorno de extremidade ausente | 44 | 0 | 44 |
+| Semente na barreira | 14 | 1 | 13 |
+| **Total** | **58** | **1** | **57** |
+
+Nos 44 recortes sem contorno válido, 41 ficaram sem os dois
+polígonos e três ficaram sem um deles. Ao reunir as extremidades
+compartilhadas, são **67 cortes distintos**. A preparação interrompeu
+esses recortes na validação do polígono, antes de rasterizar as
+tampas ou iniciar o flood fill. As falhas se distribuem em dois
+recortes de Cascade de Môtiers, 18 de Markov Spodmol e 24 do Indian
+Tunnel.
+
+#### O que limitou os 67 cortes
+
+Para cada corte, foram conferidos os diagnósticos `section_reviews`
+do plano novo. Um setor conta como sustentado quando tem pelo menos
+dois pontos na etapa considerada. A tabela usa o melhor número de
+setores obtido nas estações testadas em cada etapa. Cada corte
+entrou uma vez, na primeira condição aplicável.
+
+| Evidência nos diagnósticos | Cortes |
+| --- | ---: |
+| A faixa da nuvem original ficou abaixo de 14 setores sustentados mesmo antes de aplicar o raio mínimo. | 55 |
+| A faixa original atingiu 14 setores, mas a seleção por ramo e estação ficou abaixo desse limite após o filtro de raio. | 6 |
+| O conjunto filtrado atingiu 14 setores, mas o ajuste por um componente conectado da amostra ficou abaixo desse limite. | 3 |
+| O ajuste conectado atingiu 14 setores, porém nenhuma estação passou na regra de contorno completo. | 2 |
+| Houve contorno completo em uma estação que violava a distância mínima entre cortes. | 1 |
+
+O raio mínimo, isoladamente, ficou sem caso nesta classificação.
+Nos três casos abaixo do limite no ajuste conectado, os diagnósticos
+registram a cobertura obtida, que depende do agrupamento e da
+amostragem. Nos dois com 14 setores e ajuste rejeitado, o registro
+por estação guarda a cobertura e a aprovação, com informação
+insuficiente para separar lacunas consecutivas de componentes
+concorrentes. Nos 55 cortes com cobertura angular insuficiente já
+na fonte, a medição se refere às faixas e estações testadas. A
+interpretação física depende da relação entre a nuvem e a linha
+central e da inspeção da abertura.
+
+Em Cascade, no início do `ramo_012_001`, a estação de 0,48 m
+registrou suporte em 16 setores na fonte e 11 nos pontos filtrados.
+No Indian Tunnel, o início do `ramo_006_001` teve contorno completo
+a 1,44 m, mas a estação deixaria menos de 1,28 m até o corte vizinho.
+[Regras de geração e espaçamento](../../planejamento-recortes-voxelizacao.md#revisão-de-contornos-no-planejador)
+
+#### O que ocorreu depois da busca de semente
+
+Cinco casos ficaram sem um voxel elegível no raio testado. Em oito,
+o algoritmo encontrou uma semente provisória, mas o flood fill
+continuou alcançando o exterior mesmo com as duas extremidades
+cobertas por planos temporários. Os oito tinham alerta
+`outra_passagem_ou_retorno_proximo`, que bloqueia o reparo local e
+as tampas auxiliares. A origem física dessas fugas continua em
+aberto.
+
+O `ramo_001_008` de Archamps PreEtroiture fechou com deslocamento
+de semente de 20,1 cm e 19 células de tampa auxiliar. O flood fill
+externo reproduziu 7.499 voxels de ar e contato com ambas as
+extremidades. Remover a tampa auxiliar reabriu a fuga.
+
+Os arquivos locais `voxelizacao_44_contornos.json` e
+`busca_sementes_originais.json`, em
+`data/processed/experiments/planejamento_auto_16cm/`, identificam
+cada recorte, sua configuração e o diagnóstico aplicável. O arquivo
+`comparacao_fontes_originais.json` conserva os resultados dos sete
+planos e as mudanças fora do inventário de 58 recortes.
+
+### Busca conjunta de tampas perto de bifurcações
+
+A rotina auxiliar usa o grafo para filtrar os recortes sem volume
+antes de ler a nuvem. Ela ajusta seções pela tangente de cada ramo,
+descarta conflitos entre polígonos e máscaras e testa um conjunto
+limitado de combinações. Os volumes de junção são armazenados
+separadamente dos recortes que acionaram o ensaio.
+[Método e parâmetros da busca conjunta](../../planejamento-recortes-voxelizacao.md#busca-conjunta-de-tampas-em-bifurcações)
+
+O inventário da rodada a 16 cm reuniu os 44 recortes sem contorno,
+os 13 casos de semente ainda sem volume, os 93 com aviso de
+passagem ambígua e os 17 que já tinham passado pela tentativa de
+fechamento anterior. O inventário e o resultado por recorte e
+junção ficam em `data/processed/experiments/juncoes_auto/`.
+
+Dos **167 recortes** de entrada, **39** ficaram fora da busca
+custosa pela distância ao nó mais próximo. Os demais apontaram
+para **61 nós distintos**. Foram 62 avaliações por fonte e nó,
+pois uma junção do Indian Tunnel entrou com as variantes Full
+10x e Full 1x.
+
+| Levantamento | Avaliações | Ramo sem tampa válida | Combinações sem fechamento | Fechou |
+| --- | ---: | ---: | ---: | ---: |
+| Cascade de Môtiers | 24 | 18 | 5 | 1 |
+| Markov Spodmol | 28 | 24 | 4 | 0 |
+| Archamps PreEtroiture | 2 | 2 | 0 | 0 |
+| Indian Tunnel Full 10x | 7 | 7 | 0 | 0 |
+| Indian Tunnel Full 1x | 1 | 1 | 0 | 0 |
+
+Nas 68 combinações avaliadas em 3D, 39 foram descartadas porque
+a barreira tocava a borda da grade, 28 vazaram e uma fechou.
+Três recortes de entrada levaram à mesma junção salva. Os desfechos
+originais desses recortes foram preservados. A checagem da
+junção foi reproduzida pelos NPZs, com a máscara de cada tampa
+rasterizada novamente a partir do polígono salvo.
+
+A `juncao_023` de Cascade de Môtiers, com os ramos 14, 15 e 16,
+havia vazado no ensaio anterior. As tampas estavam a
+aproximadamente 5,33 m, 1,28 m e 1,28 m do nó. Na busca conjunta,
+as distâncias escolhidas foram 1,28 m, 1,92 m e 1,92 m. Os
+polígonos e os voxels das três tampas ficaram disjuntos. Na
+grade ZYX de 43×46×52, o flood fill pelo exterior reproduziu
+6.421 voxels de ar no mesmo componente, em contato com as
+três tampas. A verificação foi numérica. A geometria inferida
+permanece como referência candidata.
+
+#### Pendências após a busca conjunta
+
+O inventário contém **218 recortes**, incluindo os ramos adicionais e
+contando cada recorte uma vez entre revisões. **51 têm alguma versão
+fechada e 167 permanecem sem um volume do trecho original**. A junção
+023 foi salva como um volume próprio. Os três recortes que acionaram
+essa busca continuam na contagem das pendências.
+
+| Bloqueio atual | Recortes | O que já foi tentado | Resultado da triagem de junções |
+| --- | ---: | --- | --- |
+| Falta contorno em uma ou ambas as extremidades | 44 | Comparação com a nuvem original, busca de estações, recentragem e ajuste de contorno por componente conectado. Ao fim, 41 ficaram sem as duas tampas e três sem uma. | 34 associados a junções sem volume. 10 fora da busca por distância ao nó. |
+| Semente na barreira sem posição alternativa aceita | 5 | Classificação pelo exterior e busca em até quatro voxels por ar interno entre tampas ou por uma janela local fechada. | 4 associados a junções sem volume. 1 fora da busca por distância ao nó. |
+| Fuga com alerta de passagem próxima ou retorno | 101 | Diagnóstico com planos temporários, busca da rota de fuga e consulta à nuvem original. Inclui os oito casos em que o reposicionamento da semente revelou uma fuga. O alerta bloqueou o reparo automático no recorte. | 87 associados a junções sem volume. 11 fora da busca por distância ao nó. 3 associados à mesma junção 023 salva. |
+| Fuga persistente após a tentativa de tampa auxiliar | 17 | Reparo local e busca de tampa sintética com raio de até quatro voxels, sem fechamento aceito. | Os 17 ficaram fora da busca por distância ao nó. |
+| **Total pendente** | **167** | | **125** associados a junções sem volume, **39** fora da busca e **3** associados à junção salva. |
+
+| Levantamento | Recortes sem volume do trecho original |
+| --- | ---: |
+| Archamps PostEtroiture | 0 |
+| Archamps PreEtroiture | 11 |
+| Cascade de Môtiers | 57 |
+| Markov Spodmol | 67 |
+| Indian Tunnel | 32 |
+| **Total** | **167** |
+
+As linhas usam o desfecho da configuração considerada para cada
+recorte no inventário. Há versões anteriores com desfechos
+diferentes, como o `ramo_042_002` de Cascade, cuja tentativa de tampa
+auxiliar antecedeu o alerta de passagem ambígua.

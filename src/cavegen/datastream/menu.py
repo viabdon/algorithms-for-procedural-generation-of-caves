@@ -114,7 +114,8 @@ def _voxelizar_recorte(crop: "GalleryCrop", prefix: str = "") -> None:
 
 
 def _voxelizar_conjunto(path: Path) -> None:
-    from cavegen.datastream.gallery_crop import prepare_crop
+    from cavegen.datastream.gallery_crop import CropGeometryError, prepare_crop
+    from cavegen.datastream.junction_fallback import OUTCOMES, attempt_failed_crops
 
     root = path.parent if path.name == "plan.json" and path.is_file() else path
     if not root.is_dir():
@@ -129,6 +130,7 @@ def _voxelizar_conjunto(path: Path) -> None:
         return
 
     completed = skipped = failed = 0
+    pending = []
     for index, config in enumerate(configs, start=1):
         prefix = f"[{index}/{total} {config.parent.name}] "
         try:
@@ -143,11 +145,16 @@ def _voxelizar_conjunto(path: Path) -> None:
         except (OSError, ValueError, TypeError, KeyError) as error:
             failed += 1
             print(f"{prefix}Não foi possível concluir: {error}", flush=True)
+            if isinstance(error, CropGeometryError) and error.outcome in OUTCOMES:
+                pending.append((config, error.outcome))
     print(f"Lote: {completed} volumes salvos, {skipped} pulados, {failed} sem volume.")
+    if pending:
+        print(f"Triagem de junções para {len(pending)} recortes sem volume.", flush=True)
+        attempt_failed_crops(pending, progress=lambda message: print(message, flush=True))
 
 
 def _crop_menu() -> None:
-    from cavegen.datastream.gallery_crop import CROP_FORMATS, inspect_crop, prepare_crop
+    from cavegen.datastream.gallery_crop import CROP_FORMATS, CropGeometryError, inspect_crop, prepare_crop
     from cavegen.datastream.crop_planner import default_plan_destination, propose_crops, read_plan_config
     from cavegen.datastream.crop_preview import (
         CROP_PREVIEW_NAME,
@@ -246,10 +253,23 @@ def _crop_menu() -> None:
                 if mode == "1":
                     path = _ask(f"JSON do recorte (modelo em {template}; Enter para cancelar)")
                     if path:
-                        crop = prepare_crop(_path(path))
-                        _print_crop_summary(crop)
-                        if _ask("Digite PROCESSAR para confirmar") == "PROCESSAR":
-                            _voxelizar_recorte(crop)
+                        from cavegen.datastream.junction_fallback import OUTCOMES, attempt_failed_crops
+
+                        config = _path(path)
+                        confirmed = False
+                        try:
+                            crop = prepare_crop(config)
+                            _print_crop_summary(crop)
+                            confirmed = _ask("Digite PROCESSAR para confirmar") == "PROCESSAR"
+                            if confirmed:
+                                _voxelizar_recorte(crop)
+                        except CropGeometryError as error:
+                            if error.outcome not in OUTCOMES:
+                                raise
+                            print(f"Recorte sem volume: {error}")
+                            if confirmed or _ask("Digite PROCESSAR para testar a junção") == "PROCESSAR":
+                                attempt_failed_crops([(config, error.outcome)],
+                                                     progress=lambda message: print(message, flush=True))
                 elif mode == "2":
                     path = _ask("Pasta dos recortes ou plan.json (Enter para cancelar)")
                     if path:

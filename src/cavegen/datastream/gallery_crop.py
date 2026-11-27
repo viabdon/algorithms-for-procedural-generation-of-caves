@@ -23,9 +23,18 @@ from cavegen.datastream.point_cloud import iter_point_cloud_xyz
 from cavegen.datastream.progress import report_point_progress
 from cavegen.datastream.surface_io import load_surface_npz, save_surface_npz
 from cavegen.datastream.voxel_io import load_volume_npz, save_volume_npz
+from cavegen.tools.planar_caps import raster_cap_voxels
 
 CROP_FORMATS = frozenset({".xyz", ".ply", ".f32", ".las"})
 DEFAULT_SEED_SEARCH_RADIUS = 4
+
+
+class CropGeometryError(ValueError):
+    """An otherwise requested crop stopped at a geometric check."""
+
+    def __init__(self, message: str, outcome: str):
+        super().__init__(message)
+        self.outcome = outcome
 
 
 @dataclass(frozen=True)
@@ -155,6 +164,8 @@ def prepare_crop(path: Path, *, repository: Path = Path(".")) -> GalleryCrop:
     sections = spec.get("sections")
     if not isinstance(sections, list) or len(sections) != 2:
         raise ValueError("Informe as duas seções revisadas.")
+    if any(isinstance(section, dict) and section.get("polygon_uv") == [] for section in sections):
+        raise CropGeometryError("Informe um polígono UV finito e com área.", "missing_contour")
     start, end = (parse_section(section, origin) for section in sections)
     seed = _vector(spec.get("seed_xyz"), "seed_xyz") - origin
     if np.any(seed < lo - origin) or np.any(seed >= hi - origin) or np.any(seed < 0) or np.any(seed >= extent):
@@ -223,26 +234,17 @@ def _rasterize_surface(
 
 
 def _rasterize_caps(crop: GalleryCrop) -> np.ndarray:
-    # Trabalhar por fatia limita a memória das coordenadas temporárias.
-    y, x = np.indices(crop.shape_zyx[1:])
-    caps = np.zeros((2, *crop.shape_zyx), dtype=bool)
-    tolerance = crop.config["plane_tolerance"]
-    for z in range(crop.shape_zyx[0]):
-        xyz = np.column_stack((x.ravel(), y.ravel(), np.full(x.size, z)))
-        centers = (xyz + 0.5) * crop.voxel_size
-        for i, section in enumerate(crop.sections):
-            relative = centers - section.point
-            half_width = crop.voxel_size / 2 * np.abs(section.normal).sum() + tolerance
-            near = np.abs(relative @ section.normal) <= half_width
-            uv = relative[near] @ section.uv_basis
-            caps[i, z].ravel()[near] = section.polygon.contains_points(uv, radius=tolerance)
+    caps = np.zeros((len(crop.sections), *crop.shape_zyx), dtype=bool)
+    for mask, section in zip(caps, crop.sections):
+        voxels = raster_cap_voxels(section, crop.voxel_size, crop.config["plane_tolerance"], crop.shape_zyx)
+        mask[tuple(voxels.T)] = True
     return caps
 
 
 def _reject_crop(crop: GalleryCrop, record: dict, checks: list[dict], error: str,
                  *, outcome: str, report: dict | None = None) -> NoReturn:
     folder = write_failed_report(crop, record, checks, outcome=outcome, leak=report, error=error)
-    raise ValueError(f"{error} Relatório: {folder / SUMMARY_FILE}")
+    raise CropGeometryError(f"{error} Relatório: {folder / SUMMARY_FILE}", outcome)
 
 
 def process_crop(

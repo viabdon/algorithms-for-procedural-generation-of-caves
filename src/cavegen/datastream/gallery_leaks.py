@@ -224,7 +224,9 @@ class _WindowScan:
 def _enclosed_seeds(interior, caps, candidates):
     labels, _ = label(interior, structure=CONNECTIVITY)
     touching = [np.unique(labels[binary_dilation(cap, structure=CONNECTIVITY)]) for cap in caps]
-    shared = np.intersect1d(*touching)
+    shared = touching[0]
+    for labels_at_cap in touching[1:]:
+        shared = np.intersect1d(shared, labels_at_cap)
     values = labels[tuple(candidates.T)]
     eligible = np.isin(values, shared[shared != 0])
     if len(np.unique(values[eligible])) > 1:

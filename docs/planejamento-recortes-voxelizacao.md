@@ -267,6 +267,120 @@ Não normalizar cada eixo separadamente para fazê-lo caber.
 
 ## 4. Posicionar e conferir as tampas
 
+### Da parede observada à tampa na grade
+
+Imagine olhar a galeria de frente. O planejador põe um plano transversal
+à linha central e projeta nele os pontos de uma faixa estreita. A 16 cm
+por voxel, essa faixa vai até 32 cm de cada lado do plano. A seção é
+dividida em **16 setores, como fatias de pizza**. Em cada setor com pelo
+menos dois pontos elegíveis, o percentil 75 das distâncias ao eixo, mais
+meio voxel, estima até onde vai a parede naquela direção.
+
+Na revisão por componentes conectados, a tampa precisa de um único
+conjunto conectado que sustente pelo menos **14 setores**, com lacunas
+isoladas. O planejador interpola uma fatia vazia isolada entre as
+vizinhas. Duas fatias vazias consecutivas impedem o fechamento do
+polígono, mesmo quando as outras 14 têm suporte. Com o polígono
+aceito, a voxelização marca as células junto ao plano cujos centros
+projetados ficam dentro do contorno.
+
+Neste esquema simplificado, `●` representa pontos da parede e `■`
+representa células preenchidas pela tampa.
+
+```text
+Parede projetada    Tampa na grade    Parede com lacuna
+·······             ·······           ·······
+··●●●··             ··■■■··           ··●●···
+·●···●·             ·■■■■■·           ·●·····
+·●···●·             ·■■■■■·           ·●···●·
+·●···●·             ·■■■■■·           ·●···●·
+··●●●··             ··■■■··           ··●●●··
+·······             ·······           ·······
+```
+
+### Contagens por setor e bins de vazamento
+
+No planejamento, `section_reviews` guarda a contagem por setor na
+nuvem original e após os filtros de ramo, estação e raio mínimo. Ela
+mostra se havia pontos na faixa examinada e em que etapa se perdeu
+suporte. Uma faixa vazia pode resultar de falta de observação, de uma
+abertura real ou de um plano ou eixo mal posicionado.
+
+O diagnóstico de vazamento trabalha com bins de voxels em 3D. Ele
+compara a nuvem do recorte com a original nos mesmos bins perto das
+rotas de fuga. Essa etapa precisa de dois contornos de extremidade
+válidos e de uma semente conectada ao exterior. Se falta um polígono,
+a execução para na validação. As tampas auxiliares entram depois do
+reparo local, quando habilitadas e quando a passagem está sem alerta
+de ambiguidade.
+
+Perto de uma bifurcação, a faixa projetada pode pegar paredes de
+duas saídas ou misturar pontos de ramos diferentes. Duas aberturas
+podem aparecer como contornos concorrentes. Se os pontos se
+conectam na projeção, também podem parecer um único contorno
+apesar da bifurcação em 3D. Um ensaio de junções testou delimitar
+cada saída com uma tampa própria. Seu resultado ficou registrado
+separadamente.
+[Histórico dos ensaios de junção](auditoria/gan/historico-voxelizacao.md#sementes-cortes-compartilhados-e-junções)
+
+### Busca conjunta de tampas em bifurcações
+
+A opção 3 da Datastream tenta primeiro o fluxo de um recorte comum,
+com duas tampas, diagnóstico de fuga e os reparos já autorizados.
+Depois de uma falha geométrica, a rotina auxiliar consulta o ramo
+e o intervalo do recorte no grafo. Só abre a nuvem original para
+testar nós de bifurcação a até 50 voxels do intervalo. No lote,
+recortes vizinhos remetem ao mesmo nó e a nuvem é lida uma vez por
+fonte, grafo, origem e escala. A projeção dos pontos no grafo e a
+rasterização da parede processam lotes menores para limitar a
+memória temporária em levantamentos mais densos.
+
+Em um Y, o volume central inclui o tronco e os dois braços. A
+busca tenta uma tampa por ramo incidente, inclusive o tronco.
+A partir do nó, percorre estações entre 8 e 50 voxels, com
+passo de 4 voxels e um teste no limite do intervalo disponível,
+respeitando a extremidade seguinte do ramo. A tangente local
+orienta cada plano. Os pontos atribuídos ao ramo sustentam a
+estimativa por setores e por componente conectado. A abordagem
+curta do eixo precisa cruzar o polígono e permanecer livre de parede
+observada. Cada tampa rasterizada precisa ter contato com a parede.
+
+As seções viáveis são comparadas em pares. O teste rejeita
+interseções entre polígonos finitos, voxels compartilhados pelas
+tampas e casos em que um plano ou sua tampa corta o trecho de outro
+ramo que deveria ficar dentro da junção. Os pares são avaliados
+sob demanda e reutilizados. A busca conserva até 24 combinações
+parciais por etapa, prioriza a menor soma das distâncias ao nó e
+voxeliza até oito combinações completas. Nesta versão, cada
+estação testa apenas a orientação da tangente local.
+
+Se uma combinação vaza, o primeiro diagnóstico de fuga testa as
+extremidades com planos temporários completos e rastreia a rota
+até a borda. Quando a rota cruza o plano de uma ou mais saídas, é
+dada prioridade a combinações que alteram apenas tampas dessas
+saídas. A versão experimental usa a parede medida e mantém a
+revisão de aberturas ambíguas. O volume só é salvo se o mesmo
+componente de ar alcançar todas as tampas e a inundação a partir
+da borda reproduzir esse componente. Uma semente no nó pode ser
+reposicionada em até quatro voxels quando houver um único
+componente interno elegível.
+
+As saídas ficam em `data/processed/experiments/juncoes_auto/`.
+O `resultados.json` separa desfechos dos recortes de entrada e
+das junções únicas, registra as rejeições por ramo e identifica
+as combinações testadas. Os NPZs de uma junção salva incluem uma
+máscara por tampa e o volume passa pela mesma verificação externa
+dos demais produtos. A junção é um volume candidato próprio.
+O recorte que a acionou permanece no histórico com seu desfecho
+original. A rotina usa a topologia do grafo fornecido ou estimado.
+Conexões omitidas pelo grafo continuam fora da busca.
+
+Para retomar um lote já diagnosticado, execute
+`python -m cavegen.datastream.junction_fallback INVENTARIO.json --output PASTA_NOVA`.
+O inventário é uma lista de objetos com `config` (caminho do JSON
+do recorte) e `falha_anterior` (desfecho registrado no fluxo
+principal).
+
 Salvar para cada extremidade: posição e normal do plano, orientação da seção
 e contorno interno revisado. A tampa acompanha esse contorno, não o retângulo
 da caixa de seleção. No piloto simples, as meias-regiões dos dois planos
