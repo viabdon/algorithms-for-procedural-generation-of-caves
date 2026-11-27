@@ -1,0 +1,22 @@
+{
+  "source": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/vallorbe_16cm/fontes/Vallorbe/GalerieSemiActive/pointclouds/Vallorbe_GalerieSemiActive_sampled_5cm_PCV_normals_classified_georef.las",
+  "centreline": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/vallorbe_16cm/fontes/Vallorbe/GalerieSemiActive/centreline/Vallorbe_GalerieSemiActive_nodes_from_LBC.txt",
+  "cave": "vallorbe",
+  "survey": "GalerieSemiActive",
+  "fold": "teste_externo",
+  "plan_id": "las5cm_16cm",
+  "units": "m",
+  "count": 26,
+  "passages": [
+    1,
+    2,
+    4,
+    6,
+    7,
+    11
+  ],
+  "voxel_size": 0.16,
+  "section_search_radius_voxels": 8,
+  "batch_size": 65536,
+  "padding_voxels": 2
+}

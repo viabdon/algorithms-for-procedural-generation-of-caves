@@ -1,0 +1,98 @@
+{
+  "cave": "markovspodmol",
+  "survey": "MainGallery",
+  "crop_id": "ramo_080_001",
+  "plan_id": "auto_ramos_adicionais_16cm",
+  "fold": "holdout_indian_tunnel",
+  "branch": "passagem_080",
+  "source": "cloud.ply",
+  "source_origin_xyz": [
+    430842.428,
+    65788.001,
+    554.649
+  ],
+  "units": "m",
+  "origin_xyz": [
+    48.15599999998556,
+    79.9709999999962,
+    -3.757999999999988
+  ],
+  "selection_min_xyz": [
+    48.47439999998556,
+    80.28939999999619,
+    -3.439599999999988
+  ],
+  "selection_max_xyz": [
+    50.32859999998556,
+    82.0565999999962,
+    5.867599999999985
+  ],
+  "shape_zyx": [
+    64,
+    64,
+    64
+  ],
+  "voxel_size": 0.16,
+  "sections": [
+    {
+      "point_xyz": [
+        49.81232183903335,
+        80.30622444611858,
+        1.3420866238809392
+      ],
+      "inward_normal_xyz": [
+        0.19191247702040853,
+        0.9773858541271538,
+        -0.08880593063543162
+      ],
+      "u_xyz": [
+        0.01711057087873868,
+        0.08714196279765996,
+        0.9960489479357804
+      ],
+      "polygon_uv": []
+    },
+    {
+      "point_xyz": [
+        48.897803366451086,
+        81.32634426583921,
+        1.140590171574639
+      ],
+      "inward_normal_xyz": [
+        0.9205624975308617,
+        -0.36885417693156325,
+        0.1284962423570475
+      ],
+      "u_xyz": [
+        -0.1192776338775259,
+        0.0477925763739514,
+        0.9917099957649509
+      ],
+      "polygon_uv": []
+    }
+  ],
+  "seed_xyz": [
+    49.641829419888936,
+    80.83274484100917,
+    1.2670633301978833
+  ],
+  "batch_size": 131072,
+  "proposal": {
+    "crop_id": "ramo_080_001",
+    "status": "pending_review",
+    "review_reasons": [
+      "tampa_com_cobertura_insuficiente",
+      "outra_passagem_ou_retorno_proximo"
+    ],
+    "retained_points": 694,
+    "cut_stations": [
+      0.48,
+      2.373641303668784
+    ],
+    "section_bins_supported": [
+      2,
+      2
+    ],
+    "selection_radius": 4.863704815966879
+  }
+}

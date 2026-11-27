@@ -1,0 +1,105 @@
+{
+  "cave": "rupt_du_puits",
+  "survey": "Cascades",
+  "crop_id": "ramo_001_006",
+  "plan_id": "las2mm_16cm",
+  "fold": "teste_externo",
+  "branch": "passagem_001",
+  "source": "cloud.ply",
+  "source_origin_xyz": [
+    61.078,
+    14.17,
+    -0.505
+  ],
+  "units": "m",
+  "origin_xyz": [
+    -12.295899663204821,
+    14.56050085695234,
+    -5.518000072173838
+  ],
+  "selection_min_xyz": [
+    -11.97749966320482,
+    14.87890085695234,
+    -5.199600072173838
+  ],
+  "selection_max_xyz": [
+    -5.497500663204821,
+    23.269099956952342,
+    5.6286998278261615
+  ],
+  "shape_zyx": [
+    72,
+    64,
+    64
+  ],
+  "voxel_size": 0.16,
+  "sections": [
+    {
+      "point_xyz": [
+        -7.356622177621898,
+        16.561305249407976,
+        0.20614571978938664
+      ],
+      "inward_normal_xyz": [
+        -0.3638713375743811,
+        0.9313399929232343,
+        0.014264195511169558
+      ],
+      "u_xyz": [
+        0.0051908600120035816,
+        -0.01328616746532468,
+        0.9998982611878167
+      ],
+      "polygon_uv": []
+    },
+    {
+      "point_xyz": [
+        -9.324393055143075,
+        22.390845594857833,
+        0.11102284049997285
+      ],
+      "inward_normal_xyz": [
+        0.291743427783376,
+        -0.9557176079674677,
+        0.03859567548505856
+      ],
+      "u_xyz": [
+        -0.011268430666103148,
+        0.03691407098209539,
+        0.999254909336878
+      ],
+      "polygon_uv": []
+    }
+  ],
+  "seed_xyz": [
+    -8.389470915573144,
+    19.459955346428337,
+    0.19524214919951138
+  ],
+  "batch_size": 65536,
+  "proposal": {
+    "crop_id": "ramo_001_006",
+    "status": "pending_review",
+    "review_reasons": [
+      "tampa_com_cobertura_insuficiente",
+      "grade_excede_64_com_voxel_escolhido"
+    ],
+    "retained_points": 2985268,
+    "cut_stations": [
+      32.69734802643306,
+      38.85281763171969
+    ],
+    "section_bins_supported": [
+      7,
+      8
+    ],
+    "selection_radius": 5.552866508192166
+  },
+  "auxiliary_cap_radius_voxels": 4,
+  "seed_search_radius_voxels": 4,
+  "progress_every": 20000,
+  "leak_diagnostics": {
+    "raw_source": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/madeleine_rupt_16cm/fontes/RuptDuPuits/Cascades/pointclouds/RuptDuPuits_Cascades_sampled_2mm_PCV_normals_classified.las",
+    "centreline": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/madeleine_rupt_16cm/fontes/RuptDuPuits/Cascades/centreline/RuptDuPuits_Cascades_nodes_from_LBC.txt"
+  }
+}

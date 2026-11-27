@@ -1,0 +1,105 @@
+{
+  "cave": "vallorbe",
+  "survey": "GalerieSemiActive",
+  "crop_id": "ramo_011_001",
+  "plan_id": "las5cm_16cm",
+  "fold": "teste_externo",
+  "branch": "passagem_011",
+  "source": "cloud.ply",
+  "source_origin_xyz": [
+    2516274.164,
+    1172042.544,
+    813.459
+  ],
+  "units": "m",
+  "origin_xyz": [
+    -23.077001999873353,
+    -3.9119999999944137,
+    -1.274971999999998
+  ],
+  "selection_min_xyz": [
+    -22.758601999873353,
+    -3.5935999999944137,
+    -0.956571999999998
+  ],
+  "selection_max_xyz": [
+    -16.43540999987334,
+    4.643601000005585,
+    7.928586000000056
+  ],
+  "shape_zyx": [
+    64,
+    64,
+    64
+  ],
+  "voxel_size": 0.16,
+  "sections": [
+    {
+      "point_xyz": [
+        -18.4579262926138,
+        -2.389522736144467,
+        2.21734545996707
+      ],
+      "inward_normal_xyz": [
+        0.18842133939385178,
+        0.5809657980311785,
+        0.7918182495870013
+      ],
+      "u_xyz": [
+        0.9820882846572536,
+        -0.11146284454992364,
+        -0.151916540981595
+      ],
+      "polygon_uv": []
+    },
+    {
+      "point_xyz": [
+        -17.205039870106724,
+        -0.0771171939153272,
+        5.873496746274059
+      ],
+      "inward_normal_xyz": [
+        -0.3627378446968395,
+        -0.45143356583615174,
+        -0.8152478099701639
+      ],
+      "u_xyz": [
+        0.931891225425313,
+        -0.17572012079036203,
+        -0.31733449721820195
+      ],
+      "polygon_uv": []
+    }
+  ],
+  "seed_xyz": [
+    -17.9258615689729,
+    -1.1568623068987731,
+    4.029308826170178
+  ],
+  "batch_size": 65536,
+  "proposal": {
+    "crop_id": "ramo_011_001",
+    "status": "pending_review",
+    "review_reasons": [
+      "tampa_com_cobertura_insuficiente",
+      "outra_passagem_ou_retorno_proximo"
+    ],
+    "retained_points": 25136,
+    "cut_stations": [
+      0.08,
+      4.592831695749329
+    ],
+    "section_bins_supported": [
+      13,
+      6
+    ],
+    "selection_radius": 6.941675762897608
+  },
+  "auxiliary_cap_radius_voxels": 4,
+  "seed_search_radius_voxels": 4,
+  "progress_every": 20000,
+  "leak_diagnostics": {
+    "raw_source": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/vallorbe_16cm/fontes/Vallorbe/GalerieSemiActive/pointclouds/Vallorbe_GalerieSemiActive_sampled_5cm_PCV_normals_classified_georef.las",
+    "centreline": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/vallorbe_16cm/fontes/Vallorbe/GalerieSemiActive/centreline/Vallorbe_GalerieSemiActive_nodes_from_LBC.txt"
+  }
+}

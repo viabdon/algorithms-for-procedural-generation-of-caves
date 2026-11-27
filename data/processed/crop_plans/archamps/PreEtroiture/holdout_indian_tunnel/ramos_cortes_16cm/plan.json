@@ -1,0 +1,211 @@
+{
+  "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/Archamps/PreEtroiture/pointclouds/Archamps_PreEtroiture_sampled_5cm_PCV_normals_classified_georef.las",
+  "centreline": "/run/media/midnavi/Pablo/TCC/DATA/RAW/Archamps/PreEtroiture/centreline/Archamps_PreEtroiture_nodes_from_LBC.txt",
+  "centreline_extraction": null,
+  "source_origin_xyz": [
+    943833.256,
+    6562017.192,
+    1072.762
+  ],
+  "parameters": {
+    "cave": "archamps",
+    "survey": "PreEtroiture",
+    "fold": "holdout_indian_tunnel",
+    "units": "m",
+    "plan_id": "ramos_cortes_16cm",
+    "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/Archamps/PreEtroiture/pointclouds/Archamps_PreEtroiture_sampled_5cm_PCV_normals_classified_georef.las",
+    "centreline": "/run/media/midnavi/Pablo/TCC/DATA/RAW/Archamps/PreEtroiture/centreline/Archamps_PreEtroiture_nodes_from_LBC.txt",
+    "count": 21,
+    "passages": [
+      1,
+      2,
+      4
+    ],
+    "voxel_size": 0.16,
+    "batch_size": 131072,
+    "padding_voxels": 2
+  },
+  "requested": 11,
+  "proposed": 11,
+  "crops": [
+    {
+      "crop_id": "ramo_001_001",
+      "status": "pending_review",
+      "review_reasons": [
+        "outra_passagem_ou_retorno_proximo"
+      ],
+      "retained_points": 26184,
+      "cut_stations": [
+        0.8,
+        9.189786633436588
+      ],
+      "section_bins_supported": [
+        16,
+        16
+      ],
+      "selection_radius": 2.287694760083953
+    },
+    {
+      "crop_id": "ramo_001_002",
+      "status": "pending_review",
+      "review_reasons": [],
+      "retained_points": 23267,
+      "cut_stations": [
+        9.189786633436588,
+        17.899573266873176
+      ],
+      "section_bins_supported": [
+        16,
+        16
+      ],
+      "selection_radius": 4.138665349888139
+    },
+    {
+      "crop_id": "ramo_001_003",
+      "status": "pending_review",
+      "review_reasons": [
+        "grade_excede_64_com_voxel_escolhido"
+      ],
+      "retained_points": 28333,
+      "cut_stations": [
+        17.899573266873176,
+        26.769359900309766
+      ],
+      "section_bins_supported": [
+        16,
+        16
+      ],
+      "selection_radius": 3.41806802391404
+    },
+    {
+      "crop_id": "ramo_001_004",
+      "status": "pending_review",
+      "review_reasons": [],
+      "retained_points": 35084,
+      "cut_stations": [
+        26.769359900309766,
+        35.31914653374635
+      ],
+      "section_bins_supported": [
+        16,
+        16
+      ],
+      "selection_radius": 2.7539702755582445
+    },
+    {
+      "crop_id": "ramo_001_007",
+      "status": "pending_review",
+      "review_reasons": [],
+      "retained_points": 29417,
+      "cut_stations": [
+        52.73871980061953,
+        61.448506434056114
+      ],
+      "section_bins_supported": [
+        16,
+        15
+      ],
+      "selection_radius": 2.9580593997983535
+    },
+    {
+      "crop_id": "ramo_001_008",
+      "status": "pending_review",
+      "review_reasons": [],
+      "retained_points": 29412,
+      "cut_stations": [
+        61.448506434056114,
+        70.3182930674927
+      ],
+      "section_bins_supported": [
+        15,
+        16
+      ],
+      "selection_radius": 2.9131478548491447
+    },
+    {
+      "crop_id": "ramo_001_009",
+      "status": "pending_review",
+      "review_reasons": [],
+      "retained_points": 28731,
+      "cut_stations": [
+        70.3182930674927,
+        78.8680797009293
+      ],
+      "section_bins_supported": [
+        16,
+        16
+      ],
+      "selection_radius": 4.026628435609033
+    },
+    {
+      "crop_id": "ramo_001_010",
+      "status": "pending_review",
+      "review_reasons": [
+        "grade_excede_64_com_voxel_escolhido"
+      ],
+      "retained_points": 28192,
+      "cut_stations": [
+        78.8680797009293,
+        88.53786633436587
+      ],
+      "section_bins_supported": [
+        16,
+        16
+      ],
+      "selection_radius": 3.8284004505746427
+    },
+    {
+      "crop_id": "ramo_001_011",
+      "status": "pending_review",
+      "review_reasons": [
+        "grade_excede_64_com_voxel_escolhido"
+      ],
+      "retained_points": 40057,
+      "cut_stations": [
+        88.53786633436587,
+        96.28765296780247
+      ],
+      "section_bins_supported": [
+        16,
+        15
+      ],
+      "selection_radius": 5.297079905708646
+    },
+    {
+      "crop_id": "ramo_002_001",
+      "status": "pending_review",
+      "review_reasons": [
+        "outra_passagem_ou_retorno_proximo"
+      ],
+      "retained_points": 21808,
+      "cut_stations": [
+        2.08,
+        8.553861795070246
+      ],
+      "section_bins_supported": [
+        16,
+        16
+      ],
+      "selection_radius": 3.202771818129379
+    },
+    {
+      "crop_id": "ramo_002_008",
+      "status": "pending_review",
+      "review_reasons": [
+        "outra_passagem_ou_retorno_proximo",
+        "grade_excede_64_com_voxel_escolhido"
+      ],
+      "retained_points": 60019,
+      "cut_stations": [
+        56.997032565491715,
+        64.27089436056197
+      ],
+      "section_bins_supported": [
+        16,
+        15
+      ],
+      "selection_radius": 6.690431548468682
+    }
+  ],
+  "source_plan": "data/processed/crop_plans/archamps/PreEtroiture/holdout_indian_tunnel/pre_5cm_16cm/plan.json"
+}

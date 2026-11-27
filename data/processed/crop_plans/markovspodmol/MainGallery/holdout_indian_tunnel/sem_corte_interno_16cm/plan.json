@@ -1,0 +1,149 @@
+{
+  "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/MarkovSpodmol/MainGallery/pointclouds/MarkovSpodmol_MainGallery_sampled_5cm_PCV_normals_classified_georef.las",
+  "centreline": "/run/media/midnavi/Pablo/TCC/DATA/RAW/MarkovSpodmol/MainGallery/centreline/MarkovSpodmol_MainGallery_nodes_from_LBC.txt",
+  "centreline_extraction": null,
+  "source_origin_xyz": [
+    430842.428,
+    65788.001,
+    554.649
+  ],
+  "parameters": {
+    "cave": "markovspodmol",
+    "survey": "MainGallery",
+    "fold": "holdout_indian_tunnel",
+    "units": "m",
+    "plan_id": "sem_corte_interno_16cm",
+    "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/MarkovSpodmol/MainGallery/pointclouds/MarkovSpodmol_MainGallery_sampled_5cm_PCV_normals_classified_georef.las",
+    "centreline": "/run/media/midnavi/Pablo/TCC/DATA/RAW/MarkovSpodmol/MainGallery/centreline/MarkovSpodmol_MainGallery_nodes_from_LBC.txt",
+    "count": 65,
+    "voxel_size": 0.16,
+    "batch_size": 131072,
+    "padding_voxels": 2,
+    "section_overrides": [
+      {
+        "passage": 1,
+        "cut": 0,
+        "station": 2.08,
+        "contour": "connected"
+      },
+      {
+        "passage": 5,
+        "cut": 0,
+        "station": 1.92,
+        "contour": "connected"
+      },
+      {
+        "passage": 9,
+        "cut": 0,
+        "station": 1.28,
+        "contour": "connected"
+      },
+      {
+        "passage": 9,
+        "cut": 3,
+        "station": 19.399416604316585,
+        "contour": "connected"
+      },
+      {
+        "passage": 10,
+        "cut": 0,
+        "station": 1.92,
+        "contour": "connected"
+      },
+      {
+        "passage": 10,
+        "cut": 3,
+        "station": 19.958938210026524,
+        "contour": "connected"
+      },
+      {
+        "passage": 16,
+        "cut": 0,
+        "station": 2.24,
+        "contour": "connected"
+      },
+      {
+        "passage": 16,
+        "cut": 2,
+        "station": 10.801277176499617,
+        "contour": "connected"
+      },
+      {
+        "passage": 17,
+        "cut": 0,
+        "station": 0.96,
+        "contour": "connected"
+      },
+      {
+        "passage": 17,
+        "cut": 6,
+        "station": 44.00148096688749,
+        "contour": "connected"
+      },
+      {
+        "passage": 17,
+        "cut": 16,
+        "station": 112.00394924503334,
+        "contour": "connected"
+      },
+      {
+        "passage": 28,
+        "cut": 1,
+        "station": 7.487254950728671,
+        "contour": "connected"
+      },
+      {
+        "passage": 35,
+        "cut": 0,
+        "station": 2.24,
+        "contour": "connected"
+      },
+      {
+        "passage": 58,
+        "cut": 0,
+        "station": 1.76,
+        "contour": "connected"
+      },
+      {
+        "passage": 58,
+        "cut": 2,
+        "station": 11.617765632665474,
+        "contour": "connected"
+      },
+      {
+        "passage": 58,
+        "cut": 3,
+        "station": 14.546648448998212,
+        "contour": "connected"
+      },
+      {
+        "passage": 65,
+        "cut": 0,
+        "station": 0.96,
+        "contour": "connected"
+      }
+    ]
+  },
+  "requested": 1,
+  "proposed": 1,
+  "crops": [
+    {
+      "crop_id": "ramo_065_002_a_003",
+      "status": "pending_review",
+      "review_reasons": [
+        "corte_interno_removido",
+        "outra_passagem_ou_retorno_proximo"
+      ],
+      "cut_stations": [
+        6.654298983984363,
+        19.002896951953087
+      ],
+      "selection_radius": 5.919950669653861,
+      "section_bins_supported": [
+        16,
+        16
+      ],
+      "retained_points": 86015
+    }
+  ]
+}

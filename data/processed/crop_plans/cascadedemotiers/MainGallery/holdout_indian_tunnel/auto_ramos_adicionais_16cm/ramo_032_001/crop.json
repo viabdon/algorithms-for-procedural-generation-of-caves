@@ -1,0 +1,98 @@
+{
+  "cave": "cascadedemotiers",
+  "survey": "MainGallery",
+  "crop_id": "ramo_032_001",
+  "plan_id": "auto_ramos_adicionais_16cm",
+  "fold": "holdout_indian_tunnel",
+  "branch": "passagem_032",
+  "source": "cloud.ply",
+  "source_origin_xyz": [
+    2537750.899,
+    1195208.176,
+    783.079
+  ],
+  "units": "m",
+  "origin_xyz": [
+    -5.957281000208646,
+    0.38290600002235237,
+    -1.8180060000000322
+  ],
+  "selection_min_xyz": [
+    -5.638881000208645,
+    0.7013060000223523,
+    -1.4996060000000322
+  ],
+  "selection_max_xyz": [
+    -0.731384000208603,
+    6.592690000022348,
+    7.695610000000048
+  ],
+  "shape_zyx": [
+    64,
+    64,
+    64
+  ],
+  "voxel_size": 0.16,
+  "sections": [
+    {
+      "point_xyz": [
+        -3.1346306066470104,
+        2.254472534877923,
+        -0.9595343928633355
+      ],
+      "inward_normal_xyz": [
+        -0.5704415385437244,
+        0.5736472676651801,
+        0.5878139700654806
+      ],
+      "u_xyz": [
+        0.8213382075027733,
+        0.3984135000163426,
+        0.40825265694280427
+      ],
+      "polygon_uv": []
+    },
+    {
+      "point_xyz": [
+        -4.4532199663400105,
+        3.2211847523791857,
+        -1.2290974962499184
+      ],
+      "inward_normal_xyz": [
+        0.6799986972507611,
+        -0.39678882735662285,
+        0.6165714867087385
+      ],
+      "u_xyz": [
+        0.2939459297329073,
+        0.9179099228600571,
+        0.26652797959782876
+      ],
+      "polygon_uv": []
+    }
+  ],
+  "seed_xyz": [
+    -3.789674815531045,
+    2.801523732029111,
+    -0.7839573700578872
+  ],
+  "batch_size": 131072,
+  "proposal": {
+    "crop_id": "ramo_032_001",
+    "status": "pending_review",
+    "review_reasons": [
+      "tampa_com_cobertura_insuficiente",
+      "outra_passagem_ou_retorno_proximo"
+    ],
+    "retained_points": 11188,
+    "cut_stations": [
+      0.64,
+      2.466221274591822
+    ],
+    "section_bins_supported": [
+      8,
+      9
+    ],
+    "selection_radius": 8.705133403389077
+  }
+}

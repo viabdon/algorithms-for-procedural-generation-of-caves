@@ -1,0 +1,389 @@
+{
+  "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/Archamps/PreEtroiture/pointclouds/Archamps_PreEtroiture_sampled_5cm_PCV_normals_classified_georef.las",
+  "centreline": "/run/media/midnavi/Pablo/TCC/DATA/RAW/Archamps/PreEtroiture/centreline/Archamps_PreEtroiture_nodes_from_LBC.txt",
+  "centreline_extraction": null,
+  "source_origin_xyz": [
+    943833.256,
+    6562017.192,
+    1072.762
+  ],
+  "parameters": {
+    "cave": "archamps",
+    "survey": "PreEtroiture",
+    "fold": "holdout_indian_tunnel",
+    "units": "m",
+    "plan_id": "pre_5cm_16cm",
+    "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/Archamps/PreEtroiture/pointclouds/Archamps_PreEtroiture_sampled_5cm_PCV_normals_classified_georef.las",
+    "centreline": "/run/media/midnavi/Pablo/TCC/DATA/RAW/Archamps/PreEtroiture/centreline/Archamps_PreEtroiture_nodes_from_LBC.txt",
+    "count": 21,
+    "passages": [
+      1,
+      2,
+      4
+    ],
+    "voxel_size": 0.16,
+    "batch_size": 131072,
+    "padding_voxels": 2
+  },
+  "requested": 21,
+  "proposed": 21,
+  "crops": [
+    {
+      "crop_id": "ramo_001_001",
+      "status": "pending_review",
+      "review_reasons": [
+        "tampa_com_cobertura_insuficiente",
+        "outra_passagem_ou_retorno_proximo"
+      ],
+      "retained_points": 26541,
+      "cut_stations": [
+        0.48,
+        9.189786633436588
+      ],
+      "section_bins_supported": [
+        8,
+        16
+      ],
+      "selection_radius": 2.287694760083953
+    },
+    {
+      "crop_id": "ramo_001_002",
+      "status": "pending_review",
+      "review_reasons": [
+        "tampa_com_cobertura_insuficiente"
+      ],
+      "retained_points": 23267,
+      "cut_stations": [
+        9.189786633436588,
+        17.899573266873176
+      ],
+      "section_bins_supported": [
+        16,
+        6
+      ],
+      "selection_radius": 4.138665349888139
+    },
+    {
+      "crop_id": "ramo_001_003",
+      "status": "pending_review",
+      "review_reasons": [
+        "tampa_com_cobertura_insuficiente",
+        "grade_excede_64_com_voxel_escolhido"
+      ],
+      "retained_points": 28333,
+      "cut_stations": [
+        17.899573266873176,
+        26.769359900309766
+      ],
+      "section_bins_supported": [
+        6,
+        8
+      ],
+      "selection_radius": 3.41806802391404
+    },
+    {
+      "crop_id": "ramo_001_004",
+      "status": "pending_review",
+      "review_reasons": [
+        "tampa_com_cobertura_insuficiente"
+      ],
+      "retained_points": 35082,
+      "cut_stations": [
+        26.769359900309766,
+        35.31914653374635
+      ],
+      "section_bins_supported": [
+        8,
+        16
+      ],
+      "selection_radius": 2.7444147746696537
+    },
+    {
+      "crop_id": "ramo_001_005",
+      "status": "pending_review",
+      "review_reasons": [],
+      "retained_points": 30441,
+      "cut_stations": [
+        35.31914653374635,
+        44.028933167182934
+      ],
+      "section_bins_supported": [
+        16,
+        16
+      ],
+      "selection_radius": 2.588805027366835
+    },
+    {
+      "crop_id": "ramo_001_006",
+      "status": "pending_review",
+      "review_reasons": [
+        "grade_excede_64_com_voxel_escolhido"
+      ],
+      "retained_points": 23513,
+      "cut_stations": [
+        44.028933167182934,
+        52.73871980061953
+      ],
+      "section_bins_supported": [
+        16,
+        16
+      ],
+      "selection_radius": 2.5589401123266247
+    },
+    {
+      "crop_id": "ramo_001_007",
+      "status": "pending_review",
+      "review_reasons": [
+        "tampa_com_cobertura_insuficiente"
+      ],
+      "retained_points": 29417,
+      "cut_stations": [
+        52.73871980061953,
+        61.448506434056114
+      ],
+      "section_bins_supported": [
+        16,
+        10
+      ],
+      "selection_radius": 2.9580593997983535
+    },
+    {
+      "crop_id": "ramo_001_008",
+      "status": "pending_review",
+      "review_reasons": [
+        "tampa_com_cobertura_insuficiente"
+      ],
+      "retained_points": 29412,
+      "cut_stations": [
+        61.448506434056114,
+        70.3182930674927
+      ],
+      "section_bins_supported": [
+        10,
+        16
+      ],
+      "selection_radius": 2.9131478548491447
+    },
+    {
+      "crop_id": "ramo_001_009",
+      "status": "pending_review",
+      "review_reasons": [
+        "tampa_com_cobertura_insuficiente"
+      ],
+      "retained_points": 28731,
+      "cut_stations": [
+        70.3182930674927,
+        78.8680797009293
+      ],
+      "section_bins_supported": [
+        16,
+        8
+      ],
+      "selection_radius": 4.026628435609033
+    },
+    {
+      "crop_id": "ramo_001_010",
+      "status": "pending_review",
+      "review_reasons": [
+        "tampa_com_cobertura_insuficiente"
+      ],
+      "retained_points": 25224,
+      "cut_stations": [
+        78.8680797009293,
+        87.57786633436588
+      ],
+      "section_bins_supported": [
+        8,
+        5
+      ],
+      "selection_radius": 3.044037577114098
+    },
+    {
+      "crop_id": "ramo_001_011",
+      "status": "pending_review",
+      "review_reasons": [
+        "tampa_com_cobertura_insuficiente",
+        "grade_excede_64_com_voxel_escolhido"
+      ],
+      "retained_points": 42931,
+      "cut_stations": [
+        87.57786633436588,
+        96.28765296780247
+      ],
+      "section_bins_supported": [
+        5,
+        15
+      ],
+      "selection_radius": 5.297079905708646
+    },
+    {
+      "crop_id": "ramo_002_001",
+      "status": "pending_review",
+      "review_reasons": [
+        "tampa_com_cobertura_insuficiente",
+        "outra_passagem_ou_retorno_proximo"
+      ],
+      "retained_points": 25397,
+      "cut_stations": [
+        0.48,
+        8.553861795070246
+      ],
+      "section_bins_supported": [
+        4,
+        16
+      ],
+      "selection_radius": 3.202771818129379
+    },
+    {
+      "crop_id": "ramo_002_002",
+      "status": "pending_review",
+      "review_reasons": [
+        "outra_passagem_ou_retorno_proximo"
+      ],
+      "retained_points": 57396,
+      "cut_stations": [
+        8.553861795070246,
+        16.62772359014049
+      ],
+      "section_bins_supported": [
+        16,
+        16
+      ],
+      "selection_radius": 6.473173966088811
+    },
+    {
+      "crop_id": "ramo_002_003",
+      "status": "pending_review",
+      "review_reasons": [],
+      "retained_points": 35190,
+      "cut_stations": [
+        16.62772359014049,
+        24.701585385210738
+      ],
+      "section_bins_supported": [
+        16,
+        16
+      ],
+      "selection_radius": 3.966624007074566
+    },
+    {
+      "crop_id": "ramo_002_004",
+      "status": "pending_review",
+      "review_reasons": [],
+      "retained_points": 46531,
+      "cut_stations": [
+        24.701585385210738,
+        32.77544718028098
+      ],
+      "section_bins_supported": [
+        16,
+        16
+      ],
+      "selection_radius": 4.3371753593919795
+    },
+    {
+      "crop_id": "ramo_002_005",
+      "status": "pending_review",
+      "review_reasons": [
+        "grade_excede_64_com_voxel_escolhido"
+      ],
+      "retained_points": 60676,
+      "cut_stations": [
+        32.77544718028098,
+        40.689308975351224
+      ],
+      "section_bins_supported": [
+        16,
+        15
+      ],
+      "selection_radius": 4.557415165821699
+    },
+    {
+      "crop_id": "ramo_002_006",
+      "status": "pending_review",
+      "review_reasons": [
+        "grade_excede_64_com_voxel_escolhido"
+      ],
+      "retained_points": 62075,
+      "cut_stations": [
+        40.689308975351224,
+        48.92317077042147
+      ],
+      "section_bins_supported": [
+        15,
+        16
+      ],
+      "selection_radius": 4.318045496658508
+    },
+    {
+      "crop_id": "ramo_002_007",
+      "status": "pending_review",
+      "review_reasons": [
+        "grade_excede_64_com_voxel_escolhido"
+      ],
+      "retained_points": 47851,
+      "cut_stations": [
+        48.92317077042147,
+        56.997032565491715
+      ],
+      "section_bins_supported": [
+        16,
+        16
+      ],
+      "selection_radius": 4.099038241934751
+    },
+    {
+      "crop_id": "ramo_002_008",
+      "status": "pending_review",
+      "review_reasons": [
+        "tampa_com_cobertura_insuficiente",
+        "outra_passagem_ou_retorno_proximo",
+        "grade_excede_64_com_voxel_escolhido"
+      ],
+      "retained_points": 62813,
+      "cut_stations": [
+        56.997032565491715,
+        64.91089436056197
+      ],
+      "section_bins_supported": [
+        16,
+        11
+      ],
+      "selection_radius": 6.690431548468682
+    },
+    {
+      "crop_id": "ramo_004_001",
+      "status": "pending_review",
+      "review_reasons": [
+        "outra_passagem_ou_retorno_proximo"
+      ],
+      "retained_points": 15938,
+      "cut_stations": [
+        0.16,
+        4.667081436686546
+      ],
+      "section_bins_supported": [
+        16,
+        16
+      ],
+      "selection_radius": 2.961359968445556
+    },
+    {
+      "crop_id": "ramo_004_002",
+      "status": "pending_review",
+      "review_reasons": [
+        "outra_passagem_ou_retorno_proximo"
+      ],
+      "retained_points": 21287,
+      "cut_stations": [
+        4.667081436686546,
+        9.174162873373092
+      ],
+      "section_bins_supported": [
+        16,
+        16
+      ],
+      "selection_radius": 3.5076487941271903
+    }
+  ]
+}

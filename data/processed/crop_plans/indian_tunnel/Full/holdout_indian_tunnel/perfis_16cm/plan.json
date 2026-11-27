@@ -1,0 +1,48 @@
+{
+  "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/IndianTunnel/IndianTunnel_cave/Full/IndianTunnel_full_10x.f32",
+  "centreline": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/full10x_16cm/centreline.npz",
+  "centreline_extraction": null,
+  "source_origin_xyz": [
+    -52.01074437747145,
+    98.82685720435171,
+    3.461709513021538
+  ],
+  "parameters": {
+    "cave": "indian_tunnel",
+    "survey": "Full",
+    "fold": "holdout_indian_tunnel",
+    "units": "m",
+    "plan_id": "perfis_16cm",
+    "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/IndianTunnel/IndianTunnel_cave/Full/IndianTunnel_full_10x.f32",
+    "centreline": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/full10x_16cm/centreline.npz",
+    "count": 32,
+    "voxel_size": 0.16,
+    "batch_size": 131072,
+    "padding_voxels": 2,
+    "section_overrides": [
+      {
+        "passage": 2,
+        "cut": 2,
+        "station": 12.451901871290229,
+        "contour": "connected"
+      }
+    ]
+  },
+  "requested": 1,
+  "proposed": 1,
+  "crops": [
+    {
+      "crop_id": "ramo_002_001",
+      "status": "pending_review",
+      "review_reasons": [
+        "secoes_transversais_reavaliadas"
+      ],
+      "cut_stations": [
+        33.120000000000005,
+        34.400000000000006
+      ],
+      "selection_radius": 7.806048936561956,
+      "retained_points": 274636
+    }
+  ]
+}

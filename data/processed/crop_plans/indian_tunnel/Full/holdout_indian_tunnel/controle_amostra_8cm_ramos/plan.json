@@ -1,0 +1,69 @@
+{
+  "source": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/planejamento_auto_16cm/indian_tunnel_amostra_8cm.ply",
+  "centreline": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/full10x_16cm/centreline.npz",
+  "centreline_extraction": null,
+  "source_origin_xyz": [
+    -52.01074437747145,
+    98.82685720435171,
+    3.461709513021538
+  ],
+  "parameters": {
+    "cave": "indian_tunnel",
+    "survey": "Full",
+    "fold": "holdout_indian_tunnel",
+    "units": "m",
+    "plan_id": "controle_amostra_8cm_ramos",
+    "source": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/planejamento_auto_16cm/indian_tunnel_amostra_8cm.ply",
+    "centreline": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/full10x_16cm/centreline.npz",
+    "count": 2,
+    "passages": [
+      6,
+      18
+    ],
+    "voxel_size": 0.16,
+    "batch_size": 131072,
+    "padding_voxels": 2,
+    "section_search_radius_voxels": 0
+  },
+  "requested": 2,
+  "proposed": 2,
+  "crops": [
+    {
+      "crop_id": "ramo_006_001",
+      "status": "pending_review",
+      "review_reasons": [
+        "tampa_com_cobertura_insuficiente",
+        "outra_passagem_ou_retorno_proximo"
+      ],
+      "retained_points": 836,
+      "cut_stations": [
+        0.32,
+        1.553095073217653
+      ],
+      "section_bins_supported": [
+        8,
+        11
+      ],
+      "selection_radius": 3.3294157223915657
+    },
+    {
+      "crop_id": "ramo_018_001",
+      "status": "pending_review",
+      "review_reasons": [
+        "tampa_com_cobertura_insuficiente",
+        "outra_passagem_ou_retorno_proximo",
+        "grade_excede_64_com_voxel_escolhido"
+      ],
+      "retained_points": 13401,
+      "cut_stations": [
+        0.16,
+        1.7333596311004975
+      ],
+      "section_bins_supported": [
+        2,
+        9
+      ],
+      "selection_radius": 12.186790371810956
+    }
+  ]
+}

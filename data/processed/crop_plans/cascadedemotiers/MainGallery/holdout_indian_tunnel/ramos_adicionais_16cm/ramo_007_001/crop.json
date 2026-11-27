@@ -1,0 +1,99 @@
+{
+  "cave": "cascadedemotiers",
+  "survey": "MainGallery",
+  "crop_id": "ramo_007_001",
+  "plan_id": "ramos_adicionais_16cm",
+  "fold": "holdout_indian_tunnel",
+  "branch": "passagem_007",
+  "source": "cloud.ply",
+  "source_origin_xyz": [
+    2537750.899,
+    1195208.176,
+    783.079
+  ],
+  "units": "m",
+  "origin_xyz": [
+    -8.904547000208659,
+    -1.2630899999776444,
+    -10.339002
+  ],
+  "selection_min_xyz": [
+    -8.586147000208658,
+    -0.9446899999776444,
+    -10.020602
+  ],
+  "selection_max_xyz": [
+    -2.476502000208651,
+    6.807534000022347,
+    -1.871406000000032
+  ],
+  "shape_zyx": [
+    64,
+    64,
+    64
+  ],
+  "voxel_size": 0.16,
+  "sections": [
+    {
+      "point_xyz": [
+        -5.274931023440287,
+        3.673862186993416,
+        -2.090792506965976
+      ],
+      "inward_normal_xyz": [
+        -0.018606298220807945,
+        -0.19403711041486163,
+        -0.9808177228457738
+      ],
+      "u_xyz": [
+        0.9998268878493509,
+        -0.003610937439428754,
+        -0.018252546789151718
+      ],
+      "polygon_uv": []
+    },
+    {
+      "point_xyz": [
+        -8.195147401478405,
+        5.353842125811327,
+        -4.7343730261260735
+      ],
+      "inward_normal_xyz": [
+        0.7458003540367028,
+        -0.464256932285206,
+        0.47775237596882614
+      ],
+      "u_xyz": [
+        0.39092555197703976,
+        0.8857005706361092,
+        0.2504230660029485
+      ],
+      "polygon_uv": []
+    }
+  ],
+  "seed_xyz": [
+    -6.4867585846398335,
+    4.28082483171479,
+    -3.6388500975147746
+  ],
+  "batch_size": 131072,
+  "proposal": {
+    "crop_id": "ramo_007_001",
+    "status": "pending_review",
+    "review_reasons": [
+      "tampa_com_cobertura_insuficiente",
+      "outra_passagem_ou_retorno_proximo"
+    ],
+    "retained_points": 32669,
+    "cut_stations": [
+      0.48,
+      5.071401196345304
+    ],
+    "section_bins_supported": [
+      12,
+      14
+    ],
+    "selection_radius": 6.709982913022832
+  },
+  "auxiliary_cap_radius_voxels": 4
+}
