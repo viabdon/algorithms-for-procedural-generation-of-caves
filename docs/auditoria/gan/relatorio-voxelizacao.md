@@ -2,6 +2,11 @@
 
 **Relatório técnico do TCC · 26 de novembro de 2026**
 
+Em 27/11, o piloto passou a usar `holdout_carste`, com 52 recortes a
+16 cm. As contagens históricas deste relatório descrevem os ensaios
+anteriores à atualização. [Inventário ativo](../../relatorios/inventario-gan-holdout-carste.md) ·
+[Vallorbe e novo fold](historico-voxelizacao.md#vallorbe-e-novo-fold-cárstico)
+
 ## Resumo executivo
 
 O trabalho prepara volumes de galerias reais para treinar e avaliar uma GAN

@@ -1,5 +1,13 @@
 # Notebooks Colab
 
+O [fold ativo de galerias](../../docs/relatorios/inventario-gan-holdout-carste.md)
+é `holdout_carste`, com 29 recortes de treino, oito de validação e 15 de
+teste. O preflight desse conjunto usa `--root data/processed` e
+`--splits docs/auditoria/gan/holdout_carste/splits.json`. Os padrões do
+empacotador e do notebook abaixo ainda apontam para a auditoria dos
+volumes globais de 15/11. Os NPZ do piloto precisam estar disponíveis
+nos caminhos registrados no manifesto de galerias.
+
 O [notebook GAN](01_gan_reference_volumes.ipynb) está implementado e não foi
 treinado. Consulte o [plano neural](../../docs/plano-redes-neurais.md) e a
 [auditoria](../../docs/auditoria/gan/README.md) antes de executar. Os quatro

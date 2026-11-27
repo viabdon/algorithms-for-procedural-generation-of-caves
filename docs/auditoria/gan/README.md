@@ -6,6 +6,20 @@ rodadas e indica onde conferir a evidência por recorte.
 [Relatório de voxelização](relatorio-voxelizacao.md) ·
 [Histórico das rodadas](historico-voxelizacao.md)
 
+## Manifesto ativo de galerias a 16 cm
+
+O fold `holdout_carste` tem 29 recortes de treino, oito de validação e
+15 de teste. Madeleine, Rupt du Puits e Vallorbe compõem o teste; o
+Indian Tunnel permanece como avaliação externa. Os 52 tensores usam
+`64³`, com quatro janelas derivadas que preservam todo o ar da grade
+original. O estado permanece `gallery_proxy_pending_review`.
+[Inventário do fold](../../relatorios/inventario-gan-holdout-carste.md) ·
+[Manifesto](holdout_carste/splits.json) ·
+[Auditoria](holdout_carste/reference_audit.json) ·
+[Seleção das versões](holdout_carste/selecao_teste.json)
+
+## Auditoria histórica dos volumes globais
+
 Auditoria executada em **15/11/2026**, sem treinamento. Código reprodutível:
 [`reference_data.py`](../../../src/cavegen/training/reference_data.py).
 O [manifesto completo](reference_audit.json) contém hashes SHA-256 dos nove

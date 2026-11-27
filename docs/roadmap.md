@@ -1,9 +1,12 @@
 # Roadmap do TCC
 
-**Atualizado em 17/11/2026.** A `feat/neural-models` incorporou a `main` até
-`a7dd1e7`. Felipe se aproxima do fim dos clássicos e passa à coleta de métricas
-e consolidação da tabela comparativa; Pablo inicia GAN, PCGRL e PCGARL em
-paralelo. As tarefas neurais estão detalhadas no [plano neural](plano-redes-neurais.md).
+**Atualizado em 27/11/2026.** O piloto da GAN a 16 cm usa o fold
+`holdout_carste`, com 29 recortes de treino, oito de validação e 15 de
+teste. A avaliação de Indian Tunnel fica separada. O próximo marco da
+frente neural é verificar os dados no ambiente de treino, registrar
+checkpoints do piloto e comparar a geração com sementes fixas.
+[Plano neural](plano-redes-neurais.md#piloto-ativo-de-27112026) ·
+[Inventário do fold](relatorios/inventario-gan-holdout-carste.md)
 
 A decisão de retorno ao pipeline de volumes gerados permanece vigente: não há
 interior real validado do Elaphes, logo SDF real e IoU volumétrica contra o
@@ -35,9 +38,9 @@ registram os limites e os experimentos preservados.
 - [x] Preparar a infraestrutura GAN: auditoria, folds por caverna, variantes
   ocupação/SDF, treino/checkpoints, inferência, avaliação e notebook Colab.
   Testes usam fixtures artificiais; não há treino nas referências.
-- [ ] Corrigir os dados da GAN: interiores globais atuais têm 2, 1, 98 e 5
-  voxels de ar e não passam a triagem. O piloto local já produz candidatos
-  com inspeção das tampas e do reparo, ainda em revisão. [Evolução do piloto](plano-reconstrucao-secoes.md#evolucao-do-piloto-em-archamps)
+- [x] Substituir, no piloto da GAN, as grades globais por recortes de
+  galerias com escala física de 16 cm. O manifesto ativo registra os 52
+  candidatos aprovados na triagem. [Auditoria](auditoria/gan/README.md#manifesto-ativo-de-galerias-a-16-cm)
 - [ ] Gerar e avaliar os modelos neurais após validar seus dados/ambientes.
   PCGRL ainda tem placeholders; PCGARL continua sem implementação.
 
@@ -64,15 +67,12 @@ registram os limites e os experimentos preservados.
 
 ## Frente de Pablo — modelos neurais
 
-- [ ] **Ampliar a busca de cortes sem cobertura**, próxima prioridade da GAN.
-  Começar pelos limites 001/002 e 005/006 de Archamps / PostEtroiture, com
-  avanço de quatro voxels em ambos os sentidos e refinamento de um voxel.
-  Usar a tampa inicial do 001 para testar se o contorno acompanha a
-  abertura de interesse perto de uma ramificação. Reextrair os vizinhos
-  com a mesma seção e verificar o fechamento.
-  [Procedimento e critérios](planejamento-recortes-voxelizacao.md#busca-de-cortes-com-melhor-cobertura)
-- [ ] Depois do ensaio de cortes, organizar a voxelização em background dos
-  recortes pendentes de Archamps e consolidar os resumos em um CSV por caverna.
+- [x] Ampliar a busca de cortes de Archamps e aplicar as rotinas em
+  outros levantamentos. Registrar os fechamentos, as intervenções por
+  recorte e as falhas remanescentes. [Histórico](auditoria/gan/historico-voxelizacao.md)
+- [ ] Executar o preflight de `holdout_carste` no ambiente da GAN e
+  registrar a primeira execução de ocupação em 64³. Guardar o manifesto
+  e os checkpoints para comparação visual com as mesmas sementes.
 - [ ] Definir estado, ações, transições, recompensa, término e orçamento do
   PCGRL; validar ambiente pequeno e política aleatória antes do treinamento.
 - [x] Auditar os dados atuais de GAN e definir folds por caverna, registrando
@@ -80,8 +80,8 @@ registram os limites e os experimentos preservados.
 - [x] Implementar o piloto com origem local, seleção em lotes, tampas e
   diagnóstico por janelas. Registrar reparos em máscara própria e distinguir
   um fechamento verificado de um recorte que continua vazando.
-- [ ] Validar detalhes, continuidade e limites em grades comparáveis; registrar
-  máscaras, revisão e novos manifestos antes de treinar e medir VRAM no Colab.
+- [ ] Revisar a geometria das tampas auxiliares e medir a VRAM do
+  primeiro passo completo no ambiente usado pelo piloto.
 - [ ] Confirmar o significado de PCGARL e definir gerador, adversário, objetivo,
   avaliação de alcançabilidade e custo antes de implementá-lo.
 - [ ] Produzir volumes sob o contrato comum, registrar checkpoints e avaliar

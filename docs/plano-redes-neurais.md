@@ -1,6 +1,56 @@
 # Plano de redes neurais: GAN, PCGRL e PCGARL
 
+## Piloto ativo de 27/11/2026
+
+O fold **`holdout_carste`** reúne 52 máscaras de ar em **64³**, com
+voxels de **16 cm**. Os 29 recortes de treino e os oito de validação
+conservam os arquivos e as atribuições do fold anterior. As partições
+são definidas por caverna. Cada recorte entra uma vez, mesmo quando
+as duas densidades do levantamento passaram na triagem.
+[Manifesto versionado](auditoria/gan/holdout_carste/splits.json) ·
+[Inventário dos 52 recortes](relatorios/inventario-gan-holdout-carste.md)
+
+| Partição | Cavernas | Recortes |
+| --- | --- | ---: |
+| Treino | Archamps (12) e Cascade de Môtiers (17) | 29 |
+| Validação | Markov Spodmol | 8 |
+| Teste | Madeleine (4), Rupt du Puits (3) e Vallorbe (8) | 15 |
+
+O Indian Tunnel fica reservado para avaliação externa em um tubo de
+lava. Esse ensaio usa a única referência aprovada a 16 cm e deve ter
+seus resultados registrados separadamente. Os quatro folds descritos
+na revisão de 15/11 documentam a configuração histórica.
+[Inventário externo do Indian Tunnel](auditoria/gan/holdout_carste/avaliacao_externa_indian_tunnel.json)
+
+O manifesto tem status `gallery_proxy_pending_review`. Os fechamentos
+passaram pela reclassificação pelo exterior e pela triagem geométrica
+numérica. A fidelidade às paredes medidas, sobretudo onde houve
+intervenção sintética, ainda depende de revisão. A primeira execução
+servirá para registrar a evolução do piloto. Use Markov para selecionar
+o checkpoint e preserve as cavernas de teste para a avaliação do
+checkpoint congelado. Para comparar visualmente passos sucessivos,
+gere as mesmas sementes latentes com o mesmo limiar em cada passo e
+registre a configuração, o manifesto e o hardware de cada execução.
+[Reparos e seleção das referências](auditoria/gan/historico-voxelizacao.md#vallorbe-e-novo-fold-cárstico)
+
+Com os NPZ locais e PyTorch no ambiente, verifique o carregamento antes
+de iniciar um treino de ocupação:
+
+```bash
+PYTHONPATH=src python -m cavegen.training.train_gan \
+  --root data/processed \
+  --splits docs/auditoria/gan/holdout_carste/splits.json \
+  --fold holdout_carste
+```
+
+Os caminhos do novo manifesto são relativos a `data/processed`. O CLI
+usa `configs/gan/occupancy64.json` por padrão e exige `--train` para
+atualizar os pesos.
+
 ## Revisão executável de 15/11/2026 — GAN de referências voxelizadas
+
+Esta revisão descreve o protocolo e a auditoria dos volumes globais de
+novembro. A composição ativa está na seção acima.
 
 **Pergunta:** uma GAN incondicional consegue gerar volumes voxelizados com
 distribuição geométrica próxima das referências reconstruídas de nuvens de

@@ -866,5 +866,144 @@ e foi sinalizado na varredura. As seis propostas revisadas de
 PostEtroiture já pertencem aos planos selecionados.
 
 O manifesto e o relatório completo ficam em
-`data/processed/experiments/gan_piloto_16cm_mascaras_ar/`.
+`data/processed/experiments/gan_piloto_16cm_indian_tunnel/`,
+que preserva a configuração anterior ao fold cárstico.
 [Método e reprodução da máscara de ar](README.md#máscara-derivada-de-ar-para-a-grade-da-gan)
+
+### Piloto externo em Madeleine e Rupt du Puits
+
+Em 27/11/2026, o piloto incluiu a Galerie du Filleul, em
+Grotte de la Madeleine, e Cascades, em Rupt du Puits. Os dois
+pacotes SwissUbase trazem nuvens do FARO Focus 3D e tabelas de
+nós e arestas da linha central. O ensaio usou os grafos do
+catálogo no sistema XYZ das nuvens, sem extrair um novo eixo.
+Os DOI abaixo são os da versão 1.0 nos metadados que vieram
+com os arquivos do HD. O MD5 de cada ZIP coincide com o
+valor publicado nos metadados do pacote.
+[Madeleine, versão 1.0](https://doi.org/10.60544/ckkg-gn58) ·
+[Rupt du Puits, versão 1.0](https://doi.org/10.60544/t0nv-xj93)
+
+| Levantamento | Ramos do grafo | LAS de 5 cm | LAS de 2 mm | Recortes por variante |
+| --- | ---: | ---: | ---: | ---: |
+| Madeleine / Filleul | 5 | 645.190 pontos | 15.916.629 pontos | 19 |
+| Rupt du Puits / Cascades | 1 | 377.430 pontos | 13.045.683 pontos | 7 |
+
+As duas rodadas mantiveram voxels de **16 cm**. O alvo de
+comprimento nominal foi de aproximadamente 7 m, com pelo
+menos um recorte por ramo e distribuição dos demais pelo
+comprimento útil. A revisão de estações consultou a nuvem
+original a até oito voxels de distância. As variantes
+usaram os mesmos grafos e o mesmo ponto de partida do
+planejamento, com novo ajuste dos contornos e possíveis
+deslocamentos de estação em cada nuvem. O efeito da densidade
+e o efeito dessas mudanças de estação podem coexistir.
+A busca de semente e a tampa auxiliar foram limitadas a
+quatro voxels. As falhas elegíveis seguiram para a triagem
+de junções, com recentramento por âncoras disponível após
+falha do fluxo padrão.
+
+A execução local fica em
+`data/processed/experiments/madeleine_rupt_16cm/`.
+Cada variante guarda `entrada.json`, `recortes/plan.json`,
+`recortes/recortes.html`, `resultados.json` e
+`juncoes/resultados.json`. O `reference_audit.json` registra
+a reprodução pelo exterior, o contato do ar com as duas
+tampas e a triagem em 64³, inclusive a janela derivada de ar
+quando aplicável. Os inventários locais marcaram cada caverna
+como fonte de teste externo. Uma revisão de densidade permanece
+uma versão da mesma galeria e os resultados ficam fora do
+manifesto principal até a definição do conjunto comparativo.
+
+| Fonte | Fecharam | Passaram na triagem da GAN | Contorno ausente | Semente na barreira | Fuga em passagem ambígua | Fuga sem apoio para o reparo |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Madeleine 5 cm | 4/19 | 4 | 7 | 2 | 4 | 2 |
+| Madeleine 2 mm | 5/19 | 4 | 7 | 1 | 3 | 3 |
+| Rupt du Puits 5 cm | 1/7 | 1 | 0 | 0 | 0 | 6 |
+| Rupt du Puits 2 mm | 3/7 | 3 | 3 | 0 | 0 | 1 |
+
+Considerando os identificadores uma vez por caverna, **oito
+recortes fecharam e sete passaram na triagem**. Todos os
+aprovados estão em 64³ nativos e todos os fechamentos deste
+ensaio usaram tampas auxiliares sintéticas. As contagens abaixo
+identificam a intervenção aplicada a cada variante.
+
+| Caverna | Recorte | Ar a 5 cm de amostragem | Células auxiliares a 5 cm | Ar a 2 mm de amostragem | Células auxiliares a 2 mm |
+| --- | --- | ---: | ---: | ---: | ---: |
+| Madeleine | `ramo_001_002` | 6.527 | 114 | 6.316 | 106 |
+| Madeleine | `ramo_001_006` | 3.791 | 1.059 | 4.012 | 1.182 |
+| Madeleine | `ramo_001_008` | — | — | 15.218 | 481 |
+| Madeleine | `ramo_002_001` | 7.528 | 286 | 7.302 | 270 |
+| Madeleine | `ramo_002_003` | 14.528 | 415 | 11.815 | 523 |
+| Rupt du Puits | `ramo_001_001` | 25.987 | 6 | 25.493 | 22 |
+| Rupt du Puits | `ramo_001_002` | — | — | 24.758 | 25 |
+| Rupt du Puits | `ramo_001_003` | — | — | 27.305 | 316 |
+
+O 001/008 de Madeleine é o fechamento adicional da fonte
+densa. Na grade nativa de 64×74×64, o ar ocupa 63 células no
+eixo Y. Como o ajuste exige duas células de margem em cada
+ponta do eixo reduzido, seriam necessárias 67 células. O volume
+permanece disponível na grade nativa para inspeção. A magnitude
+da intervenção em 001/006 também merece revisão geométrica
+antes de usar o trecho como referência de teste.
+
+Em Rupt du Puits, a nova rodada recuperou 001/002 e 001/003.
+Nos três últimos recortes, o problema passou a ser a falta de
+contorno. Dois cortes compartilhados ficaram com apenas 7 e 8
+setores apoiados nas estações selecionadas. Na variante de
+5 cm esses recortes tinham as duas tampas, mas vazavam. A
+cobertura das estações e a capacidade de fechar a parede são
+checagens distintas.
+
+As duas junções de Madeleine ficaram sem tampa válida em
+pelo menos um ramo nas duas densidades, mesmo após acionar o
+recentramento. Em Cascades, o grafo tem um único ramo e a
+triagem não encontrou junções a examinar. A repetição pelo
+exterior reproduziu os 13 volumes salvos nas quatro
+execuções, contando suas diferentes versões. A comparação por
+identificador e os caminhos dos relatórios de repetição estão
+em `comparacao.json`. Os sete candidatos de 64³ continuam
+sujeitos à revisão geométrica das tampas auxiliares.
+
+### Vallorbe e novo fold cárstico
+
+O piloto de **Vallorbe / GalerieSemiActive** usou o LAS de
+5 cm do BLK2GO, em coordenadas EPSG:2056, com **1.928.808
+pontos**. O grafo fornecido tem 325 nós, 324 arestas e 11
+ramos. Seis ramos tinham extensão útil para o planejador.
+A extração, a busca de estações e a voxelização repetiram os
+parâmetros do piloto de Madeleine e Rupt du Puits, com
+voxels de 16 cm.
+[Vallorbe, versão 1.0](https://doi.org/10.60544/5jz0-fx48)
+
+Dos **26 recortes**, **11 fecharam** e passaram no replay
+pelo exterior. Nove ficaram sem contorno, cinco vazaram com
+alerta de outra passagem e um vazou sem pontos suficientes
+nos bins necessários ao reparo local. A busca de junções
+avaliou quatro nós e ficou sem tampa válida em pelo menos
+um ramo em cada nó. Entre os fechamentos, nenhum usou
+células de reparo local. Dez usaram de 4 a 160 células de
+tampa auxiliar e o `ramo_004_004` fechou com as duas tampas
+de extremidade. A triagem aceitou **8 recortes**, com seis
+grades nativas de 64³ e duas janelas derivadas. Os outros
+três interiores fechados excederam o limite ou a margem da
+janela. A execução está em
+`data/processed/experiments/vallorbe_16cm/`.
+
+O fold ativo passa a ser **`holdout_carste`**. Ele conserva
+29 recortes de treino de Archamps e Cascade de Môtiers e oito
+de validação de Markov Spodmol, com as mesmas máscaras da
+configuração anterior. O teste passa a usar 15 recortes de
+cavernas cársticas reservadas, sendo quatro de Madeleine,
+três de Rupt du Puits e oito de Vallorbe. Quando as duas
+densidades deram um recorte elegível do mesmo identificador,
+selecionou-se a versão com menos células de tampa auxiliar.
+A seleção e as versões concorrentes são registradas em
+`selecao_teste.json`.
+
+O manifesto anterior foi arquivado em
+`gan_piloto_16cm_indian_tunnel/`. O manifesto ativo ocupa
+`gan_piloto_16cm_mascaras_ar/` e resolve os caminhos a
+partir de `data/processed`. O `ramo_002_001` de Indian
+Tunnel fica reservado em `avaliacao_externa_indian_tunnel.json`
+para uma avaliação separada no domínio de tubo de lava.
+[Inventário completo e comando de verificação do novo fold](../../relatorios/inventario-gan-holdout-carste.md)

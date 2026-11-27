@@ -6,6 +6,12 @@ O código da GAN está preparado. Os exemplos globais da auditoria perderam
 quase todo o ar, e os interiores locais ainda passam por revisão. Nenhum
 treino nas referências foi iniciado.
 
+Em 27/11, a preparação reuniu 52 recortes que passaram na triagem de
+64³ a 16 cm. O fold `holdout_carste` inclui três cavernas reservadas
+para teste, e Indian Tunnel fica separado. Os resultados abaixo
+descrevem o problema dos volumes globais e os primeiros recortes que
+motivaram essa mudança. [Inventário do piloto ativo](relatorios/inventario-gan-holdout-carste.md)
+
 ## O gargalo atual
 
 As nuvens mostram pontos nas paredes, no piso e no teto, sem indicar
@@ -39,7 +45,7 @@ O [registro do piloto](plano-reconstrucao-secoes.md#evolucao-do-piloto-em-archam
 documenta como os testes distinguiram uma fresta lateral de um problema
 de tampa e o que ainda precisamos medir antes do treino.
 
-## Próximos passos
+## Plano inicial para recuperar os recortes
 
 1. **Buscar cortes com melhor cobertura.** Reavaliar primeiro os limites
    001/002 e 005/006 de PostEtroiture, em passos de quatro voxels pela linha

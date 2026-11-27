@@ -1,0 +1,61 @@
+{
+  "schema": "gan-gallery-reference-audit-v1",
+  "resolution": 64,
+  "voxel_size": 0.16,
+  "reference_root": "data/processed",
+  "use": "external_domain_evaluation",
+  "records": [
+    {
+      "path": "reference_sections/indian_tunnel/Full/holdout_indian_tunnel/perfis_rotacao_16cm/ramo_002_001/64x64x64/interior.npz",
+      "group": "indian_tunnel",
+      "sha256": "d345d0177a20aa56dcba8a7a944eb21afb5a712db215a7aff849eaf299100a35",
+      "voxel_sha256": "f8bb94def20a3ed715a5359f4198a75bd31a70505b3254fe7f4b33550cb6348b",
+      "gallery_evidence": {
+        "surface.npz": "472abaada3a3baf5727ae2594b6d836eb684f4f9b6a39fd58e9e832e6cce5fff",
+        "masks.npz": "126965da89d667f1950d5a72a0bf15e5bd2a54e3e93eaba05cd01d2751fadea5"
+      },
+      "candidate": true,
+      "eligible_proxy": true,
+      "geometry_screen_passed": true,
+      "issues": [],
+      "shape_zyx": [
+        64,
+        64,
+        64
+      ],
+      "voxel_size": 0.16,
+      "crop_id": "ramo_002_001",
+      "structure": {
+        "structural_schema_version": "structural-v1",
+        "axis_order": "ZYX",
+        "shape_depth": 64,
+        "shape_height": 64,
+        "shape_width": 64,
+        "spacing_z": 1.0,
+        "spacing_y": 1.0,
+        "spacing_x": 1.0,
+        "distance_unit": "voxel",
+        "exterior_policy": "solid",
+        "distance_reference": "voxel_centers",
+        "connectivity": 6,
+        "total_voxels": 262144,
+        "open_voxels": 20433,
+        "open_ratio": 0.07794570922851562,
+        "component_count": 1,
+        "largest_component_voxels": 20433,
+        "largest_component_ratio": 1.0,
+        "dt_mean": 2.0133376221507464,
+        "dt_median": 2.0,
+        "dt_max": 4.242640687119285,
+        "is_degenerate": false,
+        "degenerate_reason": null
+      },
+      "repair_voxels": 0,
+      "auxiliary_cap_voxels": 46,
+      "review_status": "pending_review"
+    }
+  ],
+  "interpretation": "one candidate air volume in lava tube for separate evaluation",
+  "source_splits_id": "32b90e9ea313962bdc1dcbedb03548da80710cd4813ddf32b34b15e1b8e35db7",
+  "audit_id": "7ae87ff8b8e5cf7d15a28ab4942c28883dc71278ffadcda05bddfa7efa8b7358"
+}
