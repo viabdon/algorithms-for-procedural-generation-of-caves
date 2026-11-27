@@ -1,0 +1,126 @@
+{
+  "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/data/Archamps/PostEtroiture/pointclouds/Archamps_PostEtroiture_sampled_2mm_PCV_normals_classified_georef.las",
+  "centreline": "/run/media/midnavi/Pablo/TCC/DATA/RAW/data/Archamps/PostEtroiture/centreline/Archamps_PostEtroiture_nodes_from_LBC.txt",
+  "centreline_extraction": null,
+  "source_origin_xyz": [
+    943844.079,
+    6561936.867,
+    1044.824
+  ],
+  "parameters": {
+    "cave": "archamps",
+    "survey": "PostEtroiture",
+    "fold": "holdout_indian_tunnel",
+    "units": "m",
+    "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/data/Archamps/PostEtroiture/pointclouds/Archamps_PostEtroiture_sampled_2mm_PCV_normals_classified_georef.las",
+    "centreline": "/run/media/midnavi/Pablo/TCC/DATA/RAW/data/Archamps/PostEtroiture/centreline/Archamps_PostEtroiture_nodes_from_LBC.txt",
+    "count": 6,
+    "voxel_size": 0.16,
+    "batch_size": 65536,
+    "padding_voxels": 2,
+    "plan_id": "piloto_2mm_6_trechos"
+  },
+  "requested": 6,
+  "proposed": 6,
+  "crops": [
+    {
+      "crop_id": "ramo_001_001",
+      "status": "pending_review",
+      "review_reasons": [
+        "tampa_com_cobertura_insuficiente",
+        "grade_excede_64_com_voxel_escolhido"
+      ],
+      "retained_points": 21820922,
+      "cut_stations": [
+        0.16,
+        8.756148184614059
+      ],
+      "section_bins_supported": [
+        16,
+        11
+      ],
+      "selection_radius": 4.484545721875803
+    },
+    {
+      "crop_id": "ramo_001_002",
+      "status": "pending_review",
+      "review_reasons": [
+        "tampa_com_cobertura_insuficiente"
+      ],
+      "retained_points": 21893047,
+      "cut_stations": [
+        8.756148184614059,
+        17.032296369228117
+      ],
+      "section_bins_supported": [
+        11,
+        16
+      ],
+      "selection_radius": 2.832484684717221
+    },
+    {
+      "crop_id": "ramo_001_003",
+      "status": "pending_review",
+      "review_reasons": [],
+      "retained_points": 20652469,
+      "cut_stations": [
+        17.032296369228117,
+        25.468444553842176
+      ],
+      "section_bins_supported": [
+        16,
+        16
+      ],
+      "selection_radius": 2.4219029181176146
+    },
+    {
+      "crop_id": "ramo_001_004",
+      "status": "pending_review",
+      "review_reasons": [],
+      "retained_points": 18681574,
+      "cut_stations": [
+        25.468444553842176,
+        33.90459273845623
+      ],
+      "section_bins_supported": [
+        16,
+        16
+      ],
+      "selection_radius": 2.6078650068077383
+    },
+    {
+      "crop_id": "ramo_001_005",
+      "status": "pending_review",
+      "review_reasons": [
+        "tampa_com_cobertura_insuficiente"
+      ],
+      "retained_points": 24670550,
+      "cut_stations": [
+        33.90459273845623,
+        42.340740923070285
+      ],
+      "section_bins_supported": [
+        16,
+        11
+      ],
+      "selection_radius": 2.6930704515027406
+    },
+    {
+      "crop_id": "ramo_001_006",
+      "status": "pending_review",
+      "review_reasons": [
+        "tampa_com_cobertura_insuficiente"
+      ],
+      "retained_points": 21701489,
+      "cut_stations": [
+        42.340740923070285,
+        50.77688910768435
+      ],
+      "section_bins_supported": [
+        11,
+        14
+      ],
+      "selection_radius": 4.3952298164973165
+    }
+  ]
+}

@@ -18,7 +18,7 @@ Para uma caverna voxelizada com interior conhecido, o SDF é um campo `float32[D
 
 Este é o contrato escolhido para novos campos sintéticos; não afirma que já exista uma API pública de SDF integrada ao pacote `cavegen`. Se um futuro campo usar espaçamento físico ou outra regra de borda, a conversão e os metadados precisarão ser explícitos.
 
-## Contratos e implementação no `main`
+## Contratos e implementação neste checkout — 17/11/2026
 
 | Etapa | Contrato | Estado |
 | --- | --- | --- |
@@ -27,7 +27,8 @@ Este é o contrato escolhido para novos campos sintéticos; não afirma que já 
 | Avaliação estrutural | `evaluate_structure(Volume3D)` → `StructuralMetrics` imutável | Ocupação, componentes e EDT, validações e degeneração explícitas; registro plano `structural-v1` |
 | Benchmark inicial | Uma linha por execução no CSV central, com NPZ rastreável | Código de persistência incremental e medições iniciais disponível; importação bloqueada pela API do CA; protocolo e resultados finais pendentes |
 | Marching Cubes | Malha derivada do volume gerado | Disponível para visualização |
-| GAN e PCGRL | Devem gerar `Volume3D` | Interfaces ainda lançam `NotImplementedError` |
+| GAN | Checkpoint → `Volume3D`, ocupação ou TSDF discreto explícito | Código/Colab implementados; nenhum treino nas referências, que falharam na auditoria |
+| PCGRL | Deve gerar `Volume3D` | Interface ainda lança `NotImplementedError` |
 | CPU/GPU/VRAM e descritores adicionais | Protocolo e instrumentação | Amostrador disponível; protocolo e inclusão no CSV ainda pendentes |
 
 A transformada de distância descreve o espaço livre em unidades da grade atual. Seus resumos não validam, por si sós, a largura de todos os túneis. Resolução, espaçamento e bordas precisam ser explicitados para interpretações físicas.
@@ -82,6 +83,16 @@ O scan pode apoiar inspeção qualitativa e propriedades efetivamente observáve
 
 Uma variante de CA com peso espacial já existe na branch `CA`. O ensaio com o campo do Elaphes demonstra o efeito do peso na regra, sem fornecer avaliação de semelhança volumétrica real. A extensão guiada requer campo procedural com semântica e unidade documentadas, independente do scan de teste. Peso zero já foi verificado contra o CA básico; ainda falta comparar resultados sob protocolo comum. Está planejado ajustar geneticamente parâmetros de CA e Random Walk, com orçamento e sementes de avaliação reservadas, custo de busca separado e controle por busca simples de mesmo orçamento. Para o GA do CA, decidido em 12/11/2026, o peso e o alvo da aptidão vêm do mesmo Elaphes, o que é assumido como exceção à independência acima e exige o controle de cópia pura do peso ([ajustes metodológicos](methodology-adjustments.md#3-extensões-condicionadas-e-neurais)).
 
-Uma GAN requer volumes de treino com semântica válida; dados sintéticos verificam a infraestrutura, mas não sustentam alegação de aprendizagem de cavernas reais. PCGRL deve começar com ambiente pequeno e recompensa de conectividade e ocupação, após definição do MDP. Ambos ainda não geram volumes no código atual.
+Uma GAN requer volumes de treino com semântica válida; dados sintéticos verificam a infraestrutura, mas não sustentam alegação de aprendizagem de cavernas reais. O código atual implementa G/D, treino e inferência a partir de checkpoint, sem modelo treinado nas referências. A variante neural usa TSDF discreto nos centros, com interface entre centros e recuperação por sinal, distinta do contrato histórico de borda zero acima; ver o [plano neural](plano-redes-neurais.md). PCGRL ainda depende de ambiente pequeno, recompensa e definição do MDP.
+
+Para preparar referências menores, o [planejamento dos recortes](planejamento-recortes-voxelizacao.md)
+separa seleção de pontos, seções/tampas e bounds da grade. O menu local
+executa o filtro em lotes e voxeliza o recorte em coordenadas locais.
+Se a semente alcança a borda, o diagnóstico por janelas localiza
+caminhos de fuga e avalia um remendo apoiado pela nuvem. O NPZ de superfície
+guarda a observação, as máscaras registram tampas e reparo, e o NPZ de
+interior guarda apenas a componente de ar candidata. A integração
+posterior à GAN deve preservar a divisão por caverna e considerar a
+proveniência de cada máscara. [Histórico e critérios](plano-reconstrucao-secoes.md#evolucao-do-piloto-em-archamps)
 
 Ver [ajustes metodológicos](methodology-adjustments.md) e [roadmap](roadmap.md).

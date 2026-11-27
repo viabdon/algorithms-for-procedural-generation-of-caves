@@ -1,0 +1,47 @@
+{
+  "origem": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/secoes_indian_16cm/amostra_8cm.npz",
+  "pontos": 879386,
+  "celula_amostral_m": 0.08,
+  "resultados": [
+    {
+      "grupo": "principal",
+      "total": 32,
+      "contornos_completos_original": 9,
+      "contornos_completos_controle_amostra": 9,
+      "contornos_completos_auto_amostra": 0,
+      "recortes_recuperados_frente_ao_original": [],
+      "ganhos_auto_frente_ao_controle_amostra": [],
+      "recortes_que_perderam_contorno_frente_ao_original": [
+        "ramo_002_002",
+        "ramo_002_003",
+        "ramo_002_004",
+        "ramo_002_005",
+        "ramo_002_006",
+        "ramo_002_007",
+        "ramo_002_008",
+        "ramo_002_009",
+        "ramo_002_010"
+      ],
+      "cortes_deslocados": 0,
+      "cortes_reajustados": 0,
+      "cortes_pendentes": 36,
+      "plan": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/auto_amostra_8cm_principal/plan.json",
+      "validacao_recuperados": {}
+    },
+    {
+      "grupo": "ramos",
+      "total": 2,
+      "contornos_completos_original": 0,
+      "contornos_completos_controle_amostra": 0,
+      "contornos_completos_auto_amostra": 0,
+      "recortes_recuperados_frente_ao_original": [],
+      "ganhos_auto_frente_ao_controle_amostra": [],
+      "recortes_que_perderam_contorno_frente_ao_original": [],
+      "cortes_deslocados": 0,
+      "cortes_reajustados": 0,
+      "cortes_pendentes": 4,
+      "plan": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/auto_amostra_8cm_ramos/plan.json",
+      "validacao_recuperados": {}
+    }
+  ]
+}

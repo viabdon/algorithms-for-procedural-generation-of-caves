@@ -1,0 +1,98 @@
+{
+  "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/MarkovSpodmol/MainGallery/pointclouds/MarkovSpodmol_MainGallery_sampled_5cm_PCV_normals_classified_georef.las",
+  "centreline": "/run/media/midnavi/Pablo/TCC/DATA/RAW/MarkovSpodmol/MainGallery/centreline/MarkovSpodmol_MainGallery_nodes_from_LBC.txt",
+  "centreline_extraction": null,
+  "source_origin_xyz": [
+    430842.428,
+    65788.001,
+    554.649
+  ],
+  "parameters": {
+    "cave": "markovspodmol",
+    "survey": "MainGallery",
+    "fold": "holdout_indian_tunnel",
+    "units": "m",
+    "plan_id": "ramos_cortes_16cm",
+    "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/MarkovSpodmol/MainGallery/pointclouds/MarkovSpodmol_MainGallery_sampled_5cm_PCV_normals_classified_georef.las",
+    "centreline": "/run/media/midnavi/Pablo/TCC/DATA/RAW/MarkovSpodmol/MainGallery/centreline/MarkovSpodmol_MainGallery_nodes_from_LBC.txt",
+    "count": 15,
+    "passages": [
+      4,
+      19,
+      23,
+      26,
+      27,
+      32,
+      36,
+      51,
+      52,
+      57,
+      66,
+      69,
+      75,
+      80,
+      82
+    ],
+    "voxel_size": 0.16,
+    "batch_size": 131072,
+    "padding_voxels": 2
+  },
+  "requested": 3,
+  "proposed": 3,
+  "crops": [
+    {
+      "crop_id": "ramo_019_001",
+      "status": "pending_review",
+      "review_reasons": [
+        "outra_passagem_ou_retorno_proximo"
+      ],
+      "retained_points": 14853,
+      "cut_stations": [
+        1.6,
+        3.1986531562648297
+      ],
+      "section_bins_supported": [
+        15,
+        16
+      ],
+      "selection_radius": 5.188396868205769
+    },
+    {
+      "crop_id": "ramo_051_001",
+      "status": "pending_review",
+      "review_reasons": [
+        "outra_passagem_ou_retorno_proximo",
+        "grade_excede_64_com_voxel_escolhido"
+      ],
+      "retained_points": 26606,
+      "cut_stations": [
+        2.56,
+        5.8508040006100694
+      ],
+      "section_bins_supported": [
+        15,
+        15
+      ],
+      "selection_radius": 6.3210445567212314
+    },
+    {
+      "crop_id": "ramo_066_001",
+      "status": "pending_review",
+      "review_reasons": [
+        "outra_passagem_ou_retorno_proximo",
+        "grade_excede_64_com_voxel_escolhido"
+      ],
+      "retained_points": 30398,
+      "cut_stations": [
+        1.6,
+        3.768732269587791
+      ],
+      "section_bins_supported": [
+        15,
+        16
+      ],
+      "selection_radius": 8.75711196041198
+    }
+  ],
+  "source_plan": "data/processed/crop_plans/markovspodmol/MainGallery/holdout_indian_tunnel/ramos_adicionais_16cm/plan.json"
+}

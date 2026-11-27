@@ -1,0 +1,171 @@
+{
+  "cave": "vallorbe",
+  "survey": "GalerieSemiActive",
+  "crop_id": "ramo_004_001",
+  "plan_id": "las5cm_16cm",
+  "fold": "teste_externo",
+  "branch": "passagem_004",
+  "source": "cloud.ply",
+  "source_origin_xyz": [
+    2516274.164,
+    1172042.544,
+    813.459
+  ],
+  "units": "m",
+  "origin_xyz": [
+    6.867013000126626,
+    -4.251000999994417,
+    -5.2060019999999625
+  ],
+  "selection_min_xyz": [
+    7.185413000126626,
+    -3.932600999994417,
+    -4.887601999999962
+  ],
+  "selection_max_xyz": [
+    17.20460400012667,
+    9.786599000005584,
+    6.438596000000022
+  ],
+  "shape_zyx": [
+    75,
+    90,
+    67
+  ],
+  "voxel_size": 0.16,
+  "sections": [
+    {
+      "point_xyz": [
+        15.15094016847751,
+        5.207907528407014,
+        0.6527192504575062
+      ],
+      "inward_normal_xyz": [
+        -0.8259930539073295,
+        -0.5635387854549435,
+        0.012629813332381584
+      ],
+      "u_xyz": [
+        0.010432970210814456,
+        0.007117957388960814,
+        0.9999202407268238
+      ],
+      "polygon_uv": [
+        [
+          1.0776295872931356,
+          0.2143538523668414
+        ],
+        [
+          1.7967871734894305,
+          1.2005748062130346
+        ],
+        [
+          1.712120910263173,
+          2.5623700206799467
+        ],
+        [
+          0.5270421679230243,
+          2.6496199048150415
+        ],
+        [
+          -0.5517751037099566,
+          2.7739607696529016
+        ],
+        [
+          -1.3071088140253875,
+          1.9562265835012493
+        ],
+        [
+          -0.9367921068908038,
+          0.6259444739958475
+        ],
+        [
+          -0.9136402077287588,
+          0.18173433665257024
+        ],
+        [
+          -0.8709595377754885,
+          -0.17324462355081519
+        ],
+        [
+          -0.7608003343358434,
+          -0.5083505311250707
+        ],
+        [
+          -0.44062823230967774,
+          -0.6594467516677716
+        ],
+        [
+          -0.10949054519380653,
+          -0.5504461418672124
+        ],
+        [
+          0.19757450611348112,
+          -0.9932741172215632
+        ],
+        [
+          0.6118029588079053,
+          -0.9156278337677087
+        ],
+        [
+          0.46733110077149237,
+          -0.31226065837082234
+        ],
+        [
+          0.7845776451248433,
+          -0.15606219678494015
+        ]
+      ]
+    },
+    {
+      "point_xyz": [
+        9.55128320290217,
+        1.7045054409051728,
+        0.7240789983521317
+      ],
+      "inward_normal_xyz": [
+        0.8817150705780884,
+        0.47171166929158664,
+        -0.008163049039496748
+      ],
+      "u_xyz": [
+        0.007197723175459501,
+        0.003850733788602112,
+        0.9999666817601368
+      ],
+      "polygon_uv": []
+    }
+  ],
+  "seed_xyz": [
+    12.347895631799398,
+    3.4547871630807605,
+    0.6422966724484831
+  ],
+  "batch_size": 65536,
+  "proposal": {
+    "crop_id": "ramo_004_001",
+    "status": "pending_review",
+    "review_reasons": [
+      "tampa_com_cobertura_insuficiente",
+      "outra_passagem_ou_retorno_proximo",
+      "grade_excede_64_com_voxel_escolhido"
+    ],
+    "retained_points": 117763,
+    "cut_stations": [
+      0.48,
+      7.093593072127394
+    ],
+    "section_bins_supported": [
+      16,
+      8
+    ],
+    "selection_radius": 7.18880288608787
+  },
+  "auxiliary_cap_radius_voxels": 4,
+  "seed_search_radius_voxels": 4,
+  "progress_every": 20000,
+  "leak_diagnostics": {
+    "raw_source": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/vallorbe_16cm/fontes/Vallorbe/GalerieSemiActive/pointclouds/Vallorbe_GalerieSemiActive_sampled_5cm_PCV_normals_classified_georef.las",
+    "centreline": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/vallorbe_16cm/fontes/Vallorbe/GalerieSemiActive/centreline/Vallorbe_GalerieSemiActive_nodes_from_LBC.txt"
+  }
+}

@@ -1,0 +1,264 @@
+{
+  "config": {
+    "cave": "rupt_du_puits",
+    "survey": "Cascades",
+    "crop_id": "ramo_001_003",
+    "plan_id": "las2mm_16cm",
+    "fold": "teste_externo",
+    "branch": "passagem_001",
+    "source": "cloud.ply",
+    "source_origin_xyz": [
+      61.078,
+      14.17,
+      -0.505
+    ],
+    "units": "m",
+    "origin_xyz": [
+      -4.194259506899434,
+      -2.337235155869334,
+      -4.6228750319576015
+    ],
+    "selection_min_xyz": [
+      -3.875859506899434,
+      -2.018835155869334,
+      -4.304475031957601
+    ],
+    "selection_max_xyz": [
+      4.110497236795179,
+      5.97540075695234,
+      4.020300027826162
+    ],
+    "shape_zyx": [
+      64,
+      64,
+      64
+    ],
+    "voxel_size": 0.16,
+    "sections": [
+      {
+        "point_xyz": [
+          0.5517968472362479,
+          -1.5195564938140964,
+          0.0458814627818966
+        ],
+        "inward_normal_xyz": [
+          -0.3256169012363606,
+          0.9449261881600935,
+          -0.032986854328135105
+        ],
+        "u_xyz": [
+          -0.010746925919315318,
+          0.031187114995625268,
+          0.9994557856361302
+        ],
+        "polygon_uv": [
+          [
+            3.7034601829678784,
+            0.736664032490442
+          ],
+          [
+            3.019586893372804,
+            2.017623457492807
+          ],
+          [
+            2.024386785103846,
+            3.029708928450279
+          ],
+          [
+            0.6528645506129889,
+            3.282171738305672
+          ],
+          [
+            -0.3634850935630097,
+            1.827362965668378
+          ],
+          [
+            -0.881658317371074,
+            1.3194949184795088
+          ],
+          [
+            -1.5087414939496986,
+            1.0081088363996376
+          ],
+          [
+            -2.662554157504389,
+            0.5296149507457498
+          ],
+          [
+            -3.0461881866867446,
+            -0.6059245036978083
+          ],
+          [
+            -1.9997065938472183,
+            -1.336161228115074
+          ],
+          [
+            -0.7900912337130908,
+            -1.1824550934064975
+          ],
+          [
+            -0.18445121138367565,
+            -0.9272988593596034
+          ],
+          [
+            0.1468810973375855,
+            -0.7384211412920242
+          ],
+          [
+            0.8349096049111792,
+            -1.2495305260148386
+          ],
+          [
+            2.1043791667013103,
+            -1.4061012052722306
+          ],
+          [
+            3.525849522413953,
+            -0.7013350755277977
+          ]
+        ]
+      },
+      {
+        "point_xyz": [
+          -1.981787397753736,
+          4.608709816839323,
+          -0.03618048180659507
+        ],
+        "inward_normal_xyz": [
+          0.42193487625698534,
+          -0.9065974705803199,
+          -0.007210168886272735
+        ],
+        "u_xyz": [
+          0.0030423007971882416,
+          -0.006536890792112349,
+          0.999974006394482
+        ],
+        "polygon_uv": [
+          [
+            3.582710127133932,
+            0.7126453530232877
+          ],
+          [
+            2.3623349093132227,
+            1.5784617220141195
+          ],
+          [
+            1.3978840152111005,
+            2.0920812727029072
+          ],
+          [
+            0.06606679205112363,
+            0.33214019279667983
+          ],
+          [
+            -0.06347480644931232,
+            0.3191094012176716
+          ],
+          [
+            -0.20119221768584555,
+            0.301105432392086
+          ],
+          [
+            -0.7519847387983456,
+            0.5024601385063779
+          ],
+          [
+            -3.3005745435907357,
+            0.6565250961786677
+          ],
+          [
+            -4.266805459808951,
+            -0.8487203751590502
+          ],
+          [
+            -2.477513435354455,
+            -1.6554215526619023
+          ],
+          [
+            -0.8980333837574344,
+            -1.3440019371973657
+          ],
+          [
+            -0.5396655238602522,
+            -2.7130818006414312
+          ],
+          [
+            0.6337937472801013,
+            -3.1862963355636817
+          ],
+          [
+            2.0386939950970384,
+            -3.0511211813737553
+          ],
+          [
+            3.0773167206297343,
+            -2.056197294836659
+          ],
+          [
+            4.0250821399215235,
+            -0.80063861734937
+          ]
+        ]
+      }
+    ],
+    "seed_xyz": [
+      -0.6342634336118862,
+      1.5772525427333342,
+      -0.029876887905115557
+    ],
+    "batch_size": 65536,
+    "proposal": {
+      "crop_id": "ramo_001_003",
+      "status": "pending_review",
+      "review_reasons": [],
+      "retained_points": 1909410,
+      "cut_stations": [
+        12.950939210573228,
+        19.586408815859844
+      ],
+      "section_bins_supported": [
+        16,
+        16
+      ],
+      "selection_radius": 4.395770038915251
+    },
+    "auxiliary_cap_radius_voxels": 4,
+    "seed_search_radius_voxels": 4,
+    "progress_every": 20000,
+    "leak_diagnostics": {
+      "raw_source": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/madeleine_rupt_16cm/fontes/RuptDuPuits/Cascades/pointclouds/RuptDuPuits_Cascades_sampled_2mm_PCV_normals_classified.las",
+      "centreline": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/madeleine_rupt_16cm/fontes/RuptDuPuits/Cascades/centreline/RuptDuPuits_Cascades_nodes_from_LBC.txt"
+    },
+    "plane_tolerance": 1e-08
+  },
+  "partition": "test",
+  "source_path": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/madeleine_rupt_16cm/rupt_du_puits/las2mm_16cm/recortes/ramo_001_003/cloud.ply",
+  "source_size_bytes": 45825977,
+  "source_mtime_ns": 1795774767796064515,
+  "counts": {
+    "read": 1909410,
+    "candidate": 1909410,
+    "retained": 1909410,
+    "outside_grid": 0
+  },
+  "axis_order": "ZYX",
+  "seed_zyx": [
+    28,
+    24,
+    22
+  ],
+  "surface_voxels": 10053,
+  "cap_voxels": [
+    1024,
+    1237
+  ],
+  "method": "synthetic_auxiliary_caps_exterior_flood_fill_6",
+  "status": "pending_review",
+  "auxiliary_cap_voxels": 316,
+  "auxiliary_cap_radius_voxels": 4,
+  "repair_voxels": 0,
+  "air_voxels": 27305,
+  "candidate_volume": 111.84128000000001,
+  "diagnostics": "relatorio_volume/summary.csv"
+}

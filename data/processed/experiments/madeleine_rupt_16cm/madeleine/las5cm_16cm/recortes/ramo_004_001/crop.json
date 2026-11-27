@@ -1,0 +1,106 @@
+{
+  "cave": "madeleine",
+  "survey": "Filleul",
+  "crop_id": "ramo_004_001",
+  "plan_id": "las5cm_16cm",
+  "fold": "teste_externo",
+  "branch": "passagem_004",
+  "source": "cloud.ply",
+  "source_origin_xyz": [
+    33.804,
+    -89.122,
+    170.394
+  ],
+  "units": "m",
+  "origin_xyz": [
+    -33.580792800000005,
+    53.1301555,
+    10.9827468
+  ],
+  "selection_min_xyz": [
+    -33.26239280000001,
+    53.4485555,
+    11.3011468
+  ],
+  "selection_max_xyz": [
+    -27.893550300000005,
+    59.2058411,
+    22.9922893
+  ],
+  "shape_zyx": [
+    78,
+    64,
+    64
+  ],
+  "voxel_size": 0.16,
+  "sections": [
+    {
+      "point_xyz": [
+        -29.628328776802103,
+        56.65514944001991,
+        15.192233985962666
+      ],
+      "inward_normal_xyz": [
+        -0.5022968514842746,
+        0.7703669997227672,
+        0.3927245328816707
+      ],
+      "u_xyz": [
+        0.21449788113317714,
+        -0.3289729741430196,
+        0.9196561538275453
+      ],
+      "polygon_uv": []
+    },
+    {
+      "point_xyz": [
+        -29.907181432172802,
+        57.854582869710015,
+        15.651840143753722
+      ],
+      "inward_normal_xyz": [
+        -0.32655298494382395,
+        -0.9071024484021877,
+        -0.2655716402913437
+      ],
+      "u_xyz": [
+        -0.08995333459490176,
+        -0.24987335536685878,
+        0.9640911284069391
+      ],
+      "polygon_uv": []
+    }
+  ],
+  "seed_xyz": [
+    -29.93373253143443,
+    57.26073931676548,
+    15.464398410807394
+  ],
+  "batch_size": 65536,
+  "proposal": {
+    "crop_id": "ramo_004_001",
+    "status": "pending_review",
+    "review_reasons": [
+      "tampa_com_cobertura_insuficiente",
+      "outra_passagem_ou_retorno_proximo",
+      "grade_excede_64_com_voxel_escolhido"
+    ],
+    "retained_points": 6657,
+    "cut_stations": [
+      0.64,
+      2.1054813862712396
+    ],
+    "section_bins_supported": [
+      3,
+      2
+    ],
+    "selection_radius": 7.959621761741056
+  },
+  "auxiliary_cap_radius_voxels": 4,
+  "seed_search_radius_voxels": 4,
+  "progress_every": 20000,
+  "leak_diagnostics": {
+    "raw_source": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/madeleine_rupt_16cm/fontes/GrotteDeLaMadeleine/Filleul/pointclouds/GrotteDeLaMadeleine_Filleul_sampled_5cm_PCV_normals_classified.las",
+    "centreline": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/madeleine_rupt_16cm/fontes/GrotteDeLaMadeleine/Filleul/centreline/GrotteDeLaMadeleine_Filleul_nodes_from_LBC.txt"
+  }
+}

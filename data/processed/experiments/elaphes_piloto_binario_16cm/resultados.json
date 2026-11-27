@@ -1,0 +1,74 @@
+[
+  {
+    "recorte": "ramo_003_001",
+    "planejamento": {
+      "crop_id": "ramo_003_001",
+      "status": "pending_review",
+      "review_reasons": [
+        "outra_passagem_ou_retorno_proximo",
+        "grade_excede_64_com_voxel_escolhido"
+      ],
+      "retained_points": 11452381,
+      "cut_stations": [
+        1.28,
+        12.345873944847924
+      ],
+      "section_bins_supported": [
+        16,
+        16
+      ],
+      "selection_radius": 2.877170570179554
+    },
+    "resultado": "ambiguous_passage",
+    "motivo": "A semente ficou conectada ao exterior e o reparo não foi verificado. Relatório: /home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/elaphes_piloto_binario_16cm/data/processed/reference_sections/elaphes/MainGallery/holdout_elaphes/galeria_piloto/ramo_003_001/64x64x76_sem_volume/20261127T063007097705Z-d1472dc3/summary.csv"
+  },
+  {
+    "recorte": "ramo_006_001",
+    "planejamento": {
+      "crop_id": "ramo_006_001",
+      "status": "pending_review",
+      "review_reasons": [
+        "outra_passagem_ou_retorno_proximo"
+      ],
+      "retained_points": 7618856,
+      "cut_stations": [
+        0.64,
+        8.34400600643442
+      ],
+      "section_bins_supported": [
+        16,
+        16
+      ],
+      "selection_radius": 2.675284357732472
+    },
+    "resultado": "ambiguous_passage",
+    "motivo": "A semente ficou conectada ao exterior e o reparo não foi verificado. Relatório: /home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/elaphes_piloto_binario_16cm/data/processed/reference_sections/elaphes/MainGallery/holdout_elaphes/galeria_piloto/ramo_006_001/64x64x64_sem_volume/20261127T063014054090Z-b4fe4c7c/summary.csv"
+  },
+  {
+    "recorte": "ramo_006_002",
+    "planejamento": {
+      "crop_id": "ramo_006_002",
+      "status": "pending_review",
+      "review_reasons": [],
+      "retained_points": 7540050,
+      "cut_stations": [
+        8.34400600643442,
+        16.04801201286884
+      ],
+      "section_bins_supported": [
+        16,
+        16
+      ],
+      "selection_radius": 2.016754458362735
+    },
+    "resultado": "volume_salvo",
+    "volume": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/elaphes_piloto_binario_16cm/data/processed/reference_sections/elaphes/MainGallery/holdout_elaphes/galeria_piloto/ramo_006_002/64x64x64",
+    "air_voxels": 7334,
+    "grade": [
+      64,
+      64,
+      64
+    ],
+    "replay": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/elaphes_piloto_binario_16cm/data/processed/reference_sections/elaphes/MainGallery/holdout_elaphes/galeria_piloto/ramo_006_002/64x64x64/relatorio_volume/checks_replay.csv"
+  }
+]

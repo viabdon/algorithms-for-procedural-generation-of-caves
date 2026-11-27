@@ -1,0 +1,224 @@
+{
+  "casos": [
+    {
+      "levantamento": "cascadedemotiers/MainGallery",
+      "plano_anterior": "ramos_adicionais_16cm",
+      "recorte": "ramo_012_001"
+    },
+    {
+      "levantamento": "cascadedemotiers/MainGallery",
+      "plano_anterior": "ramos_adicionais_16cm",
+      "recorte": "ramo_040_001"
+    },
+    {
+      "levantamento": "markovspodmol/MainGallery",
+      "plano_anterior": "las5cm_16cm_rev",
+      "recorte": "ramo_018_005"
+    },
+    {
+      "levantamento": "markovspodmol/MainGallery",
+      "plano_anterior": "las5cm_16cm_rev",
+      "recorte": "ramo_028_001"
+    },
+    {
+      "levantamento": "markovspodmol/MainGallery",
+      "plano_anterior": "las5cm_16cm_rev",
+      "recorte": "ramo_037_001"
+    },
+    {
+      "levantamento": "markovspodmol/MainGallery",
+      "plano_anterior": "las5cm_16cm_rev",
+      "recorte": "ramo_037_008"
+    },
+    {
+      "levantamento": "markovspodmol/MainGallery",
+      "plano_anterior": "las5cm_16cm_rev",
+      "recorte": "ramo_040_001"
+    },
+    {
+      "levantamento": "markovspodmol/MainGallery",
+      "plano_anterior": "las5cm_16cm_rev",
+      "recorte": "ramo_040_002"
+    },
+    {
+      "levantamento": "markovspodmol/MainGallery",
+      "plano_anterior": "ramos_adicionais_16cm",
+      "recorte": "ramo_004_001"
+    },
+    {
+      "levantamento": "markovspodmol/MainGallery",
+      "plano_anterior": "ramos_adicionais_16cm",
+      "recorte": "ramo_023_001"
+    },
+    {
+      "levantamento": "markovspodmol/MainGallery",
+      "plano_anterior": "ramos_adicionais_16cm",
+      "recorte": "ramo_026_001"
+    },
+    {
+      "levantamento": "markovspodmol/MainGallery",
+      "plano_anterior": "ramos_adicionais_16cm",
+      "recorte": "ramo_027_001"
+    },
+    {
+      "levantamento": "markovspodmol/MainGallery",
+      "plano_anterior": "ramos_adicionais_16cm",
+      "recorte": "ramo_032_001"
+    },
+    {
+      "levantamento": "markovspodmol/MainGallery",
+      "plano_anterior": "ramos_adicionais_16cm",
+      "recorte": "ramo_036_001"
+    },
+    {
+      "levantamento": "markovspodmol/MainGallery",
+      "plano_anterior": "ramos_adicionais_16cm",
+      "recorte": "ramo_052_001"
+    },
+    {
+      "levantamento": "markovspodmol/MainGallery",
+      "plano_anterior": "ramos_adicionais_16cm",
+      "recorte": "ramo_057_001"
+    },
+    {
+      "levantamento": "markovspodmol/MainGallery",
+      "plano_anterior": "ramos_adicionais_16cm",
+      "recorte": "ramo_069_001"
+    },
+    {
+      "levantamento": "markovspodmol/MainGallery",
+      "plano_anterior": "ramos_adicionais_16cm",
+      "recorte": "ramo_075_001"
+    },
+    {
+      "levantamento": "markovspodmol/MainGallery",
+      "plano_anterior": "ramos_adicionais_16cm",
+      "recorte": "ramo_080_001"
+    },
+    {
+      "levantamento": "markovspodmol/MainGallery",
+      "plano_anterior": "ramos_adicionais_16cm",
+      "recorte": "ramo_082_001"
+    },
+    {
+      "levantamento": "indian_tunnel/Full",
+      "plano_anterior": "full10x_16cm_rev",
+      "recorte": "ramo_001_001"
+    },
+    {
+      "levantamento": "indian_tunnel/Full",
+      "plano_anterior": "full10x_16cm_rev",
+      "recorte": "ramo_001_002"
+    },
+    {
+      "levantamento": "indian_tunnel/Full",
+      "plano_anterior": "full10x_16cm_rev",
+      "recorte": "ramo_001_003"
+    },
+    {
+      "levantamento": "indian_tunnel/Full",
+      "plano_anterior": "full10x_16cm_rev",
+      "recorte": "ramo_001_004"
+    },
+    {
+      "levantamento": "indian_tunnel/Full",
+      "plano_anterior": "full10x_16cm_rev",
+      "recorte": "ramo_001_005"
+    },
+    {
+      "levantamento": "indian_tunnel/Full",
+      "plano_anterior": "full10x_16cm_rev",
+      "recorte": "ramo_001_006"
+    },
+    {
+      "levantamento": "indian_tunnel/Full",
+      "plano_anterior": "full10x_16cm_rev",
+      "recorte": "ramo_001_007"
+    },
+    {
+      "levantamento": "indian_tunnel/Full",
+      "plano_anterior": "full10x_16cm_rev",
+      "recorte": "ramo_001_008"
+    },
+    {
+      "levantamento": "indian_tunnel/Full",
+      "plano_anterior": "full10x_16cm_rev",
+      "recorte": "ramo_001_009"
+    },
+    {
+      "levantamento": "indian_tunnel/Full",
+      "plano_anterior": "full10x_16cm_rev",
+      "recorte": "ramo_001_010"
+    },
+    {
+      "levantamento": "indian_tunnel/Full",
+      "plano_anterior": "full10x_16cm_rev",
+      "recorte": "ramo_002_001"
+    },
+    {
+      "levantamento": "indian_tunnel/Full",
+      "plano_anterior": "full10x_16cm_rev",
+      "recorte": "ramo_007_001"
+    },
+    {
+      "levantamento": "indian_tunnel/Full",
+      "plano_anterior": "full10x_16cm_rev",
+      "recorte": "ramo_007_002"
+    },
+    {
+      "levantamento": "indian_tunnel/Full",
+      "plano_anterior": "full10x_16cm_rev",
+      "recorte": "ramo_007_003"
+    },
+    {
+      "levantamento": "indian_tunnel/Full",
+      "plano_anterior": "full10x_16cm_rev",
+      "recorte": "ramo_008_001"
+    },
+    {
+      "levantamento": "indian_tunnel/Full",
+      "plano_anterior": "full10x_16cm_rev",
+      "recorte": "ramo_008_002"
+    },
+    {
+      "levantamento": "indian_tunnel/Full",
+      "plano_anterior": "full10x_16cm_rev",
+      "recorte": "ramo_008_003"
+    },
+    {
+      "levantamento": "indian_tunnel/Full",
+      "plano_anterior": "full10x_16cm_rev",
+      "recorte": "ramo_008_004"
+    },
+    {
+      "levantamento": "indian_tunnel/Full",
+      "plano_anterior": "full10x_16cm_rev",
+      "recorte": "ramo_008_005"
+    },
+    {
+      "levantamento": "indian_tunnel/Full",
+      "plano_anterior": "full10x_16cm_rev",
+      "recorte": "ramo_009_001"
+    },
+    {
+      "levantamento": "indian_tunnel/Full",
+      "plano_anterior": "full10x_16cm_rev",
+      "recorte": "ramo_009_002"
+    },
+    {
+      "levantamento": "indian_tunnel/Full",
+      "plano_anterior": "full10x_16cm_rev",
+      "recorte": "ramo_009_003"
+    },
+    {
+      "levantamento": "indian_tunnel/Full",
+      "plano_anterior": "ramos_adicionais_16cm",
+      "recorte": "ramo_006_001"
+    },
+    {
+      "levantamento": "indian_tunnel/Full",
+      "plano_anterior": "ramos_adicionais_16cm",
+      "recorte": "ramo_018_001"
+    }
+  ]
+}

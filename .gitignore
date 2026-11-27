@@ -3,6 +3,9 @@ __pycache__/
 *.py[cod]
 *.egg-info/
 .venv/
+.venv-gan/
+.pytest_cache/
+/tmp/
 .env
 
 # Notebooks
@@ -15,8 +18,25 @@ __pycache__/
 !/data/processed/**/.gitkeep
 !/data/processed/README.md
 !/data/processed/manifest.json
+# Receitas de recortes e grafos usados como entrada de planejamento.
+!/data/processed/crop_plans/**/*.json
+!/data/processed/crop_plans/README.md
+!/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/full10x_16cm/centreline.npz
+!/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/perfis_rotacao_16cm/ramo_002_001/centreline.npz
+!/data/processed/experiments/madeleine_rupt_16cm/*/*/recortes/**/*.json
+!/data/processed/experiments/madeleine_rupt_16cm/*/*/entrada.json
+!/data/processed/experiments/madeleine_rupt_16cm/*/*/docs/auditoria/gan/splits.json
+!/data/processed/experiments/vallorbe_16cm/vallorbe/*/recortes/**/*.json
+!/data/processed/experiments/vallorbe_16cm/vallorbe/*/entrada.json
+!/data/processed/experiments/vallorbe_16cm/vallorbe/*/docs/auditoria/gan/splits.json
+!/data/processed/experiments/elaphes_piloto_binario_16cm/galeria_piloto/**/*.json
+!/data/processed/experiments/elaphes_piloto_binario_16cm/entrada.json
+!/data/processed/experiments/elaphes_piloto_binario_16cm/docs/auditoria/gan/splits.json
+!/data/processed/experiments/experiment_elaphes-meshing/elaphes_centreline_roi_x12_45_pruned_exploratory.npz
+!/data/processed/experiments/planejamento_auto_16cm/config_sementes_originais/archamps/PreEtroiture/ramo_001_008/crop.json
 /data/external/*
-/data/references/*
+# Caminho legado substituído por data/processed/references.
+/data/references/
 
 # Resultados gerados e busca de parâmetros do CA
 /results/csv/*
@@ -26,6 +46,9 @@ __pycache__/
 /results/profiling/*
 /results/volumes/*
 /models/checkpoints/*
+
+# Rascunho local dos resultados parciais do artigo
+/docs/relatorios/resultados-parciais-artigo.md
 
 # Ferramentas de src/cavegen/tools/: só o código e a documentação são versionados.
 # A entrada (data/processed/references) vem do PLY em data/, as saídas são

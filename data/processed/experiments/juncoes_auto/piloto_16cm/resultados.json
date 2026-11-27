@@ -1,0 +1,4036 @@
+{
+  "recortes": [
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/cascadedemotiers/MainGallery/holdout_indian_tunnel/auto_ramos_adicionais_16cm/ramo_012_001/crop_validacao.json",
+      "falha_anterior": "missing_contour",
+      "juncoes": [
+        "3c093c4f874a/juncao_021",
+        "3c093c4f874a/juncao_020"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/cascadedemotiers/MainGallery/holdout_indian_tunnel/auto_ramos_adicionais_16cm/ramo_040_001/crop_validacao.json",
+      "falha_anterior": "missing_contour",
+      "juncoes": [
+        "3c093c4f874a/juncao_012"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/markovspodmol/MainGallery/holdout_indian_tunnel/auto_las5cm_16cm_rev/ramo_018_005/crop_validacao.json",
+      "falha_anterior": "missing_contour",
+      "juncoes": [
+        "a8f087b5a82c/juncao_028"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/markovspodmol/MainGallery/holdout_indian_tunnel/auto_las5cm_16cm_rev/ramo_028_001/crop_validacao.json",
+      "falha_anterior": "missing_contour",
+      "juncoes": [
+        "a8f087b5a82c/juncao_039"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/markovspodmol/MainGallery/holdout_indian_tunnel/auto_las5cm_16cm_rev/ramo_037_001/crop_validacao.json",
+      "falha_anterior": "missing_contour",
+      "juncoes": [
+        "a8f087b5a82c/juncao_013"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/markovspodmol/MainGallery/holdout_indian_tunnel/auto_las5cm_16cm_rev/ramo_037_008/crop_validacao.json",
+      "falha_anterior": "missing_contour",
+      "juncoes": [
+        "a8f087b5a82c/juncao_016"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/markovspodmol/MainGallery/holdout_indian_tunnel/auto_las5cm_16cm_rev/ramo_040_001/crop_validacao.json",
+      "falha_anterior": "missing_contour",
+      "juncoes": [
+        "a8f087b5a82c/juncao_024",
+        "a8f087b5a82c/juncao_023"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/markovspodmol/MainGallery/holdout_indian_tunnel/auto_las5cm_16cm_rev/ramo_040_002/crop_validacao.json",
+      "falha_anterior": "missing_contour",
+      "juncoes": [
+        "a8f087b5a82c/juncao_024",
+        "a8f087b5a82c/juncao_023"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/markovspodmol/MainGallery/holdout_indian_tunnel/auto_ramos_adicionais_16cm/ramo_004_001/crop_validacao.json",
+      "falha_anterior": "missing_contour",
+      "juncoes": [
+        "a8f087b5a82c/juncao_002",
+        "a8f087b5a82c/juncao_001"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/markovspodmol/MainGallery/holdout_indian_tunnel/auto_ramos_adicionais_16cm/ramo_023_001/crop_validacao.json",
+      "falha_anterior": "missing_contour",
+      "juncoes": [
+        "a8f087b5a82c/juncao_012"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/markovspodmol/MainGallery/holdout_indian_tunnel/auto_ramos_adicionais_16cm/ramo_026_001/crop_validacao.json",
+      "falha_anterior": "missing_contour",
+      "juncoes": [
+        "a8f087b5a82c/juncao_011",
+        "a8f087b5a82c/juncao_012"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/markovspodmol/MainGallery/holdout_indian_tunnel/auto_ramos_adicionais_16cm/ramo_027_001/crop_validacao.json",
+      "falha_anterior": "missing_contour",
+      "juncoes": [
+        "a8f087b5a82c/juncao_039"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/markovspodmol/MainGallery/holdout_indian_tunnel/auto_ramos_adicionais_16cm/ramo_032_001/crop_validacao.json",
+      "falha_anterior": "missing_contour",
+      "juncoes": [
+        "a8f087b5a82c/juncao_009",
+        "a8f087b5a82c/juncao_008"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/markovspodmol/MainGallery/holdout_indian_tunnel/auto_ramos_adicionais_16cm/ramo_036_001/crop_validacao.json",
+      "falha_anterior": "missing_contour",
+      "juncoes": [
+        "a8f087b5a82c/juncao_013"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/markovspodmol/MainGallery/holdout_indian_tunnel/auto_ramos_adicionais_16cm/ramo_052_001/crop_validacao.json",
+      "falha_anterior": "missing_contour",
+      "juncoes": [
+        "a8f087b5a82c/juncao_023",
+        "a8f087b5a82c/juncao_021"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/markovspodmol/MainGallery/holdout_indian_tunnel/auto_ramos_adicionais_16cm/ramo_057_001/crop_validacao.json",
+      "falha_anterior": "missing_contour",
+      "juncoes": [
+        "a8f087b5a82c/juncao_034",
+        "a8f087b5a82c/juncao_033"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/markovspodmol/MainGallery/holdout_indian_tunnel/auto_ramos_adicionais_16cm/ramo_069_001/crop_validacao.json",
+      "falha_anterior": "missing_contour",
+      "juncoes": [
+        "a8f087b5a82c/juncao_017"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/markovspodmol/MainGallery/holdout_indian_tunnel/auto_ramos_adicionais_16cm/ramo_075_001/crop_validacao.json",
+      "falha_anterior": "missing_contour",
+      "juncoes": [
+        "a8f087b5a82c/juncao_021",
+        "a8f087b5a82c/juncao_020"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/markovspodmol/MainGallery/holdout_indian_tunnel/auto_ramos_adicionais_16cm/ramo_080_001/crop_validacao.json",
+      "falha_anterior": "missing_contour",
+      "juncoes": [
+        "a8f087b5a82c/juncao_035",
+        "a8f087b5a82c/juncao_030"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/markovspodmol/MainGallery/holdout_indian_tunnel/auto_ramos_adicionais_16cm/ramo_082_001/crop_validacao.json",
+      "falha_anterior": "missing_contour",
+      "juncoes": [
+        "a8f087b5a82c/juncao_031",
+        "a8f087b5a82c/juncao_026"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/auto_full10x_16cm_rev/ramo_001_001/crop_validacao.json",
+      "falha_anterior": "missing_contour",
+      "juncoes": [],
+      "resultado": "sem_juncao_proxima"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/auto_full10x_16cm_rev/ramo_001_002/crop_validacao.json",
+      "falha_anterior": "missing_contour",
+      "juncoes": [],
+      "resultado": "sem_juncao_proxima"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/auto_full10x_16cm_rev/ramo_001_003/crop_validacao.json",
+      "falha_anterior": "missing_contour",
+      "juncoes": [],
+      "resultado": "sem_juncao_proxima"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/auto_full10x_16cm_rev/ramo_001_004/crop_validacao.json",
+      "falha_anterior": "missing_contour",
+      "juncoes": [],
+      "resultado": "sem_juncao_proxima"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/auto_full10x_16cm_rev/ramo_001_005/crop_validacao.json",
+      "falha_anterior": "missing_contour",
+      "juncoes": [],
+      "resultado": "sem_juncao_proxima"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/auto_full10x_16cm_rev/ramo_001_006/crop_validacao.json",
+      "falha_anterior": "missing_contour",
+      "juncoes": [],
+      "resultado": "sem_juncao_proxima"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/auto_full10x_16cm_rev/ramo_001_007/crop_validacao.json",
+      "falha_anterior": "missing_contour",
+      "juncoes": [],
+      "resultado": "sem_juncao_proxima"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/auto_full10x_16cm_rev/ramo_001_008/crop_validacao.json",
+      "falha_anterior": "missing_contour",
+      "juncoes": [],
+      "resultado": "sem_juncao_proxima"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/auto_full10x_16cm_rev/ramo_001_009/crop_validacao.json",
+      "falha_anterior": "missing_contour",
+      "juncoes": [
+        "67fe61f051ae/juncao_001"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/auto_full10x_16cm_rev/ramo_001_010/crop_validacao.json",
+      "falha_anterior": "missing_contour",
+      "juncoes": [
+        "67fe61f051ae/juncao_001"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/auto_full10x_16cm_rev/ramo_002_001/crop_validacao.json",
+      "falha_anterior": "missing_contour",
+      "juncoes": [
+        "67fe61f051ae/juncao_002"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/auto_full10x_16cm_rev/ramo_007_001/crop_validacao.json",
+      "falha_anterior": "missing_contour",
+      "juncoes": [
+        "67fe61f051ae/juncao_003"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/auto_full10x_16cm_rev/ramo_007_002/crop_validacao.json",
+      "falha_anterior": "missing_contour",
+      "juncoes": [
+        "67fe61f051ae/juncao_003"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/auto_full10x_16cm_rev/ramo_007_003/crop_validacao.json",
+      "falha_anterior": "missing_contour",
+      "juncoes": [
+        "67fe61f051ae/juncao_003"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/auto_full10x_16cm_rev/ramo_008_001/crop_validacao.json",
+      "falha_anterior": "missing_contour",
+      "juncoes": [
+        "67fe61f051ae/juncao_003"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/auto_full10x_16cm_rev/ramo_008_002/crop_validacao.json",
+      "falha_anterior": "missing_contour",
+      "juncoes": [
+        "67fe61f051ae/juncao_003"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/auto_full10x_16cm_rev/ramo_008_003/crop_validacao.json",
+      "falha_anterior": "missing_contour",
+      "juncoes": [],
+      "resultado": "sem_juncao_proxima"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/auto_full10x_16cm_rev/ramo_008_004/crop_validacao.json",
+      "falha_anterior": "missing_contour",
+      "juncoes": [
+        "67fe61f051ae/juncao_007"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/auto_full10x_16cm_rev/ramo_008_005/crop_validacao.json",
+      "falha_anterior": "missing_contour",
+      "juncoes": [
+        "67fe61f051ae/juncao_007"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/auto_full10x_16cm_rev/ramo_009_001/crop_validacao.json",
+      "falha_anterior": "missing_contour",
+      "juncoes": [],
+      "resultado": "sem_juncao_proxima"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/auto_full10x_16cm_rev/ramo_009_002/crop_validacao.json",
+      "falha_anterior": "missing_contour",
+      "juncoes": [
+        "67fe61f051ae/juncao_004"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/auto_full10x_16cm_rev/ramo_009_003/crop_validacao.json",
+      "falha_anterior": "missing_contour",
+      "juncoes": [
+        "67fe61f051ae/juncao_004"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/auto_ramos_adicionais_16cm/ramo_006_001/crop_validacao.json",
+      "falha_anterior": "missing_contour",
+      "juncoes": [
+        "67fe61f051ae/juncao_003"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/auto_ramos_adicionais_16cm/ramo_018_001/crop_validacao.json",
+      "falha_anterior": "missing_contour",
+      "juncoes": [
+        "67fe61f051ae/juncao_011"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/planejamento_auto_16cm/config_sementes_originais/cascadedemotiers/MainGallery/ramo_002_004/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "3c093c4f874a/juncao_018"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/planejamento_auto_16cm/config_sementes_originais/cascadedemotiers/MainGallery/ramo_018_001/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "3c093c4f874a/juncao_024"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/planejamento_auto_16cm/config_sementes_originais/cascadedemotiers/MainGallery/ramo_027_004/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "3c093c4f874a/juncao_003"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/planejamento_auto_16cm/config_sementes_originais/cascadedemotiers/MainGallery/ramo_008_001/crop.json",
+      "falha_anterior": "seed_blocked",
+      "juncoes": [
+        "3c093c4f874a/juncao_014"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/planejamento_auto_16cm/config_sementes_originais/cascadedemotiers/MainGallery/ramo_037_001/crop.json",
+      "falha_anterior": "seed_blocked",
+      "juncoes": [
+        "3c093c4f874a/juncao_001"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/planejamento_auto_16cm/config_sementes_originais/cascadedemotiers/MainGallery/ramo_019_002/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "3c093c4f874a/juncao_006",
+        "3c093c4f874a/juncao_003"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/planejamento_auto_16cm/config_sementes_originais/cascadedemotiers/MainGallery/ramo_028_002/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [],
+      "resultado": "sem_juncao_proxima"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/planejamento_auto_16cm/config_sementes_originais/cascadedemotiers/MainGallery/ramo_029_002/crop.json",
+      "falha_anterior": "seed_blocked",
+      "juncoes": [
+        "3c093c4f874a/juncao_008",
+        "3c093c4f874a/juncao_007"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/planejamento_auto_16cm/config_sementes_originais/cascadedemotiers/MainGallery/ramo_042_001/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "3c093c4f874a/juncao_018"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/planejamento_auto_16cm/config_sementes_originais/markovspodmol/MainGallery/ramo_011_002/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "a8f087b5a82c/juncao_005"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/planejamento_auto_16cm/config_sementes_originais/markovspodmol/MainGallery/ramo_037_002/crop.json",
+      "falha_anterior": "seed_blocked",
+      "juncoes": [
+        "a8f087b5a82c/juncao_013"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/planejamento_auto_16cm/config_sementes_originais/markovspodmol/MainGallery/ramo_011_001/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "a8f087b5a82c/juncao_005"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/planejamento_auto_16cm/config_sementes_originais/markovspodmol/MainGallery/ramo_028_003/crop.json",
+      "falha_anterior": "seed_blocked",
+      "juncoes": [],
+      "resultado": "sem_juncao_proxima"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/archamps/PreEtroiture/holdout_indian_tunnel/ramos_cortes_16cm/ramo_001_001/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "ccc1794c10d5/juncao_001"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/archamps/PreEtroiture/holdout_indian_tunnel/ramos_cortes_16cm/ramo_001_002/crop.json",
+      "falha_anterior": "escape_path_without_supported_voxels",
+      "juncoes": [],
+      "resultado": "sem_juncao_proxima"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/archamps/PreEtroiture/holdout_indian_tunnel/ramos_cortes_16cm/ramo_001_003/crop.json",
+      "falha_anterior": "escape_path_without_supported_voxels",
+      "juncoes": [],
+      "resultado": "sem_juncao_proxima"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/archamps/PreEtroiture/holdout_indian_tunnel/pre_5cm_16cm/ramo_001_006/crop.json",
+      "falha_anterior": "escape_path_without_supported_voxels",
+      "juncoes": [],
+      "resultado": "sem_juncao_proxima"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/archamps/PreEtroiture/holdout_indian_tunnel/ramos_cortes_16cm/ramo_001_010/crop.json",
+      "falha_anterior": "escape_path_without_supported_voxels",
+      "juncoes": [],
+      "resultado": "sem_juncao_proxima"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/archamps/PreEtroiture/holdout_indian_tunnel/ramos_cortes_16cm/ramo_001_011/crop.json",
+      "falha_anterior": "escape_path_without_supported_voxels",
+      "juncoes": [],
+      "resultado": "sem_juncao_proxima"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/archamps/PreEtroiture/holdout_indian_tunnel/pre_5cm_16cm/ramo_002_003/crop.json",
+      "falha_anterior": "escape_path_without_supported_voxels",
+      "juncoes": [],
+      "resultado": "sem_juncao_proxima"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/archamps/PreEtroiture/holdout_indian_tunnel/pre_5cm_16cm/ramo_002_004/crop.json",
+      "falha_anterior": "escape_path_without_supported_voxels",
+      "juncoes": [],
+      "resultado": "sem_juncao_proxima"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/archamps/PreEtroiture/holdout_indian_tunnel/pre_5cm_16cm/ramo_002_006/crop.json",
+      "falha_anterior": "escape_path_without_supported_voxels",
+      "juncoes": [],
+      "resultado": "sem_juncao_proxima"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/archamps/PreEtroiture/holdout_indian_tunnel/ramos_cortes_16cm/ramo_002_008/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "ccc1794c10d5/juncao_002"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/archamps/PreEtroiture/holdout_indian_tunnel/pre_5cm_16cm/ramo_004_002/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "ccc1794c10d5/juncao_002"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/cascadedemotiers/MainGallery/holdout_indian_tunnel/las5cm_16cm_rev/ramo_002_001/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "3c093c4f874a/juncao_017"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/cascadedemotiers/MainGallery/holdout_indian_tunnel/las5cm_16cm_rev/ramo_002_002/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "3c093c4f874a/juncao_017"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/cascadedemotiers/MainGallery/holdout_indian_tunnel/las5cm_16cm_rev/ramo_002_005/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "3c093c4f874a/juncao_018"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/cascadedemotiers/MainGallery/holdout_indian_tunnel/las5cm_16cm_rev/ramo_005_001/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "3c093c4f874a/juncao_005"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/cascadedemotiers/MainGallery/holdout_indian_tunnel/las5cm_16cm_rev/ramo_005_002/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "3c093c4f874a/juncao_005",
+        "3c093c4f874a/juncao_002"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/cascadedemotiers/MainGallery/holdout_indian_tunnel/las5cm_16cm_rev/ramo_005_003/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "3c093c4f874a/juncao_002"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/cascadedemotiers/MainGallery/holdout_indian_tunnel/cortes_refitos_16cm/ramo_006_001/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "3c093c4f874a/juncao_005"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/cascadedemotiers/MainGallery/holdout_indian_tunnel/las5cm_16cm_rev/ramo_006_002/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "3c093c4f874a/juncao_005"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/cascadedemotiers/MainGallery/holdout_indian_tunnel/cortes_refitos_16cm/ramo_010_001/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "3c093c4f874a/juncao_001"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/cascadedemotiers/MainGallery/holdout_indian_tunnel/las5cm_16cm_rev/ramo_010_002/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "3c093c4f874a/juncao_001"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/cascadedemotiers/MainGallery/holdout_indian_tunnel/las5cm_16cm_rev/ramo_015_001/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "3c093c4f874a/juncao_023"
+      ],
+      "resultado": "volume_de_juncao_salvo"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/cascadedemotiers/MainGallery/holdout_indian_tunnel/las5cm_16cm_rev/ramo_015_004/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "3c093c4f874a/juncao_024"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/cascadedemotiers/MainGallery/holdout_indian_tunnel/las5cm_16cm_rev/ramo_016_001/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "3c093c4f874a/juncao_023"
+      ],
+      "resultado": "volume_de_juncao_salvo"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/cascadedemotiers/MainGallery/holdout_indian_tunnel/cortes_refitos_16cm/ramo_016_003/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "3c093c4f874a/juncao_022"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/cascadedemotiers/MainGallery/holdout_indian_tunnel/cortes_refitos_16cm/ramo_017_001/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "3c093c4f874a/juncao_024"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/cascadedemotiers/MainGallery/holdout_indian_tunnel/las5cm_16cm_rev/ramo_018_002/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "3c093c4f874a/juncao_024"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/cascadedemotiers/MainGallery/holdout_indian_tunnel/las5cm_16cm_rev/ramo_018_004/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [],
+      "resultado": "sem_juncao_proxima"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/cascadedemotiers/MainGallery/holdout_indian_tunnel/cortes_refitos_16cm/ramo_019_001/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "3c093c4f874a/juncao_006",
+        "3c093c4f874a/juncao_003"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/cascadedemotiers/MainGallery/holdout_indian_tunnel/cortes_refitos_16cm/ramo_020_001/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "3c093c4f874a/juncao_006"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/cascadedemotiers/MainGallery/holdout_indian_tunnel/las5cm_16cm_rev/ramo_020_002/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "3c093c4f874a/juncao_006"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/cascadedemotiers/MainGallery/holdout_indian_tunnel/las5cm_16cm_rev/ramo_020_003/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [],
+      "resultado": "sem_juncao_proxima"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/cascadedemotiers/MainGallery/holdout_indian_tunnel/las5cm_16cm_rev/ramo_020_004/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [],
+      "resultado": "sem_juncao_proxima"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/cascadedemotiers/MainGallery/holdout_indian_tunnel/las5cm_16cm_rev/ramo_020_005/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "3c093c4f874a/juncao_007"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/cascadedemotiers/MainGallery/holdout_indian_tunnel/las5cm_16cm_rev/ramo_021_001/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "3c093c4f874a/juncao_010"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/cascadedemotiers/MainGallery/holdout_indian_tunnel/las5cm_16cm_rev/ramo_021_002/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "3c093c4f874a/juncao_010",
+        "3c093c4f874a/juncao_011"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/cascadedemotiers/MainGallery/holdout_indian_tunnel/las5cm_16cm_rev/ramo_021_003/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "3c093c4f874a/juncao_011"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/cascadedemotiers/MainGallery/holdout_indian_tunnel/cortes_refitos_16cm/ramo_024_001/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "3c093c4f874a/juncao_009",
+        "3c093c4f874a/juncao_008"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/cascadedemotiers/MainGallery/holdout_indian_tunnel/cortes_refitos_16cm/ramo_024_002/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "3c093c4f874a/juncao_009",
+        "3c093c4f874a/juncao_008"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/cascadedemotiers/MainGallery/holdout_indian_tunnel/cortes_refitos_16cm/ramo_027_001/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "3c093c4f874a/juncao_004"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/cascadedemotiers/MainGallery/holdout_indian_tunnel/cortes_refitos_16cm/ramo_028_001/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "3c093c4f874a/juncao_004"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/cascadedemotiers/MainGallery/holdout_indian_tunnel/las5cm_16cm_rev/ramo_029_001/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "3c093c4f874a/juncao_008",
+        "3c093c4f874a/juncao_007"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/cascadedemotiers/MainGallery/holdout_indian_tunnel/las5cm_16cm_rev/ramo_035_001/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "3c093c4f874a/juncao_019"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/cascadedemotiers/MainGallery/holdout_indian_tunnel/las5cm_16cm_rev/ramo_038_001/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "3c093c4f874a/juncao_002"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/cascadedemotiers/MainGallery/holdout_indian_tunnel/cortes_refitos_16cm/ramo_042_002/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "3c093c4f874a/juncao_018"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/cascadedemotiers/MainGallery/holdout_indian_tunnel/las5cm_16cm_rev/ramo_044_001/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "3c093c4f874a/juncao_013",
+        "3c093c4f874a/juncao_011"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/cascadedemotiers/MainGallery/holdout_indian_tunnel/las5cm_16cm_rev/ramo_044_002/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "3c093c4f874a/juncao_013",
+        "3c093c4f874a/juncao_011"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/cascadedemotiers/MainGallery/holdout_indian_tunnel/ramos_cortes_16cm/ramo_001_001/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "3c093c4f874a/juncao_017",
+        "3c093c4f874a/juncao_016"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/cascadedemotiers/MainGallery/holdout_indian_tunnel/ramos_cortes_16cm/ramo_007_001/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "3c093c4f874a/juncao_014",
+        "3c093c4f874a/juncao_013"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/cascadedemotiers/MainGallery/holdout_indian_tunnel/ramos_adicionais_16cm/ramo_014_001/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "3c093c4f874a/juncao_023"
+      ],
+      "resultado": "volume_de_juncao_salvo"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/cascadedemotiers/MainGallery/holdout_indian_tunnel/ramos_cortes_16cm/ramo_023_001/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "3c093c4f874a/juncao_010",
+        "3c093c4f874a/juncao_009"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/cascadedemotiers/MainGallery/holdout_indian_tunnel/ramos_cortes_16cm/ramo_025_001/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "3c093c4f874a/juncao_009"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/cascadedemotiers/MainGallery/holdout_indian_tunnel/ramos_cortes_16cm/ramo_032_001/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "3c093c4f874a/juncao_016",
+        "3c093c4f874a/juncao_015"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/cascadedemotiers/MainGallery/holdout_indian_tunnel/contornos_malha_16cm/ramo_033_001/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "3c093c4f874a/juncao_019",
+        "3c093c4f874a/juncao_018"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/cascadedemotiers/MainGallery/holdout_indian_tunnel/ramos_cortes_16cm/ramo_036_001/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "3c093c4f874a/juncao_001",
+        "3c093c4f874a/juncao_002"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/cascadedemotiers/MainGallery/holdout_indian_tunnel/ramos_cortes_16cm/ramo_041_001/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "3c093c4f874a/juncao_012",
+        "3c093c4f874a/juncao_013"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/cascadedemotiers/MainGallery/holdout_indian_tunnel/ramos_cortes_16cm/ramo_047_001/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "3c093c4f874a/juncao_022"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/markovspodmol/MainGallery/holdout_indian_tunnel/las5cm_16cm_rev/ramo_001_001/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "a8f087b5a82c/juncao_003"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/markovspodmol/MainGallery/holdout_indian_tunnel/las5cm_16cm_rev/ramo_001_002/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "a8f087b5a82c/juncao_003"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/markovspodmol/MainGallery/holdout_indian_tunnel/las5cm_16cm_rev/ramo_005_001/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "a8f087b5a82c/juncao_002"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/markovspodmol/MainGallery/holdout_indian_tunnel/las5cm_16cm_rev/ramo_005_002/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "a8f087b5a82c/juncao_002"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/markovspodmol/MainGallery/holdout_indian_tunnel/las5cm_16cm_rev/ramo_005_003/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "a8f087b5a82c/juncao_004"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/markovspodmol/MainGallery/holdout_indian_tunnel/cortes_refitos_16cm/ramo_005_004/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "a8f087b5a82c/juncao_004"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/markovspodmol/MainGallery/holdout_indian_tunnel/las5cm_16cm_rev/ramo_009_001/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "a8f087b5a82c/juncao_005"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/markovspodmol/MainGallery/holdout_indian_tunnel/las5cm_16cm_rev/ramo_009_002/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "a8f087b5a82c/juncao_005",
+        "a8f087b5a82c/juncao_004"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/markovspodmol/MainGallery/holdout_indian_tunnel/cortes_refitos_16cm/ramo_009_003/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "a8f087b5a82c/juncao_004"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/markovspodmol/MainGallery/holdout_indian_tunnel/las5cm_16cm_rev/ramo_010_001/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "a8f087b5a82c/juncao_005"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/markovspodmol/MainGallery/holdout_indian_tunnel/las5cm_16cm_rev/ramo_010_003/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "a8f087b5a82c/juncao_006"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/markovspodmol/MainGallery/holdout_indian_tunnel/las5cm_16cm_rev/ramo_016_001/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "a8f087b5a82c/juncao_004"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/markovspodmol/MainGallery/holdout_indian_tunnel/las5cm_16cm_rev/ramo_016_002/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "a8f087b5a82c/juncao_004"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/markovspodmol/MainGallery/holdout_indian_tunnel/las5cm_16cm_rev/ramo_017_001/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "a8f087b5a82c/juncao_019"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/markovspodmol/MainGallery/holdout_indian_tunnel/las5cm_16cm_rev/ramo_017_002/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "a8f087b5a82c/juncao_019"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/markovspodmol/MainGallery/holdout_indian_tunnel/cortes_refitos_16cm/ramo_017_008/crop.json",
+      "falha_anterior": "escape_path_without_supported_voxels",
+      "juncoes": [],
+      "resultado": "sem_juncao_proxima"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/markovspodmol/MainGallery/holdout_indian_tunnel/cortes_refitos_16cm/ramo_017_009/crop.json",
+      "falha_anterior": "escape_path_without_supported_voxels",
+      "juncoes": [],
+      "resultado": "sem_juncao_proxima"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/markovspodmol/MainGallery/holdout_indian_tunnel/las5cm_16cm_rev/ramo_017_012/crop.json",
+      "falha_anterior": "escape_path_without_supported_voxels",
+      "juncoes": [],
+      "resultado": "sem_juncao_proxima"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/markovspodmol/MainGallery/holdout_indian_tunnel/las5cm_16cm_rev/ramo_017_015/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "a8f087b5a82c/juncao_006"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/markovspodmol/MainGallery/holdout_indian_tunnel/las5cm_16cm_rev/ramo_017_016/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "a8f087b5a82c/juncao_006"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/markovspodmol/MainGallery/holdout_indian_tunnel/cortes_refitos_16cm/ramo_018_001/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "a8f087b5a82c/juncao_019"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/markovspodmol/MainGallery/holdout_indian_tunnel/las5cm_16cm_rev/ramo_018_002/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "a8f087b5a82c/juncao_019"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/markovspodmol/MainGallery/holdout_indian_tunnel/las5cm_16cm_rev/ramo_018_003/crop.json",
+      "falha_anterior": "escape_path_without_supported_voxels",
+      "juncoes": [],
+      "resultado": "sem_juncao_proxima"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/markovspodmol/MainGallery/holdout_indian_tunnel/las5cm_16cm_rev/ramo_018_004/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "a8f087b5a82c/juncao_028"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/markovspodmol/MainGallery/holdout_indian_tunnel/las5cm_16cm_rev/ramo_028_002/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "a8f087b5a82c/juncao_039"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/markovspodmol/MainGallery/holdout_indian_tunnel/las5cm_16cm_rev/ramo_035_001/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "a8f087b5a82c/juncao_012",
+        "a8f087b5a82c/juncao_013"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/markovspodmol/MainGallery/holdout_indian_tunnel/cortes_refitos_16cm/ramo_035_002/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "a8f087b5a82c/juncao_012",
+        "a8f087b5a82c/juncao_013"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/markovspodmol/MainGallery/holdout_indian_tunnel/las5cm_16cm_rev/ramo_037_003/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [],
+      "resultado": "sem_juncao_proxima"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/markovspodmol/MainGallery/holdout_indian_tunnel/las5cm_16cm_rev/ramo_037_004/crop.json",
+      "falha_anterior": "escape_path_without_supported_voxels",
+      "juncoes": [],
+      "resultado": "sem_juncao_proxima"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/markovspodmol/MainGallery/holdout_indian_tunnel/las5cm_16cm_rev/ramo_037_005/crop.json",
+      "falha_anterior": "escape_path_without_supported_voxels",
+      "juncoes": [],
+      "resultado": "sem_juncao_proxima"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/markovspodmol/MainGallery/holdout_indian_tunnel/las5cm_16cm_rev/ramo_037_006/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [],
+      "resultado": "sem_juncao_proxima"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/markovspodmol/MainGallery/holdout_indian_tunnel/las5cm_16cm_rev/ramo_037_007/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "a8f087b5a82c/juncao_016"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/markovspodmol/MainGallery/holdout_indian_tunnel/cortes_refitos_16cm/ramo_041_001/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "a8f087b5a82c/juncao_024"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/markovspodmol/MainGallery/holdout_indian_tunnel/las5cm_16cm_rev/ramo_041_002/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "a8f087b5a82c/juncao_024",
+        "a8f087b5a82c/juncao_025"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/markovspodmol/MainGallery/holdout_indian_tunnel/cortes_refitos_16cm/ramo_041_003/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "a8f087b5a82c/juncao_025"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/markovspodmol/MainGallery/holdout_indian_tunnel/las5cm_16cm_rev/ramo_058_001/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [],
+      "resultado": "sem_juncao_proxima"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/markovspodmol/MainGallery/holdout_indian_tunnel/las5cm_16cm_rev/ramo_058_002/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "a8f087b5a82c/juncao_001"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/markovspodmol/MainGallery/holdout_indian_tunnel/las5cm_16cm_rev/ramo_058_003/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "a8f087b5a82c/juncao_001"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/markovspodmol/MainGallery/holdout_indian_tunnel/las5cm_16cm_rev/ramo_065_001/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "a8f087b5a82c/juncao_007"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/markovspodmol/MainGallery/holdout_indian_tunnel/cortes_refitos_16cm/ramo_065_002/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "a8f087b5a82c/juncao_007"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/markovspodmol/MainGallery/holdout_indian_tunnel/cortes_refitos_16cm/ramo_065_003/crop.json",
+      "falha_anterior": "escape_path_without_supported_voxels",
+      "juncoes": [],
+      "resultado": "sem_juncao_proxima"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/markovspodmol/MainGallery/holdout_indian_tunnel/las5cm_16cm_rev/ramo_065_004/crop.json",
+      "falha_anterior": "escape_path_without_supported_voxels",
+      "juncoes": [],
+      "resultado": "sem_juncao_proxima"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/markovspodmol/MainGallery/holdout_indian_tunnel/contornos_malha_16cm/ramo_019_001/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "a8f087b5a82c/juncao_019"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/markovspodmol/MainGallery/holdout_indian_tunnel/ramos_cortes_16cm/ramo_051_001/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "a8f087b5a82c/juncao_006"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/markovspodmol/MainGallery/holdout_indian_tunnel/ramos_cortes_16cm/ramo_066_001/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "a8f087b5a82c/juncao_007",
+        "a8f087b5a82c/juncao_008"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/full10x_16cm_rev/ramo_002_002/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "67fe61f051ae/juncao_002"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/full10x_16cm_rev/ramo_002_003/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [],
+      "resultado": "sem_juncao_proxima"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/full1x_16cm/ramo_002_004/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [],
+      "resultado": "sem_juncao_proxima"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/full1x_16cm/ramo_002_005/crop.json",
+      "falha_anterior": "escape_path_without_supported_voxels",
+      "juncoes": [],
+      "resultado": "sem_juncao_proxima"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/full1x_16cm/ramo_002_008/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [],
+      "resultado": "sem_juncao_proxima"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/full1x_16cm/ramo_002_009/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [],
+      "resultado": "sem_juncao_proxima"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/full1x_16cm/ramo_002_010/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "5865abbe2035/juncao_012"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/cortes_refitos_16cm/ramo_002_011/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "67fe61f051ae/juncao_012"
+      ],
+      "resultado": "juncao_sem_volume"
+    }
+  ],
+  "juncoes": {
+    "3c093c4f874a/juncao_001": {
+      "ramos": {
+        "10": {
+          "aceitos": 1,
+          "rejeicoes": {
+            "eixo_na_parede": 3,
+            "contorno": 8
+          }
+        },
+        "36": {
+          "aceitos": 2,
+          "rejeicoes": {
+            "contorno": 4
+          }
+        },
+        "37": {
+          "aceitos": 1,
+          "rejeicoes": {
+            "contorno": 5,
+            "eixo_na_parede": 1
+          }
+        }
+      },
+      "tentativas": [
+        {
+          "distancias": {
+            "10": 7.04,
+            "36": 2.56,
+            "37": 1.92
+          },
+          "resultado": "barreira_na_borda"
+        },
+        {
+          "distancias": {
+            "10": 7.04,
+            "36": 3.2,
+            "37": 1.92
+          },
+          "resultado": "barreira_na_borda"
+        }
+      ],
+      "resultado": "sem_fechamento",
+      "no_xyz": [
+        2537636.953,
+        1195258.318,
+        779.131
+      ],
+      "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/CascadeDeMotiers/MainGallery/pointclouds/CascadeDeMotiers_MainGallery_sampled_5cm_PCV_normals_classified_georef.las",
+      "centreline": "/run/media/midnavi/Pablo/TCC/DATA/RAW/CascadeDeMotiers/MainGallery/centreline/CascadeDeMotiers_MainGallery_nodes_from_LBC.txt",
+      "voxel_size": 0.16
+    },
+    "3c093c4f874a/juncao_002": {
+      "ramos": {
+        "5": {
+          "aceitos": 11,
+          "rejeicoes": {
+            "contorno": 1
+          }
+        },
+        "36": {
+          "aceitos": 2,
+          "rejeicoes": {
+            "contorno": 4
+          }
+        },
+        "38": {
+          "aceitos": 11,
+          "rejeicoes": {
+            "contorno": 1
+          }
+        }
+      },
+      "tentativas": [
+        {
+          "distancias": {
+            "5": 1.92,
+            "36": 1.92,
+            "38": 2.56
+          },
+          "resultado": "barreira_na_borda"
+        },
+        {
+          "distancias": {
+            "5": 2.56,
+            "36": 1.92,
+            "38": 1.92
+          },
+          "resultado": "barreira_na_borda"
+        },
+        {
+          "distancias": {
+            "5": 1.92,
+            "36": 1.92,
+            "38": 3.2
+          },
+          "resultado": "barreira_na_borda"
+        },
+        {
+          "distancias": {
+            "5": 3.2,
+            "36": 1.92,
+            "38": 1.92
+          },
+          "resultado": "barreira_na_borda"
+        },
+        {
+          "distancias": {
+            "5": 2.56,
+            "36": 2.56,
+            "38": 1.92
+          },
+          "resultado": "barreira_na_borda"
+        },
+        {
+          "distancias": {
+            "5": 2.56,
+            "36": 1.92,
+            "38": 2.56
+          },
+          "resultado": "barreira_na_borda"
+        },
+        {
+          "distancias": {
+            "5": 1.92,
+            "36": 2.56,
+            "38": 2.56
+          },
+          "resultado": "barreira_na_borda"
+        },
+        {
+          "distancias": {
+            "5": 1.92,
+            "36": 1.92,
+            "38": 3.84
+          },
+          "resultado": "barreira_na_borda"
+        }
+      ],
+      "resultado": "sem_fechamento",
+      "no_xyz": [
+        2537641.501,
+        1195257.736,
+        780.49
+      ],
+      "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/CascadeDeMotiers/MainGallery/pointclouds/CascadeDeMotiers_MainGallery_sampled_5cm_PCV_normals_classified_georef.las",
+      "centreline": "/run/media/midnavi/Pablo/TCC/DATA/RAW/CascadeDeMotiers/MainGallery/centreline/CascadeDeMotiers_MainGallery_nodes_from_LBC.txt",
+      "voxel_size": 0.16
+    },
+    "3c093c4f874a/juncao_003": {
+      "ramos": {
+        "19": {
+          "aceitos": 2,
+          "rejeicoes": {
+            "contorno": 9,
+            "eixo_na_parede": 1
+          }
+        },
+        "27": {
+          "aceitos": 7,
+          "rejeicoes": {
+            "contorno": 3,
+            "eixo_na_parede": 2
+          }
+        },
+        "48": {
+          "aceitos": 0,
+          "rejeicoes": {}
+        }
+      },
+      "tentativas": [],
+      "resultado": "ramo_sem_tampa_valida",
+      "no_xyz": [
+        2537657.327,
+        1195235.534,
+        775.26
+      ],
+      "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/CascadeDeMotiers/MainGallery/pointclouds/CascadeDeMotiers_MainGallery_sampled_5cm_PCV_normals_classified_georef.las",
+      "centreline": "/run/media/midnavi/Pablo/TCC/DATA/RAW/CascadeDeMotiers/MainGallery/centreline/CascadeDeMotiers_MainGallery_nodes_from_LBC.txt",
+      "voxel_size": 0.16
+    },
+    "3c093c4f874a/juncao_004": {
+      "ramos": {
+        "26": {
+          "aceitos": 0,
+          "rejeicoes": {}
+        },
+        "27": {
+          "aceitos": 0,
+          "rejeicoes": {
+            "contorno": 8,
+            "eixo_na_parede": 4
+          }
+        },
+        "28": {
+          "aceitos": 0,
+          "rejeicoes": {
+            "contorno": 11,
+            "eixo_na_parede": 1
+          }
+        }
+      },
+      "tentativas": [],
+      "resultado": "ramo_sem_tampa_valida",
+      "no_xyz": [
+        2537657.372,
+        1195210.556,
+        765.104
+      ],
+      "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/CascadeDeMotiers/MainGallery/pointclouds/CascadeDeMotiers_MainGallery_sampled_5cm_PCV_normals_classified_georef.las",
+      "centreline": "/run/media/midnavi/Pablo/TCC/DATA/RAW/CascadeDeMotiers/MainGallery/centreline/CascadeDeMotiers_MainGallery_nodes_from_LBC.txt",
+      "voxel_size": 0.16
+    },
+    "3c093c4f874a/juncao_005": {
+      "ramos": {
+        "4": {
+          "aceitos": 0,
+          "rejeicoes": {
+            "contorno": 2
+          }
+        },
+        "5": {
+          "aceitos": 7,
+          "rejeicoes": {
+            "contorno": 4,
+            "eixo_na_parede": 1
+          }
+        },
+        "6": {
+          "aceitos": 5,
+          "rejeicoes": {
+            "contorno": 4,
+            "eixo_na_parede": 3
+          }
+        }
+      },
+      "tentativas": [],
+      "resultado": "ramo_sem_tampa_valida",
+      "no_xyz": [
+        2537657.673,
+        1195249.899,
+        781.556
+      ],
+      "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/CascadeDeMotiers/MainGallery/pointclouds/CascadeDeMotiers_MainGallery_sampled_5cm_PCV_normals_classified_georef.las",
+      "centreline": "/run/media/midnavi/Pablo/TCC/DATA/RAW/CascadeDeMotiers/MainGallery/centreline/CascadeDeMotiers_MainGallery_nodes_from_LBC.txt",
+      "voxel_size": 0.16
+    },
+    "3c093c4f874a/juncao_006": {
+      "ramos": {
+        "4": {
+          "aceitos": 0,
+          "rejeicoes": {
+            "contorno": 2
+          }
+        },
+        "19": {
+          "aceitos": 5,
+          "rejeicoes": {
+            "contorno": 5,
+            "eixo_na_parede": 2
+          }
+        },
+        "20": {
+          "aceitos": 1,
+          "rejeicoes": {
+            "contorno": 9,
+            "eixo_na_parede": 2
+          }
+        }
+      },
+      "tentativas": [],
+      "resultado": "ramo_sem_tampa_valida",
+      "no_xyz": [
+        2537658.892,
+        1195248.721,
+        780.917
+      ],
+      "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/CascadeDeMotiers/MainGallery/pointclouds/CascadeDeMotiers_MainGallery_sampled_5cm_PCV_normals_classified_georef.las",
+      "centreline": "/run/media/midnavi/Pablo/TCC/DATA/RAW/CascadeDeMotiers/MainGallery/centreline/CascadeDeMotiers_MainGallery_nodes_from_LBC.txt",
+      "voxel_size": 0.16
+    },
+    "3c093c4f874a/juncao_007": {
+      "ramos": {
+        "20": {
+          "aceitos": 1,
+          "rejeicoes": {
+            "eixo_na_parede": 1,
+            "contorno": 10
+          }
+        },
+        "29": {
+          "aceitos": 7,
+          "rejeicoes": {
+            "contorno": 2,
+            "eixo_na_parede": 3
+          }
+        },
+        "46": {
+          "aceitos": 0,
+          "rejeicoes": {}
+        }
+      },
+      "tentativas": [],
+      "resultado": "ramo_sem_tampa_valida",
+      "no_xyz": [
+        2537694.576,
+        1195239.646,
+        784.473
+      ],
+      "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/CascadeDeMotiers/MainGallery/pointclouds/CascadeDeMotiers_MainGallery_sampled_5cm_PCV_normals_classified_georef.las",
+      "centreline": "/run/media/midnavi/Pablo/TCC/DATA/RAW/CascadeDeMotiers/MainGallery/centreline/CascadeDeMotiers_MainGallery_nodes_from_LBC.txt",
+      "voxel_size": 0.16
+    },
+    "3c093c4f874a/juncao_008": {
+      "ramos": {
+        "24": {
+          "aceitos": 1,
+          "rejeicoes": {
+            "eixo_na_parede": 3,
+            "contorno": 8
+          }
+        },
+        "29": {
+          "aceitos": 9,
+          "rejeicoes": {
+            "eixo_na_parede": 3
+          }
+        },
+        "30": {
+          "aceitos": 0,
+          "rejeicoes": {
+            "contorno": 2
+          }
+        }
+      },
+      "tentativas": [],
+      "resultado": "ramo_sem_tampa_valida",
+      "no_xyz": [
+        2537704.178,
+        1195232.837,
+        784.62
+      ],
+      "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/CascadeDeMotiers/MainGallery/pointclouds/CascadeDeMotiers_MainGallery_sampled_5cm_PCV_normals_classified_georef.las",
+      "centreline": "/run/media/midnavi/Pablo/TCC/DATA/RAW/CascadeDeMotiers/MainGallery/centreline/CascadeDeMotiers_MainGallery_nodes_from_LBC.txt",
+      "voxel_size": 0.16
+    },
+    "3c093c4f874a/juncao_009": {
+      "ramos": {
+        "23": {
+          "aceitos": 1,
+          "rejeicoes": {
+            "eixo_na_parede": 1,
+            "contorno": 2
+          }
+        },
+        "24": {
+          "aceitos": 0,
+          "rejeicoes": {
+            "contorno": 12
+          }
+        },
+        "25": {
+          "aceitos": 2,
+          "rejeicoes": {
+            "contorno": 1,
+            "eixo_na_parede": 1
+          }
+        }
+      },
+      "tentativas": [],
+      "resultado": "ramo_sem_tampa_valida",
+      "no_xyz": [
+        2537711.8,
+        1195227.135,
+        779.155
+      ],
+      "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/CascadeDeMotiers/MainGallery/pointclouds/CascadeDeMotiers_MainGallery_sampled_5cm_PCV_normals_classified_georef.las",
+      "centreline": "/run/media/midnavi/Pablo/TCC/DATA/RAW/CascadeDeMotiers/MainGallery/centreline/CascadeDeMotiers_MainGallery_nodes_from_LBC.txt",
+      "voxel_size": 0.16
+    },
+    "3c093c4f874a/juncao_010": {
+      "ramos": {
+        "21": {
+          "aceitos": 12,
+          "rejeicoes": {}
+        },
+        "22": {
+          "aceitos": 0,
+          "rejeicoes": {}
+        },
+        "23": {
+          "aceitos": 0,
+          "rejeicoes": {
+            "contorno": 3,
+            "eixo_na_parede": 1
+          }
+        }
+      },
+      "tentativas": [],
+      "resultado": "ramo_sem_tampa_valida",
+      "no_xyz": [
+        2537714.897,
+        1195227.061,
+        779.144
+      ],
+      "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/CascadeDeMotiers/MainGallery/pointclouds/CascadeDeMotiers_MainGallery_sampled_5cm_PCV_normals_classified_georef.las",
+      "centreline": "/run/media/midnavi/Pablo/TCC/DATA/RAW/CascadeDeMotiers/MainGallery/centreline/CascadeDeMotiers_MainGallery_nodes_from_LBC.txt",
+      "voxel_size": 0.16
+    },
+    "3c093c4f874a/juncao_011": {
+      "ramos": {
+        "21": {
+          "aceitos": 11,
+          "rejeicoes": {
+            "contorno": 1
+          }
+        },
+        "44": {
+          "aceitos": 8,
+          "rejeicoes": {
+            "eixo_na_parede": 1,
+            "contorno": 3
+          }
+        },
+        "49": {
+          "aceitos": 0,
+          "rejeicoes": {}
+        }
+      },
+      "tentativas": [],
+      "resultado": "ramo_sem_tampa_valida",
+      "no_xyz": [
+        2537734.439,
+        1195218.319,
+        774.169
+      ],
+      "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/CascadeDeMotiers/MainGallery/pointclouds/CascadeDeMotiers_MainGallery_sampled_5cm_PCV_normals_classified_georef.las",
+      "centreline": "/run/media/midnavi/Pablo/TCC/DATA/RAW/CascadeDeMotiers/MainGallery/centreline/CascadeDeMotiers_MainGallery_nodes_from_LBC.txt",
+      "voxel_size": 0.16
+    },
+    "3c093c4f874a/juncao_012": {
+      "ramos": {
+        "39": {
+          "aceitos": 0,
+          "rejeicoes": {}
+        },
+        "40": {
+          "aceitos": 0,
+          "rejeicoes": {
+            "contorno": 4
+          }
+        },
+        "41": {
+          "aceitos": 2,
+          "rejeicoes": {
+            "contorno": 7
+          }
+        }
+      },
+      "tentativas": [],
+      "resultado": "ramo_sem_tampa_valida",
+      "no_xyz": [
+        2537739.691,
+        1195216.924,
+        783.139
+      ],
+      "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/CascadeDeMotiers/MainGallery/pointclouds/CascadeDeMotiers_MainGallery_sampled_5cm_PCV_normals_classified_georef.las",
+      "centreline": "/run/media/midnavi/Pablo/TCC/DATA/RAW/CascadeDeMotiers/MainGallery/centreline/CascadeDeMotiers_MainGallery_nodes_from_LBC.txt",
+      "voxel_size": 0.16
+    },
+    "3c093c4f874a/juncao_013": {
+      "ramos": {
+        "7": {
+          "aceitos": 4,
+          "rejeicoes": {
+            "contorno": 4
+          }
+        },
+        "41": {
+          "aceitos": 2,
+          "rejeicoes": {
+            "contorno": 7
+          }
+        },
+        "44": {
+          "aceitos": 7,
+          "rejeicoes": {
+            "contorno": 4,
+            "eixo_na_parede": 1
+          }
+        }
+      },
+      "tentativas": [
+        {
+          "distancias": {
+            "7": 1.28,
+            "41": 2.56,
+            "44": 4.48
+          },
+          "resultado": "barreira_na_borda"
+        },
+        {
+          "distancias": {
+            "7": 1.28,
+            "41": 2.56,
+            "44": 5.12
+          },
+          "resultado": "barreira_na_borda"
+        },
+        {
+          "distancias": {
+            "7": 1.92,
+            "41": 2.56,
+            "44": 4.48
+          },
+          "resultado": "barreira_na_borda"
+        },
+        {
+          "distancias": {
+            "7": 1.28,
+            "41": 3.2,
+            "44": 4.48
+          },
+          "resultado": "barreira_na_borda"
+        },
+        {
+          "distancias": {
+            "7": 1.28,
+            "41": 2.56,
+            "44": 5.76
+          },
+          "resultado": "barreira_na_borda"
+        },
+        {
+          "distancias": {
+            "7": 1.92,
+            "41": 2.56,
+            "44": 5.12
+          },
+          "resultado": "barreira_na_borda"
+        },
+        {
+          "distancias": {
+            "7": 2.56,
+            "41": 2.56,
+            "44": 4.48
+          },
+          "resultado": "barreira_na_borda"
+        },
+        {
+          "distancias": {
+            "7": 1.28,
+            "41": 3.2,
+            "44": 5.12
+          },
+          "resultado": "barreira_na_borda"
+        }
+      ],
+      "resultado": "sem_fechamento",
+      "no_xyz": [
+        2537742.345,
+        1195213.752,
+        778.116
+      ],
+      "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/CascadeDeMotiers/MainGallery/pointclouds/CascadeDeMotiers_MainGallery_sampled_5cm_PCV_normals_classified_georef.las",
+      "centreline": "/run/media/midnavi/Pablo/TCC/DATA/RAW/CascadeDeMotiers/MainGallery/centreline/CascadeDeMotiers_MainGallery_nodes_from_LBC.txt",
+      "voxel_size": 0.16
+    },
+    "3c093c4f874a/juncao_014": {
+      "ramos": {
+        "7": {
+          "aceitos": 5,
+          "rejeicoes": {
+            "contorno": 3
+          }
+        },
+        "8": {
+          "aceitos": 0,
+          "rejeicoes": {
+            "contorno": 4
+          }
+        },
+        "9": {
+          "aceitos": 0,
+          "rejeicoes": {}
+        }
+      },
+      "tentativas": [],
+      "resultado": "ramo_sem_tampa_valida",
+      "no_xyz": [
+        2537745.633,
+        1195211.943,
+        781.459
+      ],
+      "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/CascadeDeMotiers/MainGallery/pointclouds/CascadeDeMotiers_MainGallery_sampled_5cm_PCV_normals_classified_georef.las",
+      "centreline": "/run/media/midnavi/Pablo/TCC/DATA/RAW/CascadeDeMotiers/MainGallery/centreline/CascadeDeMotiers_MainGallery_nodes_from_LBC.txt",
+      "voxel_size": 0.16
+    },
+    "3c093c4f874a/juncao_015": {
+      "ramos": {
+        "9": {
+          "aceitos": 0,
+          "rejeicoes": {}
+        },
+        "32": {
+          "aceitos": 0,
+          "rejeicoes": {
+            "contorno": 4
+          }
+        },
+        "43": {
+          "aceitos": 0,
+          "rejeicoes": {}
+        }
+      },
+      "tentativas": [],
+      "resultado": "ramo_sem_tampa_valida",
+      "no_xyz": [
+        2537746.158,
+        1195211.506,
+        781.318
+      ],
+      "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/CascadeDeMotiers/MainGallery/pointclouds/CascadeDeMotiers_MainGallery_sampled_5cm_PCV_normals_classified_georef.las",
+      "centreline": "/run/media/midnavi/Pablo/TCC/DATA/RAW/CascadeDeMotiers/MainGallery/centreline/CascadeDeMotiers_MainGallery_nodes_from_LBC.txt",
+      "voxel_size": 0.16
+    },
+    "3c093c4f874a/juncao_016": {
+      "ramos": {
+        "1": {
+          "aceitos": 2,
+          "rejeicoes": {
+            "contorno": 3
+          }
+        },
+        "31": {
+          "aceitos": 0,
+          "rejeicoes": {}
+        },
+        "32": {
+          "aceitos": 0,
+          "rejeicoes": {
+            "contorno": 4
+          }
+        }
+      },
+      "tentativas": [],
+      "resultado": "ramo_sem_tampa_valida",
+      "no_xyz": [
+        2537748.033,
+        1195210.113,
+        781.633
+      ],
+      "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/CascadeDeMotiers/MainGallery/pointclouds/CascadeDeMotiers_MainGallery_sampled_5cm_PCV_normals_classified_georef.las",
+      "centreline": "/run/media/midnavi/Pablo/TCC/DATA/RAW/CascadeDeMotiers/MainGallery/centreline/CascadeDeMotiers_MainGallery_nodes_from_LBC.txt",
+      "voxel_size": 0.16
+    },
+    "3c093c4f874a/juncao_017": {
+      "ramos": {
+        "1": {
+          "aceitos": 2,
+          "rejeicoes": {
+            "contorno": 3
+          }
+        },
+        "2": {
+          "aceitos": 5,
+          "rejeicoes": {
+            "contorno": 7
+          }
+        },
+        "3": {
+          "aceitos": 0,
+          "rejeicoes": {}
+        }
+      },
+      "tentativas": [],
+      "resultado": "ramo_sem_tampa_valida",
+      "no_xyz": [
+        2537750.899,
+        1195208.176,
+        783.079
+      ],
+      "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/CascadeDeMotiers/MainGallery/pointclouds/CascadeDeMotiers_MainGallery_sampled_5cm_PCV_normals_classified_georef.las",
+      "centreline": "/run/media/midnavi/Pablo/TCC/DATA/RAW/CascadeDeMotiers/MainGallery/centreline/CascadeDeMotiers_MainGallery_nodes_from_LBC.txt",
+      "voxel_size": 0.16
+    },
+    "3c093c4f874a/juncao_018": {
+      "ramos": {
+        "2": {
+          "aceitos": 2,
+          "rejeicoes": {
+            "contorno": 9,
+            "eixo_na_parede": 1
+          }
+        },
+        "33": {
+          "aceitos": 4,
+          "rejeicoes": {
+            "contorno": 5,
+            "eixo_na_parede": 1
+          }
+        },
+        "42": {
+          "aceitos": 1,
+          "rejeicoes": {
+            "eixo_na_parede": 3,
+            "contorno": 8
+          }
+        }
+      },
+      "tentativas": [
+        {
+          "distancias": {
+            "2": 1.28,
+            "33": 3.2,
+            "42": 1.28
+          },
+          "resultado": "leaking",
+          "planos_completos": "leaking",
+          "ramos_cruzados_pela_fuga": [
+            2
+          ]
+        },
+        {
+          "distancias": {
+            "2": 8.0,
+            "33": 3.2,
+            "42": 1.28
+          },
+          "resultado": "barreira_na_borda"
+        },
+        {
+          "distancias": {
+            "2": 1.28,
+            "33": 3.84,
+            "42": 1.28
+          },
+          "resultado": "barreira_na_borda"
+        },
+        {
+          "distancias": {
+            "2": 1.28,
+            "33": 4.48,
+            "42": 1.28
+          },
+          "resultado": "barreira_na_borda"
+        },
+        {
+          "distancias": {
+            "2": 8.0,
+            "33": 3.84,
+            "42": 1.28
+          },
+          "resultado": "barreira_na_borda"
+        },
+        {
+          "distancias": {
+            "2": 8.0,
+            "33": 4.48,
+            "42": 1.28
+          },
+          "resultado": "barreira_na_borda"
+        }
+      ],
+      "resultado": "sem_fechamento",
+      "no_xyz": [
+        2537776.879,
+        1195189.518,
+        774.117
+      ],
+      "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/CascadeDeMotiers/MainGallery/pointclouds/CascadeDeMotiers_MainGallery_sampled_5cm_PCV_normals_classified_georef.las",
+      "centreline": "/run/media/midnavi/Pablo/TCC/DATA/RAW/CascadeDeMotiers/MainGallery/centreline/CascadeDeMotiers_MainGallery_nodes_from_LBC.txt",
+      "voxel_size": 0.16
+    },
+    "3c093c4f874a/juncao_019": {
+      "ramos": {
+        "33": {
+          "aceitos": 4,
+          "rejeicoes": {
+            "contorno": 5,
+            "eixo_na_parede": 1
+          }
+        },
+        "34": {
+          "aceitos": 0,
+          "rejeicoes": {}
+        },
+        "35": {
+          "aceitos": 12,
+          "rejeicoes": {}
+        }
+      },
+      "tentativas": [],
+      "resultado": "ramo_sem_tampa_valida",
+      "no_xyz": [
+        2537779.16,
+        1195194.614,
+        777.862
+      ],
+      "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/CascadeDeMotiers/MainGallery/pointclouds/CascadeDeMotiers_MainGallery_sampled_5cm_PCV_normals_classified_georef.las",
+      "centreline": "/run/media/midnavi/Pablo/TCC/DATA/RAW/CascadeDeMotiers/MainGallery/centreline/CascadeDeMotiers_MainGallery_nodes_from_LBC.txt",
+      "voxel_size": 0.16
+    },
+    "3c093c4f874a/juncao_020": {
+      "ramos": {
+        "12": {
+          "aceitos": 0,
+          "rejeicoes": {
+            "contorno": 3
+          }
+        },
+        "35": {
+          "aceitos": 9,
+          "rejeicoes": {
+            "contorno": 3
+          }
+        },
+        "45": {
+          "aceitos": 0,
+          "rejeicoes": {
+            "contorno": 2
+          }
+        }
+      },
+      "tentativas": [],
+      "resultado": "ramo_sem_tampa_valida",
+      "no_xyz": [
+        2537842.021,
+        1195187.173,
+        765.84
+      ],
+      "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/CascadeDeMotiers/MainGallery/pointclouds/CascadeDeMotiers_MainGallery_sampled_5cm_PCV_normals_classified_georef.las",
+      "centreline": "/run/media/midnavi/Pablo/TCC/DATA/RAW/CascadeDeMotiers/MainGallery/centreline/CascadeDeMotiers_MainGallery_nodes_from_LBC.txt",
+      "voxel_size": 0.16
+    },
+    "3c093c4f874a/juncao_021": {
+      "ramos": {
+        "11": {
+          "aceitos": 0,
+          "rejeicoes": {
+            "contorno": 2
+          }
+        },
+        "12": {
+          "aceitos": 0,
+          "rejeicoes": {
+            "contorno": 3
+          }
+        },
+        "13": {
+          "aceitos": 0,
+          "rejeicoes": {}
+        }
+      },
+      "tentativas": [],
+      "resultado": "ramo_sem_tampa_valida",
+      "no_xyz": [
+        2537843.56,
+        1195188.757,
+        766.448
+      ],
+      "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/CascadeDeMotiers/MainGallery/pointclouds/CascadeDeMotiers_MainGallery_sampled_5cm_PCV_normals_classified_georef.las",
+      "centreline": "/run/media/midnavi/Pablo/TCC/DATA/RAW/CascadeDeMotiers/MainGallery/centreline/CascadeDeMotiers_MainGallery_nodes_from_LBC.txt",
+      "voxel_size": 0.16
+    },
+    "3c093c4f874a/juncao_022": {
+      "ramos": {
+        "11": {
+          "aceitos": 0,
+          "rejeicoes": {
+            "contorno": 2
+          }
+        },
+        "16": {
+          "aceitos": 2,
+          "rejeicoes": {
+            "contorno": 9,
+            "eixo_na_parede": 1
+          }
+        },
+        "47": {
+          "aceitos": 6,
+          "rejeicoes": {
+            "contorno": 4
+          }
+        }
+      },
+      "tentativas": [],
+      "resultado": "ramo_sem_tampa_valida",
+      "no_xyz": [
+        2537843.689,
+        1195190.574,
+        767.682
+      ],
+      "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/CascadeDeMotiers/MainGallery/pointclouds/CascadeDeMotiers_MainGallery_sampled_5cm_PCV_normals_classified_georef.las",
+      "centreline": "/run/media/midnavi/Pablo/TCC/DATA/RAW/CascadeDeMotiers/MainGallery/centreline/CascadeDeMotiers_MainGallery_nodes_from_LBC.txt",
+      "voxel_size": 0.16
+    },
+    "3c093c4f874a/juncao_023": {
+      "ramos": {
+        "14": {
+          "aceitos": 8,
+          "rejeicoes": {}
+        },
+        "15": {
+          "aceitos": 11,
+          "rejeicoes": {
+            "eixo_na_parede": 1
+          }
+        },
+        "16": {
+          "aceitos": 12,
+          "rejeicoes": {}
+        }
+      },
+      "tentativas": [
+        {
+          "distancias": {
+            "14": 1.28,
+            "15": 1.28,
+            "16": 1.92
+          },
+          "resultado": "leaking",
+          "planos_completos": "sealed",
+          "ramos_cruzados_pela_fuga": [
+            15,
+            16
+          ]
+        },
+        {
+          "distancias": {
+            "14": 1.28,
+            "15": 1.92,
+            "16": 1.28
+          },
+          "resultado": "leaking"
+        },
+        {
+          "distancias": {
+            "14": 1.28,
+            "15": 1.28,
+            "16": 2.56
+          },
+          "resultado": "leaking"
+        },
+        {
+          "distancias": {
+            "14": 1.28,
+            "15": 1.92,
+            "16": 1.92
+          },
+          "resultado": "volume_salvo"
+        }
+      ],
+      "tampas": [
+        {
+          "ramo": 14,
+          "distancia": 1.28,
+          "setores": 16,
+          "secao": {
+            "point_xyz": [
+              108.21791883702191,
+              -5.498380859520709,
+              -13.42666456673824
+            ],
+            "inward_normal_xyz": [
+              -0.2652708562127678,
+              -0.9052345913803483,
+              -0.3319363002333416
+            ],
+            "u_xyz": [
+              0.9641739328794079,
+              -0.2490550168803558,
+              -0.0913248362855397
+            ],
+            "polygon_uv": [
+              [
+                2.06324598066328,
+                0.4104051425002982
+              ],
+              [
+                1.5848152263139026,
+                1.0589396792721888
+              ],
+              [
+                0.844817705528862,
+                1.2643590464963324
+              ],
+              [
+                0.26261139759225177,
+                1.32023665019789
+              ],
+              [
+                -0.3020666884766078,
+                1.5185917922341228
+              ],
+              [
+                -1.0890107841481418,
+                1.6298198151609722
+              ],
+              [
+                -1.951715936969524,
+                1.304094896369684
+              ],
+              [
+                -2.1681296251810744,
+                0.43126779653073827
+              ],
+              [
+                -2.333442486053546,
+                -0.4641505690451863
+              ],
+              [
+                -1.9281844216462052,
+                -1.2883716405127723
+              ],
+              [
+                -1.2573731966469768,
+                -1.8817919719229939
+              ],
+              [
+                -0.44615497550254707,
+                -2.242972527952396
+              ],
+              [
+                0.38356318987641763,
+                -1.9283023721914792
+              ],
+              [
+                0.9612836788190336,
+                -1.4386626932768467
+              ],
+              [
+                1.5265542069007698,
+                -1.020010910676932
+              ],
+              [
+                1.9335031112971408,
+                -0.38459768120404864
+              ]
+            ]
+          }
+        },
+        {
+          "ramo": 15,
+          "distancia": 1.92,
+          "setores": 16,
+          "secao": {
+            "point_xyz": [
+              108.93590241559636,
+              -8.101449730948481,
+              -14.56401255409977
+            ],
+            "inward_normal_xyz": [
+              -0.5469982140485183,
+              0.7507702931919217,
+              0.3703200246924908
+            ],
+            "u_xyz": [
+              0.2180681111394191,
+              -0.2993045599257267,
+              0.9289042358132258
+            ],
+            "polygon_uv": [
+              [
+                1.6241074682457364,
+                0.323055061387743
+              ],
+              [
+                1.4342608816675193,
+                0.9583424823335357
+              ],
+              [
+                1.143432242350845,
+                1.7112672831197981
+              ],
+              [
+                0.40953551650412745,
+                2.0588740755493564
+              ],
+              [
+                -0.36507018131353364,
+                1.8353317399150675
+              ],
+              [
+                -0.9290949773096431,
+                1.3904888971051736
+              ],
+              [
+                -1.1890490181187106,
+                0.7944971533458393
+              ],
+              [
+                -1.33624591929698,
+                0.26579583920876987
+              ],
+              [
+                -1.203293796810752,
+                -0.23935001777688428
+              ],
+              [
+                -0.9151845115301855,
+                -0.6115067403590781
+              ],
+              [
+                -0.5649608670852784,
+                -0.8455236893603197
+              ],
+              [
+                -0.2508163132368736,
+                -1.2609387568051422
+              ],
+              [
+                0.2981558817702754,
+                -1.4989308392333103
+              ],
+              [
+                0.6904266997178724,
+                -1.0332965774958829
+              ],
+              [
+                1.0566986981272337,
+                -0.7060634968057514
+              ],
+              [
+                1.347273390889662,
+                -0.267989339689482
+              ]
+            ]
+          }
+        },
+        {
+          "ramo": 16,
+          "distancia": 1.92,
+          "setores": 16,
+          "secao": {
+            "point_xyz": [
+              106.31996979954916,
+              -7.744947858278996,
+              -14.07967476118809
+            ],
+            "inward_normal_xyz": [
+              0.8141311558146208,
+              0.5687703740162366,
+              0.11700736204777797
+            ],
+            "u_xyz": [
+              -0.09591819645169931,
+              -0.06701061380731418,
+              0.9931310473581119
+            ],
+            "polygon_uv": [
+              [
+                1.3055889783962535,
+                0.2596977945175886
+              ],
+              [
+                0.9834957245157501,
+                0.6571508336063879
+              ],
+              [
+                0.6421507214757193,
+                0.9610464702603638
+              ],
+              [
+                0.32691115077491373,
+                1.6434933387070312
+              ],
+              [
+                -0.3486851511325555,
+                1.752958630606562
+              ],
+              [
+                -0.9436415296431264,
+                1.41225935115438
+              ],
+              [
+                -1.3401901733180983,
+                0.8954864445605154
+              ],
+              [
+                -1.566622950282077,
+                0.31162067983191233
+              ],
+              [
+                -1.846051618612513,
+                -0.3672024977632652
+              ],
+              [
+                -1.846867942650852,
+                -1.2340377063372638
+              ],
+              [
+                -1.2084288910552279,
+                -1.808541642124722
+              ],
+              [
+                -0.4390500536650878,
+                -2.2072536738104698
+              ],
+              [
+                0.42095905769888353,
+                -2.11630409533768
+              ],
+              [
+                1.1740736684707318,
+                -1.757125418027108
+              ],
+              [
+                1.815325916856011,
+                -1.2129619985044517
+              ],
+              [
+                1.6106155441761723,
+                -0.3203713508305585
+              ]
+            ]
+          }
+        }
+      ],
+      "resultado": "volume_salvo",
+      "no_xyz": [
+        2537858.786,
+        1195201.517,
+        769.226
+      ],
+      "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/CascadeDeMotiers/MainGallery/pointclouds/CascadeDeMotiers_MainGallery_sampled_5cm_PCV_normals_classified_georef.las",
+      "centreline": "/run/media/midnavi/Pablo/TCC/DATA/RAW/CascadeDeMotiers/MainGallery/centreline/CascadeDeMotiers_MainGallery_nodes_from_LBC.txt",
+      "voxel_size": 0.16,
+      "volume": "3c093c4f874a/juncao_023"
+    },
+    "3c093c4f874a/juncao_024": {
+      "ramos": {
+        "15": {
+          "aceitos": 4,
+          "rejeicoes": {
+            "eixo_na_parede": 4,
+            "contorno": 4
+          }
+        },
+        "17": {
+          "aceitos": 6,
+          "rejeicoes": {
+            "contorno": 5,
+            "eixo_na_parede": 1
+          }
+        },
+        "18": {
+          "aceitos": 5,
+          "rejeicoes": {
+            "eixo_na_parede": 3,
+            "contorno": 4
+          }
+        }
+      },
+      "tentativas": [
+        {
+          "distancias": {
+            "15": 4.48,
+            "17": 5.12,
+            "18": 1.28
+          },
+          "resultado": "leaking",
+          "planos_completos": "leaking",
+          "ramos_cruzados_pela_fuga": [
+            18
+          ]
+        },
+        {
+          "distancias": {
+            "15": 4.48,
+            "17": 5.12,
+            "18": 6.4
+          },
+          "resultado": "leaking"
+        },
+        {
+          "distancias": {
+            "15": 4.48,
+            "17": 5.12,
+            "18": 7.04
+          },
+          "resultado": "leaking"
+        },
+        {
+          "distancias": {
+            "15": 4.48,
+            "17": 5.76,
+            "18": 1.28
+          },
+          "resultado": "leaking"
+        },
+        {
+          "distancias": {
+            "15": 4.48,
+            "17": 6.4,
+            "18": 1.28
+          },
+          "resultado": "leaking"
+        },
+        {
+          "distancias": {
+            "15": 4.48,
+            "17": 7.04,
+            "18": 1.28
+          },
+          "resultado": "leaking"
+        },
+        {
+          "distancias": {
+            "15": 4.48,
+            "17": 7.68,
+            "18": 1.28
+          },
+          "resultado": "leaking"
+        },
+        {
+          "distancias": {
+            "15": 7.04,
+            "17": 5.12,
+            "18": 1.28
+          },
+          "resultado": "leaking"
+        }
+      ],
+      "resultado": "sem_fechamento",
+      "no_xyz": [
+        2537867.046,
+        1195178.231,
+        755.229
+      ],
+      "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/CascadeDeMotiers/MainGallery/pointclouds/CascadeDeMotiers_MainGallery_sampled_5cm_PCV_normals_classified_georef.las",
+      "centreline": "/run/media/midnavi/Pablo/TCC/DATA/RAW/CascadeDeMotiers/MainGallery/centreline/CascadeDeMotiers_MainGallery_nodes_from_LBC.txt",
+      "voxel_size": 0.16
+    },
+    "a8f087b5a82c/juncao_001": {
+      "ramos": {
+        "4": {
+          "aceitos": 0,
+          "rejeicoes": {
+            "contorno": 3
+          }
+        },
+        "58": {
+          "aceitos": 0,
+          "rejeicoes": {
+            "contorno": 12
+          }
+        },
+        "62": {
+          "aceitos": 0,
+          "rejeicoes": {}
+        }
+      },
+      "tentativas": [],
+      "resultado": "ramo_sem_tampa_valida",
+      "no_xyz": [
+        430742.71,
+        65980.293,
+        556.1
+      ],
+      "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/MarkovSpodmol/MainGallery/pointclouds/MarkovSpodmol_MainGallery_sampled_5cm_PCV_normals_classified_georef.las",
+      "centreline": "/run/media/midnavi/Pablo/TCC/DATA/RAW/MarkovSpodmol/MainGallery/centreline/MarkovSpodmol_MainGallery_nodes_from_LBC.txt",
+      "voxel_size": 0.16
+    },
+    "a8f087b5a82c/juncao_002": {
+      "ramos": {
+        "2": {
+          "aceitos": 0,
+          "rejeicoes": {}
+        },
+        "4": {
+          "aceitos": 0,
+          "rejeicoes": {
+            "contorno": 3
+          }
+        },
+        "5": {
+          "aceitos": 11,
+          "rejeicoes": {
+            "contorno": 1
+          }
+        }
+      },
+      "tentativas": [],
+      "resultado": "ramo_sem_tampa_valida",
+      "no_xyz": [
+        430744.954,
+        65980.631,
+        555.972
+      ],
+      "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/MarkovSpodmol/MainGallery/pointclouds/MarkovSpodmol_MainGallery_sampled_5cm_PCV_normals_classified_georef.las",
+      "centreline": "/run/media/midnavi/Pablo/TCC/DATA/RAW/MarkovSpodmol/MainGallery/centreline/MarkovSpodmol_MainGallery_nodes_from_LBC.txt",
+      "voxel_size": 0.16
+    },
+    "a8f087b5a82c/juncao_003": {
+      "ramos": {
+        "1": {
+          "aceitos": 10,
+          "rejeicoes": {
+            "contorno": 2
+          }
+        },
+        "2": {
+          "aceitos": 0,
+          "rejeicoes": {}
+        },
+        "3": {
+          "aceitos": 0,
+          "rejeicoes": {}
+        }
+      },
+      "tentativas": [],
+      "resultado": "ramo_sem_tampa_valida",
+      "no_xyz": [
+        430745.345,
+        65979.377,
+        555.963
+      ],
+      "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/MarkovSpodmol/MainGallery/pointclouds/MarkovSpodmol_MainGallery_sampled_5cm_PCV_normals_classified_georef.las",
+      "centreline": "/run/media/midnavi/Pablo/TCC/DATA/RAW/MarkovSpodmol/MainGallery/centreline/MarkovSpodmol_MainGallery_nodes_from_LBC.txt",
+      "voxel_size": 0.16
+    },
+    "a8f087b5a82c/juncao_004": {
+      "ramos": {
+        "5": {
+          "aceitos": 7,
+          "rejeicoes": {
+            "contorno": 3,
+            "eixo_na_parede": 2
+          }
+        },
+        "9": {
+          "aceitos": 10,
+          "rejeicoes": {
+            "contorno": 2
+          }
+        },
+        "16": {
+          "aceitos": 10,
+          "rejeicoes": {
+            "contorno": 2
+          }
+        }
+      },
+      "tentativas": [
+        {
+          "distancias": {
+            "5": 2.56,
+            "9": 2.56,
+            "16": 2.56
+          },
+          "resultado": "barreira_na_borda"
+        },
+        {
+          "distancias": {
+            "5": 2.56,
+            "9": 2.56,
+            "16": 3.2
+          },
+          "resultado": "barreira_na_borda"
+        },
+        {
+          "distancias": {
+            "5": 2.56,
+            "9": 3.2,
+            "16": 2.56
+          },
+          "resultado": "barreira_na_borda"
+        },
+        {
+          "distancias": {
+            "5": 3.2,
+            "9": 2.56,
+            "16": 2.56
+          },
+          "resultado": "barreira_na_borda"
+        },
+        {
+          "distancias": {
+            "5": 2.56,
+            "9": 2.56,
+            "16": 3.84
+          },
+          "resultado": "barreira_na_borda"
+        },
+        {
+          "distancias": {
+            "5": 2.56,
+            "9": 3.2,
+            "16": 3.2
+          },
+          "resultado": "barreira_na_borda"
+        },
+        {
+          "distancias": {
+            "5": 2.56,
+            "9": 3.84,
+            "16": 2.56
+          },
+          "resultado": "barreira_na_borda"
+        },
+        {
+          "distancias": {
+            "5": 3.2,
+            "9": 2.56,
+            "16": 3.2
+          },
+          "resultado": "barreira_na_borda"
+        }
+      ],
+      "resultado": "sem_fechamento",
+      "no_xyz": [
+        430768.695,
+        65992.638,
+        557.466
+      ],
+      "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/MarkovSpodmol/MainGallery/pointclouds/MarkovSpodmol_MainGallery_sampled_5cm_PCV_normals_classified_georef.las",
+      "centreline": "/run/media/midnavi/Pablo/TCC/DATA/RAW/MarkovSpodmol/MainGallery/centreline/MarkovSpodmol_MainGallery_nodes_from_LBC.txt",
+      "voxel_size": 0.16
+    },
+    "a8f087b5a82c/juncao_005": {
+      "ramos": {
+        "9": {
+          "aceitos": 7,
+          "rejeicoes": {
+            "contorno": 5
+          }
+        },
+        "10": {
+          "aceitos": 11,
+          "rejeicoes": {
+            "contorno": 1
+          }
+        },
+        "11": {
+          "aceitos": 1,
+          "rejeicoes": {
+            "contorno": 9,
+            "eixo_na_parede": 2
+          }
+        }
+      },
+      "tentativas": [
+        {
+          "distancias": {
+            "9": 3.2,
+            "10": 3.2,
+            "11": 2.56
+          },
+          "resultado": "leaking",
+          "planos_completos": "leaking",
+          "ramos_cruzados_pela_fuga": [
+            10,
+            11
+          ]
+        },
+        {
+          "distancias": {
+            "9": 3.2,
+            "10": 3.84,
+            "11": 2.56
+          },
+          "resultado": "leaking"
+        },
+        {
+          "distancias": {
+            "9": 3.2,
+            "10": 4.48,
+            "11": 2.56
+          },
+          "resultado": "leaking"
+        },
+        {
+          "distancias": {
+            "9": 3.2,
+            "10": 5.12,
+            "11": 2.56
+          },
+          "resultado": "leaking"
+        },
+        {
+          "distancias": {
+            "9": 3.2,
+            "10": 5.76,
+            "11": 2.56
+          },
+          "resultado": "leaking"
+        },
+        {
+          "distancias": {
+            "9": 3.2,
+            "10": 6.4,
+            "11": 2.56
+          },
+          "resultado": "leaking"
+        },
+        {
+          "distancias": {
+            "9": 3.2,
+            "10": 7.04,
+            "11": 2.56
+          },
+          "resultado": "leaking"
+        },
+        {
+          "distancias": {
+            "9": 3.2,
+            "10": 7.68,
+            "11": 2.56
+          },
+          "resultado": "leaking"
+        }
+      ],
+      "resultado": "sem_fechamento",
+      "no_xyz": [
+        430788.095,
+        65984.013,
+        556.157
+      ],
+      "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/MarkovSpodmol/MainGallery/pointclouds/MarkovSpodmol_MainGallery_sampled_5cm_PCV_normals_classified_georef.las",
+      "centreline": "/run/media/midnavi/Pablo/TCC/DATA/RAW/MarkovSpodmol/MainGallery/centreline/MarkovSpodmol_MainGallery_nodes_from_LBC.txt",
+      "voxel_size": 0.16
+    },
+    "a8f087b5a82c/juncao_006": {
+      "ramos": {
+        "10": {
+          "aceitos": 8,
+          "rejeicoes": {
+            "contorno": 4
+          }
+        },
+        "17": {
+          "aceitos": 9,
+          "rejeicoes": {
+            "contorno": 3
+          }
+        },
+        "51": {
+          "aceitos": 4,
+          "rejeicoes": {
+            "contorno": 3,
+            "eixo_na_parede": 1
+          }
+        }
+      },
+      "tentativas": [
+        {
+          "distancias": {
+            "10": 3.84,
+            "17": 3.2,
+            "51": 3.2
+          },
+          "resultado": "barreira_na_borda"
+        },
+        {
+          "distancias": {
+            "10": 3.84,
+            "17": 3.84,
+            "51": 3.2
+          },
+          "resultado": "barreira_na_borda"
+        },
+        {
+          "distancias": {
+            "10": 3.84,
+            "17": 3.2,
+            "51": 3.84
+          },
+          "resultado": "barreira_na_borda"
+        },
+        {
+          "distancias": {
+            "10": 4.48,
+            "17": 3.2,
+            "51": 3.2
+          },
+          "resultado": "barreira_na_borda"
+        },
+        {
+          "distancias": {
+            "10": 3.84,
+            "17": 4.48,
+            "51": 3.2
+          },
+          "resultado": "barreira_na_borda"
+        },
+        {
+          "distancias": {
+            "10": 4.48,
+            "17": 3.84,
+            "51": 3.2
+          },
+          "resultado": "barreira_na_borda"
+        },
+        {
+          "distancias": {
+            "10": 5.12,
+            "17": 3.2,
+            "51": 3.2
+          },
+          "resultado": "barreira_na_borda"
+        },
+        {
+          "distancias": {
+            "10": 3.84,
+            "17": 3.84,
+            "51": 3.84
+          },
+          "resultado": "barreira_na_borda"
+        }
+      ],
+      "resultado": "sem_fechamento",
+      "no_xyz": [
+        430807.971,
+        65976.305,
+        554.771
+      ],
+      "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/MarkovSpodmol/MainGallery/pointclouds/MarkovSpodmol_MainGallery_sampled_5cm_PCV_normals_classified_georef.las",
+      "centreline": "/run/media/midnavi/Pablo/TCC/DATA/RAW/MarkovSpodmol/MainGallery/centreline/MarkovSpodmol_MainGallery_nodes_from_LBC.txt",
+      "voxel_size": 0.16
+    },
+    "a8f087b5a82c/juncao_007": {
+      "ramos": {
+        "7": {
+          "aceitos": 0,
+          "rejeicoes": {
+            "contorno": 2
+          }
+        },
+        "65": {
+          "aceitos": 4,
+          "rejeicoes": {
+            "eixo_na_parede": 3,
+            "contorno": 5
+          }
+        },
+        "66": {
+          "aceitos": 0,
+          "rejeicoes": {
+            "contorno": 7
+          }
+        }
+      },
+      "tentativas": [],
+      "resultado": "ramo_sem_tampa_valida",
+      "no_xyz": [
+        430841.854,
+        65786.34,
+        554.474
+      ],
+      "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/MarkovSpodmol/MainGallery/pointclouds/MarkovSpodmol_MainGallery_sampled_5cm_PCV_normals_classified_georef.las",
+      "centreline": "/run/media/midnavi/Pablo/TCC/DATA/RAW/MarkovSpodmol/MainGallery/centreline/MarkovSpodmol_MainGallery_nodes_from_LBC.txt",
+      "voxel_size": 0.16
+    },
+    "a8f087b5a82c/juncao_008": {
+      "ramos": {
+        "32": {
+          "aceitos": 0,
+          "rejeicoes": {
+            "contorno": 4
+          }
+        },
+        "66": {
+          "aceitos": 0,
+          "rejeicoes": {
+            "contorno": 7
+          }
+        },
+        "68": {
+          "aceitos": 0,
+          "rejeicoes": {}
+        }
+      },
+      "tentativas": [],
+      "resultado": "ramo_sem_tampa_valida",
+      "no_xyz": [
+        430843.106,
+        65790.933,
+        555.323
+      ],
+      "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/MarkovSpodmol/MainGallery/pointclouds/MarkovSpodmol_MainGallery_sampled_5cm_PCV_normals_classified_georef.las",
+      "centreline": "/run/media/midnavi/Pablo/TCC/DATA/RAW/MarkovSpodmol/MainGallery/centreline/MarkovSpodmol_MainGallery_nodes_from_LBC.txt",
+      "voxel_size": 0.16
+    },
+    "a8f087b5a82c/juncao_009": {
+      "ramos": {
+        "32": {
+          "aceitos": 0,
+          "rejeicoes": {
+            "contorno": 4
+          }
+        },
+        "33": {
+          "aceitos": 0,
+          "rejeicoes": {}
+        },
+        "34": {
+          "aceitos": 0,
+          "rejeicoes": {}
+        }
+      },
+      "tentativas": [],
+      "resultado": "ramo_sem_tampa_valida",
+      "no_xyz": [
+        430843.964,
+        65793.646,
+        555.09
+      ],
+      "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/MarkovSpodmol/MainGallery/pointclouds/MarkovSpodmol_MainGallery_sampled_5cm_PCV_normals_classified_georef.las",
+      "centreline": "/run/media/midnavi/Pablo/TCC/DATA/RAW/MarkovSpodmol/MainGallery/centreline/MarkovSpodmol_MainGallery_nodes_from_LBC.txt",
+      "voxel_size": 0.16
+    },
+    "a8f087b5a82c/juncao_011": {
+      "ramos": {
+        "24": {
+          "aceitos": 0,
+          "rejeicoes": {}
+        },
+        "25": {
+          "aceitos": 0,
+          "rejeicoes": {}
+        },
+        "26": {
+          "aceitos": 0,
+          "rejeicoes": {
+            "contorno": 7
+          }
+        }
+      },
+      "tentativas": [],
+      "resultado": "ramo_sem_tampa_valida",
+      "no_xyz": [
+        430844.833,
+        65795.12,
+        555.463
+      ],
+      "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/MarkovSpodmol/MainGallery/pointclouds/MarkovSpodmol_MainGallery_sampled_5cm_PCV_normals_classified_georef.las",
+      "centreline": "/run/media/midnavi/Pablo/TCC/DATA/RAW/MarkovSpodmol/MainGallery/centreline/MarkovSpodmol_MainGallery_nodes_from_LBC.txt",
+      "voxel_size": 0.16
+    },
+    "a8f087b5a82c/juncao_012": {
+      "ramos": {
+        "23": {
+          "aceitos": 2,
+          "rejeicoes": {
+            "contorno": 9
+          }
+        },
+        "26": {
+          "aceitos": 0,
+          "rejeicoes": {
+            "contorno": 7
+          }
+        },
+        "35": {
+          "aceitos": 0,
+          "rejeicoes": {
+            "contorno": 12
+          }
+        }
+      },
+      "tentativas": [],
+      "resultado": "ramo_sem_tampa_valida",
+      "no_xyz": [
+        430846.056,
+        65799.661,
+        556.246
+      ],
+      "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/MarkovSpodmol/MainGallery/pointclouds/MarkovSpodmol_MainGallery_sampled_5cm_PCV_normals_classified_georef.las",
+      "centreline": "/run/media/midnavi/Pablo/TCC/DATA/RAW/MarkovSpodmol/MainGallery/centreline/MarkovSpodmol_MainGallery_nodes_from_LBC.txt",
+      "voxel_size": 0.16
+    },
+    "a8f087b5a82c/juncao_013": {
+      "ramos": {
+        "35": {
+          "aceitos": 0,
+          "rejeicoes": {
+            "contorno": 12
+          }
+        },
+        "36": {
+          "aceitos": 0,
+          "rejeicoes": {
+            "contorno": 3
+          }
+        },
+        "37": {
+          "aceitos": 1,
+          "rejeicoes": {
+            "contorno": 11
+          }
+        }
+      },
+      "tentativas": [],
+      "resultado": "ramo_sem_tampa_valida",
+      "no_xyz": [
+        430846.617,
+        65810.266,
+        555.048
+      ],
+      "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/MarkovSpodmol/MainGallery/pointclouds/MarkovSpodmol_MainGallery_sampled_5cm_PCV_normals_classified_georef.las",
+      "centreline": "/run/media/midnavi/Pablo/TCC/DATA/RAW/MarkovSpodmol/MainGallery/centreline/MarkovSpodmol_MainGallery_nodes_from_LBC.txt",
+      "voxel_size": 0.16
+    },
+    "a8f087b5a82c/juncao_016": {
+      "ramos": {
+        "31": {
+          "aceitos": 0,
+          "rejeicoes": {}
+        },
+        "37": {
+          "aceitos": 0,
+          "rejeicoes": {
+            "contorno": 12
+          }
+        },
+        "77": {
+          "aceitos": 0,
+          "rejeicoes": {
+            "contorno": 2
+          }
+        }
+      },
+      "tentativas": [],
+      "resultado": "ramo_sem_tampa_valida",
+      "no_xyz": [
+        430859.743,
+        65861.973,
+        557.878
+      ],
+      "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/MarkovSpodmol/MainGallery/pointclouds/MarkovSpodmol_MainGallery_sampled_5cm_PCV_normals_classified_georef.las",
+      "centreline": "/run/media/midnavi/Pablo/TCC/DATA/RAW/MarkovSpodmol/MainGallery/centreline/MarkovSpodmol_MainGallery_nodes_from_LBC.txt",
+      "voxel_size": 0.16
+    },
+    "a8f087b5a82c/juncao_017": {
+      "ramos": {
+        "69": {
+          "aceitos": 0,
+          "rejeicoes": {
+            "contorno": 3
+          }
+        },
+        "73": {
+          "aceitos": 0,
+          "rejeicoes": {
+            "contorno": 2
+          }
+        },
+        "77": {
+          "aceitos": 0,
+          "rejeicoes": {
+            "contorno": 2
+          }
+        }
+      },
+      "tentativas": [],
+      "resultado": "ramo_sem_tampa_valida",
+      "no_xyz": [
+        430860.964,
+        65861.287,
+        557.868
+      ],
+      "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/MarkovSpodmol/MainGallery/pointclouds/MarkovSpodmol_MainGallery_sampled_5cm_PCV_normals_classified_georef.las",
+      "centreline": "/run/media/midnavi/Pablo/TCC/DATA/RAW/MarkovSpodmol/MainGallery/centreline/MarkovSpodmol_MainGallery_nodes_from_LBC.txt",
+      "voxel_size": 0.16
+    },
+    "a8f087b5a82c/juncao_019": {
+      "ramos": {
+        "17": {
+          "aceitos": 12,
+          "rejeicoes": {}
+        },
+        "18": {
+          "aceitos": 10,
+          "rejeicoes": {
+            "contorno": 2
+          }
+        },
+        "19": {
+          "aceitos": 3,
+          "rejeicoes": {
+            "contorno": 1
+          }
+        }
+      },
+      "tentativas": [
+        {
+          "distancias": {
+            "17": 1.28,
+            "18": 2.56,
+            "19": 1.92
+          },
+          "resultado": "leaking",
+          "planos_completos": "leaking",
+          "ramos_cruzados_pela_fuga": [
+            17,
+            19
+          ]
+        },
+        {
+          "distancias": {
+            "17": 1.92,
+            "18": 2.56,
+            "19": 1.92
+          },
+          "resultado": "leaking"
+        },
+        {
+          "distancias": {
+            "17": 1.28,
+            "18": 2.56,
+            "19": 3.03865315626483
+          },
+          "resultado": "leaking"
+        },
+        {
+          "distancias": {
+            "17": 2.56,
+            "18": 2.56,
+            "19": 1.92
+          },
+          "resultado": "leaking"
+        },
+        {
+          "distancias": {
+            "17": 1.92,
+            "18": 2.56,
+            "19": 3.03865315626483
+          },
+          "resultado": "leaking"
+        },
+        {
+          "distancias": {
+            "17": 3.2,
+            "18": 2.56,
+            "19": 1.92
+          },
+          "resultado": "leaking"
+        },
+        {
+          "distancias": {
+            "17": 2.56,
+            "18": 2.56,
+            "19": 3.03865315626483
+          },
+          "resultado": "leaking"
+        },
+        {
+          "distancias": {
+            "17": 3.84,
+            "18": 2.56,
+            "19": 1.92
+          },
+          "resultado": "leaking"
+        }
+      ],
+      "resultado": "sem_fechamento",
+      "no_xyz": [
+        430861.844,
+        65885.264,
+        554.898
+      ],
+      "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/MarkovSpodmol/MainGallery/pointclouds/MarkovSpodmol_MainGallery_sampled_5cm_PCV_normals_classified_georef.las",
+      "centreline": "/run/media/midnavi/Pablo/TCC/DATA/RAW/MarkovSpodmol/MainGallery/centreline/MarkovSpodmol_MainGallery_nodes_from_LBC.txt",
+      "voxel_size": 0.16
+    },
+    "a8f087b5a82c/juncao_020": {
+      "ramos": {
+        "74": {
+          "aceitos": 0,
+          "rejeicoes": {}
+        },
+        "75": {
+          "aceitos": 0,
+          "rejeicoes": {
+            "contorno": 5
+          }
+        },
+        "76": {
+          "aceitos": 0,
+          "rejeicoes": {}
+        }
+      },
+      "tentativas": [],
+      "resultado": "ramo_sem_tampa_valida",
+      "no_xyz": [
+        430862.639,
+        65859.279,
+        557.709
+      ],
+      "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/MarkovSpodmol/MainGallery/pointclouds/MarkovSpodmol_MainGallery_sampled_5cm_PCV_normals_classified_georef.las",
+      "centreline": "/run/media/midnavi/Pablo/TCC/DATA/RAW/MarkovSpodmol/MainGallery/centreline/MarkovSpodmol_MainGallery_nodes_from_LBC.txt",
+      "voxel_size": 0.16
+    },
+    "a8f087b5a82c/juncao_021": {
+      "ramos": {
+        "22": {
+          "aceitos": 0,
+          "rejeicoes": {}
+        },
+        "52": {
+          "aceitos": 0,
+          "rejeicoes": {
+            "contorno": 3
+          }
+        },
+        "75": {
+          "aceitos": 0,
+          "rejeicoes": {
+            "contorno": 5
+          }
+        }
+      },
+      "tentativas": [],
+      "resultado": "ramo_sem_tampa_valida",
+      "no_xyz": [
+        430866.088,
+        65859.463,
+        557.907
+      ],
+      "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/MarkovSpodmol/MainGallery/pointclouds/MarkovSpodmol_MainGallery_sampled_5cm_PCV_normals_classified_georef.las",
+      "centreline": "/run/media/midnavi/Pablo/TCC/DATA/RAW/MarkovSpodmol/MainGallery/centreline/MarkovSpodmol_MainGallery_nodes_from_LBC.txt",
+      "voxel_size": 0.16
+    },
+    "a8f087b5a82c/juncao_023": {
+      "ramos": {
+        "40": {
+          "aceitos": 0,
+          "rejeicoes": {
+            "contorno": 12
+          }
+        },
+        "52": {
+          "aceitos": 0,
+          "rejeicoes": {
+            "contorno": 3
+          }
+        },
+        "53": {
+          "aceitos": 0,
+          "rejeicoes": {}
+        }
+      },
+      "tentativas": [],
+      "resultado": "ramo_sem_tampa_valida",
+      "no_xyz": [
+        430868.214,
+        65859.162,
+        557.905
+      ],
+      "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/MarkovSpodmol/MainGallery/pointclouds/MarkovSpodmol_MainGallery_sampled_5cm_PCV_normals_classified_georef.las",
+      "centreline": "/run/media/midnavi/Pablo/TCC/DATA/RAW/MarkovSpodmol/MainGallery/centreline/MarkovSpodmol_MainGallery_nodes_from_LBC.txt",
+      "voxel_size": 0.16
+    },
+    "a8f087b5a82c/juncao_024": {
+      "ramos": {
+        "40": {
+          "aceitos": 0,
+          "rejeicoes": {
+            "contorno": 12
+          }
+        },
+        "41": {
+          "aceitos": 0,
+          "rejeicoes": {
+            "contorno": 12
+          }
+        },
+        "42": {
+          "aceitos": 0,
+          "rejeicoes": {}
+        }
+      },
+      "tentativas": [],
+      "resultado": "ramo_sem_tampa_valida",
+      "no_xyz": [
+        430875.686,
+        65857.226,
+        557.319
+      ],
+      "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/MarkovSpodmol/MainGallery/pointclouds/MarkovSpodmol_MainGallery_sampled_5cm_PCV_normals_classified_georef.las",
+      "centreline": "/run/media/midnavi/Pablo/TCC/DATA/RAW/MarkovSpodmol/MainGallery/centreline/MarkovSpodmol_MainGallery_nodes_from_LBC.txt",
+      "voxel_size": 0.16
+    },
+    "a8f087b5a82c/juncao_025": {
+      "ramos": {
+        "41": {
+          "aceitos": 0,
+          "rejeicoes": {
+            "contorno": 12
+          }
+        },
+        "43": {
+          "aceitos": 0,
+          "rejeicoes": {}
+        },
+        "44": {
+          "aceitos": 0,
+          "rejeicoes": {
+            "contorno": 2
+          }
+        }
+      },
+      "tentativas": [],
+      "resultado": "ramo_sem_tampa_valida",
+      "no_xyz": [
+        430889.81,
+        65864.852,
+        556.216
+      ],
+      "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/MarkovSpodmol/MainGallery/pointclouds/MarkovSpodmol_MainGallery_sampled_5cm_PCV_normals_classified_georef.las",
+      "centreline": "/run/media/midnavi/Pablo/TCC/DATA/RAW/MarkovSpodmol/MainGallery/centreline/MarkovSpodmol_MainGallery_nodes_from_LBC.txt",
+      "voxel_size": 0.16
+    },
+    "a8f087b5a82c/juncao_026": {
+      "ramos": {
+        "45": {
+          "aceitos": 0,
+          "rejeicoes": {}
+        },
+        "78": {
+          "aceitos": 0,
+          "rejeicoes": {}
+        },
+        "82": {
+          "aceitos": 0,
+          "rejeicoes": {
+            "contorno": 3
+          }
+        }
+      },
+      "tentativas": [],
+      "resultado": "ramo_sem_tampa_valida",
+      "no_xyz": [
+        430890.111,
+        65867.276,
+        555.936
+      ],
+      "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/MarkovSpodmol/MainGallery/pointclouds/MarkovSpodmol_MainGallery_sampled_5cm_PCV_normals_classified_georef.las",
+      "centreline": "/run/media/midnavi/Pablo/TCC/DATA/RAW/MarkovSpodmol/MainGallery/centreline/MarkovSpodmol_MainGallery_nodes_from_LBC.txt",
+      "voxel_size": 0.16
+    },
+    "a8f087b5a82c/juncao_028": {
+      "ramos": {
+        "18": {
+          "aceitos": 7,
+          "rejeicoes": {
+            "contorno": 5
+          }
+        },
+        "38": {
+          "aceitos": 0,
+          "rejeicoes": {}
+        },
+        "46": {
+          "aceitos": 0,
+          "rejeicoes": {}
+        }
+      },
+      "tentativas": [],
+      "resultado": "ramo_sem_tampa_valida",
+      "no_xyz": [
+        430890.726,
+        65870.212,
+        555.628
+      ],
+      "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/MarkovSpodmol/MainGallery/pointclouds/MarkovSpodmol_MainGallery_sampled_5cm_PCV_normals_classified_georef.las",
+      "centreline": "/run/media/midnavi/Pablo/TCC/DATA/RAW/MarkovSpodmol/MainGallery/centreline/MarkovSpodmol_MainGallery_nodes_from_LBC.txt",
+      "voxel_size": 0.16
+    },
+    "a8f087b5a82c/juncao_030": {
+      "ramos": {
+        "79": {
+          "aceitos": 0,
+          "rejeicoes": {}
+        },
+        "80": {
+          "aceitos": 0,
+          "rejeicoes": {
+            "contorno": 3
+          }
+        },
+        "81": {
+          "aceitos": 0,
+          "rejeicoes": {}
+        }
+      },
+      "tentativas": [],
+      "resultado": "ramo_sem_tampa_valida",
+      "no_xyz": [
+        430890.848,
+        65869.308,
+        555.748
+      ],
+      "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/MarkovSpodmol/MainGallery/pointclouds/MarkovSpodmol_MainGallery_sampled_5cm_PCV_normals_classified_georef.las",
+      "centreline": "/run/media/midnavi/Pablo/TCC/DATA/RAW/MarkovSpodmol/MainGallery/centreline/MarkovSpodmol_MainGallery_nodes_from_LBC.txt",
+      "voxel_size": 0.16
+    },
+    "a8f087b5a82c/juncao_031": {
+      "ramos": {
+        "49": {
+          "aceitos": 0,
+          "rejeicoes": {}
+        },
+        "81": {
+          "aceitos": 0,
+          "rejeicoes": {}
+        },
+        "82": {
+          "aceitos": 0,
+          "rejeicoes": {
+            "contorno": 3
+          }
+        }
+      },
+      "tentativas": [],
+      "resultado": "ramo_sem_tampa_valida",
+      "no_xyz": [
+        430890.953,
+        65868.917,
+        555.805
+      ],
+      "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/MarkovSpodmol/MainGallery/pointclouds/MarkovSpodmol_MainGallery_sampled_5cm_PCV_normals_classified_georef.las",
+      "centreline": "/run/media/midnavi/Pablo/TCC/DATA/RAW/MarkovSpodmol/MainGallery/centreline/MarkovSpodmol_MainGallery_nodes_from_LBC.txt",
+      "voxel_size": 0.16
+    },
+    "a8f087b5a82c/juncao_033": {
+      "ramos": {
+        "57": {
+          "aceitos": 0,
+          "rejeicoes": {
+            "contorno": 4
+          }
+        },
+        "63": {
+          "aceitos": 0,
+          "rejeicoes": {}
+        },
+        "67": {
+          "aceitos": 0,
+          "rejeicoes": {}
+        }
+      },
+      "tentativas": [],
+      "resultado": "ramo_sem_tampa_valida",
+      "no_xyz": [
+        430891.809,
+        65865.782,
+        556.214
+      ],
+      "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/MarkovSpodmol/MainGallery/pointclouds/MarkovSpodmol_MainGallery_sampled_5cm_PCV_normals_classified_georef.las",
+      "centreline": "/run/media/midnavi/Pablo/TCC/DATA/RAW/MarkovSpodmol/MainGallery/centreline/MarkovSpodmol_MainGallery_nodes_from_LBC.txt",
+      "voxel_size": 0.16
+    },
+    "a8f087b5a82c/juncao_034": {
+      "ramos": {
+        "55": {
+          "aceitos": 0,
+          "rejeicoes": {}
+        },
+        "56": {
+          "aceitos": 0,
+          "rejeicoes": {}
+        },
+        "57": {
+          "aceitos": 0,
+          "rejeicoes": {
+            "contorno": 4
+          }
+        }
+      },
+      "tentativas": [],
+      "resultado": "ramo_sem_tampa_valida",
+      "no_xyz": [
+        430892.165,
+        65867.782,
+        556.041
+      ],
+      "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/MarkovSpodmol/MainGallery/pointclouds/MarkovSpodmol_MainGallery_sampled_5cm_PCV_normals_classified_georef.las",
+      "centreline": "/run/media/midnavi/Pablo/TCC/DATA/RAW/MarkovSpodmol/MainGallery/centreline/MarkovSpodmol_MainGallery_nodes_from_LBC.txt",
+      "voxel_size": 0.16
+    },
+    "a8f087b5a82c/juncao_035": {
+      "ramos": {
+        "55": {
+          "aceitos": 0,
+          "rejeicoes": {}
+        },
+        "71": {
+          "aceitos": 0,
+          "rejeicoes": {}
+        },
+        "80": {
+          "aceitos": 0,
+          "rejeicoes": {
+            "contorno": 3
+          }
+        }
+      },
+      "tentativas": [],
+      "resultado": "ramo_sem_tampa_valida",
+      "no_xyz": [
+        430892.528,
+        65867.975,
+        556.053
+      ],
+      "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/MarkovSpodmol/MainGallery/pointclouds/MarkovSpodmol_MainGallery_sampled_5cm_PCV_normals_classified_georef.las",
+      "centreline": "/run/media/midnavi/Pablo/TCC/DATA/RAW/MarkovSpodmol/MainGallery/centreline/MarkovSpodmol_MainGallery_nodes_from_LBC.txt",
+      "voxel_size": 0.16
+    },
+    "a8f087b5a82c/juncao_039": {
+      "ramos": {
+        "15": {
+          "aceitos": 0,
+          "rejeicoes": {}
+        },
+        "27": {
+          "aceitos": 0,
+          "rejeicoes": {
+            "contorno": 3
+          }
+        },
+        "28": {
+          "aceitos": 0,
+          "rejeicoes": {
+            "contorno": 12
+          }
+        }
+      },
+      "tentativas": [],
+      "resultado": "ramo_sem_tampa_valida",
+      "no_xyz": [
+        430893.922,
+        65868.9,
+        556.086
+      ],
+      "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/MarkovSpodmol/MainGallery/pointclouds/MarkovSpodmol_MainGallery_sampled_5cm_PCV_normals_classified_georef.las",
+      "centreline": "/run/media/midnavi/Pablo/TCC/DATA/RAW/MarkovSpodmol/MainGallery/centreline/MarkovSpodmol_MainGallery_nodes_from_LBC.txt",
+      "voxel_size": 0.16
+    },
+    "67fe61f051ae/juncao_001": {
+      "ramos": {
+        "1": {
+          "aceitos": 0,
+          "rejeicoes": {
+            "contorno": 12
+          }
+        },
+        "3": {
+          "aceitos": 0,
+          "rejeicoes": {}
+        },
+        "5": {
+          "aceitos": 0,
+          "rejeicoes": {}
+        }
+      },
+      "tentativas": [],
+      "resultado": "ramo_sem_tampa_valida",
+      "no_xyz": [
+        -18.5942245655856,
+        55.26071876082451,
+        1.3941528429845018
+      ],
+      "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/IndianTunnel/IndianTunnel_cave/Full/IndianTunnel_full_10x.f32",
+      "centreline": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/full10x_16cm/centreline.npz",
+      "voxel_size": 0.16
+    },
+    "67fe61f051ae/juncao_002": {
+      "ramos": {
+        "2": {
+          "aceitos": 0,
+          "rejeicoes": {
+            "contorno": 12
+          }
+        },
+        "3": {
+          "aceitos": 0,
+          "rejeicoes": {}
+        },
+        "4": {
+          "aceitos": 0,
+          "rejeicoes": {}
+        }
+      },
+      "tentativas": [],
+      "resultado": "ramo_sem_tampa_valida",
+      "no_xyz": [
+        -18.528799366316576,
+        54.86815706449709,
+        1.395393436230659
+      ],
+      "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/IndianTunnel/IndianTunnel_cave/Full/IndianTunnel_full_10x.f32",
+      "centreline": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/full10x_16cm/centreline.npz",
+      "voxel_size": 0.16
+    },
+    "67fe61f051ae/juncao_003": {
+      "ramos": {
+        "6": {
+          "aceitos": 0,
+          "rejeicoes": {
+            "contorno": 2
+          }
+        },
+        "7": {
+          "aceitos": 0,
+          "rejeicoes": {
+            "contorno": 12
+          }
+        },
+        "8": {
+          "aceitos": 0,
+          "rejeicoes": {
+            "contorno": 12
+          }
+        }
+      },
+      "tentativas": [],
+      "resultado": "ramo_sem_tampa_valida",
+      "no_xyz": [
+        -10.742732694779662,
+        -28.174422980446593,
+        9.09460515384626
+      ],
+      "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/IndianTunnel/IndianTunnel_cave/Full/IndianTunnel_full_10x.f32",
+      "centreline": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/full10x_16cm/centreline.npz",
+      "voxel_size": 0.16
+    },
+    "67fe61f051ae/juncao_004": {
+      "ramos": {
+        "9": {
+          "aceitos": 0,
+          "rejeicoes": {
+            "contorno": 12
+          }
+        },
+        "10": {
+          "aceitos": 0,
+          "rejeicoes": {}
+        },
+        "11": {
+          "aceitos": 0,
+          "rejeicoes": {
+            "contorno": 2
+          }
+        }
+      },
+      "tentativas": [],
+      "resultado": "ramo_sem_tampa_valida",
+      "no_xyz": [
+        -0.9371120319713384,
+        -6.424424485983906,
+        4.565454907370398
+      ],
+      "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/IndianTunnel/IndianTunnel_cave/Full/IndianTunnel_full_10x.f32",
+      "centreline": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/full10x_16cm/centreline.npz",
+      "voxel_size": 0.16
+    },
+    "67fe61f051ae/juncao_007": {
+      "ramos": {
+        "8": {
+          "aceitos": 0,
+          "rejeicoes": {
+            "contorno": 12
+          }
+        },
+        "11": {
+          "aceitos": 0,
+          "rejeicoes": {
+            "contorno": 2
+          }
+        },
+        "15": {
+          "aceitos": 0,
+          "rejeicoes": {}
+        }
+      },
+      "tentativas": [],
+      "resultado": "ramo_sem_tampa_valida",
+      "no_xyz": [
+        0.44781861096493714,
+        -7.23626767450213,
+        4.574225941900023
+      ],
+      "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/IndianTunnel/IndianTunnel_cave/Full/IndianTunnel_full_10x.f32",
+      "centreline": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/full10x_16cm/centreline.npz",
+      "voxel_size": 0.16
+    },
+    "67fe61f051ae/juncao_011": {
+      "ramos": {
+        "15": {
+          "aceitos": 0,
+          "rejeicoes": {}
+        },
+        "17": {
+          "aceitos": 0,
+          "rejeicoes": {}
+        },
+        "18": {
+          "aceitos": 0,
+          "rejeicoes": {
+            "contorno": 3
+          }
+        }
+      },
+      "tentativas": [],
+      "resultado": "ramo_sem_tampa_valida",
+      "no_xyz": [
+        0.9350725370655297,
+        -5.915348175103148,
+        4.329400215145565
+      ],
+      "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/IndianTunnel/IndianTunnel_cave/Full/IndianTunnel_full_10x.f32",
+      "centreline": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/full10x_16cm/centreline.npz",
+      "voxel_size": 0.16
+    },
+    "67fe61f051ae/juncao_012": {
+      "ramos": {
+        "2": {
+          "aceitos": 0,
+          "rejeicoes": {
+            "contorno": 12
+          }
+        },
+        "23": {
+          "aceitos": 0,
+          "rejeicoes": {
+            "contorno": 2
+          }
+        },
+        "25": {
+          "aceitos": 0,
+          "rejeicoes": {}
+        }
+      },
+      "tentativas": [],
+      "resultado": "ramo_sem_tampa_valida",
+      "no_xyz": [
+        1.0229689179519283,
+        -1.778368741941776,
+        3.842155249739222
+      ],
+      "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/IndianTunnel/IndianTunnel_cave/Full/IndianTunnel_full_10x.f32",
+      "centreline": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/full10x_16cm/centreline.npz",
+      "voxel_size": 0.16
+    },
+    "ccc1794c10d5/juncao_001": {
+      "ramos": {
+        "1": {
+          "aceitos": 11,
+          "rejeicoes": {
+            "eixo_na_parede": 1
+          }
+        },
+        "2": {
+          "aceitos": 7,
+          "rejeicoes": {
+            "contorno": 4,
+            "eixo_na_parede": 1
+          }
+        },
+        "3": {
+          "aceitos": 0,
+          "rejeicoes": {}
+        }
+      },
+      "tentativas": [],
+      "resultado": "ramo_sem_tampa_valida",
+      "no_xyz": [
+        943821.387,
+        6562012.316,
+        1079.268
+      ],
+      "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/Archamps/PreEtroiture/pointclouds/Archamps_PreEtroiture_sampled_5cm_PCV_normals_classified_georef.las",
+      "centreline": "/run/media/midnavi/Pablo/TCC/DATA/RAW/Archamps/PreEtroiture/centreline/Archamps_PreEtroiture_nodes_from_LBC.txt",
+      "voxel_size": 0.16
+    },
+    "ccc1794c10d5/juncao_002": {
+      "ramos": {
+        "2": {
+          "aceitos": 7,
+          "rejeicoes": {
+            "contorno": 2,
+            "eixo_na_parede": 3
+          }
+        },
+        "4": {
+          "aceitos": 6,
+          "rejeicoes": {
+            "contorno": 5,
+            "eixo_na_parede": 1
+          }
+        },
+        "5": {
+          "aceitos": 0,
+          "rejeicoes": {}
+        }
+      },
+      "tentativas": [],
+      "resultado": "ramo_sem_tampa_valida",
+      "no_xyz": [
+        943860.843,
+        6561984.989,
+        1050.103
+      ],
+      "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/Archamps/PreEtroiture/pointclouds/Archamps_PreEtroiture_sampled_5cm_PCV_normals_classified_georef.las",
+      "centreline": "/run/media/midnavi/Pablo/TCC/DATA/RAW/Archamps/PreEtroiture/centreline/Archamps_PreEtroiture_nodes_from_LBC.txt",
+      "voxel_size": 0.16
+    },
+    "5865abbe2035/juncao_012": {
+      "ramos": {
+        "2": {
+          "aceitos": 0,
+          "rejeicoes": {
+            "contorno": 12
+          }
+        },
+        "23": {
+          "aceitos": 0,
+          "rejeicoes": {
+            "contorno": 2
+          }
+        },
+        "25": {
+          "aceitos": 0,
+          "rejeicoes": {}
+        }
+      },
+      "tentativas": [],
+      "resultado": "ramo_sem_tampa_valida",
+      "no_xyz": [
+        1.0229689179519283,
+        -1.778368741941776,
+        3.842155249739222
+      ],
+      "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/IndianTunnel/IndianTunnel_cave/Full/IndianTunnel_full_1x.f32",
+      "centreline": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/full10x_16cm/centreline.npz",
+      "voxel_size": 0.16
+    }
+  }
+}

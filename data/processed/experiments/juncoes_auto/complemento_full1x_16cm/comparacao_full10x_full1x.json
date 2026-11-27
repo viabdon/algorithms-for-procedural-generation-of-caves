@@ -1,0 +1,137 @@
+{
+  "recortes": {
+    "juncao_sem_volume": 15
+  },
+  "juncoes": {
+    "ramo_sem_tampa_valida": 6
+  },
+  "desfechos_ramos": {
+    "eixo_sem_cruzamento": 17,
+    "sem_duas_ancoras": 1
+  },
+  "comparacao": [
+    {
+      "juncao": "5865abbe2035/juncao_001",
+      "10x": "ramo_sem_tampa_valida",
+      "1x": "ramo_sem_tampa_valida",
+      "candidatos_aceitos_10x_1x_por_ramo": {},
+      "recentramento": {
+        "resultado": "sem_eixo_ajustado",
+        "ramos": {
+          "1": {
+            "resultado": "eixo_sem_cruzamento"
+          },
+          "3": {
+            "resultado": "eixo_sem_cruzamento"
+          },
+          "5": {
+            "resultado": "eixo_sem_cruzamento"
+          }
+        }
+      }
+    },
+    {
+      "juncao": "5865abbe2035/juncao_002",
+      "10x": "ramo_sem_tampa_valida",
+      "1x": "ramo_sem_tampa_valida",
+      "candidatos_aceitos_10x_1x_por_ramo": {},
+      "recentramento": {
+        "resultado": "sem_eixo_ajustado",
+        "ramos": {
+          "2": {
+            "resultado": "eixo_sem_cruzamento"
+          },
+          "3": {
+            "resultado": "eixo_sem_cruzamento"
+          },
+          "4": {
+            "resultado": "eixo_sem_cruzamento"
+          }
+        }
+      }
+    },
+    {
+      "juncao": "5865abbe2035/juncao_003",
+      "10x": "ramo_sem_tampa_valida",
+      "1x": "ramo_sem_tampa_valida",
+      "candidatos_aceitos_10x_1x_por_ramo": {},
+      "recentramento": {
+        "resultado": "sem_eixo_ajustado",
+        "ramos": {
+          "6": {
+            "voxels_de_parede_antes": 4,
+            "resultado": "sem_duas_ancoras",
+            "ancora_antes": false,
+            "ancora_depois": false
+          },
+          "7": {
+            "resultado": "eixo_sem_cruzamento"
+          },
+          "8": {
+            "resultado": "eixo_sem_cruzamento"
+          }
+        }
+      }
+    },
+    {
+      "juncao": "5865abbe2035/juncao_004",
+      "10x": "ramo_sem_tampa_valida",
+      "1x": "ramo_sem_tampa_valida",
+      "candidatos_aceitos_10x_1x_por_ramo": {},
+      "recentramento": {
+        "resultado": "sem_eixo_ajustado",
+        "ramos": {
+          "9": {
+            "resultado": "eixo_sem_cruzamento"
+          },
+          "10": {
+            "resultado": "eixo_sem_cruzamento"
+          },
+          "11": {
+            "resultado": "eixo_sem_cruzamento"
+          }
+        }
+      }
+    },
+    {
+      "juncao": "5865abbe2035/juncao_007",
+      "10x": "ramo_sem_tampa_valida",
+      "1x": "ramo_sem_tampa_valida",
+      "candidatos_aceitos_10x_1x_por_ramo": {},
+      "recentramento": {
+        "resultado": "sem_eixo_ajustado",
+        "ramos": {
+          "8": {
+            "resultado": "eixo_sem_cruzamento"
+          },
+          "11": {
+            "resultado": "eixo_sem_cruzamento"
+          },
+          "15": {
+            "resultado": "eixo_sem_cruzamento"
+          }
+        }
+      }
+    },
+    {
+      "juncao": "5865abbe2035/juncao_011",
+      "10x": "ramo_sem_tampa_valida",
+      "1x": "ramo_sem_tampa_valida",
+      "candidatos_aceitos_10x_1x_por_ramo": {},
+      "recentramento": {
+        "resultado": "sem_eixo_ajustado",
+        "ramos": {
+          "15": {
+            "resultado": "eixo_sem_cruzamento"
+          },
+          "17": {
+            "resultado": "eixo_sem_cruzamento"
+          },
+          "18": {
+            "resultado": "eixo_sem_cruzamento"
+          }
+        }
+      }
+    }
+  ]
+}

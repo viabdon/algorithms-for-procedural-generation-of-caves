@@ -1,0 +1,235 @@
+{
+  "policy": [
+    "fewer auxiliary cap voxels",
+    "fewer local repair voxels",
+    "prefer native 64³",
+    "plan name"
+  ],
+  "records": [
+    {
+      "group": "madeleine",
+      "crop_id": "ramo_001_002",
+      "selected": "experiments/madeleine_rupt_16cm/madeleine/las2mm_16cm/data/processed/reference_sections/madeleine/Filleul/teste_externo/las2mm_16cm/ramo_001_002/64x64x64/interior.npz",
+      "versions": [
+        {
+          "path": "experiments/madeleine_rupt_16cm/madeleine/las2mm_16cm/data/processed/reference_sections/madeleine/Filleul/teste_externo/las2mm_16cm/ramo_001_002/64x64x64/interior.npz",
+          "auxiliary_cap_voxels": 106,
+          "repair_voxels": 0,
+          "derived_air_window": false
+        },
+        {
+          "path": "experiments/madeleine_rupt_16cm/madeleine/las5cm_16cm/data/processed/reference_sections/madeleine/Filleul/teste_externo/las5cm_16cm/ramo_001_002/64x64x64/interior.npz",
+          "auxiliary_cap_voxels": 114,
+          "repair_voxels": 0,
+          "derived_air_window": false
+        }
+      ]
+    },
+    {
+      "group": "madeleine",
+      "crop_id": "ramo_001_006",
+      "selected": "experiments/madeleine_rupt_16cm/madeleine/las5cm_16cm/data/processed/reference_sections/madeleine/Filleul/teste_externo/las5cm_16cm/ramo_001_006/64x64x64/interior.npz",
+      "versions": [
+        {
+          "path": "experiments/madeleine_rupt_16cm/madeleine/las5cm_16cm/data/processed/reference_sections/madeleine/Filleul/teste_externo/las5cm_16cm/ramo_001_006/64x64x64/interior.npz",
+          "auxiliary_cap_voxels": 1059,
+          "repair_voxels": 0,
+          "derived_air_window": false
+        },
+        {
+          "path": "experiments/madeleine_rupt_16cm/madeleine/las2mm_16cm/data/processed/reference_sections/madeleine/Filleul/teste_externo/las2mm_16cm/ramo_001_006/64x64x64/interior.npz",
+          "auxiliary_cap_voxels": 1182,
+          "repair_voxels": 0,
+          "derived_air_window": false
+        }
+      ]
+    },
+    {
+      "group": "madeleine",
+      "crop_id": "ramo_002_001",
+      "selected": "experiments/madeleine_rupt_16cm/madeleine/las2mm_16cm/data/processed/reference_sections/madeleine/Filleul/teste_externo/las2mm_16cm/ramo_002_001/64x64x64/interior.npz",
+      "versions": [
+        {
+          "path": "experiments/madeleine_rupt_16cm/madeleine/las2mm_16cm/data/processed/reference_sections/madeleine/Filleul/teste_externo/las2mm_16cm/ramo_002_001/64x64x64/interior.npz",
+          "auxiliary_cap_voxels": 270,
+          "repair_voxels": 0,
+          "derived_air_window": false
+        },
+        {
+          "path": "experiments/madeleine_rupt_16cm/madeleine/las5cm_16cm/data/processed/reference_sections/madeleine/Filleul/teste_externo/las5cm_16cm/ramo_002_001/64x64x64/interior.npz",
+          "auxiliary_cap_voxels": 286,
+          "repair_voxels": 0,
+          "derived_air_window": false
+        }
+      ]
+    },
+    {
+      "group": "madeleine",
+      "crop_id": "ramo_002_003",
+      "selected": "experiments/madeleine_rupt_16cm/madeleine/las5cm_16cm/data/processed/reference_sections/madeleine/Filleul/teste_externo/las5cm_16cm/ramo_002_003/64x64x64/interior.npz",
+      "versions": [
+        {
+          "path": "experiments/madeleine_rupt_16cm/madeleine/las5cm_16cm/data/processed/reference_sections/madeleine/Filleul/teste_externo/las5cm_16cm/ramo_002_003/64x64x64/interior.npz",
+          "auxiliary_cap_voxels": 415,
+          "repair_voxels": 0,
+          "derived_air_window": false
+        },
+        {
+          "path": "experiments/madeleine_rupt_16cm/madeleine/las2mm_16cm/data/processed/reference_sections/madeleine/Filleul/teste_externo/las2mm_16cm/ramo_002_003/64x64x64/interior.npz",
+          "auxiliary_cap_voxels": 523,
+          "repair_voxels": 0,
+          "derived_air_window": false
+        }
+      ]
+    },
+    {
+      "group": "rupt_du_puits",
+      "crop_id": "ramo_001_001",
+      "selected": "experiments/madeleine_rupt_16cm/rupt_du_puits/las5cm_16cm/data/processed/reference_sections/rupt_du_puits/Cascades/teste_externo/las5cm_16cm/ramo_001_001/64x64x64/interior.npz",
+      "versions": [
+        {
+          "path": "experiments/madeleine_rupt_16cm/rupt_du_puits/las5cm_16cm/data/processed/reference_sections/rupt_du_puits/Cascades/teste_externo/las5cm_16cm/ramo_001_001/64x64x64/interior.npz",
+          "auxiliary_cap_voxels": 6,
+          "repair_voxels": 0,
+          "derived_air_window": false
+        },
+        {
+          "path": "experiments/madeleine_rupt_16cm/rupt_du_puits/las2mm_16cm/data/processed/reference_sections/rupt_du_puits/Cascades/teste_externo/las2mm_16cm/ramo_001_001/64x64x64/interior.npz",
+          "auxiliary_cap_voxels": 22,
+          "repair_voxels": 0,
+          "derived_air_window": false
+        }
+      ]
+    },
+    {
+      "group": "rupt_du_puits",
+      "crop_id": "ramo_001_002",
+      "selected": "experiments/madeleine_rupt_16cm/rupt_du_puits/las2mm_16cm/data/processed/reference_sections/rupt_du_puits/Cascades/teste_externo/las2mm_16cm/ramo_001_002/64x64x64/interior.npz",
+      "versions": [
+        {
+          "path": "experiments/madeleine_rupt_16cm/rupt_du_puits/las2mm_16cm/data/processed/reference_sections/rupt_du_puits/Cascades/teste_externo/las2mm_16cm/ramo_001_002/64x64x64/interior.npz",
+          "auxiliary_cap_voxels": 25,
+          "repair_voxels": 0,
+          "derived_air_window": false
+        }
+      ]
+    },
+    {
+      "group": "rupt_du_puits",
+      "crop_id": "ramo_001_003",
+      "selected": "experiments/madeleine_rupt_16cm/rupt_du_puits/las2mm_16cm/data/processed/reference_sections/rupt_du_puits/Cascades/teste_externo/las2mm_16cm/ramo_001_003/64x64x64/interior.npz",
+      "versions": [
+        {
+          "path": "experiments/madeleine_rupt_16cm/rupt_du_puits/las2mm_16cm/data/processed/reference_sections/rupt_du_puits/Cascades/teste_externo/las2mm_16cm/ramo_001_003/64x64x64/interior.npz",
+          "auxiliary_cap_voxels": 316,
+          "repair_voxels": 0,
+          "derived_air_window": false
+        }
+      ]
+    },
+    {
+      "group": "vallorbe",
+      "crop_id": "ramo_001_003",
+      "selected": "experiments/vallorbe_16cm/vallorbe/las5cm_16cm/data/processed/reference_sections/vallorbe/GalerieSemiActive/teste_externo/las5cm_16cm/ramo_001_003/64x64x64/interior.npz",
+      "versions": [
+        {
+          "path": "experiments/vallorbe_16cm/vallorbe/las5cm_16cm/data/processed/reference_sections/vallorbe/GalerieSemiActive/teste_externo/las5cm_16cm/ramo_001_003/64x64x64/interior.npz",
+          "auxiliary_cap_voxels": 35,
+          "repair_voxels": 0,
+          "derived_air_window": false
+        }
+      ]
+    },
+    {
+      "group": "vallorbe",
+      "crop_id": "ramo_001_004",
+      "selected": "experiments/vallorbe_16cm/vallorbe/las5cm_16cm/data/processed/reference_sections/vallorbe/GalerieSemiActive/teste_externo/las5cm_16cm/ramo_001_004/64x64x64/interior.npz",
+      "versions": [
+        {
+          "path": "experiments/vallorbe_16cm/vallorbe/las5cm_16cm/data/processed/reference_sections/vallorbe/GalerieSemiActive/teste_externo/las5cm_16cm/ramo_001_004/64x64x64/interior.npz",
+          "auxiliary_cap_voxels": 11,
+          "repair_voxels": 0,
+          "derived_air_window": false
+        }
+      ]
+    },
+    {
+      "group": "vallorbe",
+      "crop_id": "ramo_001_005",
+      "selected": "experiments/vallorbe_16cm/vallorbe/las5cm_16cm/data/processed/reference_sections/vallorbe/GalerieSemiActive/teste_externo/las5cm_16cm/ramo_001_005/64x64x64/interior.npz",
+      "versions": [
+        {
+          "path": "experiments/vallorbe_16cm/vallorbe/las5cm_16cm/data/processed/reference_sections/vallorbe/GalerieSemiActive/teste_externo/las5cm_16cm/ramo_001_005/64x64x64/interior.npz",
+          "auxiliary_cap_voxels": 55,
+          "repair_voxels": 0,
+          "derived_air_window": false
+        }
+      ]
+    },
+    {
+      "group": "vallorbe",
+      "crop_id": "ramo_001_006",
+      "selected": "experiments/vallorbe_16cm/vallorbe/las5cm_16cm/data/processed/reference_sections/vallorbe/GalerieSemiActive/teste_externo/las5cm_16cm/ramo_001_006/64x66x64/interior.npz",
+      "versions": [
+        {
+          "path": "experiments/vallorbe_16cm/vallorbe/las5cm_16cm/data/processed/reference_sections/vallorbe/GalerieSemiActive/teste_externo/las5cm_16cm/ramo_001_006/64x66x64/interior.npz",
+          "auxiliary_cap_voxels": 30,
+          "repair_voxels": 0,
+          "derived_air_window": true
+        }
+      ]
+    },
+    {
+      "group": "vallorbe",
+      "crop_id": "ramo_002_004",
+      "selected": "experiments/vallorbe_16cm/vallorbe/las5cm_16cm/data/processed/reference_sections/vallorbe/GalerieSemiActive/teste_externo/las5cm_16cm/ramo_002_004/64x64x64/interior.npz",
+      "versions": [
+        {
+          "path": "experiments/vallorbe_16cm/vallorbe/las5cm_16cm/data/processed/reference_sections/vallorbe/GalerieSemiActive/teste_externo/las5cm_16cm/ramo_002_004/64x64x64/interior.npz",
+          "auxiliary_cap_voxels": 4,
+          "repair_voxels": 0,
+          "derived_air_window": false
+        }
+      ]
+    },
+    {
+      "group": "vallorbe",
+      "crop_id": "ramo_002_007",
+      "selected": "experiments/vallorbe_16cm/vallorbe/las5cm_16cm/data/processed/reference_sections/vallorbe/GalerieSemiActive/teste_externo/las5cm_16cm/ramo_002_007/64x68x66/interior.npz",
+      "versions": [
+        {
+          "path": "experiments/vallorbe_16cm/vallorbe/las5cm_16cm/data/processed/reference_sections/vallorbe/GalerieSemiActive/teste_externo/las5cm_16cm/ramo_002_007/64x68x66/interior.npz",
+          "auxiliary_cap_voxels": 20,
+          "repair_voxels": 0,
+          "derived_air_window": true
+        }
+      ]
+    },
+    {
+      "group": "vallorbe",
+      "crop_id": "ramo_004_003",
+      "selected": "experiments/vallorbe_16cm/vallorbe/las5cm_16cm/data/processed/reference_sections/vallorbe/GalerieSemiActive/teste_externo/las5cm_16cm/ramo_004_003/64x64x64/interior.npz",
+      "versions": [
+        {
+          "path": "experiments/vallorbe_16cm/vallorbe/las5cm_16cm/data/processed/reference_sections/vallorbe/GalerieSemiActive/teste_externo/las5cm_16cm/ramo_004_003/64x64x64/interior.npz",
+          "auxiliary_cap_voxels": 8,
+          "repair_voxels": 0,
+          "derived_air_window": false
+        }
+      ]
+    },
+    {
+      "group": "vallorbe",
+      "crop_id": "ramo_004_004",
+      "selected": "experiments/vallorbe_16cm/vallorbe/las5cm_16cm/data/processed/reference_sections/vallorbe/GalerieSemiActive/teste_externo/las5cm_16cm/ramo_004_004/64x64x64/interior.npz",
+      "versions": [
+        {
+          "path": "experiments/vallorbe_16cm/vallorbe/las5cm_16cm/data/processed/reference_sections/vallorbe/GalerieSemiActive/teste_externo/las5cm_16cm/ramo_004_004/64x64x64/interior.npz",
+          "auxiliary_cap_voxels": 0,
+          "repair_voxels": 0,
+          "derived_air_window": false
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "schema": "gan_observed_surface_sparse_v1",
+  "axis_order": "ZYX",
+  "coordinate_units": "m",
+  "voxel_size": 0.16,
+  "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/IndianTunnel/IndianTunnel_cave/Full/IndianTunnel_full_1x.f32",
+  "source_size_bytes": 3253750976,
+  "source_mtime_ns": 1793202140955263000,
+  "source_points": 116205392,
+  "source_plan": "data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/full1x_16cm/plan.json",
+  "source_origin_xyz": [
+    -52.01074437747145,
+    98.82685720435171,
+    3.461709513021538
+  ],
+  "bounds_source_xyz": [
+    [
+      -63.62174987792969,
+      -65.01918029785156,
+      -2.3868234157562256
+    ],
+    [
+      12.838187217712395,
+      105.42890167236328,
+      13.038862228393555
+    ]
+  ],
+  "grid_origin_xyz": [
+    -63.69074437747145,
+    -65.17314279564829,
+    -2.458290486978462
+  ],
+  "shape_zyx": [
+    97,
+    1067,
+    479
+  ],
+  "occupied_voxels": 305895,
+  "semantic": "indices of observed surface; missing indices have unknown occupancy"
+}

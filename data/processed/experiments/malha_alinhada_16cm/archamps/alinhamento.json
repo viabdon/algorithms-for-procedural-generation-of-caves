@@ -1,0 +1,34 @@
+{
+  "shift_xyz": [
+    100.0002479687505,
+    -0.00048828125,
+    -0.0009775390625037517
+  ],
+  "mesh_to_raw_percentiles_m": [
+    0.02581170795153683,
+    0.037919938036809604,
+    0.04239427138369767,
+    0.09074980081705974
+  ],
+  "mesh_within_voxel": 0.9979285714285714,
+  "raw_to_mesh_percentiles_m": [
+    0.04503900995447542,
+    0.08183502932439508,
+    0.09802479433242318,
+    0.7848955396472148
+  ],
+  "unshifted_mesh_to_raw_percentiles_m": [
+    71.08270204332901,
+    93.41629918126495,
+    94.93169068852747,
+    97.25852071625809
+  ],
+  "applied_shift_xyz": [
+    100,
+    0,
+    0
+  ],
+  "unit": "m",
+  "mesh": "/run/media/midnavi/Pablo/TCC/DATA/RAW/Archamps/PreEtroiture/mesh/Archamps_PreEtroiture_mesh_5cm.ply",
+  "cloud": "/run/media/midnavi/Pablo/TCC/DATA/RAW/Archamps/PreEtroiture/pointclouds/Archamps_PreEtroiture_sampled_5cm_PCV_normals_classified_georef.las"
+}

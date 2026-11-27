@@ -1,0 +1,99 @@
+{
+  "cave": "indian_tunnel",
+  "survey": "Full",
+  "crop_id": "ramo_002_011",
+  "plan_id": "auto_amostra_8cm_principal",
+  "fold": "holdout_indian_tunnel",
+  "branch": "passagem_002",
+  "source": "cloud.ply",
+  "source_origin_xyz": [
+    -52.01074437747145,
+    98.82685720435171,
+    3.461709513021538
+  ],
+  "units": "m",
+  "origin_xyz": [
+    45.37337682376051,
+    -102.27223056784658,
+    -5.597149094892571
+  ],
+  "selection_min_xyz": [
+    45.691776823760506,
+    -101.95383056784658,
+    -5.278749094892571
+  ],
+  "selection_max_xyz": [
+    64.19275190158032,
+    -94.62719859915762,
+    6.513876158975532
+  ],
+  "shape_zyx": [
+    78,
+    64,
+    120
+  ],
+  "voxel_size": 0.16,
+  "sections": [
+    {
+      "point_xyz": [
+        53.712287648428685,
+        -95.06444328652157,
+        -0.12801321111355016
+      ],
+      "inward_normal_xyz": [
+        0.00472353173979084,
+        -0.9974556203549046,
+        0.0711334919030109
+      ],
+      "u_xyz": [
+        0.9999888440617241,
+        0.00471156584371689,
+        -0.0003360050552176831
+      ],
+      "polygon_uv": []
+    },
+    {
+      "point_xyz": [
+        53.378716688974286,
+        -100.09428124489823,
+        0.30429080854937124
+      ],
+      "inward_normal_xyz": [
+        0.4928455688531517,
+        0.8618804107534298,
+        -0.11943786175795469
+      ],
+      "u_xyz": [
+        0.059288829464814494,
+        0.10368335219312906,
+        0.9928416778009915
+      ],
+      "polygon_uv": []
+    }
+  ],
+  "seed_xyz": [
+    53.605404056918545,
+    -97.70834937286337,
+    0.08311768301583441
+  ],
+  "batch_size": 131072,
+  "proposal": {
+    "crop_id": "ramo_002_011",
+    "status": "pending_review",
+    "review_reasons": [
+      "tampa_com_cobertura_insuficiente",
+      "outra_passagem_ou_retorno_proximo",
+      "grade_excede_64_com_voxel_escolhido"
+    ],
+    "retained_points": 60623,
+    "cut_stations": [
+      55.53950935645114,
+      60.88546029209626
+    ],
+    "section_bins_supported": [
+      3,
+      3
+    ],
+    "selection_radius": 11.197530326390115
+  }
+}

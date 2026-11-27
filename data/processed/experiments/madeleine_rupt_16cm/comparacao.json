@@ -1,0 +1,991 @@
+{
+  "madeleine": {
+    "5cm": {
+      "ramo_001_001": {
+        "resultado": "seed_blocked",
+        "grade": [
+          64,
+          64,
+          64
+        ],
+        "estacoes_m": [
+          0.16,
+          7.130884581282557
+        ],
+        "setores": [
+          16,
+          16
+        ],
+        "elegivel": false
+      },
+      "ramo_001_002": {
+        "resultado": "volume_salvo",
+        "grade": [
+          64,
+          64,
+          64
+        ],
+        "estacoes_m": [
+          7.130884581282557,
+          14.101769162565114
+        ],
+        "setores": [
+          16,
+          16
+        ],
+        "elegivel": true,
+        "air_voxels": 6527,
+        "repair_voxels": 0,
+        "auxiliary_cap_voxels": 114,
+        "auxiliary_cap_radius_voxels": 3,
+        "auditoria": [],
+        "janela_ar": false,
+        "replay": "madeleine/las5cm_16cm/data/processed/reference_sections/madeleine/Filleul/teste_externo/las5cm_16cm/ramo_001_002/64x64x64/relatorio_volume/checks_replay.csv"
+      },
+      "ramo_001_003": {
+        "resultado": "missing_contour",
+        "grade": [
+          64,
+          64,
+          64
+        ],
+        "estacoes_m": [
+          14.101769162565114,
+          21.07265374384767
+        ],
+        "setores": [
+          16,
+          9
+        ],
+        "elegivel": false
+      },
+      "ramo_001_004": {
+        "resultado": "missing_contour",
+        "grade": [
+          64,
+          64,
+          64
+        ],
+        "estacoes_m": [
+          21.07265374384767,
+          28.04353832513023
+        ],
+        "setores": [
+          9,
+          16
+        ],
+        "elegivel": false
+      },
+      "ramo_001_005": {
+        "resultado": "seed_blocked",
+        "grade": [
+          71,
+          64,
+          64
+        ],
+        "estacoes_m": [
+          28.04353832513023,
+          35.01442290641278
+        ],
+        "setores": [
+          16,
+          16
+        ],
+        "elegivel": false
+      },
+      "ramo_001_006": {
+        "resultado": "volume_salvo",
+        "grade": [
+          64,
+          64,
+          64
+        ],
+        "estacoes_m": [
+          35.01442290641278,
+          42.145307487695334
+        ],
+        "setores": [
+          16,
+          16
+        ],
+        "elegivel": true,
+        "air_voxels": 3791,
+        "repair_voxels": 0,
+        "auxiliary_cap_voxels": 1059,
+        "auxiliary_cap_radius_voxels": 4,
+        "auditoria": [],
+        "janela_ar": false,
+        "replay": "madeleine/las5cm_16cm/data/processed/reference_sections/madeleine/Filleul/teste_externo/las5cm_16cm/ramo_001_006/64x64x64/relatorio_volume/checks_replay.csv"
+      },
+      "ramo_001_007": {
+        "resultado": "escape_path_without_supported_voxels",
+        "grade": [
+          64,
+          64,
+          64
+        ],
+        "estacoes_m": [
+          42.145307487695334,
+          48.9561920689779
+        ],
+        "setores": [
+          16,
+          15
+        ],
+        "elegivel": false
+      },
+      "ramo_001_008": {
+        "resultado": "ambiguous_passage",
+        "grade": [
+          64,
+          73,
+          64
+        ],
+        "estacoes_m": [
+          48.9561920689779,
+          55.92707665026045
+        ],
+        "setores": [
+          15,
+          16
+        ],
+        "elegivel": false
+      },
+      "ramo_001_009": {
+        "resultado": "ambiguous_passage",
+        "grade": [
+          64,
+          69,
+          64
+        ],
+        "estacoes_m": [
+          55.92707665026045,
+          62.89796123154301
+        ],
+        "setores": [
+          16,
+          16
+        ],
+        "elegivel": false
+      },
+      "ramo_001_010": {
+        "resultado": "missing_contour",
+        "grade": [
+          64,
+          64,
+          64
+        ],
+        "estacoes_m": [
+          62.89796123154301,
+          69.70884581282557
+        ],
+        "setores": [
+          16,
+          4
+        ],
+        "elegivel": false
+      },
+      "ramo_002_001": {
+        "resultado": "volume_salvo",
+        "grade": [
+          64,
+          64,
+          64
+        ],
+        "estacoes_m": [
+          1.36,
+          5.8283366914208
+        ],
+        "setores": [
+          15,
+          15
+        ],
+        "elegivel": true,
+        "air_voxels": 7528,
+        "repair_voxels": 0,
+        "auxiliary_cap_voxels": 286,
+        "auxiliary_cap_radius_voxels": 4,
+        "auditoria": [],
+        "janela_ar": false,
+        "replay": "madeleine/las5cm_16cm/data/processed/reference_sections/madeleine/Filleul/teste_externo/las5cm_16cm/ramo_002_001/64x64x64/relatorio_volume/checks_replay.csv"
+      },
+      "ramo_002_002": {
+        "resultado": "escape_path_without_supported_voxels",
+        "grade": [
+          64,
+          64,
+          64
+        ],
+        "estacoes_m": [
+          5.8283366914208,
+          10.536673382841599
+        ],
+        "setores": [
+          15,
+          15
+        ],
+        "elegivel": false
+      },
+      "ramo_002_003": {
+        "resultado": "volume_salvo",
+        "grade": [
+          64,
+          64,
+          64
+        ],
+        "estacoes_m": [
+          10.536673382841599,
+          17.1650100742624
+        ],
+        "setores": [
+          15,
+          16
+        ],
+        "elegivel": true,
+        "air_voxels": 14528,
+        "repair_voxels": 0,
+        "auxiliary_cap_voxels": 415,
+        "auxiliary_cap_radius_voxels": 3,
+        "auditoria": [],
+        "janela_ar": false,
+        "replay": "madeleine/las5cm_16cm/data/processed/reference_sections/madeleine/Filleul/teste_externo/las5cm_16cm/ramo_002_003/64x64x64/relatorio_volume/checks_replay.csv"
+      },
+      "ramo_002_004": {
+        "resultado": "ambiguous_passage",
+        "grade": [
+          66,
+          64,
+          64
+        ],
+        "estacoes_m": [
+          17.1650100742624,
+          22.6733467656832
+        ],
+        "setores": [
+          16,
+          16
+        ],
+        "elegivel": false
+      },
+      "ramo_002_005": {
+        "resultado": "missing_contour",
+        "grade": [
+          80,
+          69,
+          64
+        ],
+        "estacoes_m": [
+          22.6733467656832,
+          28.341683457104
+        ],
+        "setores": [
+          16,
+          3
+        ],
+        "elegivel": false
+      },
+      "ramo_003_001": {
+        "resultado": "missing_contour",
+        "grade": [
+          67,
+          64,
+          64
+        ],
+        "estacoes_m": [
+          0.64,
+          4.703690118994933
+        ],
+        "setores": [
+          3,
+          16
+        ],
+        "elegivel": false
+      },
+      "ramo_003_002": {
+        "resultado": "ambiguous_passage",
+        "grade": [
+          64,
+          64,
+          64
+        ],
+        "estacoes_m": [
+          4.703690118994933,
+          8.927380237989865
+        ],
+        "setores": [
+          16,
+          16
+        ],
+        "elegivel": false
+      },
+      "ramo_004_001": {
+        "resultado": "missing_contour",
+        "grade": [
+          78,
+          64,
+          64
+        ],
+        "estacoes_m": [
+          0.64,
+          2.1054813862712396
+        ],
+        "setores": [
+          3,
+          2
+        ],
+        "elegivel": false
+      },
+      "ramo_005_001": {
+        "resultado": "missing_contour",
+        "grade": [
+          80,
+          64,
+          64
+        ],
+        "estacoes_m": [
+          0.64,
+          3.1183818612841883
+        ],
+        "setores": [
+          3,
+          16
+        ],
+        "elegivel": false
+      }
+    },
+    "2mm": {
+      "ramo_001_001": {
+        "resultado": "escape_path_without_supported_voxels",
+        "grade": [
+          64,
+          64,
+          64
+        ],
+        "estacoes_m": [
+          0.16,
+          7.130884581282557
+        ],
+        "setores": [
+          16,
+          16
+        ],
+        "elegivel": false
+      },
+      "ramo_001_002": {
+        "resultado": "volume_salvo",
+        "grade": [
+          64,
+          64,
+          64
+        ],
+        "estacoes_m": [
+          7.130884581282557,
+          14.101769162565114
+        ],
+        "setores": [
+          16,
+          16
+        ],
+        "elegivel": true,
+        "air_voxels": 6316,
+        "repair_voxels": 0,
+        "auxiliary_cap_voxels": 106,
+        "auxiliary_cap_radius_voxels": 3,
+        "auditoria": [],
+        "janela_ar": false,
+        "replay": "madeleine/las2mm_16cm/data/processed/reference_sections/madeleine/Filleul/teste_externo/las2mm_16cm/ramo_001_002/64x64x64/relatorio_volume/checks_replay.csv"
+      },
+      "ramo_001_003": {
+        "resultado": "missing_contour",
+        "grade": [
+          64,
+          64,
+          64
+        ],
+        "estacoes_m": [
+          14.101769162565114,
+          21.07265374384767
+        ],
+        "setores": [
+          16,
+          9
+        ],
+        "elegivel": false
+      },
+      "ramo_001_004": {
+        "resultado": "missing_contour",
+        "grade": [
+          64,
+          64,
+          64
+        ],
+        "estacoes_m": [
+          21.07265374384767,
+          28.04353832513023
+        ],
+        "setores": [
+          9,
+          16
+        ],
+        "elegivel": false
+      },
+      "ramo_001_005": {
+        "resultado": "seed_blocked",
+        "grade": [
+          65,
+          64,
+          64
+        ],
+        "estacoes_m": [
+          28.04353832513023,
+          35.01442290641278
+        ],
+        "setores": [
+          16,
+          16
+        ],
+        "elegivel": false
+      },
+      "ramo_001_006": {
+        "resultado": "volume_salvo",
+        "grade": [
+          64,
+          64,
+          64
+        ],
+        "estacoes_m": [
+          35.01442290641278,
+          42.145307487695334
+        ],
+        "setores": [
+          16,
+          16
+        ],
+        "elegivel": true,
+        "air_voxels": 4012,
+        "repair_voxels": 0,
+        "auxiliary_cap_voxels": 1182,
+        "auxiliary_cap_radius_voxels": 4,
+        "auditoria": [],
+        "janela_ar": false,
+        "replay": "madeleine/las2mm_16cm/data/processed/reference_sections/madeleine/Filleul/teste_externo/las2mm_16cm/ramo_001_006/64x64x64/relatorio_volume/checks_replay.csv"
+      },
+      "ramo_001_007": {
+        "resultado": "escape_path_without_supported_voxels",
+        "grade": [
+          64,
+          64,
+          64
+        ],
+        "estacoes_m": [
+          42.145307487695334,
+          48.9561920689779
+        ],
+        "setores": [
+          16,
+          15
+        ],
+        "elegivel": false
+      },
+      "ramo_001_008": {
+        "resultado": "volume_salvo",
+        "grade": [
+          64,
+          74,
+          64
+        ],
+        "estacoes_m": [
+          48.9561920689779,
+          55.92707665026045
+        ],
+        "setores": [
+          15,
+          16
+        ],
+        "elegivel": false,
+        "air_voxels": 15218,
+        "repair_voxels": 0,
+        "auxiliary_cap_voxels": 481,
+        "auxiliary_cap_radius_voxels": 4,
+        "auditoria": [
+          "air_window_exceeds_target_or_margin"
+        ],
+        "janela_ar": false,
+        "replay": "madeleine/las2mm_16cm/data/processed/reference_sections/madeleine/Filleul/teste_externo/las2mm_16cm/ramo_001_008/64x74x64/relatorio_volume/checks_replay.csv"
+      },
+      "ramo_001_009": {
+        "resultado": "ambiguous_passage",
+        "grade": [
+          64,
+          64,
+          64
+        ],
+        "estacoes_m": [
+          55.92707665026045,
+          62.89796123154301
+        ],
+        "setores": [
+          16,
+          16
+        ],
+        "elegivel": false
+      },
+      "ramo_001_010": {
+        "resultado": "missing_contour",
+        "grade": [
+          64,
+          64,
+          64
+        ],
+        "estacoes_m": [
+          62.89796123154301,
+          69.70884581282557
+        ],
+        "setores": [
+          16,
+          4
+        ],
+        "elegivel": false
+      },
+      "ramo_002_001": {
+        "resultado": "volume_salvo",
+        "grade": [
+          64,
+          64,
+          64
+        ],
+        "estacoes_m": [
+          1.36,
+          5.8283366914208
+        ],
+        "setores": [
+          15,
+          15
+        ],
+        "elegivel": true,
+        "air_voxels": 7302,
+        "repair_voxels": 0,
+        "auxiliary_cap_voxels": 270,
+        "auxiliary_cap_radius_voxels": 4,
+        "auditoria": [],
+        "janela_ar": false,
+        "replay": "madeleine/las2mm_16cm/data/processed/reference_sections/madeleine/Filleul/teste_externo/las2mm_16cm/ramo_002_001/64x64x64/relatorio_volume/checks_replay.csv"
+      },
+      "ramo_002_002": {
+        "resultado": "escape_path_without_supported_voxels",
+        "grade": [
+          64,
+          64,
+          64
+        ],
+        "estacoes_m": [
+          5.8283366914208,
+          12.4566733828416
+        ],
+        "setores": [
+          15,
+          15
+        ],
+        "elegivel": false
+      },
+      "ramo_002_003": {
+        "resultado": "volume_salvo",
+        "grade": [
+          64,
+          64,
+          64
+        ],
+        "estacoes_m": [
+          12.4566733828416,
+          17.3250100742624
+        ],
+        "setores": [
+          15,
+          15
+        ],
+        "elegivel": true,
+        "air_voxels": 11815,
+        "repair_voxels": 0,
+        "auxiliary_cap_voxels": 523,
+        "auxiliary_cap_radius_voxels": 4,
+        "auditoria": [],
+        "janela_ar": false,
+        "replay": "madeleine/las2mm_16cm/data/processed/reference_sections/madeleine/Filleul/teste_externo/las2mm_16cm/ramo_002_003/64x64x64/relatorio_volume/checks_replay.csv"
+      },
+      "ramo_002_004": {
+        "resultado": "ambiguous_passage",
+        "grade": [
+          65,
+          64,
+          64
+        ],
+        "estacoes_m": [
+          17.3250100742624,
+          22.6733467656832
+        ],
+        "setores": [
+          15,
+          16
+        ],
+        "elegivel": false
+      },
+      "ramo_002_005": {
+        "resultado": "missing_contour",
+        "grade": [
+          72,
+          65,
+          64
+        ],
+        "estacoes_m": [
+          22.6733467656832,
+          28.341683457104
+        ],
+        "setores": [
+          16,
+          3
+        ],
+        "elegivel": false
+      },
+      "ramo_003_001": {
+        "resultado": "missing_contour",
+        "grade": [
+          64,
+          64,
+          64
+        ],
+        "estacoes_m": [
+          0.48,
+          4.703690118994933
+        ],
+        "setores": [
+          2,
+          16
+        ],
+        "elegivel": false
+      },
+      "ramo_003_002": {
+        "resultado": "ambiguous_passage",
+        "grade": [
+          64,
+          64,
+          64
+        ],
+        "estacoes_m": [
+          4.703690118994933,
+          8.927380237989865
+        ],
+        "setores": [
+          16,
+          16
+        ],
+        "elegivel": false
+      },
+      "ramo_004_001": {
+        "resultado": "missing_contour",
+        "grade": [
+          70,
+          64,
+          64
+        ],
+        "estacoes_m": [
+          0.64,
+          2.1054813862712396
+        ],
+        "setores": [
+          3,
+          2
+        ],
+        "elegivel": false
+      },
+      "ramo_005_001": {
+        "resultado": "missing_contour",
+        "grade": [
+          80,
+          64,
+          64
+        ],
+        "estacoes_m": [
+          0.64,
+          3.1183818612841883
+        ],
+        "setores": [
+          3,
+          16
+        ],
+        "elegivel": false
+      }
+    }
+  },
+  "rupt_du_puits": {
+    "5cm": {
+      "ramo_001_001": {
+        "resultado": "volume_salvo",
+        "grade": [
+          64,
+          64,
+          64
+        ],
+        "estacoes_m": [
+          0.16,
+          6.635469605286614
+        ],
+        "setores": [
+          16,
+          16
+        ],
+        "elegivel": true,
+        "air_voxels": 25987,
+        "repair_voxels": 0,
+        "auxiliary_cap_voxels": 6,
+        "auxiliary_cap_radius_voxels": 2,
+        "auditoria": [],
+        "janela_ar": false,
+        "replay": "rupt_du_puits/las5cm_16cm/data/processed/reference_sections/rupt_du_puits/Cascades/teste_externo/las5cm_16cm/ramo_001_001/64x64x64/relatorio_volume/checks_replay.csv"
+      },
+      "ramo_001_002": {
+        "resultado": "escape_path_without_supported_voxels",
+        "grade": [
+          64,
+          64,
+          64
+        ],
+        "estacoes_m": [
+          6.635469605286614,
+          13.110939210573228
+        ],
+        "setores": [
+          16,
+          16
+        ],
+        "elegivel": false
+      },
+      "ramo_001_003": {
+        "resultado": "escape_path_without_supported_voxels",
+        "grade": [
+          64,
+          64,
+          64
+        ],
+        "estacoes_m": [
+          13.110939210573228,
+          19.586408815859844
+        ],
+        "setores": [
+          16,
+          16
+        ],
+        "elegivel": false
+      },
+      "ramo_001_004": {
+        "resultado": "escape_path_without_supported_voxels",
+        "grade": [
+          64,
+          64,
+          64
+        ],
+        "estacoes_m": [
+          19.586408815859844,
+          26.061878421146456
+        ],
+        "setores": [
+          16,
+          16
+        ],
+        "elegivel": false
+      },
+      "ramo_001_005": {
+        "resultado": "escape_path_without_supported_voxels",
+        "grade": [
+          69,
+          64,
+          64
+        ],
+        "estacoes_m": [
+          26.061878421146456,
+          32.85734802643306
+        ],
+        "setores": [
+          16,
+          15
+        ],
+        "elegivel": false
+      },
+      "ramo_001_006": {
+        "resultado": "escape_path_without_supported_voxels",
+        "grade": [
+          72,
+          64,
+          64
+        ],
+        "estacoes_m": [
+          32.85734802643306,
+          39.81281763171968
+        ],
+        "setores": [
+          15,
+          16
+        ],
+        "elegivel": false
+      },
+      "ramo_001_007": {
+        "resultado": "escape_path_without_supported_voxels",
+        "grade": [
+          73,
+          64,
+          64
+        ],
+        "estacoes_m": [
+          39.81281763171968,
+          45.168287237006304
+        ],
+        "setores": [
+          16,
+          15
+        ],
+        "elegivel": false
+      }
+    },
+    "2mm": {
+      "ramo_001_001": {
+        "resultado": "volume_salvo",
+        "grade": [
+          64,
+          64,
+          64
+        ],
+        "estacoes_m": [
+          0.16,
+          6.635469605286614
+        ],
+        "setores": [
+          16,
+          16
+        ],
+        "elegivel": true,
+        "air_voxels": 25493,
+        "repair_voxels": 0,
+        "auxiliary_cap_voxels": 22,
+        "auxiliary_cap_radius_voxels": 2,
+        "auditoria": [],
+        "janela_ar": false,
+        "replay": "rupt_du_puits/las2mm_16cm/data/processed/reference_sections/rupt_du_puits/Cascades/teste_externo/las2mm_16cm/ramo_001_001/64x64x64/relatorio_volume/checks_replay.csv"
+      },
+      "ramo_001_002": {
+        "resultado": "volume_salvo",
+        "grade": [
+          64,
+          64,
+          64
+        ],
+        "estacoes_m": [
+          6.635469605286614,
+          12.950939210573228
+        ],
+        "setores": [
+          16,
+          16
+        ],
+        "elegivel": true,
+        "air_voxels": 24758,
+        "repair_voxels": 0,
+        "auxiliary_cap_voxels": 25,
+        "auxiliary_cap_radius_voxels": 4,
+        "auditoria": [],
+        "janela_ar": false,
+        "replay": "rupt_du_puits/las2mm_16cm/data/processed/reference_sections/rupt_du_puits/Cascades/teste_externo/las2mm_16cm/ramo_001_002/64x64x64/relatorio_volume/checks_replay.csv"
+      },
+      "ramo_001_003": {
+        "resultado": "volume_salvo",
+        "grade": [
+          64,
+          64,
+          64
+        ],
+        "estacoes_m": [
+          12.950939210573228,
+          19.586408815859844
+        ],
+        "setores": [
+          16,
+          16
+        ],
+        "elegivel": true,
+        "air_voxels": 27305,
+        "repair_voxels": 0,
+        "auxiliary_cap_voxels": 316,
+        "auxiliary_cap_radius_voxels": 4,
+        "auditoria": [],
+        "janela_ar": false,
+        "replay": "rupt_du_puits/las2mm_16cm/data/processed/reference_sections/rupt_du_puits/Cascades/teste_externo/las2mm_16cm/ramo_001_003/64x64x64/relatorio_volume/checks_replay.csv"
+      },
+      "ramo_001_004": {
+        "resultado": "escape_path_without_supported_voxels",
+        "grade": [
+          64,
+          64,
+          64
+        ],
+        "estacoes_m": [
+          19.586408815859844,
+          26.221878421146457
+        ],
+        "setores": [
+          16,
+          16
+        ],
+        "elegivel": false
+      },
+      "ramo_001_005": {
+        "resultado": "missing_contour",
+        "grade": [
+          69,
+          64,
+          64
+        ],
+        "estacoes_m": [
+          26.221878421146457,
+          32.69734802643306
+        ],
+        "setores": [
+          16,
+          7
+        ],
+        "elegivel": false
+      },
+      "ramo_001_006": {
+        "resultado": "missing_contour",
+        "grade": [
+          72,
+          64,
+          64
+        ],
+        "estacoes_m": [
+          32.69734802643306,
+          38.85281763171969
+        ],
+        "setores": [
+          7,
+          8
+        ],
+        "elegivel": false
+      },
+      "ramo_001_007": {
+        "resultado": "missing_contour",
+        "grade": [
+          73,
+          64,
+          64
+        ],
+        "estacoes_m": [
+          38.85281763171969,
+          44.3682872370063
+        ],
+        "setores": [
+          8,
+          15
+        ],
+        "elegivel": false
+      }
+    }
+  }
+}

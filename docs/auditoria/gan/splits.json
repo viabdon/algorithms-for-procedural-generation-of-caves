@@ -1,0 +1,198 @@
+{
+  "schema": "gan-cave-splits-v1",
+  "audit_id": "bb4d835198c8c04eb6ae3d09ed7f74ee7c3b0ba506536abbee4fe5029caceb97",
+  "unit_of_independence": "cave",
+  "folds": [
+    {
+      "id": "holdout_archamps",
+      "groups": {
+        "archamps": "test",
+        "cascadedemotiers": "validation",
+        "indian_tunnel": "train",
+        "markovspodmol": "train"
+      },
+      "samples": [
+        {
+          "path": "Archamps_PreEtroiture_sampled_2mm_PCV_normals_classified_georef/64x64x64/interior.npz",
+          "group": "archamps",
+          "sha256": "a9f179b88b8fbe6d5c28744545f1f31b6baaa141e767a82074f76765fba669fc",
+          "voxel_sha256": "7b5c89eff584628a0f27a966b850d2362b69753e6825d1f504fdd68a17cc485e",
+          "geometry_screen_passed": false,
+          "candidate": true,
+          "split": "test"
+        },
+        {
+          "path": "CascadeDeMotiers_MainGallery_sampled_2mm_PCV_normals_classified_georef/64x64x64/interior.npz",
+          "group": "cascadedemotiers",
+          "sha256": "5233480977f1d6e50850c2b37ca97ebf18c9d30f1786aa0bc2686d078ad6fd48",
+          "voxel_sha256": "e39c62319e14aa017af0b004e2ed519314d1ddf43b68b4e79f6638de534496cc",
+          "geometry_screen_passed": false,
+          "candidate": true,
+          "split": "validation"
+        },
+        {
+          "path": "IndianTunnel_full_1x/64x64x64/interior.npz",
+          "group": "indian_tunnel",
+          "sha256": "a84436611d9cd571092f876f1f7eb4018835d945926e572a12cd08b32be48aab",
+          "voxel_sha256": "18c9b71356a0b6f427e228d5cdca0c68cab0b74c68fc01a365feb9559a18397d",
+          "geometry_screen_passed": false,
+          "candidate": true,
+          "split": "train"
+        },
+        {
+          "path": "MarkovSpodmol_MainGallery_sampled_2mm_PCV_normals_classified_georef/64x64x64/interior.npz",
+          "group": "markovspodmol",
+          "sha256": "88883b0b48d1ec78e610229edece105cd885a7d69a01ba04b7769806e025ca51",
+          "voxel_sha256": "433e646bc1021d937eff80879f966e415f87c0b2396378d24f75dfca2000e15d",
+          "geometry_screen_passed": false,
+          "candidate": true,
+          "split": "train"
+        }
+      ]
+    },
+    {
+      "id": "holdout_cascadedemotiers",
+      "groups": {
+        "archamps": "train",
+        "cascadedemotiers": "test",
+        "indian_tunnel": "validation",
+        "markovspodmol": "train"
+      },
+      "samples": [
+        {
+          "path": "Archamps_PreEtroiture_sampled_2mm_PCV_normals_classified_georef/64x64x64/interior.npz",
+          "group": "archamps",
+          "sha256": "a9f179b88b8fbe6d5c28744545f1f31b6baaa141e767a82074f76765fba669fc",
+          "voxel_sha256": "7b5c89eff584628a0f27a966b850d2362b69753e6825d1f504fdd68a17cc485e",
+          "geometry_screen_passed": false,
+          "candidate": true,
+          "split": "train"
+        },
+        {
+          "path": "CascadeDeMotiers_MainGallery_sampled_2mm_PCV_normals_classified_georef/64x64x64/interior.npz",
+          "group": "cascadedemotiers",
+          "sha256": "5233480977f1d6e50850c2b37ca97ebf18c9d30f1786aa0bc2686d078ad6fd48",
+          "voxel_sha256": "e39c62319e14aa017af0b004e2ed519314d1ddf43b68b4e79f6638de534496cc",
+          "geometry_screen_passed": false,
+          "candidate": true,
+          "split": "test"
+        },
+        {
+          "path": "IndianTunnel_full_1x/64x64x64/interior.npz",
+          "group": "indian_tunnel",
+          "sha256": "a84436611d9cd571092f876f1f7eb4018835d945926e572a12cd08b32be48aab",
+          "voxel_sha256": "18c9b71356a0b6f427e228d5cdca0c68cab0b74c68fc01a365feb9559a18397d",
+          "geometry_screen_passed": false,
+          "candidate": true,
+          "split": "validation"
+        },
+        {
+          "path": "MarkovSpodmol_MainGallery_sampled_2mm_PCV_normals_classified_georef/64x64x64/interior.npz",
+          "group": "markovspodmol",
+          "sha256": "88883b0b48d1ec78e610229edece105cd885a7d69a01ba04b7769806e025ca51",
+          "voxel_sha256": "433e646bc1021d937eff80879f966e415f87c0b2396378d24f75dfca2000e15d",
+          "geometry_screen_passed": false,
+          "candidate": true,
+          "split": "train"
+        }
+      ]
+    },
+    {
+      "id": "holdout_indian_tunnel",
+      "groups": {
+        "archamps": "train",
+        "cascadedemotiers": "train",
+        "indian_tunnel": "test",
+        "markovspodmol": "validation"
+      },
+      "samples": [
+        {
+          "path": "Archamps_PreEtroiture_sampled_2mm_PCV_normals_classified_georef/64x64x64/interior.npz",
+          "group": "archamps",
+          "sha256": "a9f179b88b8fbe6d5c28744545f1f31b6baaa141e767a82074f76765fba669fc",
+          "voxel_sha256": "7b5c89eff584628a0f27a966b850d2362b69753e6825d1f504fdd68a17cc485e",
+          "geometry_screen_passed": false,
+          "candidate": true,
+          "split": "train"
+        },
+        {
+          "path": "CascadeDeMotiers_MainGallery_sampled_2mm_PCV_normals_classified_georef/64x64x64/interior.npz",
+          "group": "cascadedemotiers",
+          "sha256": "5233480977f1d6e50850c2b37ca97ebf18c9d30f1786aa0bc2686d078ad6fd48",
+          "voxel_sha256": "e39c62319e14aa017af0b004e2ed519314d1ddf43b68b4e79f6638de534496cc",
+          "geometry_screen_passed": false,
+          "candidate": true,
+          "split": "train"
+        },
+        {
+          "path": "IndianTunnel_full_1x/64x64x64/interior.npz",
+          "group": "indian_tunnel",
+          "sha256": "a84436611d9cd571092f876f1f7eb4018835d945926e572a12cd08b32be48aab",
+          "voxel_sha256": "18c9b71356a0b6f427e228d5cdca0c68cab0b74c68fc01a365feb9559a18397d",
+          "geometry_screen_passed": false,
+          "candidate": true,
+          "split": "test"
+        },
+        {
+          "path": "MarkovSpodmol_MainGallery_sampled_2mm_PCV_normals_classified_georef/64x64x64/interior.npz",
+          "group": "markovspodmol",
+          "sha256": "88883b0b48d1ec78e610229edece105cd885a7d69a01ba04b7769806e025ca51",
+          "voxel_sha256": "433e646bc1021d937eff80879f966e415f87c0b2396378d24f75dfca2000e15d",
+          "geometry_screen_passed": false,
+          "candidate": true,
+          "split": "validation"
+        }
+      ]
+    },
+    {
+      "id": "holdout_markovspodmol",
+      "groups": {
+        "archamps": "validation",
+        "cascadedemotiers": "train",
+        "indian_tunnel": "train",
+        "markovspodmol": "test"
+      },
+      "samples": [
+        {
+          "path": "Archamps_PreEtroiture_sampled_2mm_PCV_normals_classified_georef/64x64x64/interior.npz",
+          "group": "archamps",
+          "sha256": "a9f179b88b8fbe6d5c28744545f1f31b6baaa141e767a82074f76765fba669fc",
+          "voxel_sha256": "7b5c89eff584628a0f27a966b850d2362b69753e6825d1f504fdd68a17cc485e",
+          "geometry_screen_passed": false,
+          "candidate": true,
+          "split": "validation"
+        },
+        {
+          "path": "CascadeDeMotiers_MainGallery_sampled_2mm_PCV_normals_classified_georef/64x64x64/interior.npz",
+          "group": "cascadedemotiers",
+          "sha256": "5233480977f1d6e50850c2b37ca97ebf18c9d30f1786aa0bc2686d078ad6fd48",
+          "voxel_sha256": "e39c62319e14aa017af0b004e2ed519314d1ddf43b68b4e79f6638de534496cc",
+          "geometry_screen_passed": false,
+          "candidate": true,
+          "split": "train"
+        },
+        {
+          "path": "IndianTunnel_full_1x/64x64x64/interior.npz",
+          "group": "indian_tunnel",
+          "sha256": "a84436611d9cd571092f876f1f7eb4018835d945926e572a12cd08b32be48aab",
+          "voxel_sha256": "18c9b71356a0b6f427e228d5cdca0c68cab0b74c68fc01a365feb9559a18397d",
+          "geometry_screen_passed": false,
+          "candidate": true,
+          "split": "train"
+        },
+        {
+          "path": "MarkovSpodmol_MainGallery_sampled_2mm_PCV_normals_classified_georef/64x64x64/interior.npz",
+          "group": "markovspodmol",
+          "sha256": "88883b0b48d1ec78e610229edece105cd885a7d69a01ba04b7769806e025ca51",
+          "voxel_sha256": "433e646bc1021d937eff80879f966e415f87c0b2396378d24f75dfca2000e15d",
+          "geometry_screen_passed": false,
+          "candidate": true,
+          "split": "test"
+        }
+      ]
+    }
+  ],
+  "data_status": "blocked_insufficient_interior_geometry",
+  "seed_policy": "arbitrary inference seeds; fixed validation seeds; never split by noise",
+  "splits_id": "0bb9c31ea88ce695fb8c6f07c0ac714b43118fcc8c0998328b2661441ed9c952"
+}

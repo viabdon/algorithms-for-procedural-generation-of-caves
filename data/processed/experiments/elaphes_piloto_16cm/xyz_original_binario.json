@@ -1,0 +1,17 @@
+{
+  "original": "/run/media/midnavi/Pablo/TCC/DATA/RAW/Elaphes/elaphes_cave.ply",
+  "vertices": 94465067,
+  "bounds_xyz": [
+    [
+      -9.93910026550293,
+      -3.2372701168060303,
+      -6.963339805603027
+    ],
+    [
+      73.72450256347656,
+      12.9576997756958,
+      69.78089904785156
+    ]
+  ],
+  "encoding": "XYZ float32, ordem original"
+}

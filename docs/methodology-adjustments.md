@@ -14,6 +14,13 @@ O Elaphes continua útil para inspeção qualitativa e propriedades observáveis
 
 Na branch `CA` (`a58155e`), um flood fill de seis vizinhos e uma EDT calculam um campo experimental da grade de parede `64³`. Encontraram 26 vazios fechados e classificaram 783 voxels como borda e 292 como internos. O campo usa interno positivo, externo negativo e distância em voxels. A classe interna pode conter espessura de parede e buracos fechados; o ar do túnel aberto se conecta ao exterior. Portanto, nem o campo nem a IoU 0,49 relatada para o CA guiado por ele validam uma referência volumétrica de ar do Elaphes. Esse número é apenas diagnóstico de sobreposição com a grade derivada do scan.
 
+O piloto posterior de Archamps trabalha em trechos delimitados e registra
+paredes, tampas e reparo em camadas próprias. As janelas com tampas móveis
+investigam rotas de fuga antes de testar remendos localizados. O 003
+obteve ar candidato após um reparo de um voxel, com geometria ainda em
+revisão. A exclusão de IoU contra um interior real do benchmark principal
+continua aplicável. [Histórico e controles do piloto](plano-reconstrucao-secoes.md#evolucao-do-piloto-em-archamps)
+
 ## 2. Protocolo do benchmark principal
 
 Comparar Random Walk e CA básico primeiro em `64³`, com eixos ZYX. Fixar sementes, repetições, parâmetros e orçamento de ajuste antes da coleta; registrar código, configuração e hardware e relatar dispersão. A grade não recebe unidade física sem conversão conhecida. As medidas já disponíveis no `main` são tempo de geração, pico de RSS, proporção de vazio, fração de vazio na maior componente e estatísticas da transformada de distância. CPU/GPU/VRAM e descritores adicionais precisam de instrumentação e protocolo. Custos de treinamento, otimização, geração e visualização devem ser separados quando essas etapas existirem.

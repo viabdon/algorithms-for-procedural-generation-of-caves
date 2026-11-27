@@ -1,0 +1,1822 @@
+{
+  "schema": "gan-cave-splits-v1",
+  "audit_id": "2515488d75624a86032b7131a0fd08fcabfb660c41b15c76a64e47239b6f649d",
+  "unit_of_independence": "cave",
+  "folds": [
+    {
+      "id": "holdout_archamps",
+      "groups": {
+        "archamps": "test",
+        "cascadedemotiers": "validation",
+        "indian_tunnel": "train",
+        "markovspodmol": "train"
+      },
+      "samples": [
+        {
+          "path": "archamps/PostEtroiture/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_001_002/64x64x64/interior.npz",
+          "group": "archamps",
+          "sha256": "338e4ddc85ce2ef6c5ae0e494052ce0d4d81d7b79efe499f4c0dd74979a7fa67",
+          "voxel_sha256": "c30b0ff5703fcb4068cbba0b43efde47ee40cb5f69b7c2a16c39658ff1be9b0f",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "test",
+          "gallery_evidence": {
+            "surface.npz": "3e3da3be81edf8077f569391a0e8c530c72ef0ee44d9d58f48ab71a55606fccc",
+            "masks.npz": "cad18659637fa5d8e496b608f619a3c92d849181171b452ac9bb984e9f8d343d"
+          }
+        },
+        {
+          "path": "archamps/PostEtroiture/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_001_003/64x64x64/interior.npz",
+          "group": "archamps",
+          "sha256": "7b27da00db99e7e18c2416d9499aacc330b298c0761c9cbb19676bdd79b55bb3",
+          "voxel_sha256": "17b3f06b1924edff00bc3ea93a2639db17881aaf91d34518f63332988472a4bd",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "test",
+          "gallery_evidence": {
+            "surface.npz": "82f0e21c0fe0a824ec3bcca1fcdd8f9a0c7d1fa179ff6017f4dbaa7076dfdffd",
+            "masks.npz": "30e62fc20af35388fe0a522ff56edab1c1291889cbfb9160f5c462af4d7241a9"
+          }
+        },
+        {
+          "path": "archamps/PostEtroiture/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_001_004/64x64x64/interior.npz",
+          "group": "archamps",
+          "sha256": "6b2fd193fcdaf694b681ab46ae994ed531e2e1be6781b75c4f63427dc5469d92",
+          "voxel_sha256": "ebac9b92f1798beb4b3b01e2b2ea5b7c2269ea9c0ba335c0d8a747b112170c6d",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "test",
+          "gallery_evidence": {
+            "surface.npz": "bb57b6d6e00b9b7de36d3ed5510df5eeb161cf1bac16d7a3aa44d6b1ad6ce2dc",
+            "masks.npz": "4aeb4070ad35b366d4310f2b500c9ceb122870dc2a73365d6073b5b36a9c1d21"
+          }
+        },
+        {
+          "path": "archamps/PostEtroiture/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_001_005/64x64x64/interior.npz",
+          "group": "archamps",
+          "sha256": "e2f97e25553a3af6d87c3f40f6e3e362c4134aabc717fce3d319306b0c76f3b0",
+          "voxel_sha256": "74e42e16ad773152f3dbcc6b43c4efbcc707e4d82c97e0d5a30ae69e21e6e8f2",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "test",
+          "gallery_evidence": {
+            "surface.npz": "09e3b86e8f6d1e29acd1bc48ff7015af692b3c56ef00d213d7596b822436110b",
+            "masks.npz": "1764d6f9e18879c93b9a452051f3a6fb779ec21cacc9f9d6f66eb75d94650463"
+          }
+        },
+        {
+          "path": "archamps/PostEtroiture/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_001_006/64x64x64/interior.npz",
+          "group": "archamps",
+          "sha256": "21e20259e41d0189ed38eef80ea9d8d46c6d6e91d7536791c460c80def1d3318",
+          "voxel_sha256": "4422753a1e2cfb8000b144bc0cef25077de26e0d0416e1d9641bd5d3d59b116f",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "test",
+          "gallery_evidence": {
+            "surface.npz": "4e9e3aef7e3253a3433b97a879929bf569383a7ba196b5d141de8930c5087043",
+            "masks.npz": "4020d41732e3db5ebde53c2a784284a1eef1df16ccccadc5a77a6f9a3940ca3a"
+          }
+        },
+        {
+          "path": "cascadedemotiers/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_015_001/64x64x64/interior.npz",
+          "group": "cascadedemotiers",
+          "sha256": "e3cab653877965a7bac1ca5786505f63d8c985af1cb7808c57c1fec13058f6e5",
+          "voxel_sha256": "e002100cd668558a032c52e949d50a0cb352e703f0c5646e75f7a09998d79b63",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "validation",
+          "gallery_evidence": {
+            "surface.npz": "a15a894d04e1f20b8dd6b60c65c59b5c2057bb77ee56c9d869f65435105dedd0",
+            "masks.npz": "13d8b29fc2fd3e3bb4b9afaf7a3dfd91cb0c667b5e0a0261ebc8383fde11be34"
+          }
+        },
+        {
+          "path": "cascadedemotiers/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_015_002/64x64x64/interior.npz",
+          "group": "cascadedemotiers",
+          "sha256": "a4adf1d4fe0dc844d57e812fe41527b1f99ea885daacde292f5f7699c4780194",
+          "voxel_sha256": "9f6144d17ece86c11d4eb782e905b6b316da9665219abd3243a5890ec3c8f870",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "validation",
+          "gallery_evidence": {
+            "surface.npz": "53ab1d64baa92fdfe8f9aa74e5b22cd3e6127faae23a76b1182e2980f7c52f59",
+            "masks.npz": "cd64978872c212ea0ae8ae81c576f353ee250813b0eceb0a63beadcfe6b3863e"
+          }
+        },
+        {
+          "path": "cascadedemotiers/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_015_003/64x64x64/interior.npz",
+          "group": "cascadedemotiers",
+          "sha256": "7f2ba37cb055945e4253943b37742b31db728fa4ae0df4986d77b27c65e5623d",
+          "voxel_sha256": "ffdc9b90bdd586deab2f3611edb3f5898fd773191e91a49e144ca23b29753739",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "validation",
+          "gallery_evidence": {
+            "surface.npz": "202dfd730775fe1e0fb328bbb9445723830ac8b19c64b09f16c21db43558fa21",
+            "masks.npz": "c6b572593204dfca2454fefc35052ea726aa197725b24456aa6ddccfa1cc4fbb"
+          }
+        },
+        {
+          "path": "cascadedemotiers/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_018_003/64x64x64/interior.npz",
+          "group": "cascadedemotiers",
+          "sha256": "17ffa72488b317356add85b6062bb011489377b88611672cf2bbe39b8b0d67be",
+          "voxel_sha256": "4aecdfb1074c631c15a2529104f1deec007f87d36c9a41477d9af30ee13e5b97",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "validation",
+          "gallery_evidence": {
+            "surface.npz": "8358fb22a5396bca61bb41a62734233c2730f0debcd296773bb352830c43fa54",
+            "masks.npz": "435154e0648c7b0fceecc2c11b46aa164981a3b3a5fdfa35ef9aacfa409b903f"
+          }
+        },
+        {
+          "path": "cascadedemotiers/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_021_003/64x64x64/interior.npz",
+          "group": "cascadedemotiers",
+          "sha256": "3a730342aff16ad80039e3ea02e67086812e36db53673d445ef2b2c23d88fb05",
+          "voxel_sha256": "f03936224c34a37721cf89aab34fdaeb302490d9f06298190a5ca419041f5a7b",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "validation",
+          "gallery_evidence": {
+            "surface.npz": "0c7d569644bfbdd6858c919255d11f0bccc4d42cddbb47f362e4c286bf79af6c",
+            "masks.npz": "641eae29e3d402f7aa08667e29e9cc7ccb4a3db5db7212476785d1fde8bcd436"
+          }
+        },
+        {
+          "path": "cascadedemotiers/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_035_002/64x64x64/interior.npz",
+          "group": "cascadedemotiers",
+          "sha256": "39a35e9395c20c27fc975db273aa9575a2c92368c9ff4f77b99b1714d91be1e8",
+          "voxel_sha256": "82dd77e868547c9c3102c2e571ddc3ee4eb0bb56afaf4f9d65fd4998c5f8bbe2",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "validation",
+          "gallery_evidence": {
+            "surface.npz": "b3a009347edc0cfdc1aad4d9fed4d24651afc40e5f1f15543d430c6def60b3d4",
+            "masks.npz": "1545a80e7ff379fddea906ddb70fac6631a500b291b10364d753093d86a65141"
+          }
+        },
+        {
+          "path": "cascadedemotiers/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_035_003/64x64x64/interior.npz",
+          "group": "cascadedemotiers",
+          "sha256": "ebd5ea100850ef936f3e6d2471055682c0ff1a451639ce808d89f244df921a15",
+          "voxel_sha256": "24cfe1233ed98361334bf47d229092afc4b759490054f3d97ab16bee3a22cf98",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "validation",
+          "gallery_evidence": {
+            "surface.npz": "6700357c120a8a8bd23b119873cb2bb728efc428b1ea4d6ba93b488c4839d749",
+            "masks.npz": "d8c0d39d8319942c17b1d9e5c91390a33eda1e7852d9c4a53203461130a3b288"
+          }
+        },
+        {
+          "path": "cascadedemotiers/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_035_004/64x64x64/interior.npz",
+          "group": "cascadedemotiers",
+          "sha256": "5c73fb330f249710e7675a7748a0321c55bc5d3658afe2bef556dc1774ad0eb7",
+          "voxel_sha256": "f2ce82f46876efa70bbc2c17a7302001494bedf706ee0e0b822bc99532b474aa",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "validation",
+          "gallery_evidence": {
+            "surface.npz": "bf202f18030868b3a71a0106882530abbdf6322b87bca702bb075cfd731135e6",
+            "masks.npz": "77c4112586dc3193be4f10ae84cb010cd72d27a1cb3e10f27e543f9bf74a52e8"
+          }
+        },
+        {
+          "path": "cascadedemotiers/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_035_005/64x64x64/interior.npz",
+          "group": "cascadedemotiers",
+          "sha256": "29f70a5644f914bcab10bc86ca4a16caca7b3d4aa56b3ae09a1bae5564512f9c",
+          "voxel_sha256": "ad15a6361ef84c176a5dec451fd0f5eadaac3db28bc5db10e2cf58a582ee2266",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "validation",
+          "gallery_evidence": {
+            "surface.npz": "5cbfcbf8480386e32913101f615d943146f387308bae8adb6a06150b59563a18",
+            "masks.npz": "cad7a1300e58a5cf1b07c0bdff00a2b334710aeebce33053d6f20d3fce54f1a1"
+          }
+        },
+        {
+          "path": "cascadedemotiers/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_035_006/64x64x64/interior.npz",
+          "group": "cascadedemotiers",
+          "sha256": "5adfa7098b3d06aaaf82b6c10baaeab68faebf31d53f262c4002e21127ee5673",
+          "voxel_sha256": "f97959eb441d9a793a53c2acdf9d27513f9b54a552c4d90e026ddd4b05996e74",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "validation",
+          "gallery_evidence": {
+            "surface.npz": "ac49687b9a28863037837bd43076a799b1f3ae7750acd0b32c244b8ff0a28c17",
+            "masks.npz": "43021f37715b5fcaeab1de0aab0880263e6891778b2e5e1bfa714c010d79f55d"
+          }
+        },
+        {
+          "path": "cascadedemotiers/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_035_007/64x64x64/interior.npz",
+          "group": "cascadedemotiers",
+          "sha256": "f794a7b6616b9f345286ff49b4816f070980ce9b321627d69c46aa39be372e10",
+          "voxel_sha256": "719f83028ead36fa27f3578e3fdb13f82b30f70ca13c2ea9f6f71b3699bb8c4c",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "validation",
+          "gallery_evidence": {
+            "surface.npz": "592d843f1e72e1916ed7761fbc0fe80300c6236694343c928bc1670e19d8e4a9",
+            "masks.npz": "67fefbbc7c149fb0e9d1875aac31cdfdd3a2946ffa18b5f8d24d76ad4193d348"
+          }
+        },
+        {
+          "path": "cascadedemotiers/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_035_008/64x64x64/interior.npz",
+          "group": "cascadedemotiers",
+          "sha256": "25821534d152c8303d51fdff42dea8a849b116cb524a5c9ff8a8afc36076e661",
+          "voxel_sha256": "e8ce4652f531d4815146e9202c93484c0995678f38a107a69c26b8b86d1318f5",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "validation",
+          "gallery_evidence": {
+            "surface.npz": "e93afb39728d5b97d7ee162e0ef0a16e369e7b691e2ba9910806ea457d26bf16",
+            "masks.npz": "f1a27e0e5f01fe70e1b24e9a8e8f5d62241db1f505372ade9b70bf0ed64313df"
+          }
+        },
+        {
+          "path": "cascadedemotiers/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_038_002/64x64x64/interior.npz",
+          "group": "cascadedemotiers",
+          "sha256": "19c787b1e262f3b4eff9558d0fadbd4887dc01678c50041c0a321b34b0bef800",
+          "voxel_sha256": "5a2c6d99b10e5950932a603fb7c6767a5fcc73f1ab2d25a03f48997f04a4cc4b",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "validation",
+          "gallery_evidence": {
+            "surface.npz": "72f86a0cb8b8ee5936562475eae8ceb09eb753d63ae03ac589076bb665322b07",
+            "masks.npz": "2f116b85c7a0ec045e0ddda47544190383d319c7c22f651d0318d5297305d005"
+          }
+        },
+        {
+          "path": "cascadedemotiers/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_038_003/64x64x64/interior.npz",
+          "group": "cascadedemotiers",
+          "sha256": "7a0fedeaf9bc6e45211f29941cca32ea14e44118aa4ed1fe2f628053e4497317",
+          "voxel_sha256": "3217edf61f475e593ad468b3b94793b1ba19df1f717c6785cfdc4c30f9df4ffe",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "validation",
+          "gallery_evidence": {
+            "surface.npz": "9938b4f3224782f3dbfd10757ed904f63170bf5eb0aafb8ab5add1b1e3b2561b",
+            "masks.npz": "2a8598e59cd883340dc8e86b5e5440d9ea84b1c320bc4b537708ce2b0df153b7"
+          }
+        },
+        {
+          "path": "indian_tunnel/Full/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_002_006/64x64x64/interior.npz",
+          "group": "indian_tunnel",
+          "sha256": "957e1a623cde70a35f0f5c7910ce562fad815828ff3c6feecd4ca2be36549961",
+          "voxel_sha256": "271a45ce8fe23d2dc30e347c70c5c84c0141b22199d408b02de39e8ad4162e17",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "train",
+          "gallery_evidence": {
+            "surface.npz": "35290d3168edbfd3ac4242f184c2562c93dfbb349dced854adf3819fa8ffae7c",
+            "masks.npz": "fae4b28cc1ac1d9139444d73f335afa5d23175dfe24115717ba555282c1d2b8b"
+          }
+        },
+        {
+          "path": "indian_tunnel/Full/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_002_007/64x64x64/interior.npz",
+          "group": "indian_tunnel",
+          "sha256": "636eb14d1c93c40136cbd7ade9090a4520156d6195ed97e7c947cdedec63d883",
+          "voxel_sha256": "6872d0898a96312d21d2b9251ea19b7eeba513df3f8ed565bb0becbdafa05ac3",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "train",
+          "gallery_evidence": {
+            "surface.npz": "96358bbc83a377d0f5b96098869d1914ebf4c50e36bab2b45531d88ec8f024a6",
+            "masks.npz": "77dfef44a74b8b66362f2aa8ea471dca741a75e7484626623d039705ce3a4d03"
+          }
+        },
+        {
+          "path": "markovspodmol/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_001_001/64x64x64/interior.npz",
+          "group": "markovspodmol",
+          "sha256": "41219c53a1f2873c846f0fe2d92bf46a44f77d409cbaaf4f1b997067ded7ec04",
+          "voxel_sha256": "ac2567960c2852e4ad4e21436f1c2b713de8480a0fd20965ef7889e8aef0d418",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "train",
+          "gallery_evidence": {
+            "surface.npz": "9fbf72fabbd2ad50688209d79d5a021a372ec03717697d312d1d32cf25f861d2",
+            "masks.npz": "bd37bbace3d6102f3c2d2276e3c6545841d78fead6bfd07ac1ed5c5b1ad151f5"
+          }
+        },
+        {
+          "path": "markovspodmol/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_009_002/64x64x64/interior.npz",
+          "group": "markovspodmol",
+          "sha256": "2fb5b21609f0db587cc3f657435330a89485a56ecb3374a6336279d4a57f5e3d",
+          "voxel_sha256": "6c8a2c24ba76ab540fb4a5d24fb9b6d259c8251caa2c162c9c1fbd9073c9db5e",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "train",
+          "gallery_evidence": {
+            "surface.npz": "0e9c6dadff5fbd479d2be6061a10e352a7f4bd686027a4fd27c1c51ee4608541",
+            "masks.npz": "5d9d178788d0a0d2b9f7909004f070cdf86aa3fa7927b5905153454f81321d7f"
+          }
+        },
+        {
+          "path": "markovspodmol/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_010_002/64x64x64/interior.npz",
+          "group": "markovspodmol",
+          "sha256": "a2020377368ce76ab7fd24d0488f0bcdac8bf92a160fe1282a42f00775ffd200",
+          "voxel_sha256": "e494012a35ffb213c03de66059abb6e6749c129fafcff03f747a8955b7023347",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "train",
+          "gallery_evidence": {
+            "surface.npz": "6bc582cc270df91ca3c40d36a6556921430080535f6239f4cfda9527eb10e553",
+            "masks.npz": "6bfeb9728dde34082bf34285ad0b73cfe8a6a8a218cfadfbefa06b1fc2a03662"
+          }
+        },
+        {
+          "path": "markovspodmol/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_011_003/64x64x64/interior.npz",
+          "group": "markovspodmol",
+          "sha256": "1cc14fc2584137e0f44919d1e23d456a67843c971b502884876e797c058d9c81",
+          "voxel_sha256": "f0f067aa8f9a229415891a2e0d90db4e577a19c063450376e5d9eaf84e6a3b65",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "train",
+          "gallery_evidence": {
+            "surface.npz": "5ea7b09575450bd0f66bcdb9e2cfabb1479d0cc0e9c918e6434d961eb0a29e69",
+            "masks.npz": "43e2212fbb8d0ae41b7a7ad5675632240c1c996cd3812871eb9bdfa936c01c3b"
+          }
+        },
+        {
+          "path": "markovspodmol/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_011_005/64x64x64/interior.npz",
+          "group": "markovspodmol",
+          "sha256": "314cb4e2db91b1e18f44086a4971d310e03836f416eeb738c5c55972afca94c9",
+          "voxel_sha256": "c13d7943da3772f9638ea0565dfe2f087a9b3385854b88aa9224ed9185a91326",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "train",
+          "gallery_evidence": {
+            "surface.npz": "63efdac32390bb0674109a6ddd454df412db1c47adc213e79e5c5ab4b019ed92",
+            "masks.npz": "bc74dca2ea94bc4c4eaf2f46b35e52e552f4e5ea1185b010f37df2c204057108"
+          }
+        },
+        {
+          "path": "markovspodmol/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_017_003/64x64x64/interior.npz",
+          "group": "markovspodmol",
+          "sha256": "b41dfab0b8895c1f8af3505a8bac75364487f9d1cdc9e560165567a2d59dac02",
+          "voxel_sha256": "c7a2ec1055b72d68464dd6fe4c424197b9d4f8acf3aac2ff30db8145e12faec0",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "train",
+          "gallery_evidence": {
+            "surface.npz": "e388e2540990c4135b9f38eb648627abf8166e8efb9936d0bf944519e08fb593",
+            "masks.npz": "46ef79cd7b60eed246c31b6d5fc796903ae9353df1b1feadcee3034c893f7b57"
+          }
+        },
+        {
+          "path": "markovspodmol/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_017_004/64x64x64/interior.npz",
+          "group": "markovspodmol",
+          "sha256": "72b63801135c168310719cedab2c85e9201f3e6cc245f0ad255d8516668da98c",
+          "voxel_sha256": "c8c4f77f84807988c3d8c52361009decbc1bc49c3ce884c441201ea994c107ee",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "train",
+          "gallery_evidence": {
+            "surface.npz": "ec724efc99c898715d935692dd3f05a74af3a214c1ec09f8300356a7534f219a",
+            "masks.npz": "062cdc6fda1d27c3c26bbda98f5ddf657a8326b7d0e080035fef1d7d44ca61f7"
+          }
+        },
+        {
+          "path": "markovspodmol/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_017_006/64x64x64/interior.npz",
+          "group": "markovspodmol",
+          "sha256": "d3bdc7fe70aaec7a22ecfcfddf90391422f056c70488f92101aa0400c662bb83",
+          "voxel_sha256": "924bfa0ba92e1547a8e89ab0073e0fac248c07544f9f3d46bded454e071c6eb2",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "train",
+          "gallery_evidence": {
+            "surface.npz": "f3a0326ca45c22d41c5f5d7510d8084b128bcb1444ac9b27664e7e5449cad243",
+            "masks.npz": "51c9cb928e2df6b6ed31a823b965356f52f98742b9f8e71abc9a0d9f6446f204"
+          }
+        },
+        {
+          "path": "markovspodmol/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_017_010/64x64x64/interior.npz",
+          "group": "markovspodmol",
+          "sha256": "6b0d5acb1ea9529e36f81d86b601a41ccddfeb01a4896e34cbd06befed79a48c",
+          "voxel_sha256": "2688d636d10597729807e19838ff9ccdbc1eb7a068de7a7c46c250f4c137f9d1",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "train",
+          "gallery_evidence": {
+            "surface.npz": "0d7816f69f6ee048cec3b588ceaafae6ca0bd9089f87a67ebc2f24a3a82b4cd2",
+            "masks.npz": "ef72c14085c6aa8642fc0ba16c62df7f63a4a62ba1b5d4bf82f16810e79c7b57"
+          }
+        },
+        {
+          "path": "markovspodmol/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_017_011/64x64x64/interior.npz",
+          "group": "markovspodmol",
+          "sha256": "eb4ccfac92af86111e8a5a57485b265a80114dbd84aca13acb2b9dc259f8724d",
+          "voxel_sha256": "2f48abb5dbb82905edb2c3ad0fdcd35dc63d38ec57b1a950e84598bbb245e7ec",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "train",
+          "gallery_evidence": {
+            "surface.npz": "00ae21b92d2bf8153c268f29261cc2a3c4f448a9ff76ebb615331aa129df5023",
+            "masks.npz": "be8889859c491e53085c742e38762154c058ff46a8223da1e746dc5972fbfc6c"
+          }
+        },
+        {
+          "path": "markovspodmol/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_017_013/64x64x64/interior.npz",
+          "group": "markovspodmol",
+          "sha256": "11a06d274aff23e0f63462049e6cf197aaf498a00e61e041703fa44acf8d2e87",
+          "voxel_sha256": "c12a3081d7f32f7b70c4341999ab260e54083b983822f1e2b82a91146a527fa9",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "train",
+          "gallery_evidence": {
+            "surface.npz": "ad369a905eab2d4e40d3b09bdac769b15b4e43e114da3cbc82044800965e8e04",
+            "masks.npz": "aefab73bb4e3ce0168d9f7c808684f215d56d58baad928639d231f59cc4d0b13"
+          }
+        },
+        {
+          "path": "markovspodmol/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_017_014/64x64x64/interior.npz",
+          "group": "markovspodmol",
+          "sha256": "e32fe37ae591d5da009b7b3d59688c85bdbc8434f48a1f507c66db53b7c383a5",
+          "voxel_sha256": "b34b3ccdb114f398e40a818c56ee34638a015dd452eb5164348c569c602a1970",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "train",
+          "gallery_evidence": {
+            "surface.npz": "2c7c7488c0e77bb5e622bbc9fb0f2c39a77c1acf12cc1b957b7ff128768607a6",
+            "masks.npz": "65f66959821137d075ba94b94ebbd58aa4cf1ec109c24143e45d7a27d90fe4a9"
+          }
+        },
+        {
+          "path": "markovspodmol/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_017_015/64x64x64/interior.npz",
+          "group": "markovspodmol",
+          "sha256": "7e6a3ec0d9a4bae3f2941eb1bf9077194fb193469870805d002f45cee2024f1c",
+          "voxel_sha256": "55fe5b5c73d4ba9ee1dbb103c1c7e983e72ea4afab8f76fb9f5cff393b67109e",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "train",
+          "gallery_evidence": {
+            "surface.npz": "dceb24632467ec2a906fe82b480f50e132ccd67c11760c8500262b6f8c187d17",
+            "masks.npz": "cd729b46d6879be8793913fdd557c252b4e304d53adbe1bd3150497c935baab4"
+          }
+        }
+      ]
+    },
+    {
+      "id": "holdout_cascadedemotiers",
+      "groups": {
+        "archamps": "train",
+        "cascadedemotiers": "test",
+        "indian_tunnel": "validation",
+        "markovspodmol": "train"
+      },
+      "samples": [
+        {
+          "path": "archamps/PostEtroiture/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_001_002/64x64x64/interior.npz",
+          "group": "archamps",
+          "sha256": "338e4ddc85ce2ef6c5ae0e494052ce0d4d81d7b79efe499f4c0dd74979a7fa67",
+          "voxel_sha256": "c30b0ff5703fcb4068cbba0b43efde47ee40cb5f69b7c2a16c39658ff1be9b0f",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "train",
+          "gallery_evidence": {
+            "surface.npz": "3e3da3be81edf8077f569391a0e8c530c72ef0ee44d9d58f48ab71a55606fccc",
+            "masks.npz": "cad18659637fa5d8e496b608f619a3c92d849181171b452ac9bb984e9f8d343d"
+          }
+        },
+        {
+          "path": "archamps/PostEtroiture/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_001_003/64x64x64/interior.npz",
+          "group": "archamps",
+          "sha256": "7b27da00db99e7e18c2416d9499aacc330b298c0761c9cbb19676bdd79b55bb3",
+          "voxel_sha256": "17b3f06b1924edff00bc3ea93a2639db17881aaf91d34518f63332988472a4bd",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "train",
+          "gallery_evidence": {
+            "surface.npz": "82f0e21c0fe0a824ec3bcca1fcdd8f9a0c7d1fa179ff6017f4dbaa7076dfdffd",
+            "masks.npz": "30e62fc20af35388fe0a522ff56edab1c1291889cbfb9160f5c462af4d7241a9"
+          }
+        },
+        {
+          "path": "archamps/PostEtroiture/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_001_004/64x64x64/interior.npz",
+          "group": "archamps",
+          "sha256": "6b2fd193fcdaf694b681ab46ae994ed531e2e1be6781b75c4f63427dc5469d92",
+          "voxel_sha256": "ebac9b92f1798beb4b3b01e2b2ea5b7c2269ea9c0ba335c0d8a747b112170c6d",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "train",
+          "gallery_evidence": {
+            "surface.npz": "bb57b6d6e00b9b7de36d3ed5510df5eeb161cf1bac16d7a3aa44d6b1ad6ce2dc",
+            "masks.npz": "4aeb4070ad35b366d4310f2b500c9ceb122870dc2a73365d6073b5b36a9c1d21"
+          }
+        },
+        {
+          "path": "archamps/PostEtroiture/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_001_005/64x64x64/interior.npz",
+          "group": "archamps",
+          "sha256": "e2f97e25553a3af6d87c3f40f6e3e362c4134aabc717fce3d319306b0c76f3b0",
+          "voxel_sha256": "74e42e16ad773152f3dbcc6b43c4efbcc707e4d82c97e0d5a30ae69e21e6e8f2",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "train",
+          "gallery_evidence": {
+            "surface.npz": "09e3b86e8f6d1e29acd1bc48ff7015af692b3c56ef00d213d7596b822436110b",
+            "masks.npz": "1764d6f9e18879c93b9a452051f3a6fb779ec21cacc9f9d6f66eb75d94650463"
+          }
+        },
+        {
+          "path": "archamps/PostEtroiture/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_001_006/64x64x64/interior.npz",
+          "group": "archamps",
+          "sha256": "21e20259e41d0189ed38eef80ea9d8d46c6d6e91d7536791c460c80def1d3318",
+          "voxel_sha256": "4422753a1e2cfb8000b144bc0cef25077de26e0d0416e1d9641bd5d3d59b116f",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "train",
+          "gallery_evidence": {
+            "surface.npz": "4e9e3aef7e3253a3433b97a879929bf569383a7ba196b5d141de8930c5087043",
+            "masks.npz": "4020d41732e3db5ebde53c2a784284a1eef1df16ccccadc5a77a6f9a3940ca3a"
+          }
+        },
+        {
+          "path": "cascadedemotiers/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_015_001/64x64x64/interior.npz",
+          "group": "cascadedemotiers",
+          "sha256": "e3cab653877965a7bac1ca5786505f63d8c985af1cb7808c57c1fec13058f6e5",
+          "voxel_sha256": "e002100cd668558a032c52e949d50a0cb352e703f0c5646e75f7a09998d79b63",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "test",
+          "gallery_evidence": {
+            "surface.npz": "a15a894d04e1f20b8dd6b60c65c59b5c2057bb77ee56c9d869f65435105dedd0",
+            "masks.npz": "13d8b29fc2fd3e3bb4b9afaf7a3dfd91cb0c667b5e0a0261ebc8383fde11be34"
+          }
+        },
+        {
+          "path": "cascadedemotiers/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_015_002/64x64x64/interior.npz",
+          "group": "cascadedemotiers",
+          "sha256": "a4adf1d4fe0dc844d57e812fe41527b1f99ea885daacde292f5f7699c4780194",
+          "voxel_sha256": "9f6144d17ece86c11d4eb782e905b6b316da9665219abd3243a5890ec3c8f870",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "test",
+          "gallery_evidence": {
+            "surface.npz": "53ab1d64baa92fdfe8f9aa74e5b22cd3e6127faae23a76b1182e2980f7c52f59",
+            "masks.npz": "cd64978872c212ea0ae8ae81c576f353ee250813b0eceb0a63beadcfe6b3863e"
+          }
+        },
+        {
+          "path": "cascadedemotiers/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_015_003/64x64x64/interior.npz",
+          "group": "cascadedemotiers",
+          "sha256": "7f2ba37cb055945e4253943b37742b31db728fa4ae0df4986d77b27c65e5623d",
+          "voxel_sha256": "ffdc9b90bdd586deab2f3611edb3f5898fd773191e91a49e144ca23b29753739",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "test",
+          "gallery_evidence": {
+            "surface.npz": "202dfd730775fe1e0fb328bbb9445723830ac8b19c64b09f16c21db43558fa21",
+            "masks.npz": "c6b572593204dfca2454fefc35052ea726aa197725b24456aa6ddccfa1cc4fbb"
+          }
+        },
+        {
+          "path": "cascadedemotiers/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_018_003/64x64x64/interior.npz",
+          "group": "cascadedemotiers",
+          "sha256": "17ffa72488b317356add85b6062bb011489377b88611672cf2bbe39b8b0d67be",
+          "voxel_sha256": "4aecdfb1074c631c15a2529104f1deec007f87d36c9a41477d9af30ee13e5b97",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "test",
+          "gallery_evidence": {
+            "surface.npz": "8358fb22a5396bca61bb41a62734233c2730f0debcd296773bb352830c43fa54",
+            "masks.npz": "435154e0648c7b0fceecc2c11b46aa164981a3b3a5fdfa35ef9aacfa409b903f"
+          }
+        },
+        {
+          "path": "cascadedemotiers/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_021_003/64x64x64/interior.npz",
+          "group": "cascadedemotiers",
+          "sha256": "3a730342aff16ad80039e3ea02e67086812e36db53673d445ef2b2c23d88fb05",
+          "voxel_sha256": "f03936224c34a37721cf89aab34fdaeb302490d9f06298190a5ca419041f5a7b",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "test",
+          "gallery_evidence": {
+            "surface.npz": "0c7d569644bfbdd6858c919255d11f0bccc4d42cddbb47f362e4c286bf79af6c",
+            "masks.npz": "641eae29e3d402f7aa08667e29e9cc7ccb4a3db5db7212476785d1fde8bcd436"
+          }
+        },
+        {
+          "path": "cascadedemotiers/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_035_002/64x64x64/interior.npz",
+          "group": "cascadedemotiers",
+          "sha256": "39a35e9395c20c27fc975db273aa9575a2c92368c9ff4f77b99b1714d91be1e8",
+          "voxel_sha256": "82dd77e868547c9c3102c2e571ddc3ee4eb0bb56afaf4f9d65fd4998c5f8bbe2",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "test",
+          "gallery_evidence": {
+            "surface.npz": "b3a009347edc0cfdc1aad4d9fed4d24651afc40e5f1f15543d430c6def60b3d4",
+            "masks.npz": "1545a80e7ff379fddea906ddb70fac6631a500b291b10364d753093d86a65141"
+          }
+        },
+        {
+          "path": "cascadedemotiers/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_035_003/64x64x64/interior.npz",
+          "group": "cascadedemotiers",
+          "sha256": "ebd5ea100850ef936f3e6d2471055682c0ff1a451639ce808d89f244df921a15",
+          "voxel_sha256": "24cfe1233ed98361334bf47d229092afc4b759490054f3d97ab16bee3a22cf98",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "test",
+          "gallery_evidence": {
+            "surface.npz": "6700357c120a8a8bd23b119873cb2bb728efc428b1ea4d6ba93b488c4839d749",
+            "masks.npz": "d8c0d39d8319942c17b1d9e5c91390a33eda1e7852d9c4a53203461130a3b288"
+          }
+        },
+        {
+          "path": "cascadedemotiers/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_035_004/64x64x64/interior.npz",
+          "group": "cascadedemotiers",
+          "sha256": "5c73fb330f249710e7675a7748a0321c55bc5d3658afe2bef556dc1774ad0eb7",
+          "voxel_sha256": "f2ce82f46876efa70bbc2c17a7302001494bedf706ee0e0b822bc99532b474aa",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "test",
+          "gallery_evidence": {
+            "surface.npz": "bf202f18030868b3a71a0106882530abbdf6322b87bca702bb075cfd731135e6",
+            "masks.npz": "77c4112586dc3193be4f10ae84cb010cd72d27a1cb3e10f27e543f9bf74a52e8"
+          }
+        },
+        {
+          "path": "cascadedemotiers/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_035_005/64x64x64/interior.npz",
+          "group": "cascadedemotiers",
+          "sha256": "29f70a5644f914bcab10bc86ca4a16caca7b3d4aa56b3ae09a1bae5564512f9c",
+          "voxel_sha256": "ad15a6361ef84c176a5dec451fd0f5eadaac3db28bc5db10e2cf58a582ee2266",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "test",
+          "gallery_evidence": {
+            "surface.npz": "5cbfcbf8480386e32913101f615d943146f387308bae8adb6a06150b59563a18",
+            "masks.npz": "cad7a1300e58a5cf1b07c0bdff00a2b334710aeebce33053d6f20d3fce54f1a1"
+          }
+        },
+        {
+          "path": "cascadedemotiers/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_035_006/64x64x64/interior.npz",
+          "group": "cascadedemotiers",
+          "sha256": "5adfa7098b3d06aaaf82b6c10baaeab68faebf31d53f262c4002e21127ee5673",
+          "voxel_sha256": "f97959eb441d9a793a53c2acdf9d27513f9b54a552c4d90e026ddd4b05996e74",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "test",
+          "gallery_evidence": {
+            "surface.npz": "ac49687b9a28863037837bd43076a799b1f3ae7750acd0b32c244b8ff0a28c17",
+            "masks.npz": "43021f37715b5fcaeab1de0aab0880263e6891778b2e5e1bfa714c010d79f55d"
+          }
+        },
+        {
+          "path": "cascadedemotiers/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_035_007/64x64x64/interior.npz",
+          "group": "cascadedemotiers",
+          "sha256": "f794a7b6616b9f345286ff49b4816f070980ce9b321627d69c46aa39be372e10",
+          "voxel_sha256": "719f83028ead36fa27f3578e3fdb13f82b30f70ca13c2ea9f6f71b3699bb8c4c",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "test",
+          "gallery_evidence": {
+            "surface.npz": "592d843f1e72e1916ed7761fbc0fe80300c6236694343c928bc1670e19d8e4a9",
+            "masks.npz": "67fefbbc7c149fb0e9d1875aac31cdfdd3a2946ffa18b5f8d24d76ad4193d348"
+          }
+        },
+        {
+          "path": "cascadedemotiers/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_035_008/64x64x64/interior.npz",
+          "group": "cascadedemotiers",
+          "sha256": "25821534d152c8303d51fdff42dea8a849b116cb524a5c9ff8a8afc36076e661",
+          "voxel_sha256": "e8ce4652f531d4815146e9202c93484c0995678f38a107a69c26b8b86d1318f5",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "test",
+          "gallery_evidence": {
+            "surface.npz": "e93afb39728d5b97d7ee162e0ef0a16e369e7b691e2ba9910806ea457d26bf16",
+            "masks.npz": "f1a27e0e5f01fe70e1b24e9a8e8f5d62241db1f505372ade9b70bf0ed64313df"
+          }
+        },
+        {
+          "path": "cascadedemotiers/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_038_002/64x64x64/interior.npz",
+          "group": "cascadedemotiers",
+          "sha256": "19c787b1e262f3b4eff9558d0fadbd4887dc01678c50041c0a321b34b0bef800",
+          "voxel_sha256": "5a2c6d99b10e5950932a603fb7c6767a5fcc73f1ab2d25a03f48997f04a4cc4b",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "test",
+          "gallery_evidence": {
+            "surface.npz": "72f86a0cb8b8ee5936562475eae8ceb09eb753d63ae03ac589076bb665322b07",
+            "masks.npz": "2f116b85c7a0ec045e0ddda47544190383d319c7c22f651d0318d5297305d005"
+          }
+        },
+        {
+          "path": "cascadedemotiers/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_038_003/64x64x64/interior.npz",
+          "group": "cascadedemotiers",
+          "sha256": "7a0fedeaf9bc6e45211f29941cca32ea14e44118aa4ed1fe2f628053e4497317",
+          "voxel_sha256": "3217edf61f475e593ad468b3b94793b1ba19df1f717c6785cfdc4c30f9df4ffe",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "test",
+          "gallery_evidence": {
+            "surface.npz": "9938b4f3224782f3dbfd10757ed904f63170bf5eb0aafb8ab5add1b1e3b2561b",
+            "masks.npz": "2a8598e59cd883340dc8e86b5e5440d9ea84b1c320bc4b537708ce2b0df153b7"
+          }
+        },
+        {
+          "path": "indian_tunnel/Full/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_002_006/64x64x64/interior.npz",
+          "group": "indian_tunnel",
+          "sha256": "957e1a623cde70a35f0f5c7910ce562fad815828ff3c6feecd4ca2be36549961",
+          "voxel_sha256": "271a45ce8fe23d2dc30e347c70c5c84c0141b22199d408b02de39e8ad4162e17",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "validation",
+          "gallery_evidence": {
+            "surface.npz": "35290d3168edbfd3ac4242f184c2562c93dfbb349dced854adf3819fa8ffae7c",
+            "masks.npz": "fae4b28cc1ac1d9139444d73f335afa5d23175dfe24115717ba555282c1d2b8b"
+          }
+        },
+        {
+          "path": "indian_tunnel/Full/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_002_007/64x64x64/interior.npz",
+          "group": "indian_tunnel",
+          "sha256": "636eb14d1c93c40136cbd7ade9090a4520156d6195ed97e7c947cdedec63d883",
+          "voxel_sha256": "6872d0898a96312d21d2b9251ea19b7eeba513df3f8ed565bb0becbdafa05ac3",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "validation",
+          "gallery_evidence": {
+            "surface.npz": "96358bbc83a377d0f5b96098869d1914ebf4c50e36bab2b45531d88ec8f024a6",
+            "masks.npz": "77dfef44a74b8b66362f2aa8ea471dca741a75e7484626623d039705ce3a4d03"
+          }
+        },
+        {
+          "path": "markovspodmol/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_001_001/64x64x64/interior.npz",
+          "group": "markovspodmol",
+          "sha256": "41219c53a1f2873c846f0fe2d92bf46a44f77d409cbaaf4f1b997067ded7ec04",
+          "voxel_sha256": "ac2567960c2852e4ad4e21436f1c2b713de8480a0fd20965ef7889e8aef0d418",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "train",
+          "gallery_evidence": {
+            "surface.npz": "9fbf72fabbd2ad50688209d79d5a021a372ec03717697d312d1d32cf25f861d2",
+            "masks.npz": "bd37bbace3d6102f3c2d2276e3c6545841d78fead6bfd07ac1ed5c5b1ad151f5"
+          }
+        },
+        {
+          "path": "markovspodmol/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_009_002/64x64x64/interior.npz",
+          "group": "markovspodmol",
+          "sha256": "2fb5b21609f0db587cc3f657435330a89485a56ecb3374a6336279d4a57f5e3d",
+          "voxel_sha256": "6c8a2c24ba76ab540fb4a5d24fb9b6d259c8251caa2c162c9c1fbd9073c9db5e",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "train",
+          "gallery_evidence": {
+            "surface.npz": "0e9c6dadff5fbd479d2be6061a10e352a7f4bd686027a4fd27c1c51ee4608541",
+            "masks.npz": "5d9d178788d0a0d2b9f7909004f070cdf86aa3fa7927b5905153454f81321d7f"
+          }
+        },
+        {
+          "path": "markovspodmol/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_010_002/64x64x64/interior.npz",
+          "group": "markovspodmol",
+          "sha256": "a2020377368ce76ab7fd24d0488f0bcdac8bf92a160fe1282a42f00775ffd200",
+          "voxel_sha256": "e494012a35ffb213c03de66059abb6e6749c129fafcff03f747a8955b7023347",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "train",
+          "gallery_evidence": {
+            "surface.npz": "6bc582cc270df91ca3c40d36a6556921430080535f6239f4cfda9527eb10e553",
+            "masks.npz": "6bfeb9728dde34082bf34285ad0b73cfe8a6a8a218cfadfbefa06b1fc2a03662"
+          }
+        },
+        {
+          "path": "markovspodmol/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_011_003/64x64x64/interior.npz",
+          "group": "markovspodmol",
+          "sha256": "1cc14fc2584137e0f44919d1e23d456a67843c971b502884876e797c058d9c81",
+          "voxel_sha256": "f0f067aa8f9a229415891a2e0d90db4e577a19c063450376e5d9eaf84e6a3b65",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "train",
+          "gallery_evidence": {
+            "surface.npz": "5ea7b09575450bd0f66bcdb9e2cfabb1479d0cc0e9c918e6434d961eb0a29e69",
+            "masks.npz": "43e2212fbb8d0ae41b7a7ad5675632240c1c996cd3812871eb9bdfa936c01c3b"
+          }
+        },
+        {
+          "path": "markovspodmol/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_011_005/64x64x64/interior.npz",
+          "group": "markovspodmol",
+          "sha256": "314cb4e2db91b1e18f44086a4971d310e03836f416eeb738c5c55972afca94c9",
+          "voxel_sha256": "c13d7943da3772f9638ea0565dfe2f087a9b3385854b88aa9224ed9185a91326",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "train",
+          "gallery_evidence": {
+            "surface.npz": "63efdac32390bb0674109a6ddd454df412db1c47adc213e79e5c5ab4b019ed92",
+            "masks.npz": "bc74dca2ea94bc4c4eaf2f46b35e52e552f4e5ea1185b010f37df2c204057108"
+          }
+        },
+        {
+          "path": "markovspodmol/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_017_003/64x64x64/interior.npz",
+          "group": "markovspodmol",
+          "sha256": "b41dfab0b8895c1f8af3505a8bac75364487f9d1cdc9e560165567a2d59dac02",
+          "voxel_sha256": "c7a2ec1055b72d68464dd6fe4c424197b9d4f8acf3aac2ff30db8145e12faec0",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "train",
+          "gallery_evidence": {
+            "surface.npz": "e388e2540990c4135b9f38eb648627abf8166e8efb9936d0bf944519e08fb593",
+            "masks.npz": "46ef79cd7b60eed246c31b6d5fc796903ae9353df1b1feadcee3034c893f7b57"
+          }
+        },
+        {
+          "path": "markovspodmol/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_017_004/64x64x64/interior.npz",
+          "group": "markovspodmol",
+          "sha256": "72b63801135c168310719cedab2c85e9201f3e6cc245f0ad255d8516668da98c",
+          "voxel_sha256": "c8c4f77f84807988c3d8c52361009decbc1bc49c3ce884c441201ea994c107ee",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "train",
+          "gallery_evidence": {
+            "surface.npz": "ec724efc99c898715d935692dd3f05a74af3a214c1ec09f8300356a7534f219a",
+            "masks.npz": "062cdc6fda1d27c3c26bbda98f5ddf657a8326b7d0e080035fef1d7d44ca61f7"
+          }
+        },
+        {
+          "path": "markovspodmol/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_017_006/64x64x64/interior.npz",
+          "group": "markovspodmol",
+          "sha256": "d3bdc7fe70aaec7a22ecfcfddf90391422f056c70488f92101aa0400c662bb83",
+          "voxel_sha256": "924bfa0ba92e1547a8e89ab0073e0fac248c07544f9f3d46bded454e071c6eb2",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "train",
+          "gallery_evidence": {
+            "surface.npz": "f3a0326ca45c22d41c5f5d7510d8084b128bcb1444ac9b27664e7e5449cad243",
+            "masks.npz": "51c9cb928e2df6b6ed31a823b965356f52f98742b9f8e71abc9a0d9f6446f204"
+          }
+        },
+        {
+          "path": "markovspodmol/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_017_010/64x64x64/interior.npz",
+          "group": "markovspodmol",
+          "sha256": "6b0d5acb1ea9529e36f81d86b601a41ccddfeb01a4896e34cbd06befed79a48c",
+          "voxel_sha256": "2688d636d10597729807e19838ff9ccdbc1eb7a068de7a7c46c250f4c137f9d1",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "train",
+          "gallery_evidence": {
+            "surface.npz": "0d7816f69f6ee048cec3b588ceaafae6ca0bd9089f87a67ebc2f24a3a82b4cd2",
+            "masks.npz": "ef72c14085c6aa8642fc0ba16c62df7f63a4a62ba1b5d4bf82f16810e79c7b57"
+          }
+        },
+        {
+          "path": "markovspodmol/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_017_011/64x64x64/interior.npz",
+          "group": "markovspodmol",
+          "sha256": "eb4ccfac92af86111e8a5a57485b265a80114dbd84aca13acb2b9dc259f8724d",
+          "voxel_sha256": "2f48abb5dbb82905edb2c3ad0fdcd35dc63d38ec57b1a950e84598bbb245e7ec",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "train",
+          "gallery_evidence": {
+            "surface.npz": "00ae21b92d2bf8153c268f29261cc2a3c4f448a9ff76ebb615331aa129df5023",
+            "masks.npz": "be8889859c491e53085c742e38762154c058ff46a8223da1e746dc5972fbfc6c"
+          }
+        },
+        {
+          "path": "markovspodmol/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_017_013/64x64x64/interior.npz",
+          "group": "markovspodmol",
+          "sha256": "11a06d274aff23e0f63462049e6cf197aaf498a00e61e041703fa44acf8d2e87",
+          "voxel_sha256": "c12a3081d7f32f7b70c4341999ab260e54083b983822f1e2b82a91146a527fa9",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "train",
+          "gallery_evidence": {
+            "surface.npz": "ad369a905eab2d4e40d3b09bdac769b15b4e43e114da3cbc82044800965e8e04",
+            "masks.npz": "aefab73bb4e3ce0168d9f7c808684f215d56d58baad928639d231f59cc4d0b13"
+          }
+        },
+        {
+          "path": "markovspodmol/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_017_014/64x64x64/interior.npz",
+          "group": "markovspodmol",
+          "sha256": "e32fe37ae591d5da009b7b3d59688c85bdbc8434f48a1f507c66db53b7c383a5",
+          "voxel_sha256": "b34b3ccdb114f398e40a818c56ee34638a015dd452eb5164348c569c602a1970",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "train",
+          "gallery_evidence": {
+            "surface.npz": "2c7c7488c0e77bb5e622bbc9fb0f2c39a77c1acf12cc1b957b7ff128768607a6",
+            "masks.npz": "65f66959821137d075ba94b94ebbd58aa4cf1ec109c24143e45d7a27d90fe4a9"
+          }
+        },
+        {
+          "path": "markovspodmol/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_017_015/64x64x64/interior.npz",
+          "group": "markovspodmol",
+          "sha256": "7e6a3ec0d9a4bae3f2941eb1bf9077194fb193469870805d002f45cee2024f1c",
+          "voxel_sha256": "55fe5b5c73d4ba9ee1dbb103c1c7e983e72ea4afab8f76fb9f5cff393b67109e",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "train",
+          "gallery_evidence": {
+            "surface.npz": "dceb24632467ec2a906fe82b480f50e132ccd67c11760c8500262b6f8c187d17",
+            "masks.npz": "cd729b46d6879be8793913fdd557c252b4e304d53adbe1bd3150497c935baab4"
+          }
+        }
+      ]
+    },
+    {
+      "id": "holdout_indian_tunnel",
+      "groups": {
+        "archamps": "train",
+        "cascadedemotiers": "train",
+        "indian_tunnel": "test",
+        "markovspodmol": "validation"
+      },
+      "samples": [
+        {
+          "path": "archamps/PostEtroiture/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_001_002/64x64x64/interior.npz",
+          "group": "archamps",
+          "sha256": "338e4ddc85ce2ef6c5ae0e494052ce0d4d81d7b79efe499f4c0dd74979a7fa67",
+          "voxel_sha256": "c30b0ff5703fcb4068cbba0b43efde47ee40cb5f69b7c2a16c39658ff1be9b0f",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "train",
+          "gallery_evidence": {
+            "surface.npz": "3e3da3be81edf8077f569391a0e8c530c72ef0ee44d9d58f48ab71a55606fccc",
+            "masks.npz": "cad18659637fa5d8e496b608f619a3c92d849181171b452ac9bb984e9f8d343d"
+          }
+        },
+        {
+          "path": "archamps/PostEtroiture/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_001_003/64x64x64/interior.npz",
+          "group": "archamps",
+          "sha256": "7b27da00db99e7e18c2416d9499aacc330b298c0761c9cbb19676bdd79b55bb3",
+          "voxel_sha256": "17b3f06b1924edff00bc3ea93a2639db17881aaf91d34518f63332988472a4bd",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "train",
+          "gallery_evidence": {
+            "surface.npz": "82f0e21c0fe0a824ec3bcca1fcdd8f9a0c7d1fa179ff6017f4dbaa7076dfdffd",
+            "masks.npz": "30e62fc20af35388fe0a522ff56edab1c1291889cbfb9160f5c462af4d7241a9"
+          }
+        },
+        {
+          "path": "archamps/PostEtroiture/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_001_004/64x64x64/interior.npz",
+          "group": "archamps",
+          "sha256": "6b2fd193fcdaf694b681ab46ae994ed531e2e1be6781b75c4f63427dc5469d92",
+          "voxel_sha256": "ebac9b92f1798beb4b3b01e2b2ea5b7c2269ea9c0ba335c0d8a747b112170c6d",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "train",
+          "gallery_evidence": {
+            "surface.npz": "bb57b6d6e00b9b7de36d3ed5510df5eeb161cf1bac16d7a3aa44d6b1ad6ce2dc",
+            "masks.npz": "4aeb4070ad35b366d4310f2b500c9ceb122870dc2a73365d6073b5b36a9c1d21"
+          }
+        },
+        {
+          "path": "archamps/PostEtroiture/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_001_005/64x64x64/interior.npz",
+          "group": "archamps",
+          "sha256": "e2f97e25553a3af6d87c3f40f6e3e362c4134aabc717fce3d319306b0c76f3b0",
+          "voxel_sha256": "74e42e16ad773152f3dbcc6b43c4efbcc707e4d82c97e0d5a30ae69e21e6e8f2",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "train",
+          "gallery_evidence": {
+            "surface.npz": "09e3b86e8f6d1e29acd1bc48ff7015af692b3c56ef00d213d7596b822436110b",
+            "masks.npz": "1764d6f9e18879c93b9a452051f3a6fb779ec21cacc9f9d6f66eb75d94650463"
+          }
+        },
+        {
+          "path": "archamps/PostEtroiture/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_001_006/64x64x64/interior.npz",
+          "group": "archamps",
+          "sha256": "21e20259e41d0189ed38eef80ea9d8d46c6d6e91d7536791c460c80def1d3318",
+          "voxel_sha256": "4422753a1e2cfb8000b144bc0cef25077de26e0d0416e1d9641bd5d3d59b116f",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "train",
+          "gallery_evidence": {
+            "surface.npz": "4e9e3aef7e3253a3433b97a879929bf569383a7ba196b5d141de8930c5087043",
+            "masks.npz": "4020d41732e3db5ebde53c2a784284a1eef1df16ccccadc5a77a6f9a3940ca3a"
+          }
+        },
+        {
+          "path": "cascadedemotiers/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_015_001/64x64x64/interior.npz",
+          "group": "cascadedemotiers",
+          "sha256": "e3cab653877965a7bac1ca5786505f63d8c985af1cb7808c57c1fec13058f6e5",
+          "voxel_sha256": "e002100cd668558a032c52e949d50a0cb352e703f0c5646e75f7a09998d79b63",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "train",
+          "gallery_evidence": {
+            "surface.npz": "a15a894d04e1f20b8dd6b60c65c59b5c2057bb77ee56c9d869f65435105dedd0",
+            "masks.npz": "13d8b29fc2fd3e3bb4b9afaf7a3dfd91cb0c667b5e0a0261ebc8383fde11be34"
+          }
+        },
+        {
+          "path": "cascadedemotiers/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_015_002/64x64x64/interior.npz",
+          "group": "cascadedemotiers",
+          "sha256": "a4adf1d4fe0dc844d57e812fe41527b1f99ea885daacde292f5f7699c4780194",
+          "voxel_sha256": "9f6144d17ece86c11d4eb782e905b6b316da9665219abd3243a5890ec3c8f870",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "train",
+          "gallery_evidence": {
+            "surface.npz": "53ab1d64baa92fdfe8f9aa74e5b22cd3e6127faae23a76b1182e2980f7c52f59",
+            "masks.npz": "cd64978872c212ea0ae8ae81c576f353ee250813b0eceb0a63beadcfe6b3863e"
+          }
+        },
+        {
+          "path": "cascadedemotiers/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_015_003/64x64x64/interior.npz",
+          "group": "cascadedemotiers",
+          "sha256": "7f2ba37cb055945e4253943b37742b31db728fa4ae0df4986d77b27c65e5623d",
+          "voxel_sha256": "ffdc9b90bdd586deab2f3611edb3f5898fd773191e91a49e144ca23b29753739",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "train",
+          "gallery_evidence": {
+            "surface.npz": "202dfd730775fe1e0fb328bbb9445723830ac8b19c64b09f16c21db43558fa21",
+            "masks.npz": "c6b572593204dfca2454fefc35052ea726aa197725b24456aa6ddccfa1cc4fbb"
+          }
+        },
+        {
+          "path": "cascadedemotiers/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_018_003/64x64x64/interior.npz",
+          "group": "cascadedemotiers",
+          "sha256": "17ffa72488b317356add85b6062bb011489377b88611672cf2bbe39b8b0d67be",
+          "voxel_sha256": "4aecdfb1074c631c15a2529104f1deec007f87d36c9a41477d9af30ee13e5b97",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "train",
+          "gallery_evidence": {
+            "surface.npz": "8358fb22a5396bca61bb41a62734233c2730f0debcd296773bb352830c43fa54",
+            "masks.npz": "435154e0648c7b0fceecc2c11b46aa164981a3b3a5fdfa35ef9aacfa409b903f"
+          }
+        },
+        {
+          "path": "cascadedemotiers/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_021_003/64x64x64/interior.npz",
+          "group": "cascadedemotiers",
+          "sha256": "3a730342aff16ad80039e3ea02e67086812e36db53673d445ef2b2c23d88fb05",
+          "voxel_sha256": "f03936224c34a37721cf89aab34fdaeb302490d9f06298190a5ca419041f5a7b",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "train",
+          "gallery_evidence": {
+            "surface.npz": "0c7d569644bfbdd6858c919255d11f0bccc4d42cddbb47f362e4c286bf79af6c",
+            "masks.npz": "641eae29e3d402f7aa08667e29e9cc7ccb4a3db5db7212476785d1fde8bcd436"
+          }
+        },
+        {
+          "path": "cascadedemotiers/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_035_002/64x64x64/interior.npz",
+          "group": "cascadedemotiers",
+          "sha256": "39a35e9395c20c27fc975db273aa9575a2c92368c9ff4f77b99b1714d91be1e8",
+          "voxel_sha256": "82dd77e868547c9c3102c2e571ddc3ee4eb0bb56afaf4f9d65fd4998c5f8bbe2",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "train",
+          "gallery_evidence": {
+            "surface.npz": "b3a009347edc0cfdc1aad4d9fed4d24651afc40e5f1f15543d430c6def60b3d4",
+            "masks.npz": "1545a80e7ff379fddea906ddb70fac6631a500b291b10364d753093d86a65141"
+          }
+        },
+        {
+          "path": "cascadedemotiers/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_035_003/64x64x64/interior.npz",
+          "group": "cascadedemotiers",
+          "sha256": "ebd5ea100850ef936f3e6d2471055682c0ff1a451639ce808d89f244df921a15",
+          "voxel_sha256": "24cfe1233ed98361334bf47d229092afc4b759490054f3d97ab16bee3a22cf98",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "train",
+          "gallery_evidence": {
+            "surface.npz": "6700357c120a8a8bd23b119873cb2bb728efc428b1ea4d6ba93b488c4839d749",
+            "masks.npz": "d8c0d39d8319942c17b1d9e5c91390a33eda1e7852d9c4a53203461130a3b288"
+          }
+        },
+        {
+          "path": "cascadedemotiers/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_035_004/64x64x64/interior.npz",
+          "group": "cascadedemotiers",
+          "sha256": "5c73fb330f249710e7675a7748a0321c55bc5d3658afe2bef556dc1774ad0eb7",
+          "voxel_sha256": "f2ce82f46876efa70bbc2c17a7302001494bedf706ee0e0b822bc99532b474aa",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "train",
+          "gallery_evidence": {
+            "surface.npz": "bf202f18030868b3a71a0106882530abbdf6322b87bca702bb075cfd731135e6",
+            "masks.npz": "77c4112586dc3193be4f10ae84cb010cd72d27a1cb3e10f27e543f9bf74a52e8"
+          }
+        },
+        {
+          "path": "cascadedemotiers/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_035_005/64x64x64/interior.npz",
+          "group": "cascadedemotiers",
+          "sha256": "29f70a5644f914bcab10bc86ca4a16caca7b3d4aa56b3ae09a1bae5564512f9c",
+          "voxel_sha256": "ad15a6361ef84c176a5dec451fd0f5eadaac3db28bc5db10e2cf58a582ee2266",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "train",
+          "gallery_evidence": {
+            "surface.npz": "5cbfcbf8480386e32913101f615d943146f387308bae8adb6a06150b59563a18",
+            "masks.npz": "cad7a1300e58a5cf1b07c0bdff00a2b334710aeebce33053d6f20d3fce54f1a1"
+          }
+        },
+        {
+          "path": "cascadedemotiers/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_035_006/64x64x64/interior.npz",
+          "group": "cascadedemotiers",
+          "sha256": "5adfa7098b3d06aaaf82b6c10baaeab68faebf31d53f262c4002e21127ee5673",
+          "voxel_sha256": "f97959eb441d9a793a53c2acdf9d27513f9b54a552c4d90e026ddd4b05996e74",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "train",
+          "gallery_evidence": {
+            "surface.npz": "ac49687b9a28863037837bd43076a799b1f3ae7750acd0b32c244b8ff0a28c17",
+            "masks.npz": "43021f37715b5fcaeab1de0aab0880263e6891778b2e5e1bfa714c010d79f55d"
+          }
+        },
+        {
+          "path": "cascadedemotiers/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_035_007/64x64x64/interior.npz",
+          "group": "cascadedemotiers",
+          "sha256": "f794a7b6616b9f345286ff49b4816f070980ce9b321627d69c46aa39be372e10",
+          "voxel_sha256": "719f83028ead36fa27f3578e3fdb13f82b30f70ca13c2ea9f6f71b3699bb8c4c",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "train",
+          "gallery_evidence": {
+            "surface.npz": "592d843f1e72e1916ed7761fbc0fe80300c6236694343c928bc1670e19d8e4a9",
+            "masks.npz": "67fefbbc7c149fb0e9d1875aac31cdfdd3a2946ffa18b5f8d24d76ad4193d348"
+          }
+        },
+        {
+          "path": "cascadedemotiers/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_035_008/64x64x64/interior.npz",
+          "group": "cascadedemotiers",
+          "sha256": "25821534d152c8303d51fdff42dea8a849b116cb524a5c9ff8a8afc36076e661",
+          "voxel_sha256": "e8ce4652f531d4815146e9202c93484c0995678f38a107a69c26b8b86d1318f5",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "train",
+          "gallery_evidence": {
+            "surface.npz": "e93afb39728d5b97d7ee162e0ef0a16e369e7b691e2ba9910806ea457d26bf16",
+            "masks.npz": "f1a27e0e5f01fe70e1b24e9a8e8f5d62241db1f505372ade9b70bf0ed64313df"
+          }
+        },
+        {
+          "path": "cascadedemotiers/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_038_002/64x64x64/interior.npz",
+          "group": "cascadedemotiers",
+          "sha256": "19c787b1e262f3b4eff9558d0fadbd4887dc01678c50041c0a321b34b0bef800",
+          "voxel_sha256": "5a2c6d99b10e5950932a603fb7c6767a5fcc73f1ab2d25a03f48997f04a4cc4b",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "train",
+          "gallery_evidence": {
+            "surface.npz": "72f86a0cb8b8ee5936562475eae8ceb09eb753d63ae03ac589076bb665322b07",
+            "masks.npz": "2f116b85c7a0ec045e0ddda47544190383d319c7c22f651d0318d5297305d005"
+          }
+        },
+        {
+          "path": "cascadedemotiers/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_038_003/64x64x64/interior.npz",
+          "group": "cascadedemotiers",
+          "sha256": "7a0fedeaf9bc6e45211f29941cca32ea14e44118aa4ed1fe2f628053e4497317",
+          "voxel_sha256": "3217edf61f475e593ad468b3b94793b1ba19df1f717c6785cfdc4c30f9df4ffe",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "train",
+          "gallery_evidence": {
+            "surface.npz": "9938b4f3224782f3dbfd10757ed904f63170bf5eb0aafb8ab5add1b1e3b2561b",
+            "masks.npz": "2a8598e59cd883340dc8e86b5e5440d9ea84b1c320bc4b537708ce2b0df153b7"
+          }
+        },
+        {
+          "path": "indian_tunnel/Full/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_002_006/64x64x64/interior.npz",
+          "group": "indian_tunnel",
+          "sha256": "957e1a623cde70a35f0f5c7910ce562fad815828ff3c6feecd4ca2be36549961",
+          "voxel_sha256": "271a45ce8fe23d2dc30e347c70c5c84c0141b22199d408b02de39e8ad4162e17",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "test",
+          "gallery_evidence": {
+            "surface.npz": "35290d3168edbfd3ac4242f184c2562c93dfbb349dced854adf3819fa8ffae7c",
+            "masks.npz": "fae4b28cc1ac1d9139444d73f335afa5d23175dfe24115717ba555282c1d2b8b"
+          }
+        },
+        {
+          "path": "indian_tunnel/Full/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_002_007/64x64x64/interior.npz",
+          "group": "indian_tunnel",
+          "sha256": "636eb14d1c93c40136cbd7ade9090a4520156d6195ed97e7c947cdedec63d883",
+          "voxel_sha256": "6872d0898a96312d21d2b9251ea19b7eeba513df3f8ed565bb0becbdafa05ac3",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "test",
+          "gallery_evidence": {
+            "surface.npz": "96358bbc83a377d0f5b96098869d1914ebf4c50e36bab2b45531d88ec8f024a6",
+            "masks.npz": "77dfef44a74b8b66362f2aa8ea471dca741a75e7484626623d039705ce3a4d03"
+          }
+        },
+        {
+          "path": "markovspodmol/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_001_001/64x64x64/interior.npz",
+          "group": "markovspodmol",
+          "sha256": "41219c53a1f2873c846f0fe2d92bf46a44f77d409cbaaf4f1b997067ded7ec04",
+          "voxel_sha256": "ac2567960c2852e4ad4e21436f1c2b713de8480a0fd20965ef7889e8aef0d418",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "validation",
+          "gallery_evidence": {
+            "surface.npz": "9fbf72fabbd2ad50688209d79d5a021a372ec03717697d312d1d32cf25f861d2",
+            "masks.npz": "bd37bbace3d6102f3c2d2276e3c6545841d78fead6bfd07ac1ed5c5b1ad151f5"
+          }
+        },
+        {
+          "path": "markovspodmol/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_009_002/64x64x64/interior.npz",
+          "group": "markovspodmol",
+          "sha256": "2fb5b21609f0db587cc3f657435330a89485a56ecb3374a6336279d4a57f5e3d",
+          "voxel_sha256": "6c8a2c24ba76ab540fb4a5d24fb9b6d259c8251caa2c162c9c1fbd9073c9db5e",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "validation",
+          "gallery_evidence": {
+            "surface.npz": "0e9c6dadff5fbd479d2be6061a10e352a7f4bd686027a4fd27c1c51ee4608541",
+            "masks.npz": "5d9d178788d0a0d2b9f7909004f070cdf86aa3fa7927b5905153454f81321d7f"
+          }
+        },
+        {
+          "path": "markovspodmol/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_010_002/64x64x64/interior.npz",
+          "group": "markovspodmol",
+          "sha256": "a2020377368ce76ab7fd24d0488f0bcdac8bf92a160fe1282a42f00775ffd200",
+          "voxel_sha256": "e494012a35ffb213c03de66059abb6e6749c129fafcff03f747a8955b7023347",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "validation",
+          "gallery_evidence": {
+            "surface.npz": "6bc582cc270df91ca3c40d36a6556921430080535f6239f4cfda9527eb10e553",
+            "masks.npz": "6bfeb9728dde34082bf34285ad0b73cfe8a6a8a218cfadfbefa06b1fc2a03662"
+          }
+        },
+        {
+          "path": "markovspodmol/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_011_003/64x64x64/interior.npz",
+          "group": "markovspodmol",
+          "sha256": "1cc14fc2584137e0f44919d1e23d456a67843c971b502884876e797c058d9c81",
+          "voxel_sha256": "f0f067aa8f9a229415891a2e0d90db4e577a19c063450376e5d9eaf84e6a3b65",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "validation",
+          "gallery_evidence": {
+            "surface.npz": "5ea7b09575450bd0f66bcdb9e2cfabb1479d0cc0e9c918e6434d961eb0a29e69",
+            "masks.npz": "43e2212fbb8d0ae41b7a7ad5675632240c1c996cd3812871eb9bdfa936c01c3b"
+          }
+        },
+        {
+          "path": "markovspodmol/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_011_005/64x64x64/interior.npz",
+          "group": "markovspodmol",
+          "sha256": "314cb4e2db91b1e18f44086a4971d310e03836f416eeb738c5c55972afca94c9",
+          "voxel_sha256": "c13d7943da3772f9638ea0565dfe2f087a9b3385854b88aa9224ed9185a91326",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "validation",
+          "gallery_evidence": {
+            "surface.npz": "63efdac32390bb0674109a6ddd454df412db1c47adc213e79e5c5ab4b019ed92",
+            "masks.npz": "bc74dca2ea94bc4c4eaf2f46b35e52e552f4e5ea1185b010f37df2c204057108"
+          }
+        },
+        {
+          "path": "markovspodmol/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_017_003/64x64x64/interior.npz",
+          "group": "markovspodmol",
+          "sha256": "b41dfab0b8895c1f8af3505a8bac75364487f9d1cdc9e560165567a2d59dac02",
+          "voxel_sha256": "c7a2ec1055b72d68464dd6fe4c424197b9d4f8acf3aac2ff30db8145e12faec0",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "validation",
+          "gallery_evidence": {
+            "surface.npz": "e388e2540990c4135b9f38eb648627abf8166e8efb9936d0bf944519e08fb593",
+            "masks.npz": "46ef79cd7b60eed246c31b6d5fc796903ae9353df1b1feadcee3034c893f7b57"
+          }
+        },
+        {
+          "path": "markovspodmol/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_017_004/64x64x64/interior.npz",
+          "group": "markovspodmol",
+          "sha256": "72b63801135c168310719cedab2c85e9201f3e6cc245f0ad255d8516668da98c",
+          "voxel_sha256": "c8c4f77f84807988c3d8c52361009decbc1bc49c3ce884c441201ea994c107ee",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "validation",
+          "gallery_evidence": {
+            "surface.npz": "ec724efc99c898715d935692dd3f05a74af3a214c1ec09f8300356a7534f219a",
+            "masks.npz": "062cdc6fda1d27c3c26bbda98f5ddf657a8326b7d0e080035fef1d7d44ca61f7"
+          }
+        },
+        {
+          "path": "markovspodmol/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_017_006/64x64x64/interior.npz",
+          "group": "markovspodmol",
+          "sha256": "d3bdc7fe70aaec7a22ecfcfddf90391422f056c70488f92101aa0400c662bb83",
+          "voxel_sha256": "924bfa0ba92e1547a8e89ab0073e0fac248c07544f9f3d46bded454e071c6eb2",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "validation",
+          "gallery_evidence": {
+            "surface.npz": "f3a0326ca45c22d41c5f5d7510d8084b128bcb1444ac9b27664e7e5449cad243",
+            "masks.npz": "51c9cb928e2df6b6ed31a823b965356f52f98742b9f8e71abc9a0d9f6446f204"
+          }
+        },
+        {
+          "path": "markovspodmol/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_017_010/64x64x64/interior.npz",
+          "group": "markovspodmol",
+          "sha256": "6b0d5acb1ea9529e36f81d86b601a41ccddfeb01a4896e34cbd06befed79a48c",
+          "voxel_sha256": "2688d636d10597729807e19838ff9ccdbc1eb7a068de7a7c46c250f4c137f9d1",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "validation",
+          "gallery_evidence": {
+            "surface.npz": "0d7816f69f6ee048cec3b588ceaafae6ca0bd9089f87a67ebc2f24a3a82b4cd2",
+            "masks.npz": "ef72c14085c6aa8642fc0ba16c62df7f63a4a62ba1b5d4bf82f16810e79c7b57"
+          }
+        },
+        {
+          "path": "markovspodmol/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_017_011/64x64x64/interior.npz",
+          "group": "markovspodmol",
+          "sha256": "eb4ccfac92af86111e8a5a57485b265a80114dbd84aca13acb2b9dc259f8724d",
+          "voxel_sha256": "2f48abb5dbb82905edb2c3ad0fdcd35dc63d38ec57b1a950e84598bbb245e7ec",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "validation",
+          "gallery_evidence": {
+            "surface.npz": "00ae21b92d2bf8153c268f29261cc2a3c4f448a9ff76ebb615331aa129df5023",
+            "masks.npz": "be8889859c491e53085c742e38762154c058ff46a8223da1e746dc5972fbfc6c"
+          }
+        },
+        {
+          "path": "markovspodmol/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_017_013/64x64x64/interior.npz",
+          "group": "markovspodmol",
+          "sha256": "11a06d274aff23e0f63462049e6cf197aaf498a00e61e041703fa44acf8d2e87",
+          "voxel_sha256": "c12a3081d7f32f7b70c4341999ab260e54083b983822f1e2b82a91146a527fa9",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "validation",
+          "gallery_evidence": {
+            "surface.npz": "ad369a905eab2d4e40d3b09bdac769b15b4e43e114da3cbc82044800965e8e04",
+            "masks.npz": "aefab73bb4e3ce0168d9f7c808684f215d56d58baad928639d231f59cc4d0b13"
+          }
+        },
+        {
+          "path": "markovspodmol/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_017_014/64x64x64/interior.npz",
+          "group": "markovspodmol",
+          "sha256": "e32fe37ae591d5da009b7b3d59688c85bdbc8434f48a1f507c66db53b7c383a5",
+          "voxel_sha256": "b34b3ccdb114f398e40a818c56ee34638a015dd452eb5164348c569c602a1970",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "validation",
+          "gallery_evidence": {
+            "surface.npz": "2c7c7488c0e77bb5e622bbc9fb0f2c39a77c1acf12cc1b957b7ff128768607a6",
+            "masks.npz": "65f66959821137d075ba94b94ebbd58aa4cf1ec109c24143e45d7a27d90fe4a9"
+          }
+        },
+        {
+          "path": "markovspodmol/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_017_015/64x64x64/interior.npz",
+          "group": "markovspodmol",
+          "sha256": "7e6a3ec0d9a4bae3f2941eb1bf9077194fb193469870805d002f45cee2024f1c",
+          "voxel_sha256": "55fe5b5c73d4ba9ee1dbb103c1c7e983e72ea4afab8f76fb9f5cff393b67109e",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "validation",
+          "gallery_evidence": {
+            "surface.npz": "dceb24632467ec2a906fe82b480f50e132ccd67c11760c8500262b6f8c187d17",
+            "masks.npz": "cd729b46d6879be8793913fdd557c252b4e304d53adbe1bd3150497c935baab4"
+          }
+        }
+      ]
+    },
+    {
+      "id": "holdout_markovspodmol",
+      "groups": {
+        "archamps": "validation",
+        "cascadedemotiers": "train",
+        "indian_tunnel": "train",
+        "markovspodmol": "test"
+      },
+      "samples": [
+        {
+          "path": "archamps/PostEtroiture/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_001_002/64x64x64/interior.npz",
+          "group": "archamps",
+          "sha256": "338e4ddc85ce2ef6c5ae0e494052ce0d4d81d7b79efe499f4c0dd74979a7fa67",
+          "voxel_sha256": "c30b0ff5703fcb4068cbba0b43efde47ee40cb5f69b7c2a16c39658ff1be9b0f",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "validation",
+          "gallery_evidence": {
+            "surface.npz": "3e3da3be81edf8077f569391a0e8c530c72ef0ee44d9d58f48ab71a55606fccc",
+            "masks.npz": "cad18659637fa5d8e496b608f619a3c92d849181171b452ac9bb984e9f8d343d"
+          }
+        },
+        {
+          "path": "archamps/PostEtroiture/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_001_003/64x64x64/interior.npz",
+          "group": "archamps",
+          "sha256": "7b27da00db99e7e18c2416d9499aacc330b298c0761c9cbb19676bdd79b55bb3",
+          "voxel_sha256": "17b3f06b1924edff00bc3ea93a2639db17881aaf91d34518f63332988472a4bd",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "validation",
+          "gallery_evidence": {
+            "surface.npz": "82f0e21c0fe0a824ec3bcca1fcdd8f9a0c7d1fa179ff6017f4dbaa7076dfdffd",
+            "masks.npz": "30e62fc20af35388fe0a522ff56edab1c1291889cbfb9160f5c462af4d7241a9"
+          }
+        },
+        {
+          "path": "archamps/PostEtroiture/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_001_004/64x64x64/interior.npz",
+          "group": "archamps",
+          "sha256": "6b2fd193fcdaf694b681ab46ae994ed531e2e1be6781b75c4f63427dc5469d92",
+          "voxel_sha256": "ebac9b92f1798beb4b3b01e2b2ea5b7c2269ea9c0ba335c0d8a747b112170c6d",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "validation",
+          "gallery_evidence": {
+            "surface.npz": "bb57b6d6e00b9b7de36d3ed5510df5eeb161cf1bac16d7a3aa44d6b1ad6ce2dc",
+            "masks.npz": "4aeb4070ad35b366d4310f2b500c9ceb122870dc2a73365d6073b5b36a9c1d21"
+          }
+        },
+        {
+          "path": "archamps/PostEtroiture/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_001_005/64x64x64/interior.npz",
+          "group": "archamps",
+          "sha256": "e2f97e25553a3af6d87c3f40f6e3e362c4134aabc717fce3d319306b0c76f3b0",
+          "voxel_sha256": "74e42e16ad773152f3dbcc6b43c4efbcc707e4d82c97e0d5a30ae69e21e6e8f2",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "validation",
+          "gallery_evidence": {
+            "surface.npz": "09e3b86e8f6d1e29acd1bc48ff7015af692b3c56ef00d213d7596b822436110b",
+            "masks.npz": "1764d6f9e18879c93b9a452051f3a6fb779ec21cacc9f9d6f66eb75d94650463"
+          }
+        },
+        {
+          "path": "archamps/PostEtroiture/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_001_006/64x64x64/interior.npz",
+          "group": "archamps",
+          "sha256": "21e20259e41d0189ed38eef80ea9d8d46c6d6e91d7536791c460c80def1d3318",
+          "voxel_sha256": "4422753a1e2cfb8000b144bc0cef25077de26e0d0416e1d9641bd5d3d59b116f",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "validation",
+          "gallery_evidence": {
+            "surface.npz": "4e9e3aef7e3253a3433b97a879929bf569383a7ba196b5d141de8930c5087043",
+            "masks.npz": "4020d41732e3db5ebde53c2a784284a1eef1df16ccccadc5a77a6f9a3940ca3a"
+          }
+        },
+        {
+          "path": "cascadedemotiers/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_015_001/64x64x64/interior.npz",
+          "group": "cascadedemotiers",
+          "sha256": "e3cab653877965a7bac1ca5786505f63d8c985af1cb7808c57c1fec13058f6e5",
+          "voxel_sha256": "e002100cd668558a032c52e949d50a0cb352e703f0c5646e75f7a09998d79b63",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "train",
+          "gallery_evidence": {
+            "surface.npz": "a15a894d04e1f20b8dd6b60c65c59b5c2057bb77ee56c9d869f65435105dedd0",
+            "masks.npz": "13d8b29fc2fd3e3bb4b9afaf7a3dfd91cb0c667b5e0a0261ebc8383fde11be34"
+          }
+        },
+        {
+          "path": "cascadedemotiers/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_015_002/64x64x64/interior.npz",
+          "group": "cascadedemotiers",
+          "sha256": "a4adf1d4fe0dc844d57e812fe41527b1f99ea885daacde292f5f7699c4780194",
+          "voxel_sha256": "9f6144d17ece86c11d4eb782e905b6b316da9665219abd3243a5890ec3c8f870",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "train",
+          "gallery_evidence": {
+            "surface.npz": "53ab1d64baa92fdfe8f9aa74e5b22cd3e6127faae23a76b1182e2980f7c52f59",
+            "masks.npz": "cd64978872c212ea0ae8ae81c576f353ee250813b0eceb0a63beadcfe6b3863e"
+          }
+        },
+        {
+          "path": "cascadedemotiers/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_015_003/64x64x64/interior.npz",
+          "group": "cascadedemotiers",
+          "sha256": "7f2ba37cb055945e4253943b37742b31db728fa4ae0df4986d77b27c65e5623d",
+          "voxel_sha256": "ffdc9b90bdd586deab2f3611edb3f5898fd773191e91a49e144ca23b29753739",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "train",
+          "gallery_evidence": {
+            "surface.npz": "202dfd730775fe1e0fb328bbb9445723830ac8b19c64b09f16c21db43558fa21",
+            "masks.npz": "c6b572593204dfca2454fefc35052ea726aa197725b24456aa6ddccfa1cc4fbb"
+          }
+        },
+        {
+          "path": "cascadedemotiers/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_018_003/64x64x64/interior.npz",
+          "group": "cascadedemotiers",
+          "sha256": "17ffa72488b317356add85b6062bb011489377b88611672cf2bbe39b8b0d67be",
+          "voxel_sha256": "4aecdfb1074c631c15a2529104f1deec007f87d36c9a41477d9af30ee13e5b97",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "train",
+          "gallery_evidence": {
+            "surface.npz": "8358fb22a5396bca61bb41a62734233c2730f0debcd296773bb352830c43fa54",
+            "masks.npz": "435154e0648c7b0fceecc2c11b46aa164981a3b3a5fdfa35ef9aacfa409b903f"
+          }
+        },
+        {
+          "path": "cascadedemotiers/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_021_003/64x64x64/interior.npz",
+          "group": "cascadedemotiers",
+          "sha256": "3a730342aff16ad80039e3ea02e67086812e36db53673d445ef2b2c23d88fb05",
+          "voxel_sha256": "f03936224c34a37721cf89aab34fdaeb302490d9f06298190a5ca419041f5a7b",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "train",
+          "gallery_evidence": {
+            "surface.npz": "0c7d569644bfbdd6858c919255d11f0bccc4d42cddbb47f362e4c286bf79af6c",
+            "masks.npz": "641eae29e3d402f7aa08667e29e9cc7ccb4a3db5db7212476785d1fde8bcd436"
+          }
+        },
+        {
+          "path": "cascadedemotiers/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_035_002/64x64x64/interior.npz",
+          "group": "cascadedemotiers",
+          "sha256": "39a35e9395c20c27fc975db273aa9575a2c92368c9ff4f77b99b1714d91be1e8",
+          "voxel_sha256": "82dd77e868547c9c3102c2e571ddc3ee4eb0bb56afaf4f9d65fd4998c5f8bbe2",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "train",
+          "gallery_evidence": {
+            "surface.npz": "b3a009347edc0cfdc1aad4d9fed4d24651afc40e5f1f15543d430c6def60b3d4",
+            "masks.npz": "1545a80e7ff379fddea906ddb70fac6631a500b291b10364d753093d86a65141"
+          }
+        },
+        {
+          "path": "cascadedemotiers/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_035_003/64x64x64/interior.npz",
+          "group": "cascadedemotiers",
+          "sha256": "ebd5ea100850ef936f3e6d2471055682c0ff1a451639ce808d89f244df921a15",
+          "voxel_sha256": "24cfe1233ed98361334bf47d229092afc4b759490054f3d97ab16bee3a22cf98",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "train",
+          "gallery_evidence": {
+            "surface.npz": "6700357c120a8a8bd23b119873cb2bb728efc428b1ea4d6ba93b488c4839d749",
+            "masks.npz": "d8c0d39d8319942c17b1d9e5c91390a33eda1e7852d9c4a53203461130a3b288"
+          }
+        },
+        {
+          "path": "cascadedemotiers/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_035_004/64x64x64/interior.npz",
+          "group": "cascadedemotiers",
+          "sha256": "5c73fb330f249710e7675a7748a0321c55bc5d3658afe2bef556dc1774ad0eb7",
+          "voxel_sha256": "f2ce82f46876efa70bbc2c17a7302001494bedf706ee0e0b822bc99532b474aa",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "train",
+          "gallery_evidence": {
+            "surface.npz": "bf202f18030868b3a71a0106882530abbdf6322b87bca702bb075cfd731135e6",
+            "masks.npz": "77c4112586dc3193be4f10ae84cb010cd72d27a1cb3e10f27e543f9bf74a52e8"
+          }
+        },
+        {
+          "path": "cascadedemotiers/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_035_005/64x64x64/interior.npz",
+          "group": "cascadedemotiers",
+          "sha256": "29f70a5644f914bcab10bc86ca4a16caca7b3d4aa56b3ae09a1bae5564512f9c",
+          "voxel_sha256": "ad15a6361ef84c176a5dec451fd0f5eadaac3db28bc5db10e2cf58a582ee2266",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "train",
+          "gallery_evidence": {
+            "surface.npz": "5cbfcbf8480386e32913101f615d943146f387308bae8adb6a06150b59563a18",
+            "masks.npz": "cad7a1300e58a5cf1b07c0bdff00a2b334710aeebce33053d6f20d3fce54f1a1"
+          }
+        },
+        {
+          "path": "cascadedemotiers/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_035_006/64x64x64/interior.npz",
+          "group": "cascadedemotiers",
+          "sha256": "5adfa7098b3d06aaaf82b6c10baaeab68faebf31d53f262c4002e21127ee5673",
+          "voxel_sha256": "f97959eb441d9a793a53c2acdf9d27513f9b54a552c4d90e026ddd4b05996e74",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "train",
+          "gallery_evidence": {
+            "surface.npz": "ac49687b9a28863037837bd43076a799b1f3ae7750acd0b32c244b8ff0a28c17",
+            "masks.npz": "43021f37715b5fcaeab1de0aab0880263e6891778b2e5e1bfa714c010d79f55d"
+          }
+        },
+        {
+          "path": "cascadedemotiers/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_035_007/64x64x64/interior.npz",
+          "group": "cascadedemotiers",
+          "sha256": "f794a7b6616b9f345286ff49b4816f070980ce9b321627d69c46aa39be372e10",
+          "voxel_sha256": "719f83028ead36fa27f3578e3fdb13f82b30f70ca13c2ea9f6f71b3699bb8c4c",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "train",
+          "gallery_evidence": {
+            "surface.npz": "592d843f1e72e1916ed7761fbc0fe80300c6236694343c928bc1670e19d8e4a9",
+            "masks.npz": "67fefbbc7c149fb0e9d1875aac31cdfdd3a2946ffa18b5f8d24d76ad4193d348"
+          }
+        },
+        {
+          "path": "cascadedemotiers/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_035_008/64x64x64/interior.npz",
+          "group": "cascadedemotiers",
+          "sha256": "25821534d152c8303d51fdff42dea8a849b116cb524a5c9ff8a8afc36076e661",
+          "voxel_sha256": "e8ce4652f531d4815146e9202c93484c0995678f38a107a69c26b8b86d1318f5",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "train",
+          "gallery_evidence": {
+            "surface.npz": "e93afb39728d5b97d7ee162e0ef0a16e369e7b691e2ba9910806ea457d26bf16",
+            "masks.npz": "f1a27e0e5f01fe70e1b24e9a8e8f5d62241db1f505372ade9b70bf0ed64313df"
+          }
+        },
+        {
+          "path": "cascadedemotiers/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_038_002/64x64x64/interior.npz",
+          "group": "cascadedemotiers",
+          "sha256": "19c787b1e262f3b4eff9558d0fadbd4887dc01678c50041c0a321b34b0bef800",
+          "voxel_sha256": "5a2c6d99b10e5950932a603fb7c6767a5fcc73f1ab2d25a03f48997f04a4cc4b",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "train",
+          "gallery_evidence": {
+            "surface.npz": "72f86a0cb8b8ee5936562475eae8ceb09eb753d63ae03ac589076bb665322b07",
+            "masks.npz": "2f116b85c7a0ec045e0ddda47544190383d319c7c22f651d0318d5297305d005"
+          }
+        },
+        {
+          "path": "cascadedemotiers/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_038_003/64x64x64/interior.npz",
+          "group": "cascadedemotiers",
+          "sha256": "7a0fedeaf9bc6e45211f29941cca32ea14e44118aa4ed1fe2f628053e4497317",
+          "voxel_sha256": "3217edf61f475e593ad468b3b94793b1ba19df1f717c6785cfdc4c30f9df4ffe",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "train",
+          "gallery_evidence": {
+            "surface.npz": "9938b4f3224782f3dbfd10757ed904f63170bf5eb0aafb8ab5add1b1e3b2561b",
+            "masks.npz": "2a8598e59cd883340dc8e86b5e5440d9ea84b1c320bc4b537708ce2b0df153b7"
+          }
+        },
+        {
+          "path": "indian_tunnel/Full/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_002_006/64x64x64/interior.npz",
+          "group": "indian_tunnel",
+          "sha256": "957e1a623cde70a35f0f5c7910ce562fad815828ff3c6feecd4ca2be36549961",
+          "voxel_sha256": "271a45ce8fe23d2dc30e347c70c5c84c0141b22199d408b02de39e8ad4162e17",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "train",
+          "gallery_evidence": {
+            "surface.npz": "35290d3168edbfd3ac4242f184c2562c93dfbb349dced854adf3819fa8ffae7c",
+            "masks.npz": "fae4b28cc1ac1d9139444d73f335afa5d23175dfe24115717ba555282c1d2b8b"
+          }
+        },
+        {
+          "path": "indian_tunnel/Full/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_002_007/64x64x64/interior.npz",
+          "group": "indian_tunnel",
+          "sha256": "636eb14d1c93c40136cbd7ade9090a4520156d6195ed97e7c947cdedec63d883",
+          "voxel_sha256": "6872d0898a96312d21d2b9251ea19b7eeba513df3f8ed565bb0becbdafa05ac3",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "train",
+          "gallery_evidence": {
+            "surface.npz": "96358bbc83a377d0f5b96098869d1914ebf4c50e36bab2b45531d88ec8f024a6",
+            "masks.npz": "77dfef44a74b8b66362f2aa8ea471dca741a75e7484626623d039705ce3a4d03"
+          }
+        },
+        {
+          "path": "markovspodmol/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_001_001/64x64x64/interior.npz",
+          "group": "markovspodmol",
+          "sha256": "41219c53a1f2873c846f0fe2d92bf46a44f77d409cbaaf4f1b997067ded7ec04",
+          "voxel_sha256": "ac2567960c2852e4ad4e21436f1c2b713de8480a0fd20965ef7889e8aef0d418",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "test",
+          "gallery_evidence": {
+            "surface.npz": "9fbf72fabbd2ad50688209d79d5a021a372ec03717697d312d1d32cf25f861d2",
+            "masks.npz": "bd37bbace3d6102f3c2d2276e3c6545841d78fead6bfd07ac1ed5c5b1ad151f5"
+          }
+        },
+        {
+          "path": "markovspodmol/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_009_002/64x64x64/interior.npz",
+          "group": "markovspodmol",
+          "sha256": "2fb5b21609f0db587cc3f657435330a89485a56ecb3374a6336279d4a57f5e3d",
+          "voxel_sha256": "6c8a2c24ba76ab540fb4a5d24fb9b6d259c8251caa2c162c9c1fbd9073c9db5e",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "test",
+          "gallery_evidence": {
+            "surface.npz": "0e9c6dadff5fbd479d2be6061a10e352a7f4bd686027a4fd27c1c51ee4608541",
+            "masks.npz": "5d9d178788d0a0d2b9f7909004f070cdf86aa3fa7927b5905153454f81321d7f"
+          }
+        },
+        {
+          "path": "markovspodmol/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_010_002/64x64x64/interior.npz",
+          "group": "markovspodmol",
+          "sha256": "a2020377368ce76ab7fd24d0488f0bcdac8bf92a160fe1282a42f00775ffd200",
+          "voxel_sha256": "e494012a35ffb213c03de66059abb6e6749c129fafcff03f747a8955b7023347",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "test",
+          "gallery_evidence": {
+            "surface.npz": "6bc582cc270df91ca3c40d36a6556921430080535f6239f4cfda9527eb10e553",
+            "masks.npz": "6bfeb9728dde34082bf34285ad0b73cfe8a6a8a218cfadfbefa06b1fc2a03662"
+          }
+        },
+        {
+          "path": "markovspodmol/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_011_003/64x64x64/interior.npz",
+          "group": "markovspodmol",
+          "sha256": "1cc14fc2584137e0f44919d1e23d456a67843c971b502884876e797c058d9c81",
+          "voxel_sha256": "f0f067aa8f9a229415891a2e0d90db4e577a19c063450376e5d9eaf84e6a3b65",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "test",
+          "gallery_evidence": {
+            "surface.npz": "5ea7b09575450bd0f66bcdb9e2cfabb1479d0cc0e9c918e6434d961eb0a29e69",
+            "masks.npz": "43e2212fbb8d0ae41b7a7ad5675632240c1c996cd3812871eb9bdfa936c01c3b"
+          }
+        },
+        {
+          "path": "markovspodmol/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_011_005/64x64x64/interior.npz",
+          "group": "markovspodmol",
+          "sha256": "314cb4e2db91b1e18f44086a4971d310e03836f416eeb738c5c55972afca94c9",
+          "voxel_sha256": "c13d7943da3772f9638ea0565dfe2f087a9b3385854b88aa9224ed9185a91326",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "test",
+          "gallery_evidence": {
+            "surface.npz": "63efdac32390bb0674109a6ddd454df412db1c47adc213e79e5c5ab4b019ed92",
+            "masks.npz": "bc74dca2ea94bc4c4eaf2f46b35e52e552f4e5ea1185b010f37df2c204057108"
+          }
+        },
+        {
+          "path": "markovspodmol/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_017_003/64x64x64/interior.npz",
+          "group": "markovspodmol",
+          "sha256": "b41dfab0b8895c1f8af3505a8bac75364487f9d1cdc9e560165567a2d59dac02",
+          "voxel_sha256": "c7a2ec1055b72d68464dd6fe4c424197b9d4f8acf3aac2ff30db8145e12faec0",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "test",
+          "gallery_evidence": {
+            "surface.npz": "e388e2540990c4135b9f38eb648627abf8166e8efb9936d0bf944519e08fb593",
+            "masks.npz": "46ef79cd7b60eed246c31b6d5fc796903ae9353df1b1feadcee3034c893f7b57"
+          }
+        },
+        {
+          "path": "markovspodmol/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_017_004/64x64x64/interior.npz",
+          "group": "markovspodmol",
+          "sha256": "72b63801135c168310719cedab2c85e9201f3e6cc245f0ad255d8516668da98c",
+          "voxel_sha256": "c8c4f77f84807988c3d8c52361009decbc1bc49c3ce884c441201ea994c107ee",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "test",
+          "gallery_evidence": {
+            "surface.npz": "ec724efc99c898715d935692dd3f05a74af3a214c1ec09f8300356a7534f219a",
+            "masks.npz": "062cdc6fda1d27c3c26bbda98f5ddf657a8326b7d0e080035fef1d7d44ca61f7"
+          }
+        },
+        {
+          "path": "markovspodmol/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_017_006/64x64x64/interior.npz",
+          "group": "markovspodmol",
+          "sha256": "d3bdc7fe70aaec7a22ecfcfddf90391422f056c70488f92101aa0400c662bb83",
+          "voxel_sha256": "924bfa0ba92e1547a8e89ab0073e0fac248c07544f9f3d46bded454e071c6eb2",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "test",
+          "gallery_evidence": {
+            "surface.npz": "f3a0326ca45c22d41c5f5d7510d8084b128bcb1444ac9b27664e7e5449cad243",
+            "masks.npz": "51c9cb928e2df6b6ed31a823b965356f52f98742b9f8e71abc9a0d9f6446f204"
+          }
+        },
+        {
+          "path": "markovspodmol/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_017_010/64x64x64/interior.npz",
+          "group": "markovspodmol",
+          "sha256": "6b0d5acb1ea9529e36f81d86b601a41ccddfeb01a4896e34cbd06befed79a48c",
+          "voxel_sha256": "2688d636d10597729807e19838ff9ccdbc1eb7a068de7a7c46c250f4c137f9d1",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "test",
+          "gallery_evidence": {
+            "surface.npz": "0d7816f69f6ee048cec3b588ceaafae6ca0bd9089f87a67ebc2f24a3a82b4cd2",
+            "masks.npz": "ef72c14085c6aa8642fc0ba16c62df7f63a4a62ba1b5d4bf82f16810e79c7b57"
+          }
+        },
+        {
+          "path": "markovspodmol/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_017_011/64x64x64/interior.npz",
+          "group": "markovspodmol",
+          "sha256": "eb4ccfac92af86111e8a5a57485b265a80114dbd84aca13acb2b9dc259f8724d",
+          "voxel_sha256": "2f48abb5dbb82905edb2c3ad0fdcd35dc63d38ec57b1a950e84598bbb245e7ec",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "test",
+          "gallery_evidence": {
+            "surface.npz": "00ae21b92d2bf8153c268f29261cc2a3c4f448a9ff76ebb615331aa129df5023",
+            "masks.npz": "be8889859c491e53085c742e38762154c058ff46a8223da1e746dc5972fbfc6c"
+          }
+        },
+        {
+          "path": "markovspodmol/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_017_013/64x64x64/interior.npz",
+          "group": "markovspodmol",
+          "sha256": "11a06d274aff23e0f63462049e6cf197aaf498a00e61e041703fa44acf8d2e87",
+          "voxel_sha256": "c12a3081d7f32f7b70c4341999ab260e54083b983822f1e2b82a91146a527fa9",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "test",
+          "gallery_evidence": {
+            "surface.npz": "ad369a905eab2d4e40d3b09bdac769b15b4e43e114da3cbc82044800965e8e04",
+            "masks.npz": "aefab73bb4e3ce0168d9f7c808684f215d56d58baad928639d231f59cc4d0b13"
+          }
+        },
+        {
+          "path": "markovspodmol/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_017_014/64x64x64/interior.npz",
+          "group": "markovspodmol",
+          "sha256": "e32fe37ae591d5da009b7b3d59688c85bdbc8434f48a1f507c66db53b7c383a5",
+          "voxel_sha256": "b34b3ccdb114f398e40a818c56ee34638a015dd452eb5164348c569c602a1970",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "test",
+          "gallery_evidence": {
+            "surface.npz": "2c7c7488c0e77bb5e622bbc9fb0f2c39a77c1acf12cc1b957b7ff128768607a6",
+            "masks.npz": "65f66959821137d075ba94b94ebbd58aa4cf1ec109c24143e45d7a27d90fe4a9"
+          }
+        },
+        {
+          "path": "markovspodmol/MainGallery/holdout_indian_tunnel/mesmos_cortes_28cm/ramo_017_015/64x64x64/interior.npz",
+          "group": "markovspodmol",
+          "sha256": "7e6a3ec0d9a4bae3f2941eb1bf9077194fb193469870805d002f45cee2024f1c",
+          "voxel_sha256": "55fe5b5c73d4ba9ee1dbb103c1c7e983e72ea4afab8f76fb9f5cff393b67109e",
+          "geometry_screen_passed": true,
+          "candidate": true,
+          "split": "test",
+          "gallery_evidence": {
+            "surface.npz": "dceb24632467ec2a906fe82b480f50e132ccd67c11760c8500262b6f8c187d17",
+            "masks.npz": "cd729b46d6879be8793913fdd557c252b4e304d53adbe1bd3150497c935baab4"
+          }
+        }
+      ]
+    }
+  ],
+  "data_status": "gallery_proxy_pending_review",
+  "seed_policy": "arbitrary inference seeds; fixed validation seeds; never split by noise",
+  "splits_id": "546e8150848b0ca429e6a75d40e9a5257e7d22e9e511b0b16af590f0100a912a"
+}

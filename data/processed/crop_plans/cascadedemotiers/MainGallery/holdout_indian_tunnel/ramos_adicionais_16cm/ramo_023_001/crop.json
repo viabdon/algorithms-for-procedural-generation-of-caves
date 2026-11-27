@@ -1,0 +1,99 @@
+{
+  "cave": "cascadedemotiers",
+  "survey": "MainGallery",
+  "crop_id": "ramo_023_001",
+  "plan_id": "ramos_adicionais_16cm",
+  "fold": "holdout_indian_tunnel",
+  "branch": "passagem_023",
+  "source": "cloud.ply",
+  "source_origin_xyz": [
+    2537750.899,
+    1195208.176,
+    783.079
+  ],
+  "units": "m",
+  "origin_xyz": [
+    -39.03443000020861,
+    15.01278900002233,
+    -7.755994999999935
+  ],
+  "selection_min_xyz": [
+    -38.71603000020861,
+    15.33118900002233,
+    -7.437594999999934
+  ],
+  "selection_max_xyz": [
+    -36.4872440002087,
+    20.70938900002233,
+    -0.5194170000000289
+  ],
+  "shape_zyx": [
+    64,
+    64,
+    64
+  ],
+  "voxel_size": 0.16,
+  "sections": [
+    {
+      "point_xyz": [
+        -36.58452119503988,
+        18.672730858059246,
+        -3.9653244040992512
+      ],
+      "inward_normal_xyz": [
+        -0.9959440723243798,
+        0.08870910991019786,
+        -0.015036576101987347
+      ],
+      "u_xyz": [
+        -0.014977282103959526,
+        0.0013340321020390109,
+        0.9998869442987688
+      ],
+      "polygon_uv": []
+    },
+    {
+      "point_xyz": [
+        -38.46185904166565,
+        18.906644405844208,
+        -3.954171020315366
+      ],
+      "inward_normal_xyz": [
+        0.9957940010130286,
+        -0.07988730421998434,
+        -0.04485895864738758
+      ],
+      "u_xyz": [
+        0.04471529544928015,
+        -0.0035872724752399744,
+        0.9989933302225155
+      ],
+      "polygon_uv": []
+    }
+  ],
+  "seed_xyz": [
+    -37.520777807480556,
+    18.81341265574404,
+    -3.9762280182807035
+  ],
+  "batch_size": 131072,
+  "proposal": {
+    "crop_id": "ramo_023_001",
+    "status": "pending_review",
+    "review_reasons": [
+      "tampa_com_cobertura_insuficiente",
+      "outra_passagem_ou_retorno_proximo"
+    ],
+    "retained_points": 9602,
+    "cut_stations": [
+      0.64,
+      2.5336761354178363
+    ],
+    "section_bins_supported": [
+      14,
+      11
+    ],
+    "selection_radius": 4.2204720388171815
+  },
+  "auxiliary_cap_radius_voxels": 4
+}

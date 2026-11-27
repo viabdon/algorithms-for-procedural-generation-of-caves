@@ -1,0 +1,27 @@
+{
+  "model": {
+    "resolution": 64,
+    "latent_dim": 128,
+    "base_channels": 16,
+    "representation": "occupancy",
+    "sdf_tau": 4.0
+  },
+  "seed": 17,
+  "steps": 5000,
+  "batch_size": 2,
+  "learning_rate": 0.0001,
+  "beta1": 0.0,
+  "beta2": 0.99,
+  "r1_gamma": 10.0,
+  "r1_interval": 16,
+  "instance_noise": 0.1,
+  "noise_decay_steps": 2500,
+  "yaw_augmentation": true,
+  "validation_interval": 250,
+  "validation_seed_start": 1000000,
+  "validation_count": 16,
+  "threshold": 0.5,
+  "max_minutes": 60.0,
+  "allow_candidate_proxy": true,
+  "require_cuda": true
+}

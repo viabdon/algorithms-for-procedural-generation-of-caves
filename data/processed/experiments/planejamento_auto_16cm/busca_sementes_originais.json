@@ -1,0 +1,158 @@
+{
+  "casos": [
+    {
+      "caverna": "archamps",
+      "levantamento": "PreEtroiture",
+      "recorte": "ramo_001_008",
+      "diagnostico_anterior": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/reference_sections/archamps/PreEtroiture/holdout_indian_tunnel/ramos_cortes_16cm/ramo_001_008/64x64x64_sem_volume/20261126T040452741710Z-d092eb07/summary.csv",
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/planejamento_auto_16cm/config_sementes_originais/archamps/PreEtroiture/ramo_001_008/crop.json",
+      "resultado": "volume_salvo",
+      "ar_voxels": 7499,
+      "busca_semente": "provisional",
+      "relatorio": "data/processed/reference_sections/archamps/PreEtroiture/holdout_indian_tunnel/auto_sementes_originais_16cm/ramo_001_008/64x64x64/relatorio_volume/summary.csv"
+    },
+    {
+      "caverna": "cascadedemotiers",
+      "levantamento": "MainGallery",
+      "recorte": "ramo_002_004",
+      "diagnostico_anterior": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/reference_sections/cascadedemotiers/MainGallery/holdout_indian_tunnel/las5cm_16cm_rev/ramo_002_004/64x64x64_sem_volume/20261126T033516822454Z-c6c92be2/summary.csv",
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/planejamento_auto_16cm/config_sementes_originais/cascadedemotiers/MainGallery/ramo_002_004/crop.json",
+      "resultado": "ambiguous_passage",
+      "busca_semente": "provisional",
+      "motivo": "A semente ficou conectada ao exterior e o reparo não foi verificado.",
+      "relatorio": "data/processed/reference_sections/cascadedemotiers/MainGallery/holdout_indian_tunnel/auto_sementes_originais_16cm/ramo_002_004/64x64x64_sem_volume/20261127T003446547400Z-a849cc6e/summary.csv"
+    },
+    {
+      "caverna": "cascadedemotiers",
+      "levantamento": "MainGallery",
+      "recorte": "ramo_018_001",
+      "diagnostico_anterior": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/reference_sections/cascadedemotiers/MainGallery/holdout_indian_tunnel/las5cm_16cm_rev/ramo_018_001/64x64x64_sem_volume/20261126T033542496722Z-fcc3d8d4/summary.csv",
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/planejamento_auto_16cm/config_sementes_originais/cascadedemotiers/MainGallery/ramo_018_001/crop.json",
+      "resultado": "ambiguous_passage",
+      "busca_semente": "provisional",
+      "motivo": "A semente ficou conectada ao exterior e o reparo não foi verificado.",
+      "relatorio": "data/processed/reference_sections/cascadedemotiers/MainGallery/holdout_indian_tunnel/auto_sementes_originais_16cm/ramo_018_001/64x64x64_sem_volume/20261127T003449483005Z-d6542a48/summary.csv"
+    },
+    {
+      "caverna": "cascadedemotiers",
+      "levantamento": "MainGallery",
+      "recorte": "ramo_027_004",
+      "diagnostico_anterior": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/reference_sections/cascadedemotiers/MainGallery/holdout_indian_tunnel/las5cm_16cm_rev/ramo_027_004/64x64x64_sem_volume/20261126T033600618198Z-ec1e5656/summary.csv",
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/planejamento_auto_16cm/config_sementes_originais/cascadedemotiers/MainGallery/ramo_027_004/crop.json",
+      "resultado": "ambiguous_passage",
+      "busca_semente": "provisional",
+      "motivo": "A semente ficou conectada ao exterior e o reparo não foi verificado.",
+      "relatorio": "data/processed/reference_sections/cascadedemotiers/MainGallery/holdout_indian_tunnel/auto_sementes_originais_16cm/ramo_027_004/64x64x64_sem_volume/20261127T003451074480Z-741b1d48/summary.csv"
+    },
+    {
+      "caverna": "cascadedemotiers",
+      "levantamento": "MainGallery",
+      "recorte": "ramo_008_001",
+      "diagnostico_anterior": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/reference_sections/cascadedemotiers/MainGallery/holdout_indian_tunnel/ramos_cortes_16cm/ramo_008_001/67x64x64_sem_volume/20261126T040515871790Z-0b51c443/summary.csv",
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/planejamento_auto_16cm/config_sementes_originais/cascadedemotiers/MainGallery/ramo_008_001/crop.json",
+      "resultado": "seed_blocked",
+      "busca_semente": "no_candidate",
+      "motivo": "A semente caiu na barreira. Revise sua localização na galeria.",
+      "relatorio": "data/processed/reference_sections/cascadedemotiers/MainGallery/holdout_indian_tunnel/auto_sementes_originais_16cm/ramo_008_001/67x64x64_sem_volume/20261127T003451454508Z-a12a44d8/summary.csv"
+    },
+    {
+      "caverna": "cascadedemotiers",
+      "levantamento": "MainGallery",
+      "recorte": "ramo_037_001",
+      "diagnostico_anterior": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/reference_sections/cascadedemotiers/MainGallery/holdout_indian_tunnel/ramos_cortes_16cm/ramo_037_001/70x64x64_sem_volume/20261126T040519487804Z-ae152454/summary.csv",
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/planejamento_auto_16cm/config_sementes_originais/cascadedemotiers/MainGallery/ramo_037_001/crop.json",
+      "resultado": "seed_blocked",
+      "busca_semente": "no_candidate",
+      "motivo": "A semente caiu na barreira. Revise sua localização na galeria.",
+      "relatorio": "data/processed/reference_sections/cascadedemotiers/MainGallery/holdout_indian_tunnel/auto_sementes_originais_16cm/ramo_037_001/70x64x64_sem_volume/20261127T003451909117Z-0f2f3616/summary.csv"
+    },
+    {
+      "caverna": "cascadedemotiers",
+      "levantamento": "MainGallery",
+      "recorte": "ramo_019_002",
+      "diagnostico_anterior": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/reference_sections/cascadedemotiers/MainGallery/holdout_indian_tunnel/cortes_refitos_16cm/ramo_019_002/64x64x64_sem_volume/20261126T035716034107Z-866dc5a7/summary.csv",
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/planejamento_auto_16cm/config_sementes_originais/cascadedemotiers/MainGallery/ramo_019_002/crop.json",
+      "resultado": "ambiguous_passage",
+      "busca_semente": "provisional",
+      "motivo": "A semente ficou conectada ao exterior e o reparo não foi verificado.",
+      "relatorio": "data/processed/reference_sections/cascadedemotiers/MainGallery/holdout_indian_tunnel/auto_sementes_originais_16cm/ramo_019_002/64x64x64_sem_volume/20261127T003454123545Z-a7a0a00b/summary.csv"
+    },
+    {
+      "caverna": "cascadedemotiers",
+      "levantamento": "MainGallery",
+      "recorte": "ramo_028_002",
+      "diagnostico_anterior": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/reference_sections/cascadedemotiers/MainGallery/holdout_indian_tunnel/cortes_refitos_16cm/ramo_028_002/64x64x64_sem_volume/20261126T035722322216Z-10b0f7b6/summary.csv",
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/planejamento_auto_16cm/config_sementes_originais/cascadedemotiers/MainGallery/ramo_028_002/crop.json",
+      "resultado": "ambiguous_passage",
+      "busca_semente": "provisional",
+      "motivo": "A semente ficou conectada ao exterior e o reparo não foi verificado.",
+      "relatorio": "data/processed/reference_sections/cascadedemotiers/MainGallery/holdout_indian_tunnel/auto_sementes_originais_16cm/ramo_028_002/64x64x64_sem_volume/20261127T003458430993Z-9283e50a/summary.csv"
+    },
+    {
+      "caverna": "cascadedemotiers",
+      "levantamento": "MainGallery",
+      "recorte": "ramo_029_002",
+      "diagnostico_anterior": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/reference_sections/cascadedemotiers/MainGallery/holdout_indian_tunnel/cortes_refitos_16cm/ramo_029_002/75x64x64_sem_volume/20261126T035722399709Z-f60632da/summary.csv",
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/planejamento_auto_16cm/config_sementes_originais/cascadedemotiers/MainGallery/ramo_029_002/crop.json",
+      "resultado": "seed_blocked",
+      "busca_semente": "no_candidate",
+      "motivo": "A semente caiu na barreira. Revise sua localização na galeria.",
+      "relatorio": "data/processed/reference_sections/cascadedemotiers/MainGallery/holdout_indian_tunnel/auto_sementes_originais_16cm/ramo_029_002/75x64x64_sem_volume/20261127T003458972146Z-92985ac0/summary.csv"
+    },
+    {
+      "caverna": "cascadedemotiers",
+      "levantamento": "MainGallery",
+      "recorte": "ramo_042_001",
+      "diagnostico_anterior": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/reference_sections/cascadedemotiers/MainGallery/holdout_indian_tunnel/cortes_refitos_16cm/ramo_042_001/64x64x64_sem_volume/20261126T035724174465Z-f4e44286/summary.csv",
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/planejamento_auto_16cm/config_sementes_originais/cascadedemotiers/MainGallery/ramo_042_001/crop.json",
+      "resultado": "ambiguous_passage",
+      "busca_semente": "provisional",
+      "motivo": "A semente ficou conectada ao exterior e o reparo não foi verificado.",
+      "relatorio": "data/processed/reference_sections/cascadedemotiers/MainGallery/holdout_indian_tunnel/auto_sementes_originais_16cm/ramo_042_001/64x64x64_sem_volume/20261127T003501392992Z-d3ab82e6/summary.csv"
+    },
+    {
+      "caverna": "markovspodmol",
+      "levantamento": "MainGallery",
+      "recorte": "ramo_011_002",
+      "diagnostico_anterior": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/reference_sections/markovspodmol/MainGallery/holdout_indian_tunnel/las5cm_16cm_rev/ramo_011_002/64x64x64_sem_volume/20261126T033638960046Z-759b004c/summary.csv",
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/planejamento_auto_16cm/config_sementes_originais/markovspodmol/MainGallery/ramo_011_002/crop.json",
+      "resultado": "ambiguous_passage",
+      "busca_semente": "provisional",
+      "motivo": "A semente ficou conectada ao exterior e o reparo não foi verificado.",
+      "relatorio": "data/processed/reference_sections/markovspodmol/MainGallery/holdout_indian_tunnel/auto_sementes_originais_16cm/ramo_011_002/64x64x64_sem_volume/20261127T003503359538Z-1e44d3cb/summary.csv"
+    },
+    {
+      "caverna": "markovspodmol",
+      "levantamento": "MainGallery",
+      "recorte": "ramo_037_002",
+      "diagnostico_anterior": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/reference_sections/markovspodmol/MainGallery/holdout_indian_tunnel/las5cm_16cm_rev/ramo_037_002/73x75x91_sem_volume/20261126T033710385574Z-b7252609/summary.csv",
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/planejamento_auto_16cm/config_sementes_originais/markovspodmol/MainGallery/ramo_037_002/crop.json",
+      "resultado": "seed_blocked",
+      "busca_semente": "no_candidate",
+      "motivo": "A semente caiu na barreira. Revise sua localização na galeria.",
+      "relatorio": "data/processed/reference_sections/markovspodmol/MainGallery/holdout_indian_tunnel/auto_sementes_originais_16cm/ramo_037_002/73x75x91_sem_volume/20261127T003504141230Z-abf05301/summary.csv"
+    },
+    {
+      "caverna": "markovspodmol",
+      "levantamento": "MainGallery",
+      "recorte": "ramo_011_001",
+      "diagnostico_anterior": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/reference_sections/markovspodmol/MainGallery/holdout_indian_tunnel/cortes_refitos_16cm/ramo_011_001/64x64x64_sem_volume/20261126T035750218632Z-6583c51d/summary.csv",
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/planejamento_auto_16cm/config_sementes_originais/markovspodmol/MainGallery/ramo_011_001/crop.json",
+      "resultado": "ambiguous_passage",
+      "busca_semente": "provisional",
+      "motivo": "A semente ficou conectada ao exterior e o reparo não foi verificado.",
+      "relatorio": "data/processed/reference_sections/markovspodmol/MainGallery/holdout_indian_tunnel/auto_sementes_originais_16cm/ramo_011_001/64x64x64_sem_volume/20261127T003506172228Z-05e0f1a1/summary.csv"
+    },
+    {
+      "caverna": "markovspodmol",
+      "levantamento": "MainGallery",
+      "recorte": "ramo_028_003",
+      "diagnostico_anterior": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/reference_sections/markovspodmol/MainGallery/holdout_indian_tunnel/cortes_refitos_16cm/ramo_028_003/64x96x64_sem_volume/20261126T035758016149Z-e7a11238/summary.csv",
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/planejamento_auto_16cm/config_sementes_originais/markovspodmol/MainGallery/ramo_028_003/crop.json",
+      "resultado": "seed_blocked",
+      "busca_semente": "no_candidate",
+      "motivo": "A semente caiu na barreira. Revise sua localização na galeria.",
+      "relatorio": "data/processed/reference_sections/markovspodmol/MainGallery/holdout_indian_tunnel/auto_sementes_originais_16cm/ramo_028_003/64x96x64_sem_volume/20261127T003506895016Z-5d4e7905/summary.csv"
+    }
+  ]
+}

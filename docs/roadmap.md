@@ -1,9 +1,12 @@
 # Roadmap do TCC
 
-**Atualizado em 06/11/2026.** A `feat/neural-models` incorporou a `main` até
-`a7dd1e7`. Felipe se aproxima do fim dos clássicos e passa à coleta de métricas
-e consolidação da tabela comparativa; Pablo inicia GAN, PCGRL e PCGARL em
-paralelo. As tarefas neurais estão detalhadas no [plano neural](plano-redes-neurais.md).
+**Atualizado em 27/11/2026.** O piloto da GAN a 16 cm usa o fold
+`holdout_carste`, com 29 recortes de treino, oito de validação e 15 de
+teste. A avaliação de Indian Tunnel fica separada. O próximo marco da
+frente neural é verificar os dados no ambiente de treino, registrar
+checkpoints do piloto e comparar a geração com sementes fixas.
+[Plano neural](plano-redes-neurais.md#piloto-ativo-de-27112026) ·
+[Inventário do fold](relatorios/inventario-gan-holdout-carste.md)
 
 A decisão de retorno ao pipeline de volumes gerados permanece vigente: não há
 interior real validado do Elaphes, logo SDF real e IoU volumétrica contra o
@@ -32,8 +35,14 @@ registram os limites e os experimentos preservados.
   testes do menu e dos registros são os afetados. Felipe conduz a correção.
 - [ ] Substituir a referência obsoleta do peso 002 do CA ao SDF removido com
   `random_walk_temp/`, se essa extensão voltar ao escopo.
-- [ ] Gerar e avaliar GAN, PCGRL e PCGARL: os dois primeiros só têm interfaces
-  e rotinas de treino placeholder; o terceiro ainda não foi implementado.
+- [x] Preparar a infraestrutura GAN: auditoria, folds por caverna, variantes
+  ocupação/SDF, treino/checkpoints, inferência, avaliação e notebook Colab.
+  Testes usam fixtures artificiais; não há treino nas referências.
+- [x] Substituir, no piloto da GAN, as grades globais por recortes de
+  galerias com escala física de 16 cm. O manifesto ativo registra os 52
+  candidatos aprovados na triagem. [Auditoria](auditoria/gan/README.md#manifesto-ativo-de-galerias-a-16-cm)
+- [ ] Gerar e avaliar os modelos neurais após validar seus dados/ambientes.
+  PCGRL ainda tem placeholders; PCGARL continua sem implementação.
 
 ## Frente de Felipe — clássicos, métricas e tabela
 
@@ -58,10 +67,21 @@ registram os limites e os experimentos preservados.
 
 ## Frente de Pablo — modelos neurais
 
+- [x] Ampliar a busca de cortes de Archamps e aplicar as rotinas em
+  outros levantamentos. Registrar os fechamentos, as intervenções por
+  recorte e as falhas remanescentes. [Histórico](auditoria/gan/historico-voxelizacao.md)
+- [ ] Executar o preflight de `holdout_carste` no ambiente da GAN e
+  registrar a primeira execução de ocupação em 64³. Guardar o manifesto
+  e os checkpoints para comparação visual com as mesmas sementes.
 - [ ] Definir estado, ações, transições, recompensa, término e orçamento do
   PCGRL; validar ambiente pequeno e política aleatória antes do treinamento.
-- [ ] Auditar dados de GAN, origem, independência e divisão por fonte, limites
-  de memória, resolução e pós-processamento antes de interpretar resultados.
+- [x] Auditar os dados atuais de GAN e definir folds por caverna, registrando
+  origem, hashes, resolução e limitações. Isso não aprovou os interiores.
+- [x] Implementar o piloto com origem local, seleção em lotes, tampas e
+  diagnóstico por janelas. Registrar reparos em máscara própria e distinguir
+  um fechamento verificado de um recorte que continua vazando.
+- [ ] Revisar a geometria das tampas auxiliares e medir a VRAM do
+  primeiro passo completo no ambiente usado pelo piloto.
 - [ ] Confirmar o significado de PCGARL e definir gerador, adversário, objetivo,
   avaliação de alcançabilidade e custo antes de implementá-lo.
 - [ ] Produzir volumes sob o contrato comum, registrar checkpoints e avaliar

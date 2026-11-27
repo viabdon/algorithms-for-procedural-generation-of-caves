@@ -1,0 +1,12 @@
+{
+  "cave": "archamps",
+  "survey": "PostEtroiture",
+  "fold": "holdout_indian_tunnel",
+  "units": "m",
+  "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/data/Archamps/PostEtroiture/pointclouds/Archamps_PostEtroiture_sampled_2mm_PCV_normals_classified_georef.las",
+  "centreline": "/run/media/midnavi/Pablo/TCC/DATA/RAW/data/Archamps/PostEtroiture/centreline/Archamps_PostEtroiture_nodes_from_LBC.txt",
+  "count": 6,
+  "voxel_size": 0.16,
+  "batch_size": 65536,
+  "padding_voxels": 2
+}

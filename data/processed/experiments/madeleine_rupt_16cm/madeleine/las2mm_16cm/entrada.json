@@ -1,0 +1,21 @@
+{
+  "source": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/madeleine_rupt_16cm/fontes/GrotteDeLaMadeleine/Filleul/pointclouds/GrotteDeLaMadeleine_Filleul_sampled_2mm_PCV_normals_classified.las",
+  "centreline": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/madeleine_rupt_16cm/fontes/GrotteDeLaMadeleine/Filleul/centreline/GrotteDeLaMadeleine_Filleul_nodes_from_LBC.txt",
+  "cave": "madeleine",
+  "survey": "Filleul",
+  "fold": "teste_externo",
+  "plan_id": "las2mm_16cm",
+  "units": "m",
+  "count": 19,
+  "passages": [
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "voxel_size": 0.16,
+  "section_search_radius_voxels": 8,
+  "batch_size": 65536,
+  "padding_voxels": 2
+}

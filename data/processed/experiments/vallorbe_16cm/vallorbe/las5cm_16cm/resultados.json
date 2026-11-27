@@ -1,0 +1,765 @@
+[
+  {
+    "recorte": "ramo_001_001",
+    "planejamento": {
+      "crop_id": "ramo_001_001",
+      "status": "pending_review",
+      "review_reasons": [
+        "outra_passagem_ou_retorno_proximo"
+      ],
+      "retained_points": 54712,
+      "cut_stations": [
+        0.64,
+        7.0378704281145765
+      ],
+      "section_bins_supported": [
+        16,
+        16
+      ],
+      "selection_radius": 5.096930484607506
+    },
+    "grade": [
+      64,
+      64,
+      64
+    ],
+    "resultado": "ambiguous_passage",
+    "motivo": "A semente ficou conectada ao exterior e o reparo não foi verificado. Relatório: /home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/vallorbe_16cm/vallorbe/las5cm_16cm/data/processed/reference_sections/vallorbe/GalerieSemiActive/teste_externo/las5cm_16cm/ramo_001_001/64x64x64_sem_volume/20261127T155102725813Z-b72bf3ce/summary.csv"
+  },
+  {
+    "recorte": "ramo_001_002",
+    "planejamento": {
+      "crop_id": "ramo_001_002",
+      "status": "pending_review",
+      "review_reasons": [
+        "outra_passagem_ou_retorno_proximo"
+      ],
+      "retained_points": 57362,
+      "cut_stations": [
+        7.0378704281145765,
+        13.595740856229154
+      ],
+      "section_bins_supported": [
+        16,
+        16
+      ],
+      "selection_radius": 4.6094421407295485
+    },
+    "grade": [
+      64,
+      64,
+      64
+    ],
+    "resultado": "ambiguous_passage",
+    "motivo": "A semente ficou conectada ao exterior e o reparo não foi verificado. Relatório: /home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/vallorbe_16cm/vallorbe/las5cm_16cm/data/processed/reference_sections/vallorbe/GalerieSemiActive/teste_externo/las5cm_16cm/ramo_001_002/64x64x64_sem_volume/20261127T155104267917Z-fc119764/summary.csv"
+  },
+  {
+    "recorte": "ramo_001_003",
+    "planejamento": {
+      "crop_id": "ramo_001_003",
+      "status": "pending_review",
+      "review_reasons": [],
+      "retained_points": 58984,
+      "cut_stations": [
+        13.595740856229154,
+        20.153611284343732
+      ],
+      "section_bins_supported": [
+        16,
+        16
+      ],
+      "selection_radius": 4.603212264852931
+    },
+    "grade": [
+      64,
+      64,
+      64
+    ],
+    "resultado": "volume_salvo",
+    "volume": "data/processed/reference_sections/vallorbe/GalerieSemiActive/teste_externo/las5cm_16cm/ramo_001_003/64x64x64",
+    "air_voxels": 28927,
+    "repair_voxels": 0,
+    "auxiliary_cap_voxels": 35,
+    "auxiliary_cap_radius_voxels": 2,
+    "candidate_volume": 118.48499200000002
+  },
+  {
+    "recorte": "ramo_001_004",
+    "planejamento": {
+      "crop_id": "ramo_001_004",
+      "status": "pending_review",
+      "review_reasons": [],
+      "retained_points": 65833,
+      "cut_stations": [
+        20.153611284343732,
+        26.71148171245831
+      ],
+      "section_bins_supported": [
+        16,
+        16
+      ],
+      "selection_radius": 4.995333631350624
+    },
+    "grade": [
+      64,
+      64,
+      64
+    ],
+    "resultado": "volume_salvo",
+    "volume": "data/processed/reference_sections/vallorbe/GalerieSemiActive/teste_externo/las5cm_16cm/ramo_001_004/64x64x64",
+    "air_voxels": 36248,
+    "repair_voxels": 0,
+    "auxiliary_cap_voxels": 11,
+    "auxiliary_cap_radius_voxels": 1,
+    "candidate_volume": 148.47180800000004
+  },
+  {
+    "recorte": "ramo_001_005",
+    "planejamento": {
+      "crop_id": "ramo_001_005",
+      "status": "pending_review",
+      "review_reasons": [],
+      "retained_points": 64594,
+      "cut_stations": [
+        26.71148171245831,
+        33.269352140572884
+      ],
+      "section_bins_supported": [
+        16,
+        16
+      ],
+      "selection_radius": 5.083053996899172
+    },
+    "grade": [
+      64,
+      64,
+      64
+    ],
+    "resultado": "volume_salvo",
+    "volume": "data/processed/reference_sections/vallorbe/GalerieSemiActive/teste_externo/las5cm_16cm/ramo_001_005/64x64x64",
+    "air_voxels": 39293,
+    "repair_voxels": 0,
+    "auxiliary_cap_voxels": 55,
+    "auxiliary_cap_radius_voxels": 2,
+    "candidate_volume": 160.94412800000003
+  },
+  {
+    "recorte": "ramo_001_006",
+    "planejamento": {
+      "crop_id": "ramo_001_006",
+      "status": "pending_review",
+      "review_reasons": [
+        "grade_excede_64_com_voxel_escolhido"
+      ],
+      "retained_points": 65986,
+      "cut_stations": [
+        33.269352140572884,
+        39.82722256868746
+      ],
+      "section_bins_supported": [
+        16,
+        16
+      ],
+      "selection_radius": 5.289261995601895
+    },
+    "grade": [
+      64,
+      66,
+      64
+    ],
+    "resultado": "volume_salvo",
+    "volume": "data/processed/reference_sections/vallorbe/GalerieSemiActive/teste_externo/las5cm_16cm/ramo_001_006/64x66x64",
+    "air_voxels": 45883,
+    "repair_voxels": 0,
+    "auxiliary_cap_voxels": 30,
+    "auxiliary_cap_radius_voxels": 4,
+    "candidate_volume": 187.93676800000003
+  },
+  {
+    "recorte": "ramo_001_007",
+    "planejamento": {
+      "crop_id": "ramo_001_007",
+      "status": "pending_review",
+      "review_reasons": [
+        "tampa_com_cobertura_insuficiente",
+        "grade_excede_64_com_voxel_escolhido"
+      ],
+      "retained_points": 89534,
+      "cut_stations": [
+        39.82722256868746,
+        46.38509299680204
+      ],
+      "section_bins_supported": [
+        16,
+        13
+      ],
+      "selection_radius": 6.7694379697186235
+    },
+    "grade": [
+      65,
+      77,
+      82
+    ],
+    "resultado": "missing_contour",
+    "motivo": "Informe um polígono UV finito e com área."
+  },
+  {
+    "recorte": "ramo_002_001",
+    "planejamento": {
+      "crop_id": "ramo_002_001",
+      "status": "pending_review",
+      "review_reasons": [
+        "outra_passagem_ou_retorno_proximo"
+      ],
+      "retained_points": 40675,
+      "cut_stations": [
+        0.96,
+        6.964987987281525
+      ],
+      "section_bins_supported": [
+        15,
+        16
+      ],
+      "selection_radius": 4.7607015077096015
+    },
+    "grade": [
+      64,
+      64,
+      64
+    ],
+    "resultado": "ambiguous_passage",
+    "motivo": "A semente ficou conectada ao exterior e o reparo não foi verificado. Relatório: /home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/vallorbe_16cm/vallorbe/las5cm_16cm/data/processed/reference_sections/vallorbe/GalerieSemiActive/teste_externo/las5cm_16cm/ramo_002_001/64x64x64_sem_volume/20261127T155122170743Z-f4047e72/summary.csv"
+  },
+  {
+    "recorte": "ramo_002_002",
+    "planejamento": {
+      "crop_id": "ramo_002_002",
+      "status": "pending_review",
+      "review_reasons": [
+        "outra_passagem_ou_retorno_proximo"
+      ],
+      "retained_points": 43825,
+      "cut_stations": [
+        6.964987987281525,
+        13.449975974563051
+      ],
+      "section_bins_supported": [
+        16,
+        16
+      ],
+      "selection_radius": 4.309600132776818
+    },
+    "grade": [
+      64,
+      64,
+      64
+    ],
+    "resultado": "ambiguous_passage",
+    "motivo": "A semente ficou conectada ao exterior e o reparo não foi verificado. Relatório: /home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/vallorbe_16cm/vallorbe/las5cm_16cm/data/processed/reference_sections/vallorbe/GalerieSemiActive/teste_externo/las5cm_16cm/ramo_002_002/64x64x64_sem_volume/20261127T155124013061Z-475fdbe3/summary.csv"
+  },
+  {
+    "recorte": "ramo_002_003",
+    "planejamento": {
+      "crop_id": "ramo_002_003",
+      "status": "pending_review",
+      "review_reasons": [
+        "grade_excede_64_com_voxel_escolhido"
+      ],
+      "retained_points": 53229,
+      "cut_stations": [
+        13.449975974563051,
+        19.934963961844577
+      ],
+      "section_bins_supported": [
+        16,
+        16
+      ],
+      "selection_radius": 4.932458499052461
+    },
+    "grade": [
+      64,
+      68,
+      64
+    ],
+    "resultado": "volume_salvo",
+    "volume": "data/processed/reference_sections/vallorbe/GalerieSemiActive/teste_externo/las5cm_16cm/ramo_002_003/64x68x64",
+    "air_voxels": 33781,
+    "repair_voxels": 0,
+    "auxiliary_cap_voxels": 14,
+    "auxiliary_cap_radius_voxels": 2,
+    "candidate_volume": 138.36697600000002
+  },
+  {
+    "recorte": "ramo_002_004",
+    "planejamento": {
+      "crop_id": "ramo_002_004",
+      "status": "pending_review",
+      "review_reasons": [],
+      "retained_points": 56024,
+      "cut_stations": [
+        19.934963961844577,
+        26.4199519491261
+      ],
+      "section_bins_supported": [
+        16,
+        16
+      ],
+      "selection_radius": 4.885635308236539
+    },
+    "grade": [
+      64,
+      64,
+      64
+    ],
+    "resultado": "volume_salvo",
+    "volume": "data/processed/reference_sections/vallorbe/GalerieSemiActive/teste_externo/las5cm_16cm/ramo_002_004/64x64x64",
+    "air_voxels": 37167,
+    "repair_voxels": 0,
+    "auxiliary_cap_voxels": 4,
+    "auxiliary_cap_radius_voxels": 1,
+    "candidate_volume": 152.23603200000002
+  },
+  {
+    "recorte": "ramo_002_005",
+    "planejamento": {
+      "crop_id": "ramo_002_005",
+      "status": "pending_review",
+      "review_reasons": [
+        "grade_excede_64_com_voxel_escolhido"
+      ],
+      "retained_points": 64749,
+      "cut_stations": [
+        26.4199519491261,
+        32.90493993640762
+      ],
+      "section_bins_supported": [
+        16,
+        16
+      ],
+      "selection_radius": 6.113360593474797
+    },
+    "grade": [
+      64,
+      70,
+      64
+    ],
+    "resultado": "volume_salvo",
+    "volume": "data/processed/reference_sections/vallorbe/GalerieSemiActive/teste_externo/las5cm_16cm/ramo_002_005/64x70x64",
+    "air_voxels": 38552,
+    "repair_voxels": 0,
+    "auxiliary_cap_voxels": 160,
+    "auxiliary_cap_radius_voxels": 4,
+    "candidate_volume": 157.90899200000004
+  },
+  {
+    "recorte": "ramo_002_006",
+    "planejamento": {
+      "crop_id": "ramo_002_006",
+      "status": "pending_review",
+      "review_reasons": [
+        "grade_excede_64_com_voxel_escolhido"
+      ],
+      "retained_points": 69113,
+      "cut_stations": [
+        32.90493993640762,
+        39.38992792368915
+      ],
+      "section_bins_supported": [
+        16,
+        16
+      ],
+      "selection_radius": 5.458916234335281
+    },
+    "grade": [
+      64,
+      70,
+      64
+    ],
+    "resultado": "escape_path_without_supported_voxels",
+    "motivo": "A semente ficou conectada ao exterior e o reparo não foi verificado. Relatório: /home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/vallorbe_16cm/vallorbe/las5cm_16cm/data/processed/reference_sections/vallorbe/GalerieSemiActive/teste_externo/las5cm_16cm/ramo_002_006/64x70x64_sem_volume/20261127T155138117033Z-10172bfc/summary.csv"
+  },
+  {
+    "recorte": "ramo_002_007",
+    "planejamento": {
+      "crop_id": "ramo_002_007",
+      "status": "pending_review",
+      "review_reasons": [
+        "grade_excede_64_com_voxel_escolhido"
+      ],
+      "retained_points": 59532,
+      "cut_stations": [
+        39.38992792368915,
+        45.87491591097067
+      ],
+      "section_bins_supported": [
+        16,
+        16
+      ],
+      "selection_radius": 4.674839172566865
+    },
+    "grade": [
+      64,
+      68,
+      66
+    ],
+    "resultado": "volume_salvo",
+    "volume": "data/processed/reference_sections/vallorbe/GalerieSemiActive/teste_externo/las5cm_16cm/ramo_002_007/64x68x66",
+    "air_voxels": 25984,
+    "repair_voxels": 0,
+    "auxiliary_cap_voxels": 20,
+    "auxiliary_cap_radius_voxels": 2,
+    "candidate_volume": 106.43046400000001
+  },
+  {
+    "recorte": "ramo_002_008",
+    "planejamento": {
+      "crop_id": "ramo_002_008",
+      "status": "pending_review",
+      "review_reasons": [
+        "grade_excede_64_com_voxel_escolhido"
+      ],
+      "retained_points": 56418,
+      "cut_stations": [
+        45.87491591097067,
+        52.3599038982522
+      ],
+      "section_bins_supported": [
+        16,
+        16
+      ],
+      "selection_radius": 5.520293661531375
+    },
+    "grade": [
+      64,
+      76,
+      72
+    ],
+    "resultado": "volume_salvo",
+    "volume": "data/processed/reference_sections/vallorbe/GalerieSemiActive/teste_externo/las5cm_16cm/ramo_002_008/64x76x72",
+    "air_voxels": 26757,
+    "repair_voxels": 0,
+    "auxiliary_cap_voxels": 58,
+    "auxiliary_cap_radius_voxels": 3,
+    "candidate_volume": 109.59667200000001
+  },
+  {
+    "recorte": "ramo_002_009",
+    "planejamento": {
+      "crop_id": "ramo_002_009",
+      "status": "pending_review",
+      "review_reasons": [
+        "tampa_com_cobertura_insuficiente",
+        "outra_passagem_ou_retorno_proximo",
+        "grade_excede_64_com_voxel_escolhido"
+      ],
+      "retained_points": 71760,
+      "cut_stations": [
+        52.3599038982522,
+        58.84489188553373
+      ],
+      "section_bins_supported": [
+        16,
+        14
+      ],
+      "selection_radius": 6.521845931630282
+    },
+    "grade": [
+      64,
+      80,
+      83
+    ],
+    "resultado": "missing_contour",
+    "motivo": "Informe um polígono UV finito e com área."
+  },
+  {
+    "recorte": "ramo_002_010",
+    "planejamento": {
+      "crop_id": "ramo_002_010",
+      "status": "pending_review",
+      "review_reasons": [
+        "tampa_com_cobertura_insuficiente",
+        "outra_passagem_ou_retorno_proximo",
+        "grade_excede_64_com_voxel_escolhido"
+      ],
+      "retained_points": 111496,
+      "cut_stations": [
+        58.84489188553373,
+        65.16987987281526
+      ],
+      "section_bins_supported": [
+        14,
+        5
+      ],
+      "selection_radius": 7.163771128760047
+    },
+    "grade": [
+      68,
+      71,
+      82
+    ],
+    "resultado": "missing_contour",
+    "motivo": "Informe um polígono UV finito e com área."
+  },
+  {
+    "recorte": "ramo_004_001",
+    "planejamento": {
+      "crop_id": "ramo_004_001",
+      "status": "pending_review",
+      "review_reasons": [
+        "tampa_com_cobertura_insuficiente",
+        "outra_passagem_ou_retorno_proximo",
+        "grade_excede_64_com_voxel_escolhido"
+      ],
+      "retained_points": 117763,
+      "cut_stations": [
+        0.48,
+        7.093593072127394
+      ],
+      "section_bins_supported": [
+        16,
+        8
+      ],
+      "selection_radius": 7.18880288608787
+    },
+    "grade": [
+      75,
+      90,
+      67
+    ],
+    "resultado": "missing_contour",
+    "motivo": "Informe um polígono UV finito e com área."
+  },
+  {
+    "recorte": "ramo_004_002",
+    "planejamento": {
+      "crop_id": "ramo_004_002",
+      "status": "pending_review",
+      "review_reasons": [
+        "tampa_com_cobertura_insuficiente",
+        "outra_passagem_ou_retorno_proximo",
+        "grade_excede_64_com_voxel_escolhido"
+      ],
+      "retained_points": 117012,
+      "cut_stations": [
+        7.093593072127394,
+        13.707186144254788
+      ],
+      "section_bins_supported": [
+        8,
+        16
+      ],
+      "selection_radius": 6.795367532448245
+    },
+    "grade": [
+      78,
+      70,
+      67
+    ],
+    "resultado": "missing_contour",
+    "motivo": "Informe um polígono UV finito e com área."
+  },
+  {
+    "recorte": "ramo_004_003",
+    "planejamento": {
+      "crop_id": "ramo_004_003",
+      "status": "pending_review",
+      "review_reasons": [],
+      "retained_points": 66683,
+      "cut_stations": [
+        13.707186144254788,
+        20.32077921638218
+      ],
+      "section_bins_supported": [
+        16,
+        16
+      ],
+      "selection_radius": 4.724278781297
+    },
+    "grade": [
+      64,
+      64,
+      64
+    ],
+    "resultado": "volume_salvo",
+    "volume": "data/processed/reference_sections/vallorbe/GalerieSemiActive/teste_externo/las5cm_16cm/ramo_004_003/64x64x64",
+    "air_voxels": 36316,
+    "repair_voxels": 0,
+    "auxiliary_cap_voxels": 8,
+    "auxiliary_cap_radius_voxels": 1,
+    "candidate_volume": 148.75033600000003
+  },
+  {
+    "recorte": "ramo_004_004",
+    "planejamento": {
+      "crop_id": "ramo_004_004",
+      "status": "pending_review",
+      "review_reasons": [
+        "outra_passagem_ou_retorno_proximo"
+      ],
+      "retained_points": 66326,
+      "cut_stations": [
+        20.32077921638218,
+        26.934372288509575
+      ],
+      "section_bins_supported": [
+        16,
+        16
+      ],
+      "selection_radius": 3.964119036021447
+    },
+    "grade": [
+      64,
+      64,
+      64
+    ],
+    "resultado": "volume_salvo",
+    "volume": "data/processed/reference_sections/vallorbe/GalerieSemiActive/teste_externo/las5cm_16cm/ramo_004_004/64x64x64",
+    "air_voxels": 32256,
+    "repair_voxels": 0,
+    "auxiliary_cap_voxels": 0,
+    "auxiliary_cap_radius_voxels": 0,
+    "candidate_volume": 132.12057600000003
+  },
+  {
+    "recorte": "ramo_004_005",
+    "planejamento": {
+      "crop_id": "ramo_004_005",
+      "status": "pending_review",
+      "review_reasons": [
+        "outra_passagem_ou_retorno_proximo",
+        "grade_excede_64_com_voxel_escolhido"
+      ],
+      "retained_points": 77432,
+      "cut_stations": [
+        26.934372288509575,
+        32.267965360636964
+      ],
+      "section_bins_supported": [
+        16,
+        15
+      ],
+      "selection_radius": 5.669999587884069
+    },
+    "grade": [
+      64,
+      69,
+      64
+    ],
+    "resultado": "ambiguous_passage",
+    "motivo": "A semente ficou conectada ao exterior e o reparo não foi verificado. Relatório: /home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/vallorbe_16cm/vallorbe/las5cm_16cm/data/processed/reference_sections/vallorbe/GalerieSemiActive/teste_externo/las5cm_16cm/ramo_004_005/64x69x64_sem_volume/20261127T155150652754Z-6e44f791/summary.csv"
+  },
+  {
+    "recorte": "ramo_006_001",
+    "planejamento": {
+      "crop_id": "ramo_006_001",
+      "status": "pending_review",
+      "review_reasons": [
+        "tampa_com_cobertura_insuficiente",
+        "outra_passagem_ou_retorno_proximo",
+        "grade_excede_64_com_voxel_escolhido"
+      ],
+      "retained_points": 39649,
+      "cut_stations": [
+        0.48,
+        4.361152956457174
+      ],
+      "section_bins_supported": [
+        6,
+        16
+      ],
+      "selection_radius": 6.601157824758185
+    },
+    "grade": [
+      64,
+      77,
+      64
+    ],
+    "resultado": "missing_contour",
+    "motivo": "Informe um polígono UV finito e com área."
+  },
+  {
+    "recorte": "ramo_006_002",
+    "planejamento": {
+      "crop_id": "ramo_006_002",
+      "status": "pending_review",
+      "review_reasons": [
+        "tampa_com_cobertura_insuficiente",
+        "outra_passagem_ou_retorno_proximo",
+        "grade_excede_64_com_voxel_escolhido"
+      ],
+      "retained_points": 68084,
+      "cut_stations": [
+        4.361152956457174,
+        8.242305912914347
+      ],
+      "section_bins_supported": [
+        16,
+        13
+      ],
+      "selection_radius": 8.129806652018917
+    },
+    "grade": [
+      65,
+      68,
+      72
+    ],
+    "resultado": "missing_contour",
+    "motivo": "Informe um polígono UV finito e com área."
+  },
+  {
+    "recorte": "ramo_007_001",
+    "planejamento": {
+      "crop_id": "ramo_007_001",
+      "status": "pending_review",
+      "review_reasons": [
+        "tampa_com_cobertura_insuficiente",
+        "outra_passagem_ou_retorno_proximo"
+      ],
+      "retained_points": 23760,
+      "cut_stations": [
+        0.48,
+        6.387935197609703
+      ],
+      "section_bins_supported": [
+        3,
+        2
+      ],
+      "selection_radius": 6.999806703561888
+    },
+    "grade": [
+      64,
+      64,
+      64
+    ],
+    "resultado": "missing_contour",
+    "motivo": "Informe um polígono UV finito e com área."
+  },
+  {
+    "recorte": "ramo_011_001",
+    "planejamento": {
+      "crop_id": "ramo_011_001",
+      "status": "pending_review",
+      "review_reasons": [
+        "tampa_com_cobertura_insuficiente",
+        "outra_passagem_ou_retorno_proximo"
+      ],
+      "retained_points": 25136,
+      "cut_stations": [
+        0.08,
+        4.592831695749329
+      ],
+      "section_bins_supported": [
+        13,
+        6
+      ],
+      "selection_radius": 6.941675762897608
+    },
+    "grade": [
+      64,
+      64,
+      64
+    ],
+    "resultado": "missing_contour",
+    "motivo": "Informe um polígono UV finito e com área."
+  }
+]

@@ -1,0 +1,122 @@
+[
+  {
+    "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/juncoes_auto/inventario_complemento_full1x_16cm/ramo_001_009.json",
+    "falha_anterior": "missing_contour",
+    "config_original": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/auto_full10x_16cm_rev/ramo_001_009/crop_validacao.json",
+    "juncoes_previstas": [
+      "5865abbe2035/juncao_001"
+    ]
+  },
+  {
+    "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/juncoes_auto/inventario_complemento_full1x_16cm/ramo_001_010.json",
+    "falha_anterior": "missing_contour",
+    "config_original": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/auto_full10x_16cm_rev/ramo_001_010/crop_validacao.json",
+    "juncoes_previstas": [
+      "5865abbe2035/juncao_001"
+    ]
+  },
+  {
+    "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/juncoes_auto/inventario_complemento_full1x_16cm/ramo_002_001.json",
+    "falha_anterior": "missing_contour",
+    "config_original": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/auto_full10x_16cm_rev/ramo_002_001/crop_validacao.json",
+    "juncoes_previstas": [
+      "5865abbe2035/juncao_002"
+    ]
+  },
+  {
+    "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/juncoes_auto/inventario_complemento_full1x_16cm/ramo_007_001.json",
+    "falha_anterior": "missing_contour",
+    "config_original": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/auto_full10x_16cm_rev/ramo_007_001/crop_validacao.json",
+    "juncoes_previstas": [
+      "5865abbe2035/juncao_003"
+    ]
+  },
+  {
+    "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/juncoes_auto/inventario_complemento_full1x_16cm/ramo_007_002.json",
+    "falha_anterior": "missing_contour",
+    "config_original": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/auto_full10x_16cm_rev/ramo_007_002/crop_validacao.json",
+    "juncoes_previstas": [
+      "5865abbe2035/juncao_003"
+    ]
+  },
+  {
+    "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/juncoes_auto/inventario_complemento_full1x_16cm/ramo_007_003.json",
+    "falha_anterior": "missing_contour",
+    "config_original": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/auto_full10x_16cm_rev/ramo_007_003/crop_validacao.json",
+    "juncoes_previstas": [
+      "5865abbe2035/juncao_003"
+    ]
+  },
+  {
+    "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/juncoes_auto/inventario_complemento_full1x_16cm/ramo_008_001.json",
+    "falha_anterior": "missing_contour",
+    "config_original": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/auto_full10x_16cm_rev/ramo_008_001/crop_validacao.json",
+    "juncoes_previstas": [
+      "5865abbe2035/juncao_003"
+    ]
+  },
+  {
+    "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/juncoes_auto/inventario_complemento_full1x_16cm/ramo_008_002.json",
+    "falha_anterior": "missing_contour",
+    "config_original": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/auto_full10x_16cm_rev/ramo_008_002/crop_validacao.json",
+    "juncoes_previstas": [
+      "5865abbe2035/juncao_003"
+    ]
+  },
+  {
+    "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/juncoes_auto/inventario_complemento_full1x_16cm/ramo_008_004.json",
+    "falha_anterior": "missing_contour",
+    "config_original": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/auto_full10x_16cm_rev/ramo_008_004/crop_validacao.json",
+    "juncoes_previstas": [
+      "5865abbe2035/juncao_007"
+    ]
+  },
+  {
+    "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/juncoes_auto/inventario_complemento_full1x_16cm/ramo_008_005.json",
+    "falha_anterior": "missing_contour",
+    "config_original": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/auto_full10x_16cm_rev/ramo_008_005/crop_validacao.json",
+    "juncoes_previstas": [
+      "5865abbe2035/juncao_007"
+    ]
+  },
+  {
+    "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/juncoes_auto/inventario_complemento_full1x_16cm/ramo_009_002.json",
+    "falha_anterior": "missing_contour",
+    "config_original": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/auto_full10x_16cm_rev/ramo_009_002/crop_validacao.json",
+    "juncoes_previstas": [
+      "5865abbe2035/juncao_004"
+    ]
+  },
+  {
+    "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/juncoes_auto/inventario_complemento_full1x_16cm/ramo_009_003.json",
+    "falha_anterior": "missing_contour",
+    "config_original": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/auto_full10x_16cm_rev/ramo_009_003/crop_validacao.json",
+    "juncoes_previstas": [
+      "5865abbe2035/juncao_004"
+    ]
+  },
+  {
+    "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/juncoes_auto/inventario_complemento_full1x_16cm/ramo_006_001.json",
+    "falha_anterior": "missing_contour",
+    "config_original": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/auto_ramos_adicionais_16cm/ramo_006_001/crop_validacao.json",
+    "juncoes_previstas": [
+      "5865abbe2035/juncao_003"
+    ]
+  },
+  {
+    "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/juncoes_auto/inventario_complemento_full1x_16cm/ramo_018_001.json",
+    "falha_anterior": "missing_contour",
+    "config_original": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/auto_ramos_adicionais_16cm/ramo_018_001/crop_validacao.json",
+    "juncoes_previstas": [
+      "5865abbe2035/juncao_011"
+    ]
+  },
+  {
+    "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/juncoes_auto/inventario_complemento_full1x_16cm/ramo_002_002.json",
+    "falha_anterior": "ambiguous_passage",
+    "config_original": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/full10x_16cm_rev/ramo_002_002/crop.json",
+    "juncoes_previstas": [
+      "5865abbe2035/juncao_002"
+    ]
+  }
+]

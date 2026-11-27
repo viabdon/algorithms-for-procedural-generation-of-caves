@@ -6,6 +6,306 @@ interior por flood fill. Os arquivos brutos são lidos diretamente, inclusive de
 um HD externo. O processamento é determinístico para uma mesma entrada,
 configuração e implementação; não há seed aleatória nesta preparação.
 
+## Piloto local de recortes por galeria
+
+Na raiz do repositório, abra `.venv/bin/python -m cavegen.datastream` e
+escolha **2 — Preparar recortes por galeria**. A opção **1** do submenu lista
+as nuvens do HD (a pasta pode ser alterada). Copie o
+[modelo JSON](../configs/crops/gallery.template.json) para um arquivo por
+trecho. A opção **2** confere a configuração e mostra o destino e a partição
+sem ler os pontos. A opção **3 — Voxelizar recortes** oferece
+dois modos de entrada.
+
+- **1 — Um recorte (crop.json)** recebe o arquivo do
+  trecho, como `ramo_001_001/crop.json`.
+- **2 — Recortes em lote (pasta ou plan.json)** recebe a pasta do
+  plano ou seu `plan.json`. O menu procura `crop.json` nas subpastas
+  imediatas e percorre os recortes em ordem de nome da pasta. Os avisos
+  mostram a posição no conjunto, o identificador do recorte e a
+  contagem de pontos. Ao final, o menu resume os recortes processados,
+  os pulados por terem uma saída existente e os que tiveram erro.
+
+Digite `PROCESSAR` para confirmar a execução. O processamento testa
+o fechamento original e inicia o
+[diagnóstico de vazamento](#quando-o-flood-fill-encontra-o-exterior)
+se alcançar a borda pela semente. Na opção **4**, informe a pasta da execução para salvar
+`fatias.html` com as três fatias ortogonais pela semente e
+`volume.html` com a vista 3D dos voxels. Na vista 3D, clique na
+legenda para alternar superfície observada, ar candidato e tampas. A
+superfície e o ar aparecem ao abrir, e as tampas começam ocultas.
+
+Para autorizar tampas sintéticas em um recorte, defina
+`auxiliary_cap_radius_voxels` no seu JSON. O valor padrão 0 desativa a
+etapa. Valores inteiros de 1 a 8 limitam o raio do fechamento morfológico
+em voxels. O ensaio de Archamps usou 4, ou 64 cm na grade de 16 cm.
+O algoritmo só tenta essa etapa quando o reparo local falha e a passagem
+não está marcada como ambígua. Ele testa raios crescentes e retém células
+da borda sintética em contato com o ar da semente. O ar deve alcançar
+ambas as tampas das extremidades e incluir as sementes das janelas que
+fecharam no diagnóstico. O flood fill a partir do exterior verifica o
+resultado salvo.
+
+A opção 4 mostra as tampas auxiliares em vermelho. Em `masks.npz`,
+`auxiliary_caps` marca a hipótese de fechamento, `repair` marca o reparo
+local e `caps` guarda as duas extremidades. O relatório `summary.csv`
+registra as contagens e o raio usado. A revisão geométrica deve verificar
+se alguma abertura correspondia à continuação de uma passagem.
+
+### Propor e extrair recortes pela linha central
+
+1. Copie o [modelo de planejamento](../configs/crops/plan.template.json) e
+   informe a nuvem, o número desejado em `count` e o lado físico do voxel
+   em `voxel_size`. Para usar a linha de Racine, indique o arquivo
+   `*_nodes_from_LBC.txt` com o `*_links_from_LBC.txt` correspondente na
+   mesma pasta. O NPZ experimental do Elaphes também é aceito, com os campos
+   `nodes_xyz` e `edges`. O grafo deve estar no mesmo sistema da nuvem.
+   Os caminhos no JSON são absolutos ou relativos ao próprio JSON.
+2. Use a opção **5**. O menu aceita um caminho de linha central para esta
+   execução. Se o campo e a resposta estiverem vazios, estima a linha em
+   CPU e salva `centreline.npz` no plano. Para esse modo, instale o extra
+   com `uv sync --locked --extra centreline`. Com grafo pronto, o planejador
+   percorre a nuvem duas vezes para estimar seções e extrair pontos. A
+   geração da linha central acrescenta uma leitura em lotes. Com
+   `section_search_radius_voxels` maior que zero, há uma leitura
+   adicional para comparar a nuvem original com o filtro por ramo e
+   testar outras estações. O modelo de plano usa oito voxels.
+   [Revisão de contornos](planejamento-recortes-voxelizacao.md#revisão-de-contornos-no-planejador)
+3. Quando quiser visualizar, use a opção **6** e informe a pasta do plano,
+   seu `plan.json` ou o `cloud.ply` de um dos recortes. Escolha **1** para
+   agrupar os recortes com pontos em um único `recortes.html`, com
+   uma cor por trecho e até 60.000 pontos distribuídos entre eles. Na
+   legenda, clique no nome para mostrar ou ocultar o trecho. Escolha **2**
+   para salvar um `recorte.html` ao lado de cada PLY em uma só
+   execução, com até 60.000 pontos por recorte. Abra os HTMLs no navegador.
+   Use **Mostrar tampas** para sobrepor todos os contornos disponíveis ou
+   alterne uma extremidade pela legenda. Os contornos vêm do `crop.json` e
+   ficam ocultos ao abrir o HTML. Extremidades sem polígono ficam sem contorno.
+   Na coluna à esquerda, use **Mostrar linha central** para ver o eixo entre
+   as estações de cada recorte quando o grafo estiver disponível. **Mostrar candidatas**
+   sobrepõe os contornos tracejados da revisão de cortes e marca as estações
+   testadas cujo polígono não foi salvo. Passe o cursor para ver a estação,
+   a cobertura angular e o resultado da checagem de espaçamento. Os três
+   controles funcionam de forma independente. Um PLY informado no modo **2**
+   gera apenas a prévia individual daquele recorte.
+4. Revise o PLY, os alertas, os contornos e a semente do `crop.json`.
+   Use a opção **2** para validar a configuração e, após a revisão, a
+   opção **3** para voxelizar e aplicar o flood fill a um recorte ou ao
+   conjunto do plano. No caso de Elaphes,
+   a etapa de recorte pode usar o grafo experimental no seu domínio de
+   validade. A voxelização pelo menu exige que a caverna e o fold constem na
+   auditoria.
+
+Por padrão, as propostas ficam em
+`data/processed/crop_plans/<caverna>/<levantamento>/<fold>/<plano>/`.
+O nome do JSON é usado como identificador do plano, ou pode ser substituído
+por `plan_id`. O diretório guarda `plan.json`, o grafo gerado quando
+aplicável e uma pasta por recorte com `crop.json` e o PLY quando há pontos.
+Os volumes gerados a partir desse plano ficam em
+`data/processed/reference_sections/<caverna>/<levantamento>/<fold>/<plano>/<recorte>/<resolucao>/`.
+Isso permite comparar planos ou folds sem sobrescrever recortes numerados
+da mesma forma.
+
+Os parâmetros em `centreline_extraction` vêm do ensaio exploratório do
+Elaphes. A contração usa o laplaciano robusto e uma solução esparsa em
+SciPy. O amostrador mantém o primeiro ponto por célula e dobra
+`sample_spacing` quando o total passa de `max_samples`. Depois da
+contração, `node_spacing` reduz os nós e uma árvore geradora mínima no
+grafo de vizinhos os conecta. O `plan.json` registra a escala amostral
+efetiva, versões e componentes. A geometria estimada continua candidata
+à revisão, especialmente se houver conexões longas ou contração excessiva.
+
+O planejamento distribui N por comprimento ao longo dos caminhos entre
+pontas e junções, evitando colocar planos no nó de bifurcação. Cada ponto é
+associado aproximadamente à linha central por uma busca espacial e uma
+projeção na aresta candidata. O recorte usa posição ao longo do percurso,
+distância transversal e os dois planos. A estimativa do raio de seleção
+usa o percentil 99 das distâncias observadas mais um voxel, com espaço
+para o contorno proposto. A proximidade de outra passagem ou de uma parte
+distante do mesmo caminho gera um alerta. É possível obter menos que N
+quando os caminhos são curtos para a escala escolhida.
+
+Para as tampas, o código compara três candidatos por posição de corte e
+mede a cobertura dos pontos projetados em faixas angulares. Lacunas
+relevantes deixam o contorno em branco para revisão. A margem
+`padding_voxels` se aplica à grade, separada do raio que seleciona pontos.
+Trechos que excedem 64 células em algum eixo na escala escolhida recebem
+um alerta. Revise todos os candidatos antes do flood fill.
+
+Para planejar uma lista explícita de ramos, use `passages` com os
+índices originais do grafo, a partir de 1. Por exemplo, use
+`"passages": [3, 7]` e `"count": 2` para produzir um recorte de cada
+ramo. Use um `count` maior para dividir os ramos selecionados, respeitando
+o mínimo de oito voxels úteis por trecho após as margens. Cada ramo
+solicitado precisa comportar ao menos um recorte. Omitir `passages`
+mantém a priorização automática dos intervalos mais longos.
+
+Em uma cópia do plano, use `section_overrides` para fixar cortes examinados
+na nuvem original. `passage` começa em 1, como em `passagem_001`. `cut`
+começa em 0 na extremidade inicial. O corte 1 é compartilhado pelo
+primeiro e pelo segundo recorte da passagem. `station` é a distância
+ao longo da linha central nas unidades do plano. Para manter os recortes
+em ordem, a separação entre cortes tem de ser de pelo menos oito voxels.
+
+```json
+{
+  "section_overrides": [
+    {"passage": 1, "cut": 0, "station": 0.16, "contour": "connected"},
+    {"passage": 1, "cut": 5, "station": 43.620740923070285}
+  ]
+}
+```
+
+Nos cortes fixados, a estimativa usa o plano da estação informada.
+O modo `radial`, padrão, usa os pontos projetados em conjunto.
+O modo `connected` agrupa os pontos em células vizinhas no plano, com
+lado de dois voxels. A tampa usa o único componente que sustenta um
+contorno com pelo menos 14 de 16 faixas angulares e lacunas isoladas.
+Se houver dois contornos aptos, a seção fica pendente com o alerta
+`tampa_com_contornos_concorrentes`. O mesmo plano e polígono são usados
+pelos dois recortes vizinhos, com normais opostas.
+
+Os PLYs contêm apenas XYZ dos pontos retidos, em coordenadas locais, com
+24 bytes por ponto no corpo do arquivo.
+Some `source_origin_xyz` (gravado no plano e nos JSONs) para recuperar as
+coordenadas da fonte. A prévia usa uma amostra. A voxelização usa todos os
+pontos do PLY. Alterar os limites no JSON permite filtrar esse arquivo,
+enquanto recuperar pontos excluídos exige uma nova extração.
+
+### Configuração de um recorte
+
+- `source` aceita XYZ, PLY, F32 e LAS, com caminho absoluto ou relativo ao
+  JSON. `cave` e `fold` são os IDs da
+  [auditoria GAN](auditoria/gan/splits.json) e determinam a partição.
+  `survey`, `branch` e `crop_id` identificam o levantamento, o ramo
+  revisado e o trecho. Comece com uma passagem simples de treino. Por exemplo,
+  `archamps` é treino em `holdout_indian_tunnel`.
+- `selection_min_xyz` e `selection_max_xyz` delimitam a caixa candidata,
+  com mínimos inclusivos e máximos exclusivos. Inclua contexto além dos
+  planos. A seleção efetiva é a interseção da caixa com o lado interno de
+  cada plano. Revise se a caixa contém uma só passagem e se preserva paredes,
+  piso e teto. Os bounds globais em `data/params/` descrevem os levantamentos.
+- `sections` contém os dois cortes. `point_xyz` é a origem de cada plano,
+  `inward_normal_xyz` aponta para dentro do trecho e `u_xyz` orienta o
+  primeiro eixo do plano. O código projeta U no plano e o normaliza, depois
+  calcula **V = N × U** com a normal unitária N. Assim, U e V são
+  perpendiculares e dão dois eixos no próprio plano. Para um ponto P com
+  origem O, `u = (P − O) · U` e `v = (P − O) · V` dão as coordenadas
+  usadas para testar se o centro do voxel cai no `polygon_uv` revisado.
+  Informe os vértices do contorno em ordem. Se inverter N e conservar U,
+  V também inverte. Confira o sinal nas duas extremidades.
+- `origin_xyz`, `shape_zyx` e `voxel_size` definem a grade, com voxels
+  cúbicos e margem livre ao redor da barreira. Use o mesmo sistema de
+  coordenadas da fonte e registre a unidade em `units`. Para comparar
+  resoluções no mesmo domínio físico, dobre o shape e reduza o lado do
+  voxel à metade. A `plane_tolerance` deve ser pequena frente ao voxel.
+- `seed_xyz` marca um ponto revisado dentro da passagem. O flood fill
+  percorre voxels livres por seis vizinhos de face. No recorte, o código
+  parte da semente e verifica se a componente alcança a borda. Se a
+  semente estiver ocupada, `seed_search_radius_voxels` limita a busca
+  automática por outra posição (padrão 4, zero desativa). O volume
+  com semente reposicionada exige confirmação pelo exterior e contato
+  com as duas tampas. Barreira na borda, tampas sem contato com a parede
+  e busca sem candidata exigem revisão. Para uma semente livre
+  conectada ao exterior, o menu inicia o diagnóstico automático.
+  [Busca automática da semente](planejamento-recortes-voxelizacao.md#busca-automática-quando-a-semente-cai-na-barreira)
+- `batch_size` limita o lote de leitura. `progress_every` define a
+  frequência do aviso em pontos lidos, com `0` para desativar.
+  A nuvem é percorrida uma vez por recorte.
+
+Para a configuração manual, as saídas ficam em
+`data/processed/reference_sections/<caverna>/<levantamento>/<recorte>/<resolucao>/`.
+`surface.npz` contém a parede observada. `masks.npz` reúne as duas
+tampas em `caps` e a máscara `repair`. `interior.npz` contém o ar
+candidato em ZYX, e `run.json` guarda a configuração,
+partição, contagens e status `pending_review`. Revise se o interior se
+mantém contínuo e estável frente a pequenas mudanças de corte e resolução.
+O [planejamento dos recortes](planejamento-recortes-voxelizacao.md) descreve
+a metodologia e os critérios ainda pendentes antes de usar os volumes no treino.
+
+### Quando o flood fill encontra o exterior
+
+1. **Delimitar a falha.** O diagnóstico reutiliza a grade, testa se os planos
+   de corte completos barram a fuga e percorre a galeria com duas tampas
+   temporárias. A varredura usa janelas de oito voxels com avanço de quatro.
+   Nas janelas que vazam, move um plano por vez em passos de um voxel.
+   Cada tentativa fica registrada por intervalo e estado da semente.
+2. **Investigar os bins.** Um caminho de fuga é rastreado na grade por
+   vizinhança de face. O código conta os pontos do PLY e, se a fonte estiver
+   disponível, da nuvem original nos mesmos bins próximos do caminho.
+   O `plan.json` dá a proveniência. Se os caminhos tiverem mudado, use
+   `leak_diagnostics.raw_source` e `leak_diagnostics.centreline` no
+   `crop.json`, com caminhos absolutos ou relativos a esse JSON. Use a
+   mesma nuvem e a mesma linha central do plano. O relatório identifica
+   a projeção usada e a disponibilidade da comparação.
+3. **Testar um reparo pequeno.** Os candidatos precisam de pontos da fonte
+   dentro da seleção ou continuidade local da parede, inferida com apoio em
+   direções opostas. O algoritmo testa voxels sobre rotas que efetivamente
+   vazam. O orçamento é de até 12 voxels. A checagem final exige fechamento
+   do recorte inteiro após retirar as tampas móveis e preserva as sementes
+   das janelas que já fecharam. O resultado continua pendente de revisão.
+4. **Verificar por inundação exterior.** A busca se propaga a partir da
+   semente. Para conferir a conclusão, a pipeline reclassifica a grade
+   partindo da borda, compara a componente à máscara de ar e retira cada
+   voxel de reparo por vez. A semente deve voltar a ser alcançada pelo
+   exterior sem cada voxel publicado. Remover cada tampa também é testado
+   e documenta quanto o fechamento depende dos cortes.
+
+### Relatório por recorte e reprodução
+
+Cada execução concluída grava `<resolucao>/relatorio_volume/`. Se uma checagem
+de superfície, margem, contato, semente ou fechamento impedir a publicação,
+o menu aponta para `<resolucao>_sem_volume/<tentativa>/summary.csv`.
+O nome curto `_sem_volume` identifica o histórico ao lado da pasta da
+resolução. A opção 4 também reconhece as pastas antigas de relatórios e
+tentativas. Quando há uma amostra da fuga, a visualização se chama
+`vazamento.html`.
+
+| Arquivo | O que registra |
+| --- | --- |
+| `summary.csv` | Uma linha por execução, com fonte, método, versões de bibliotecas, parâmetros, grade, busca da semente, estado da comparação e desfecho. |
+| `checks.csv` | Checagens de superfície, margem, contato, semente, comparação do ar e retirada de tampas ou de voxels de reparo. |
+| `probes.csv` | Planos completos, deslocamentos das tampas e janelas da busca com intervalo físico e estado da semente. |
+| `bins.csv` | Bins suspeitos em ZYX, centro XYZ na origem da fonte, contagens do PLY e do original, apoio geométrico e remendo publicado. |
+| `paths.csv` | Trajetórias de fuga com IDs e coordenadas dos voxels em ordem. |
+| `preview_data.npz` | Máscaras locais pequenas e amostras de pontos necessárias à inspeção no Plotly. |
+
+As duas primeiras tabelas bastam quando a geometria falha antes da busca
+ou o recorte fecha sozinho. As demais saídas são gravadas quando há
+busca por vazamento. Os CSVs usam UTF-8, vírgula como separador e ponto
+decimal. Valor vazio significa que aquela informação não se aplica ou
+não foi medida. Um `0` nas contagens significa que o bin foi checado e
+nenhum ponto foi encontrado. Em `checks.csv`, `expected` e `passed`
+ficam vazios nas ablações informativas das tampas.
+
+Passe a pasta da execução, a da tentativa ou o `summary.csv` à opção **4**.
+Quando existe uma amostra local, o menu gera três fatias com camadas
+alternáveis de trajetória e pontos. O HTML amostra os pontos para
+visualização. As contagens em `bins.csv` usam todos os pontos relevantes.
+Os volumes das janelas temporárias ficam em memória. Os dados binários
+da visualização ficam no NPZ comprimido, e o `run.json` continua sendo
+o recibo de configuração da execução.
+
+Para repetir só a reclassificação e as retiradas usando os NPZs já
+salvos, sem reler a nuvem, execute na raiz do projeto:
+
+```bash
+.venv/bin/python -m cavegen.datastream.gallery_reports CAMINHO_DA_RESOLUCAO
+```
+
+O comando grava `relatorio_volume/checks_replay.csv`. Para repetir também a
+localização da fuga e as contagens do PLY e do original, use uma cópia
+do `crop.json` na mesma pasta, preservando o `crop_id` e usando um
+`plan_id` diferente no modo **3 → 1**. Em Python, é possível reaproveitar o
+mesmo `crop.json` e trocar apenas o destino com
+`dataclasses.replace(prepare_crop(config), destination=novo_destino)`
+antes de chamar `process_crop`. No caso de Archamps, a rechecagem usou a
+configuração local `crop_rechecagem_original.json` com os caminhos
+atualizados do LAS e da linha central.
+
+O [histórico e os critérios do piloto](plano-reconstrucao-secoes.md#evolucao-do-piloto-em-archamps)
+explicam por que o 003 motivou a varredura e como interpretar um reparo
+verificado sem confundi-lo com uma observação da superfície.
+
 ## Ambiente e menu
 
 Na raiz de uma cópia do projeto, prepare o ambiente conforme a seção de
@@ -17,7 +317,8 @@ dependências, execute `uv sync --locked`. O comando curto do menu é:
 ```
 
 O menu da datastream funciona independentemente do menu de benchmark e da
-integração dos geradores CA/Random Walk. Ele solicita:
+integração dos geradores CA/Random Walk. A opção **1** voxeliza a nuvem
+inteira e solicita:
 
 1. Caminho da nuvem, aceitando espaços e caminhos entre aspas.
 2. Resolução ZYX: um lado para grade cúbica, como `64`, ou três dimensões,
@@ -28,9 +329,11 @@ integração dos geradores CA/Random Walk. Ele solicita:
 5. Lote de leitura, padrão 65.536 pontos, e intervalo de progresso,
    padrão 1.000.000 de pontos; `0` desativa os avisos por pontos.
 6. Uso do flood fill, habilitado por padrão no menu.
-7. Execução em primeiro plano, em background ou cancelamento.
+7. Execução em primeiro plano, em segundo plano ou cancelamento.
 
-O menu mostra o comando equivalente antes de executar. Para preservar ensaios
+O menu mostra o comando equivalente antes de executar. Caminhos dentro
+da pasta atual aparecem em formato relativo, e o registro do comando
+inclui a pasta de trabalho para reprodução. Para preservar ensaios
 anteriores, recusa uma pasta com arquivos de saída conflitantes: escolha outra
 pasta para uma configuração ou execução diferente. As entradas numéricas e os
 caminhos são conferidos antes do lançamento; o leitor valida o conteúdo durante

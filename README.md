@@ -1,10 +1,11 @@
 # CaveGen TCC — Algoritmos de Geração Procedural de Cavernas 3D
 
-> **Estado em 06/11/2026:** a `feat/neural-models` incorporou a `main` em
-> `a7dd1e7`. O benchmark e o menu ainda falham ao importar o CA; as instruções
-> dependentes deles abaixo ficam condicionadas à integração pendente de Felipe.
-> A suíte local executou 116 testes: 2 erros de importação e 2 ignorados.
-> Veja o [roadmap](docs/roadmap.md) e o [plano neural](docs/plano-redes-neurais.md).
+> **Estado em 17/11/2026:** a GAN tem código, configurações e notebook Colab,
+> sem treino nas referências. A auditoria rejeitou os interiores globais atuais;
+> a próxima etapa é [preparar recortes por seções](docs/planejamento-recortes-voxelizacao.md).
+> O benchmark/menu dos clássicos ainda dependem da integração da API do CA.
+> Veja o [roadmap](docs/roadmap.md), o [plano neural](docs/plano-redes-neurais.md)
+> e a [verificação da implementação](docs/auditoria/gan/verificacao.md).
 > Os documentos externos do projeto de TC, inclusive os intitulados atualizados,
 > estão desatualizados em relação ao rollback descrito na arquitetura.
 
@@ -21,8 +22,9 @@ A arquitetura prioriza um pipeline científico **offline-first**:
    domínio, resolução, sementes e orçamento documentados.
 3. O Plotly permite inspecionar os resultados em HTML. A pesquisa compara a estrutura
    dos volumes e o custo dos algoritmos de geração. As métricas são calculadas nos voxels.
-4. GAN, PCGRL e PCGARL estão em planejamento; o pacote contém um protótipo de CA
-   com peso espacial. O ajuste genético de parâmetros de CA e Random Walk
+4. GAN tem pipeline de ocupação/SDF preparado para Colab, aguardando dados
+   geométricos adequados. PCGRL e PCGARL continuam em planejamento; o pacote
+   contém um protótipo de CA com peso espacial. O ajuste genético de CA e Random Walk
    está planejado; seus espaços de busca e orçamento ainda serão definidos.
 5. O Elaphes permanece referência de superfície para inspeção qualitativa,
    sem IoU volumétrica ou SDF real no benchmark atual.
@@ -39,6 +41,8 @@ estão reunidas nas seções abaixo:
 - [Geração automatizada pela CLI](#primeiro-teste-pela-cli).
 - [Avaliação, parsing e geração pela API Python](#api-python-para-scripts-e-notebooks).
 - [Voxelização de superfície](#voxelização-direta-de-superfície-para-diagnóstico).
+- [Planejamento dos recortes de galeria](docs/planejamento-recortes-voxelizacao.md),
+  [resumo do gargalo](docs/resumo-gargalo-gan.md) e [notebook GAN no Colab](notebooks/colab/README.md).
 - [Malhas](#exportação-de-volumes-gerados-para-malha) e [visualização](#visualização-de-volumes).
 - [Ferramentas legadas e frentes futuras](#interfaces-legadas-e-frentes-futuras).
 - [Roteiro de reprodução científica](#roteiro-de-reprodução-do-experimento).
@@ -152,27 +156,21 @@ cada conjunto. O processamento deve continuar incremental, preservar
 
 ## Validação para contribuições e forks
 
-Depois de sincronizar as dependências, execute a suíte unitária completa antes
-de abrir um PR, criar um commit importante ou integrar mudanças de outra
-branch:
+Execute os testes de Python e dos recortes com pytest.
 
 ```bash
-uv run python -m unittest discover -s tests -v
+uv run --locked --extra test --extra centreline pytest --continue-on-collection-errors
 ```
 
-Para investigar apenas um módulo, substitua o caminho pelo arquivo desejado:
-
-```bash
-uv run python -m unittest tests/test_normalization.py -v
-```
+Inclua `--extra gan` no comando do uv para executar também os testes que
+requerem PyTorch. Para testar apenas um módulo, acrescente o caminho após
+`pytest`, como `tests/test_normalization.py`.
 
 Os comandos mais usados têm atalhos no `pyproject.toml`, pelo Poe the Poet:
 
 ```bash
 uv run poe                                  # lista os atalhos
-uv run poe test                             # suíte completa, com relatório por módulo
-uv run poe test --detalhe                   # cada teste e o traceback inteiro
-uv run poe test-um tests/test_volume.py     # um módulo, teste por teste
+uv run poe test-um tests/test_volume.py     # relatório unittest de um módulo
 uv run poe menu-ca                          # menu do CA
 uv run poe menu-rw                          # menu do Random Walk
 uv run poe ui                               # bancada Streamlit do CA
@@ -404,9 +402,17 @@ Para preparar nuvens XYZ, PLY, F32 ou LAS pelo menu independente dos geradores:
 .venv/bin/python -m cavegen.datastream
 ```
 
-O menu solicita entrada, resolução, pasta, limites, lote, progresso e flood
-fill. Permite executar em primeiro plano ou em background, mostra o comando
-equivalente e protege saídas anteriores. Cada geração concluída salva
+Para recortes de galeria, escolha a opção **2** e use a configuração JSON
+descrita no [guia do piloto local](docs/preparacao-volumes.md#piloto-local-de-recortes-por-galeria).
+A preparação do recorte testa a conectividade, usa tampas móveis para
+localizar vazamentos e guarda remendos verificados em uma máscara própria.
+A inspeção no Plotly mostra parede, tampas, reparo e ar candidato. Consulte
+as etapas e as saídas no [guia de diagnóstico](docs/preparacao-volumes.md#quando-o-flood-fill-encontra-o-exterior).
+
+A opção **1** voxeliza a nuvem inteira e solicita entrada, resolução, pasta,
+limites, lote, progresso e flood fill. Permite executar em primeiro plano ou
+em background, mostra o comando equivalente e protege saídas anteriores.
+Cada geração concluída salva
 `<saida>.run.json` com configuração efetiva, comando e versões. O progresso é
 impresso a cada milhão de pontos tanto nos limites quanto na voxelização,
 com contadores separados por etapa. A etapa de flood fill funciona com todos
@@ -565,9 +571,9 @@ de cada gerador, como o histórico do CA ou os caminhos do Random Walk.
 | --- | --- | --- |
 | Resumo estatístico legado | `uv run python -m cavegen.benchmark.summarize_results --input results/csv/baseline_32.csv --output results/csv/baseline_32_summary.csv` | Agrupa apenas por algoritmo. Usar somente um conjunto homogêneo; não resumir diretamente o CSV central com variantes/experimentos misturados. O destino é regravado. |
 | IoU genérica | `uv run python -m cavegen.benchmark.run_iou_benchmark --reference CAMINHO_VOID_VALIDADO.npz --generated-dir PASTA_DO_EXPERIMENTO --out results/csv/iou.csv` | Exige volumes de vazio comparáveis, alinhados e com mesmo shape. Lê NPZ diretamente na pasta indicada, sem recursão; destino regravado. Não usar a superfície do Elaphes. Fora do benchmark atual. |
-| Treino GAN | `uv run python -m cavegen.training.train_gan` | Placeholder: encerra com mensagem, sem treinar. |
+| GAN: preflight | `uv run --extra gan python -m cavegen.training.train_gan` | Código implementado; só inicia otimização com `--train`. Os interiores atuais falham na triagem. |
 | Treino PCGRL | `uv run python -m cavegen.training.train_pcgrl` | Placeholder: encerra com mensagem, sem treinar. |
-| Colab | [Orientações de notebooks](notebooks/colab/README.md) | Sequência planejada; os notebooks sugeridos ainda precisam ser criados. |
+| Colab GAN | [Orientações de notebooks](notebooks/colab/README.md) | Notebook implementado, com treino/avaliação desativados por padrão e pacote de upload verificável. |
 | Menu experimental do CA | `uv run python -m cavegen.generators.cellular_automata.menu` | Disponível no pacote, com API própria; integração ao benchmark pendente. |
 | Reconstrução e linha central do Elaphes | Branch `experiment/elaphes-meshing` | Comandos e artefatos descritos na documentação daquela branch; não são etapas exigidas na avaliação atual. |
 

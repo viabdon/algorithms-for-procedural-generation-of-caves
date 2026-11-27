@@ -1,0 +1,9 @@
+check,result,expected,passed,voxel_count,z,y,x
+outside_fill_without_repair,interior,interior,True,,,,
+outside_fill_final,interior,interior,True,,,,
+candidate_air_component,match,match,True,8139,,,
+air_reaches_initial_cap,True,True,True,,,,
+air_reaches_final_cap,True,True,True,,,,
+repair_overlap,0,0,True,0,,,
+remove_initial_cap,exterior,,,,,,
+remove_final_cap,exterior,,,,,,

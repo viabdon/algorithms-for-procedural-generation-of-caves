@@ -1,0 +1,99 @@
+{
+  "cave": "markovspodmol",
+  "survey": "MainGallery",
+  "crop_id": "ramo_017_007",
+  "plan_id": "las5cm_16cm",
+  "fold": "holdout_indian_tunnel",
+  "branch": "passagem_017",
+  "source": "cloud.ply",
+  "source_origin_xyz": [
+    430842.428,
+    65788.001,
+    554.649
+  ],
+  "units": "m",
+  "origin_xyz": [
+    -4.239000000014421,
+    123.95899999999614,
+    -5.929000000000038
+  ],
+  "selection_min_xyz": [
+    -3.9206000000144208,
+    124.27739999999613,
+    -5.610600000000037
+  ],
+  "selection_max_xyz": [
+    3.2575999999855334,
+    137.28159999999622,
+    -0.7773999999999963
+  ],
+  "shape_zyx": [
+    64,
+    86,
+    64
+  ],
+  "voxel_size": 0.16,
+  "sections": [
+    {
+      "point_xyz": [
+        2.484095967889095,
+        129.26738971131684,
+        -2.962477942264467
+      ],
+      "inward_normal_xyz": [
+        -0.7892757668989855,
+        0.6022816456942136,
+        -0.11958504524349113
+      ],
+      "u_xyz": [
+        -0.09506778847982769,
+        0.07254445974326748,
+        0.9928239607070893
+      ],
+      "polygon_uv": []
+    },
+    {
+      "point_xyz": [
+        -1.6452682430661172,
+        134.85096420882496,
+        -3.8506142456152666
+      ],
+      "inward_normal_xyz": [
+        0.5522743938456839,
+        -0.8318039396084081,
+        0.05563452124638168
+      ],
+      "u_xyz": [
+        -0.030773182984564145,
+        0.04634879894142485,
+        0.9984512006331034
+      ],
+      "polygon_uv": []
+    }
+  ],
+  "seed_xyz": [
+    0.19413366337002197,
+    131.87990660324772,
+    -3.4495479457377525
+  ],
+  "batch_size": 131072,
+  "proposal": {
+    "crop_id": "ramo_017_007",
+    "status": "pending_review",
+    "review_reasons": [
+      "tampa_com_cobertura_insuficiente",
+      "grade_excede_64_com_voxel_escolhido"
+    ],
+    "retained_points": 41765,
+    "cut_stations": [
+      42.72148096688749,
+      49.761727794702075
+    ],
+    "section_bins_supported": [
+      7,
+      9
+    ],
+    "selection_radius": 6.686750572114449
+  },
+  "auxiliary_cap_radius_voxels": 4
+}

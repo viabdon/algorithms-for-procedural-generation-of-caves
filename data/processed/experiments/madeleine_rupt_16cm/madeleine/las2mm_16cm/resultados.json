@@ -1,0 +1,535 @@
+[
+  {
+    "recorte": "ramo_001_001",
+    "planejamento": {
+      "crop_id": "ramo_001_001",
+      "status": "pending_review",
+      "review_reasons": [],
+      "retained_points": 694185,
+      "cut_stations": [
+        0.16,
+        7.130884581282557
+      ],
+      "section_bins_supported": [
+        16,
+        16
+      ],
+      "selection_radius": 3.014093650560636
+    },
+    "grade": [
+      64,
+      64,
+      64
+    ],
+    "resultado": "escape_path_without_supported_voxels",
+    "motivo": "A semente ficou conectada ao exterior e o reparo não foi verificado. Relatório: /home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/madeleine_rupt_16cm/madeleine/las2mm_16cm/data/processed/reference_sections/madeleine/Filleul/teste_externo/las2mm_16cm/ramo_001_001/64x64x64_sem_volume/20261127T102025894778Z-04bcd764/summary.csv"
+  },
+  {
+    "recorte": "ramo_001_002",
+    "planejamento": {
+      "crop_id": "ramo_001_002",
+      "status": "pending_review",
+      "review_reasons": [],
+      "retained_points": 918810,
+      "cut_stations": [
+        7.130884581282557,
+        14.101769162565114
+      ],
+      "section_bins_supported": [
+        16,
+        16
+      ],
+      "selection_radius": 2.949893120393547
+    },
+    "grade": [
+      64,
+      64,
+      64
+    ],
+    "resultado": "volume_salvo",
+    "volume": "data/processed/reference_sections/madeleine/Filleul/teste_externo/las2mm_16cm/ramo_001_002/64x64x64",
+    "air_voxels": 6316,
+    "repair_voxels": 0,
+    "auxiliary_cap_voxels": 106,
+    "auxiliary_cap_radius_voxels": 3,
+    "candidate_volume": 25.870336000000005
+  },
+  {
+    "recorte": "ramo_001_003",
+    "planejamento": {
+      "crop_id": "ramo_001_003",
+      "status": "pending_review",
+      "review_reasons": [
+        "tampa_com_cobertura_insuficiente"
+      ],
+      "retained_points": 590376,
+      "cut_stations": [
+        14.101769162565114,
+        21.07265374384767
+      ],
+      "section_bins_supported": [
+        16,
+        9
+      ],
+      "selection_radius": 2.2742342921006613
+    },
+    "grade": [
+      64,
+      64,
+      64
+    ],
+    "resultado": "missing_contour",
+    "motivo": "Informe um polígono UV finito e com área."
+  },
+  {
+    "recorte": "ramo_001_004",
+    "planejamento": {
+      "crop_id": "ramo_001_004",
+      "status": "pending_review",
+      "review_reasons": [
+        "tampa_com_cobertura_insuficiente"
+      ],
+      "retained_points": 840708,
+      "cut_stations": [
+        21.07265374384767,
+        28.04353832513023
+      ],
+      "section_bins_supported": [
+        9,
+        16
+      ],
+      "selection_radius": 3.134861889949138
+    },
+    "grade": [
+      64,
+      64,
+      64
+    ],
+    "resultado": "missing_contour",
+    "motivo": "Informe um polígono UV finito e com área."
+  },
+  {
+    "recorte": "ramo_001_005",
+    "planejamento": {
+      "crop_id": "ramo_001_005",
+      "status": "pending_review",
+      "review_reasons": [
+        "grade_excede_64_com_voxel_escolhido"
+      ],
+      "retained_points": 812911,
+      "cut_stations": [
+        28.04353832513023,
+        35.01442290641278
+      ],
+      "section_bins_supported": [
+        16,
+        16
+      ],
+      "selection_radius": 6.302222705135524
+    },
+    "grade": [
+      65,
+      64,
+      64
+    ],
+    "resultado": "seed_blocked",
+    "motivo": "A semente caiu na barreira. Revise sua localização na galeria. Relatório: /home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/madeleine_rupt_16cm/madeleine/las2mm_16cm/data/processed/reference_sections/madeleine/Filleul/teste_externo/las2mm_16cm/ramo_001_005/65x64x64_sem_volume/20261127T102030375267Z-41a245e9/summary.csv"
+  },
+  {
+    "recorte": "ramo_001_006",
+    "planejamento": {
+      "crop_id": "ramo_001_006",
+      "status": "pending_review",
+      "review_reasons": [],
+      "retained_points": 814528,
+      "cut_stations": [
+        35.01442290641278,
+        42.145307487695334
+      ],
+      "section_bins_supported": [
+        16,
+        16
+      ],
+      "selection_radius": 3.582829505924063
+    },
+    "grade": [
+      64,
+      64,
+      64
+    ],
+    "resultado": "volume_salvo",
+    "volume": "data/processed/reference_sections/madeleine/Filleul/teste_externo/las2mm_16cm/ramo_001_006/64x64x64",
+    "air_voxels": 4012,
+    "repair_voxels": 0,
+    "auxiliary_cap_voxels": 1182,
+    "auxiliary_cap_radius_voxels": 4,
+    "candidate_volume": 16.433152000000003
+  },
+  {
+    "recorte": "ramo_001_007",
+    "planejamento": {
+      "crop_id": "ramo_001_007",
+      "status": "pending_review",
+      "review_reasons": [],
+      "retained_points": 1087876,
+      "cut_stations": [
+        42.145307487695334,
+        48.9561920689779
+      ],
+      "section_bins_supported": [
+        16,
+        15
+      ],
+      "selection_radius": 4.442714446606826
+    },
+    "grade": [
+      64,
+      64,
+      64
+    ],
+    "resultado": "escape_path_without_supported_voxels",
+    "motivo": "A semente ficou conectada ao exterior e o reparo não foi verificado. Relatório: /home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/madeleine_rupt_16cm/madeleine/las2mm_16cm/data/processed/reference_sections/madeleine/Filleul/teste_externo/las2mm_16cm/ramo_001_007/64x64x64_sem_volume/20261127T102039813873Z-d2c702da/summary.csv"
+  },
+  {
+    "recorte": "ramo_001_008",
+    "planejamento": {
+      "crop_id": "ramo_001_008",
+      "status": "pending_review",
+      "review_reasons": [
+        "grade_excede_64_com_voxel_escolhido"
+      ],
+      "retained_points": 1900465,
+      "cut_stations": [
+        48.9561920689779,
+        55.92707665026045
+      ],
+      "section_bins_supported": [
+        15,
+        16
+      ],
+      "selection_radius": 5.043003151413338
+    },
+    "grade": [
+      64,
+      74,
+      64
+    ],
+    "resultado": "volume_salvo",
+    "volume": "data/processed/reference_sections/madeleine/Filleul/teste_externo/las2mm_16cm/ramo_001_008/64x74x64",
+    "air_voxels": 15218,
+    "repair_voxels": 0,
+    "auxiliary_cap_voxels": 481,
+    "auxiliary_cap_radius_voxels": 4,
+    "candidate_volume": 62.33292800000001
+  },
+  {
+    "recorte": "ramo_001_009",
+    "planejamento": {
+      "crop_id": "ramo_001_009",
+      "status": "pending_review",
+      "review_reasons": [
+        "outra_passagem_ou_retorno_proximo"
+      ],
+      "retained_points": 1262696,
+      "cut_stations": [
+        55.92707665026045,
+        62.89796123154301
+      ],
+      "section_bins_supported": [
+        16,
+        16
+      ],
+      "selection_radius": 3.601380933224863
+    },
+    "grade": [
+      64,
+      64,
+      64
+    ],
+    "resultado": "ambiguous_passage",
+    "motivo": "A semente ficou conectada ao exterior e o reparo não foi verificado. Relatório: /home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/madeleine_rupt_16cm/madeleine/las2mm_16cm/data/processed/reference_sections/madeleine/Filleul/teste_externo/las2mm_16cm/ramo_001_009/64x64x64_sem_volume/20261127T102048816322Z-5b065732/summary.csv"
+  },
+  {
+    "recorte": "ramo_001_010",
+    "planejamento": {
+      "crop_id": "ramo_001_010",
+      "status": "pending_review",
+      "review_reasons": [
+        "tampa_com_cobertura_insuficiente",
+        "outra_passagem_ou_retorno_proximo"
+      ],
+      "retained_points": 1029243,
+      "cut_stations": [
+        62.89796123154301,
+        69.70884581282557
+      ],
+      "section_bins_supported": [
+        16,
+        4
+      ],
+      "selection_radius": 4.53185468205759
+    },
+    "grade": [
+      64,
+      64,
+      64
+    ],
+    "resultado": "missing_contour",
+    "motivo": "Informe um polígono UV finito e com área."
+  },
+  {
+    "recorte": "ramo_002_001",
+    "planejamento": {
+      "crop_id": "ramo_002_001",
+      "status": "pending_review",
+      "review_reasons": [],
+      "retained_points": 578340,
+      "cut_stations": [
+        1.36,
+        5.8283366914208
+      ],
+      "section_bins_supported": [
+        15,
+        15
+      ],
+      "selection_radius": 3.6419275075485356
+    },
+    "grade": [
+      64,
+      64,
+      64
+    ],
+    "resultado": "volume_salvo",
+    "volume": "data/processed/reference_sections/madeleine/Filleul/teste_externo/las2mm_16cm/ramo_002_001/64x64x64",
+    "air_voxels": 7302,
+    "repair_voxels": 0,
+    "auxiliary_cap_voxels": 270,
+    "auxiliary_cap_radius_voxels": 4,
+    "candidate_volume": 29.908992000000005
+  },
+  {
+    "recorte": "ramo_002_002",
+    "planejamento": {
+      "crop_id": "ramo_002_002",
+      "status": "pending_review",
+      "review_reasons": [],
+      "retained_points": 867278,
+      "cut_stations": [
+        5.8283366914208,
+        12.4566733828416
+      ],
+      "section_bins_supported": [
+        15,
+        15
+      ],
+      "selection_radius": 4.0158916766312585
+    },
+    "grade": [
+      64,
+      64,
+      64
+    ],
+    "resultado": "escape_path_without_supported_voxels",
+    "motivo": "A semente ficou conectada ao exterior e o reparo não foi verificado. Relatório: /home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/madeleine_rupt_16cm/madeleine/las2mm_16cm/data/processed/reference_sections/madeleine/Filleul/teste_externo/las2mm_16cm/ramo_002_002/64x64x64_sem_volume/20261127T102056591885Z-62100eb8/summary.csv"
+  },
+  {
+    "recorte": "ramo_002_003",
+    "planejamento": {
+      "crop_id": "ramo_002_003",
+      "status": "pending_review",
+      "review_reasons": [],
+      "retained_points": 811971,
+      "cut_stations": [
+        12.4566733828416,
+        17.3250100742624
+      ],
+      "section_bins_supported": [
+        15,
+        15
+      ],
+      "selection_radius": 4.961208507166118
+    },
+    "grade": [
+      64,
+      64,
+      64
+    ],
+    "resultado": "volume_salvo",
+    "volume": "data/processed/reference_sections/madeleine/Filleul/teste_externo/las2mm_16cm/ramo_002_003/64x64x64",
+    "air_voxels": 11815,
+    "repair_voxels": 0,
+    "auxiliary_cap_voxels": 523,
+    "auxiliary_cap_radius_voxels": 4,
+    "candidate_volume": 48.39424000000001
+  },
+  {
+    "recorte": "ramo_002_004",
+    "planejamento": {
+      "crop_id": "ramo_002_004",
+      "status": "pending_review",
+      "review_reasons": [
+        "outra_passagem_ou_retorno_proximo",
+        "grade_excede_64_com_voxel_escolhido"
+      ],
+      "retained_points": 826187,
+      "cut_stations": [
+        17.3250100742624,
+        22.6733467656832
+      ],
+      "section_bins_supported": [
+        15,
+        16
+      ],
+      "selection_radius": 5.153986682773278
+    },
+    "grade": [
+      65,
+      64,
+      64
+    ],
+    "resultado": "ambiguous_passage",
+    "motivo": "A semente ficou conectada ao exterior e o reparo não foi verificado. Relatório: /home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/madeleine_rupt_16cm/madeleine/las2mm_16cm/data/processed/reference_sections/madeleine/Filleul/teste_externo/las2mm_16cm/ramo_002_004/65x64x64_sem_volume/20261127T102104788157Z-bad89041/summary.csv"
+  },
+  {
+    "recorte": "ramo_002_005",
+    "planejamento": {
+      "crop_id": "ramo_002_005",
+      "status": "pending_review",
+      "review_reasons": [
+        "tampa_com_cobertura_insuficiente",
+        "outra_passagem_ou_retorno_proximo",
+        "grade_excede_64_com_voxel_escolhido"
+      ],
+      "retained_points": 735447,
+      "cut_stations": [
+        22.6733467656832,
+        28.341683457104
+      ],
+      "section_bins_supported": [
+        16,
+        3
+      ],
+      "selection_radius": 6.018646633613133
+    },
+    "grade": [
+      72,
+      65,
+      64
+    ],
+    "resultado": "missing_contour",
+    "motivo": "Informe um polígono UV finito e com área."
+  },
+  {
+    "recorte": "ramo_003_001",
+    "planejamento": {
+      "crop_id": "ramo_003_001",
+      "status": "pending_review",
+      "review_reasons": [
+        "tampa_com_cobertura_insuficiente",
+        "outra_passagem_ou_retorno_proximo"
+      ],
+      "retained_points": 514168,
+      "cut_stations": [
+        0.48,
+        4.703690118994933
+      ],
+      "section_bins_supported": [
+        2,
+        16
+      ],
+      "selection_radius": 6.093980738254345
+    },
+    "grade": [
+      64,
+      64,
+      64
+    ],
+    "resultado": "missing_contour",
+    "motivo": "Informe um polígono UV finito e com área."
+  },
+  {
+    "recorte": "ramo_003_002",
+    "planejamento": {
+      "crop_id": "ramo_003_002",
+      "status": "pending_review",
+      "review_reasons": [
+        "outra_passagem_ou_retorno_proximo"
+      ],
+      "retained_points": 484250,
+      "cut_stations": [
+        4.703690118994933,
+        8.927380237989865
+      ],
+      "section_bins_supported": [
+        16,
+        16
+      ],
+      "selection_radius": 4.244471746730005
+    },
+    "grade": [
+      64,
+      64,
+      64
+    ],
+    "resultado": "ambiguous_passage",
+    "motivo": "A semente ficou conectada ao exterior e o reparo não foi verificado. Relatório: /home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/madeleine_rupt_16cm/madeleine/las2mm_16cm/data/processed/reference_sections/madeleine/Filleul/teste_externo/las2mm_16cm/ramo_003_002/64x64x64_sem_volume/20261127T102107954822Z-5f4f8114/summary.csv"
+  },
+  {
+    "recorte": "ramo_004_001",
+    "planejamento": {
+      "crop_id": "ramo_004_001",
+      "status": "pending_review",
+      "review_reasons": [
+        "tampa_com_cobertura_insuficiente",
+        "outra_passagem_ou_retorno_proximo",
+        "grade_excede_64_com_voxel_escolhido"
+      ],
+      "retained_points": 105370,
+      "cut_stations": [
+        0.64,
+        2.1054813862712396
+      ],
+      "section_bins_supported": [
+        3,
+        2
+      ],
+      "selection_radius": 6.567580896615836
+    },
+    "grade": [
+      70,
+      64,
+      64
+    ],
+    "resultado": "missing_contour",
+    "motivo": "Informe um polígono UV finito e com área."
+  },
+  {
+    "recorte": "ramo_005_001",
+    "planejamento": {
+      "crop_id": "ramo_005_001",
+      "status": "pending_review",
+      "review_reasons": [
+        "tampa_com_cobertura_insuficiente",
+        "outra_passagem_ou_retorno_proximo",
+        "grade_excede_64_com_voxel_escolhido"
+      ],
+      "retained_points": 148308,
+      "cut_stations": [
+        0.64,
+        3.1183818612841883
+      ],
+      "section_bins_supported": [
+        3,
+        16
+      ],
+      "selection_radius": 7.317954796881009
+    },
+    "grade": [
+      80,
+      64,
+      64
+    ],
+    "resultado": "missing_contour",
+    "motivo": "Informe um polígono UV finito e com área."
+  }
+]

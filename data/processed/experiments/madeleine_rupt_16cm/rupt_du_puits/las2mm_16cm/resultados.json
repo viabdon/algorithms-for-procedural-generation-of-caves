@@ -1,0 +1,201 @@
+[
+  {
+    "recorte": "ramo_001_001",
+    "planejamento": {
+      "crop_id": "ramo_001_001",
+      "status": "pending_review",
+      "review_reasons": [],
+      "retained_points": 1663364,
+      "cut_stations": [
+        0.16,
+        6.635469605286614
+      ],
+      "section_bins_supported": [
+        16,
+        16
+      ],
+      "selection_radius": 3.955139149567966
+    },
+    "grade": [
+      64,
+      64,
+      64
+    ],
+    "resultado": "volume_salvo",
+    "volume": "data/processed/reference_sections/rupt_du_puits/Cascades/teste_externo/las2mm_16cm/ramo_001_001/64x64x64",
+    "air_voxels": 25493,
+    "repair_voxels": 0,
+    "auxiliary_cap_voxels": 22,
+    "auxiliary_cap_radius_voxels": 2,
+    "candidate_volume": 104.41932800000002
+  },
+  {
+    "recorte": "ramo_001_002",
+    "planejamento": {
+      "crop_id": "ramo_001_002",
+      "status": "pending_review",
+      "review_reasons": [],
+      "retained_points": 1379477,
+      "cut_stations": [
+        6.635469605286614,
+        12.950939210573228
+      ],
+      "section_bins_supported": [
+        16,
+        16
+      ],
+      "selection_radius": 3.968162235662043
+    },
+    "grade": [
+      64,
+      64,
+      64
+    ],
+    "resultado": "volume_salvo",
+    "volume": "data/processed/reference_sections/rupt_du_puits/Cascades/teste_externo/las2mm_16cm/ramo_001_002/64x64x64",
+    "air_voxels": 24758,
+    "repair_voxels": 0,
+    "auxiliary_cap_voxels": 25,
+    "auxiliary_cap_radius_voxels": 4,
+    "candidate_volume": 101.40876800000002
+  },
+  {
+    "recorte": "ramo_001_003",
+    "planejamento": {
+      "crop_id": "ramo_001_003",
+      "status": "pending_review",
+      "review_reasons": [],
+      "retained_points": 1909410,
+      "cut_stations": [
+        12.950939210573228,
+        19.586408815859844
+      ],
+      "section_bins_supported": [
+        16,
+        16
+      ],
+      "selection_radius": 4.395770038915251
+    },
+    "grade": [
+      64,
+      64,
+      64
+    ],
+    "resultado": "volume_salvo",
+    "volume": "data/processed/reference_sections/rupt_du_puits/Cascades/teste_externo/las2mm_16cm/ramo_001_003/64x64x64",
+    "air_voxels": 27305,
+    "repair_voxels": 0,
+    "auxiliary_cap_voxels": 316,
+    "auxiliary_cap_radius_voxels": 4,
+    "candidate_volume": 111.84128000000001
+  },
+  {
+    "recorte": "ramo_001_004",
+    "planejamento": {
+      "crop_id": "ramo_001_004",
+      "status": "pending_review",
+      "review_reasons": [],
+      "retained_points": 1577927,
+      "cut_stations": [
+        19.586408815859844,
+        26.221878421146457
+      ],
+      "section_bins_supported": [
+        16,
+        16
+      ],
+      "selection_radius": 4.737716205353695
+    },
+    "grade": [
+      64,
+      64,
+      64
+    ],
+    "resultado": "escape_path_without_supported_voxels",
+    "motivo": "A semente ficou conectada ao exterior e o reparo não foi verificado. Relatório: /home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/madeleine_rupt_16cm/rupt_du_puits/las2mm_16cm/data/processed/reference_sections/rupt_du_puits/Cascades/teste_externo/las2mm_16cm/ramo_001_004/64x64x64_sem_volume/20261127T101953795668Z-5ee98965/summary.csv"
+  },
+  {
+    "recorte": "ramo_001_005",
+    "planejamento": {
+      "crop_id": "ramo_001_005",
+      "status": "pending_review",
+      "review_reasons": [
+        "tampa_com_cobertura_insuficiente",
+        "grade_excede_64_com_voxel_escolhido"
+      ],
+      "retained_points": 1052617,
+      "cut_stations": [
+        26.221878421146457,
+        32.69734802643306
+      ],
+      "section_bins_supported": [
+        16,
+        7
+      ],
+      "selection_radius": 5.980274971951748
+    },
+    "grade": [
+      69,
+      64,
+      64
+    ],
+    "resultado": "missing_contour",
+    "motivo": "Informe um polígono UV finito e com área."
+  },
+  {
+    "recorte": "ramo_001_006",
+    "planejamento": {
+      "crop_id": "ramo_001_006",
+      "status": "pending_review",
+      "review_reasons": [
+        "tampa_com_cobertura_insuficiente",
+        "grade_excede_64_com_voxel_escolhido"
+      ],
+      "retained_points": 2985268,
+      "cut_stations": [
+        32.69734802643306,
+        38.85281763171969
+      ],
+      "section_bins_supported": [
+        7,
+        8
+      ],
+      "selection_radius": 5.552866508192166
+    },
+    "grade": [
+      72,
+      64,
+      64
+    ],
+    "resultado": "missing_contour",
+    "motivo": "Informe um polígono UV finito e com área."
+  },
+  {
+    "recorte": "ramo_001_007",
+    "planejamento": {
+      "crop_id": "ramo_001_007",
+      "status": "pending_review",
+      "review_reasons": [
+        "tampa_com_cobertura_insuficiente",
+        "grade_excede_64_com_voxel_escolhido"
+      ],
+      "retained_points": 1552343,
+      "cut_stations": [
+        38.85281763171969,
+        44.3682872370063
+      ],
+      "section_bins_supported": [
+        8,
+        15
+      ],
+      "selection_radius": 5.569512175869086
+    },
+    "grade": [
+      73,
+      64,
+      64
+    ],
+    "resultado": "missing_contour",
+    "motivo": "Informe um polígono UV finito e com área."
+  }
+]

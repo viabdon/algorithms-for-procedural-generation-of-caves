@@ -1,0 +1,679 @@
+{
+  "recortes": [
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/planejamento_auto_16cm/config_sementes_originais/cascadedemotiers/MainGallery/ramo_027_004/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "3c093c4f874a/juncao_003"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/cascadedemotiers/MainGallery/holdout_indian_tunnel/las5cm_16cm_rev/ramo_015_001/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "3c093c4f874a/juncao_023"
+      ],
+      "resultado": "volume_de_juncao_salvo"
+    }
+  ],
+  "juncoes": {
+    "3c093c4f874a/juncao_003": {
+      "ramos": {
+        "19": {
+          "aceitos": 2,
+          "busca": "padrao",
+          "estacoes_do_no_m": [
+            1.28,
+            1.92,
+            2.56,
+            3.2,
+            3.84,
+            4.48,
+            5.12,
+            5.76,
+            6.4,
+            7.04,
+            7.68,
+            8.0
+          ],
+          "rejeicoes": {
+            "contorno": 9,
+            "eixo_na_parede": 1
+          },
+          "trajetorias_candidatas": [
+            {
+              "distancia_m": 5.76,
+              "voxels_de_parede_no_eixo": 23
+            },
+            {
+              "distancia_m": 6.4,
+              "voxels_de_parede_no_eixo": 23
+            }
+          ]
+        },
+        "27": {
+          "aceitos": 7,
+          "busca": "padrao",
+          "estacoes_do_no_m": [
+            1.28,
+            1.92,
+            2.56,
+            3.2,
+            3.84,
+            4.48,
+            5.12,
+            5.76,
+            6.4,
+            7.04,
+            7.68,
+            8.0
+          ],
+          "rejeicoes": {
+            "contorno": 3,
+            "eixo_na_parede": 2
+          },
+          "trajetorias_candidatas": [
+            {
+              "distancia_m": 1.28,
+              "voxels_de_parede_no_eixo": 8
+            },
+            {
+              "distancia_m": 5.12,
+              "voxels_de_parede_no_eixo": 23
+            },
+            {
+              "distancia_m": 5.76,
+              "voxels_de_parede_no_eixo": 23
+            },
+            {
+              "distancia_m": 6.4,
+              "voxels_de_parede_no_eixo": 24
+            },
+            {
+              "distancia_m": 7.04,
+              "voxels_de_parede_no_eixo": 24
+            },
+            {
+              "distancia_m": 7.68,
+              "voxels_de_parede_no_eixo": 24
+            },
+            {
+              "distancia_m": 8.0,
+              "voxels_de_parede_no_eixo": 24
+            }
+          ]
+        },
+        "48": {
+          "aceitos": 0,
+          "busca": "ramo_curto",
+          "estacoes_do_no_m": [
+            0.6289885705709704,
+            0.48
+          ],
+          "rejeicoes": {
+            "eixo_na_parede": 2
+          },
+          "trajetorias_candidatas": []
+        }
+      },
+      "tentativas": [],
+      "resultado": "ramo_sem_tampa_valida",
+      "recentramento": {
+        "resultado": "sem_eixo_ajustado",
+        "ramos": {
+          "19": {
+            "voxels_de_parede_antes": 41,
+            "resultado": "sem_duas_ancoras",
+            "ancora_antes": false,
+            "ancora_depois": false
+          },
+          "27": {
+            "voxels_de_parede_antes": 24,
+            "resultado": "sem_duas_ancoras",
+            "ancora_antes": false,
+            "ancora_depois": true
+          },
+          "48": {
+            "voxels_de_parede_antes": 4,
+            "resultado": "sem_duas_ancoras",
+            "ancora_antes": false,
+            "ancora_depois": true
+          }
+        }
+      },
+      "no_xyz": [
+        2537657.327,
+        1195235.534,
+        775.26
+      ],
+      "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/CascadeDeMotiers/MainGallery/pointclouds/CascadeDeMotiers_MainGallery_sampled_5cm_PCV_normals_classified_georef.las",
+      "centreline": "/run/media/midnavi/Pablo/TCC/DATA/RAW/CascadeDeMotiers/MainGallery/centreline/CascadeDeMotiers_MainGallery_nodes_from_LBC.txt",
+      "voxel_size": 0.16
+    },
+    "3c093c4f874a/juncao_023": {
+      "ramos": {
+        "14": {
+          "aceitos": 8,
+          "busca": "padrao",
+          "estacoes_do_no_m": [
+            1.28,
+            1.92,
+            2.56,
+            3.2,
+            3.84,
+            4.48,
+            5.12,
+            5.167144362002631
+          ],
+          "rejeicoes": {},
+          "trajetorias_candidatas": [
+            {
+              "distancia_m": 1.28,
+              "voxels_de_parede_no_eixo": 0
+            },
+            {
+              "distancia_m": 1.92,
+              "voxels_de_parede_no_eixo": 0
+            },
+            {
+              "distancia_m": 2.56,
+              "voxels_de_parede_no_eixo": 0
+            },
+            {
+              "distancia_m": 3.2,
+              "voxels_de_parede_no_eixo": 0
+            },
+            {
+              "distancia_m": 3.84,
+              "voxels_de_parede_no_eixo": 0
+            },
+            {
+              "distancia_m": 4.48,
+              "voxels_de_parede_no_eixo": 0
+            },
+            {
+              "distancia_m": 5.12,
+              "voxels_de_parede_no_eixo": 0
+            },
+            {
+              "distancia_m": 5.167144362002631,
+              "voxels_de_parede_no_eixo": 0
+            }
+          ]
+        },
+        "15": {
+          "aceitos": 11,
+          "busca": "padrao",
+          "estacoes_do_no_m": [
+            1.28,
+            1.92,
+            2.56,
+            3.2,
+            3.84,
+            4.48,
+            5.12,
+            5.76,
+            6.4,
+            7.04,
+            7.68,
+            8.0
+          ],
+          "rejeicoes": {
+            "eixo_na_parede": 1
+          },
+          "trajetorias_candidatas": [
+            {
+              "distancia_m": 1.28,
+              "voxels_de_parede_no_eixo": 0
+            },
+            {
+              "distancia_m": 1.92,
+              "voxels_de_parede_no_eixo": 0
+            },
+            {
+              "distancia_m": 3.2,
+              "voxels_de_parede_no_eixo": 3
+            },
+            {
+              "distancia_m": 3.84,
+              "voxels_de_parede_no_eixo": 3
+            },
+            {
+              "distancia_m": 4.48,
+              "voxels_de_parede_no_eixo": 3
+            },
+            {
+              "distancia_m": 5.12,
+              "voxels_de_parede_no_eixo": 3
+            },
+            {
+              "distancia_m": 5.76,
+              "voxels_de_parede_no_eixo": 3
+            },
+            {
+              "distancia_m": 6.4,
+              "voxels_de_parede_no_eixo": 3
+            },
+            {
+              "distancia_m": 7.04,
+              "voxels_de_parede_no_eixo": 3
+            },
+            {
+              "distancia_m": 7.68,
+              "voxels_de_parede_no_eixo": 3
+            },
+            {
+              "distancia_m": 8.0,
+              "voxels_de_parede_no_eixo": 3
+            }
+          ]
+        },
+        "16": {
+          "aceitos": 12,
+          "busca": "padrao",
+          "estacoes_do_no_m": [
+            1.28,
+            1.92,
+            2.56,
+            3.2,
+            3.84,
+            4.48,
+            5.12,
+            5.76,
+            6.4,
+            7.04,
+            7.68,
+            8.0
+          ],
+          "rejeicoes": {},
+          "trajetorias_candidatas": [
+            {
+              "distancia_m": 1.28,
+              "voxels_de_parede_no_eixo": 0
+            },
+            {
+              "distancia_m": 1.92,
+              "voxels_de_parede_no_eixo": 0
+            },
+            {
+              "distancia_m": 2.56,
+              "voxels_de_parede_no_eixo": 0
+            },
+            {
+              "distancia_m": 3.2,
+              "voxels_de_parede_no_eixo": 0
+            },
+            {
+              "distancia_m": 3.84,
+              "voxels_de_parede_no_eixo": 0
+            },
+            {
+              "distancia_m": 4.48,
+              "voxels_de_parede_no_eixo": 0
+            },
+            {
+              "distancia_m": 5.12,
+              "voxels_de_parede_no_eixo": 0
+            },
+            {
+              "distancia_m": 5.76,
+              "voxels_de_parede_no_eixo": 0
+            },
+            {
+              "distancia_m": 6.4,
+              "voxels_de_parede_no_eixo": 0
+            },
+            {
+              "distancia_m": 7.04,
+              "voxels_de_parede_no_eixo": 0
+            },
+            {
+              "distancia_m": 7.68,
+              "voxels_de_parede_no_eixo": 0
+            },
+            {
+              "distancia_m": 8.0,
+              "voxels_de_parede_no_eixo": 0
+            }
+          ]
+        }
+      },
+      "tentativas": [
+        {
+          "distancias": {
+            "14": 1.28,
+            "15": 1.28,
+            "16": 1.92
+          },
+          "resultado": "leaking",
+          "planos_completos": "sealed",
+          "ramos_cruzados_pela_fuga": [
+            15,
+            16
+          ]
+        },
+        {
+          "distancias": {
+            "14": 1.28,
+            "15": 1.92,
+            "16": 1.28
+          },
+          "resultado": "leaking"
+        },
+        {
+          "distancias": {
+            "14": 1.28,
+            "15": 1.28,
+            "16": 2.56
+          },
+          "resultado": "leaking"
+        },
+        {
+          "distancias": {
+            "14": 1.28,
+            "15": 1.92,
+            "16": 1.92
+          },
+          "validacao_eixos": [
+            {
+              "ramo": 14,
+              "amostras": 30,
+              "desvios": []
+            },
+            {
+              "ramo": 15,
+              "amostras": 45,
+              "desvios": []
+            },
+            {
+              "ramo": 16,
+              "amostras": 46,
+              "desvios": []
+            }
+          ],
+          "resultado": "volume_salvo"
+        }
+      ],
+      "tampas": [
+        {
+          "ramo": 14,
+          "distancia": 1.28,
+          "setores": 16,
+          "secao": {
+            "point_xyz": [
+              108.21791883702191,
+              -5.498380859520709,
+              -13.42666456673824
+            ],
+            "inward_normal_xyz": [
+              -0.2652708562127678,
+              -0.9052345913803483,
+              -0.3319363002333416
+            ],
+            "u_xyz": [
+              0.9641739328794079,
+              -0.2490550168803558,
+              -0.0913248362855397
+            ],
+            "polygon_uv": [
+              [
+                2.06324598066328,
+                0.4104051425002982
+              ],
+              [
+                1.5848152263139026,
+                1.0589396792721888
+              ],
+              [
+                0.844817705528862,
+                1.2643590464963324
+              ],
+              [
+                0.26261139759225177,
+                1.32023665019789
+              ],
+              [
+                -0.3020666884766078,
+                1.5185917922341228
+              ],
+              [
+                -1.0890107841481418,
+                1.6298198151609722
+              ],
+              [
+                -1.951715936969524,
+                1.304094896369684
+              ],
+              [
+                -2.1681296251810744,
+                0.43126779653073827
+              ],
+              [
+                -2.333442486053546,
+                -0.4641505690451863
+              ],
+              [
+                -1.9281844216462052,
+                -1.2883716405127723
+              ],
+              [
+                -1.2573731966469768,
+                -1.8817919719229939
+              ],
+              [
+                -0.44615497550254707,
+                -2.242972527952396
+              ],
+              [
+                0.38356318987641763,
+                -1.9283023721914792
+              ],
+              [
+                0.9612836788190336,
+                -1.4386626932768467
+              ],
+              [
+                1.5265542069007698,
+                -1.020010910676932
+              ],
+              [
+                1.9335031112971408,
+                -0.38459768120404864
+              ]
+            ]
+          }
+        },
+        {
+          "ramo": 15,
+          "distancia": 1.92,
+          "setores": 16,
+          "secao": {
+            "point_xyz": [
+              108.93590241559636,
+              -8.101449730948481,
+              -14.56401255409977
+            ],
+            "inward_normal_xyz": [
+              -0.5469982140485183,
+              0.7507702931919217,
+              0.3703200246924908
+            ],
+            "u_xyz": [
+              0.2180681111394191,
+              -0.2993045599257267,
+              0.9289042358132258
+            ],
+            "polygon_uv": [
+              [
+                1.6241074682457364,
+                0.323055061387743
+              ],
+              [
+                1.4342608816675193,
+                0.9583424823335357
+              ],
+              [
+                1.143432242350845,
+                1.7112672831197981
+              ],
+              [
+                0.40953551650412745,
+                2.0588740755493564
+              ],
+              [
+                -0.36507018131353364,
+                1.8353317399150675
+              ],
+              [
+                -0.9290949773096431,
+                1.3904888971051736
+              ],
+              [
+                -1.1890490181187106,
+                0.7944971533458393
+              ],
+              [
+                -1.33624591929698,
+                0.26579583920876987
+              ],
+              [
+                -1.203293796810752,
+                -0.23935001777688428
+              ],
+              [
+                -0.9151845115301855,
+                -0.6115067403590781
+              ],
+              [
+                -0.5649608670852784,
+                -0.8455236893603197
+              ],
+              [
+                -0.2508163132368736,
+                -1.2609387568051422
+              ],
+              [
+                0.2981558817702754,
+                -1.4989308392333103
+              ],
+              [
+                0.6904266997178724,
+                -1.0332965774958829
+              ],
+              [
+                1.0566986981272337,
+                -0.7060634968057514
+              ],
+              [
+                1.347273390889662,
+                -0.267989339689482
+              ]
+            ]
+          }
+        },
+        {
+          "ramo": 16,
+          "distancia": 1.92,
+          "setores": 16,
+          "secao": {
+            "point_xyz": [
+              106.31996979954916,
+              -7.744947858278996,
+              -14.07967476118809
+            ],
+            "inward_normal_xyz": [
+              0.8141311558146208,
+              0.5687703740162366,
+              0.11700736204777797
+            ],
+            "u_xyz": [
+              -0.09591819645169931,
+              -0.06701061380731418,
+              0.9931310473581119
+            ],
+            "polygon_uv": [
+              [
+                1.3055889783962535,
+                0.2596977945175886
+              ],
+              [
+                0.9834957245157501,
+                0.6571508336063879
+              ],
+              [
+                0.6421507214757193,
+                0.9610464702603638
+              ],
+              [
+                0.32691115077491373,
+                1.6434933387070312
+              ],
+              [
+                -0.3486851511325555,
+                1.752958630606562
+              ],
+              [
+                -0.9436415296431264,
+                1.41225935115438
+              ],
+              [
+                -1.3401901733180983,
+                0.8954864445605154
+              ],
+              [
+                -1.566622950282077,
+                0.31162067983191233
+              ],
+              [
+                -1.846051618612513,
+                -0.3672024977632652
+              ],
+              [
+                -1.846867942650852,
+                -1.2340377063372638
+              ],
+              [
+                -1.2084288910552279,
+                -1.808541642124722
+              ],
+              [
+                -0.4390500536650878,
+                -2.2072536738104698
+              ],
+              [
+                0.42095905769888353,
+                -2.11630409533768
+              ],
+              [
+                1.1740736684707318,
+                -1.757125418027108
+              ],
+              [
+                1.815325916856011,
+                -1.2129619985044517
+              ],
+              [
+                1.6106155441761723,
+                -0.3203713508305585
+              ]
+            ]
+          }
+        }
+      ],
+      "resultado": "volume_salvo",
+      "recentramento": {
+        "resultado": "fluxo_original_fechou"
+      },
+      "no_xyz": [
+        2537858.786,
+        1195201.517,
+        769.226
+      ],
+      "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/CascadeDeMotiers/MainGallery/pointclouds/CascadeDeMotiers_MainGallery_sampled_5cm_PCV_normals_classified_georef.las",
+      "centreline": "/run/media/midnavi/Pablo/TCC/DATA/RAW/CascadeDeMotiers/MainGallery/centreline/CascadeDeMotiers_MainGallery_nodes_from_LBC.txt",
+      "voxel_size": 0.16,
+      "volume": "3c093c4f874a/juncao_023"
+    }
+  }
+}

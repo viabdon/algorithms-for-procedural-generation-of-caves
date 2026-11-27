@@ -1,0 +1,634 @@
+{
+  "totais_por_levantamento": {
+    "indian_tunnel/Full": 15,
+    "cascadedemotiers/MainGallery": 4,
+    "markovspodmol/MainGallery": 12,
+    "archamps/PreEtroiture": 8
+  },
+  "recortes": [
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/auto_full10x_16cm_rev/ramo_001_001/crop_validacao.json",
+      "falha_anterior": "missing_contour",
+      "grupo": "contorno",
+      "levantamento": "indian_tunnel/Full",
+      "recorte": "ramo_001_001",
+      "estacoes_do_recorte_m": [
+        0.16,
+        5.704581443942084
+      ],
+      "distancias_ao_no_m": {
+        "inicio": null,
+        "fim": 50.381232995478754
+      },
+      "alcance_triagem_m": 8.0
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/auto_full10x_16cm_rev/ramo_001_002/crop_validacao.json",
+      "falha_anterior": "missing_contour",
+      "grupo": "contorno",
+      "levantamento": "indian_tunnel/Full",
+      "recorte": "ramo_001_002",
+      "estacoes_do_recorte_m": [
+        5.704581443942084,
+        11.089162887884168
+      ],
+      "distancias_ao_no_m": {
+        "inicio": null,
+        "fim": 44.99665155153667
+      },
+      "alcance_triagem_m": 8.0
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/auto_full10x_16cm_rev/ramo_001_003/crop_validacao.json",
+      "falha_anterior": "missing_contour",
+      "grupo": "contorno",
+      "levantamento": "indian_tunnel/Full",
+      "recorte": "ramo_001_003",
+      "estacoes_do_recorte_m": [
+        11.089162887884168,
+        16.63374433182625
+      ],
+      "distancias_ao_no_m": {
+        "inicio": null,
+        "fim": 39.45207010759459
+      },
+      "alcance_triagem_m": 8.0
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/auto_full10x_16cm_rev/ramo_001_004/crop_validacao.json",
+      "falha_anterior": "missing_contour",
+      "grupo": "contorno",
+      "levantamento": "indian_tunnel/Full",
+      "recorte": "ramo_001_004",
+      "estacoes_do_recorte_m": [
+        16.63374433182625,
+        22.338325775768336
+      ],
+      "distancias_ao_no_m": {
+        "inicio": null,
+        "fim": 33.747488663652504
+      },
+      "alcance_triagem_m": 8.0
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/auto_full10x_16cm_rev/ramo_001_005/crop_validacao.json",
+      "falha_anterior": "missing_contour",
+      "grupo": "contorno",
+      "levantamento": "indian_tunnel/Full",
+      "recorte": "ramo_001_005",
+      "estacoes_do_recorte_m": [
+        22.338325775768336,
+        27.88290721971042
+      ],
+      "distancias_ao_no_m": {
+        "inicio": null,
+        "fim": 28.202907219710415
+      },
+      "alcance_triagem_m": 8.0
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/auto_full10x_16cm_rev/ramo_001_006/crop_validacao.json",
+      "falha_anterior": "missing_contour",
+      "grupo": "contorno",
+      "levantamento": "indian_tunnel/Full",
+      "recorte": "ramo_001_006",
+      "estacoes_do_recorte_m": [
+        27.88290721971042,
+        33.4274886636525
+      ],
+      "distancias_ao_no_m": {
+        "inicio": null,
+        "fim": 22.65832577576834
+      },
+      "alcance_triagem_m": 8.0
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/auto_full10x_16cm_rev/ramo_001_007/crop_validacao.json",
+      "falha_anterior": "missing_contour",
+      "grupo": "contorno",
+      "levantamento": "indian_tunnel/Full",
+      "recorte": "ramo_001_007",
+      "estacoes_do_recorte_m": [
+        33.4274886636525,
+        38.812070107594586
+      ],
+      "distancias_ao_no_m": {
+        "inicio": null,
+        "fim": 17.27374433182625
+      },
+      "alcance_triagem_m": 8.0
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/auto_full10x_16cm_rev/ramo_001_008/crop_validacao.json",
+      "falha_anterior": "missing_contour",
+      "grupo": "contorno",
+      "levantamento": "indian_tunnel/Full",
+      "recorte": "ramo_001_008",
+      "estacoes_do_recorte_m": [
+        38.812070107594586,
+        44.676651551536665
+      ],
+      "distancias_ao_no_m": {
+        "inicio": null,
+        "fim": 11.409162887884172
+      },
+      "alcance_triagem_m": 8.0
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/auto_full10x_16cm_rev/ramo_008_003/crop_validacao.json",
+      "falha_anterior": "missing_contour",
+      "grupo": "contorno",
+      "levantamento": "indian_tunnel/Full",
+      "recorte": "ramo_008_003",
+      "estacoes_do_recorte_m": [
+        9.883188201386778,
+        14.424782302080168
+      ],
+      "distancias_ao_no_m": {
+        "inicio": 9.883188201386778,
+        "fim": 10.043188201386776
+      },
+      "alcance_triagem_m": 8.0
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/auto_full10x_16cm_rev/ramo_009_001/crop_validacao.json",
+      "falha_anterior": "missing_contour",
+      "grupo": "contorno",
+      "levantamento": "indian_tunnel/Full",
+      "recorte": "ramo_009_001",
+      "estacoes_do_recorte_m": [
+        0.16,
+        4.425566743701311
+      ],
+      "distancias_ao_no_m": {
+        "inicio": null,
+        "fim": 9.011133487402624
+      },
+      "alcance_triagem_m": 8.0
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/planejamento_auto_16cm/config_sementes_originais/cascadedemotiers/MainGallery/ramo_028_002/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "grupo": "semente",
+      "levantamento": "cascadedemotiers/MainGallery",
+      "recorte": "ramo_028_002",
+      "estacoes_do_recorte_m": [
+        8.517069936955497,
+        16.234139873910994
+      ],
+      "distancias_ao_no_m": {
+        "inicio": 8.517069936955497,
+        "fim": null
+      },
+      "alcance_triagem_m": 8.0
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/planejamento_auto_16cm/config_sementes_originais/markovspodmol/MainGallery/ramo_028_003/crop.json",
+      "falha_anterior": "seed_blocked",
+      "grupo": "semente",
+      "levantamento": "markovspodmol/MainGallery",
+      "recorte": "ramo_028_003",
+      "estacoes_do_recorte_m": [
+        11.294509901457344,
+        15.741764852186016
+      ],
+      "distancias_ao_no_m": {
+        "inicio": 11.294509901457344,
+        "fim": null
+      },
+      "alcance_triagem_m": 8.0
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/archamps/PreEtroiture/holdout_indian_tunnel/ramos_cortes_16cm/ramo_001_002/crop.json",
+      "falha_anterior": "escape_path_without_supported_voxels",
+      "grupo": "fechamento_anterior_falhou",
+      "levantamento": "archamps/PreEtroiture",
+      "recorte": "ramo_001_002",
+      "estacoes_do_recorte_m": [
+        9.189786633436588,
+        17.899573266873176
+      ],
+      "distancias_ao_no_m": {
+        "inicio": 9.189786633436588,
+        "fim": null
+      },
+      "alcance_triagem_m": 8.0
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/archamps/PreEtroiture/holdout_indian_tunnel/ramos_cortes_16cm/ramo_001_003/crop.json",
+      "falha_anterior": "escape_path_without_supported_voxels",
+      "grupo": "fechamento_anterior_falhou",
+      "levantamento": "archamps/PreEtroiture",
+      "recorte": "ramo_001_003",
+      "estacoes_do_recorte_m": [
+        17.899573266873176,
+        26.769359900309766
+      ],
+      "distancias_ao_no_m": {
+        "inicio": 17.899573266873176,
+        "fim": null
+      },
+      "alcance_triagem_m": 8.0
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/archamps/PreEtroiture/holdout_indian_tunnel/pre_5cm_16cm/ramo_001_006/crop.json",
+      "falha_anterior": "escape_path_without_supported_voxels",
+      "grupo": "fechamento_anterior_falhou",
+      "levantamento": "archamps/PreEtroiture",
+      "recorte": "ramo_001_006",
+      "estacoes_do_recorte_m": [
+        44.028933167182934,
+        52.73871980061953
+      ],
+      "distancias_ao_no_m": {
+        "inicio": 44.028933167182934,
+        "fim": null
+      },
+      "alcance_triagem_m": 8.0
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/archamps/PreEtroiture/holdout_indian_tunnel/ramos_cortes_16cm/ramo_001_010/crop.json",
+      "falha_anterior": "escape_path_without_supported_voxels",
+      "grupo": "fechamento_anterior_falhou",
+      "levantamento": "archamps/PreEtroiture",
+      "recorte": "ramo_001_010",
+      "estacoes_do_recorte_m": [
+        78.8680797009293,
+        88.53786633436587
+      ],
+      "distancias_ao_no_m": {
+        "inicio": 78.8680797009293,
+        "fim": null
+      },
+      "alcance_triagem_m": 8.0
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/archamps/PreEtroiture/holdout_indian_tunnel/ramos_cortes_16cm/ramo_001_011/crop.json",
+      "falha_anterior": "escape_path_without_supported_voxels",
+      "grupo": "fechamento_anterior_falhou",
+      "levantamento": "archamps/PreEtroiture",
+      "recorte": "ramo_001_011",
+      "estacoes_do_recorte_m": [
+        88.53786633436587,
+        96.28765296780247
+      ],
+      "distancias_ao_no_m": {
+        "inicio": 88.53786633436587,
+        "fim": null
+      },
+      "alcance_triagem_m": 8.0
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/archamps/PreEtroiture/holdout_indian_tunnel/pre_5cm_16cm/ramo_002_003/crop.json",
+      "falha_anterior": "escape_path_without_supported_voxels",
+      "grupo": "fechamento_anterior_falhou",
+      "levantamento": "archamps/PreEtroiture",
+      "recorte": "ramo_002_003",
+      "estacoes_do_recorte_m": [
+        16.62772359014049,
+        24.701585385210738
+      ],
+      "distancias_ao_no_m": {
+        "inicio": 16.62772359014049,
+        "fim": 40.849308975351235
+      },
+      "alcance_triagem_m": 8.0
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/archamps/PreEtroiture/holdout_indian_tunnel/pre_5cm_16cm/ramo_002_004/crop.json",
+      "falha_anterior": "escape_path_without_supported_voxels",
+      "grupo": "fechamento_anterior_falhou",
+      "levantamento": "archamps/PreEtroiture",
+      "recorte": "ramo_002_004",
+      "estacoes_do_recorte_m": [
+        24.701585385210738,
+        32.77544718028098
+      ],
+      "distancias_ao_no_m": {
+        "inicio": 24.701585385210738,
+        "fim": 32.77544718028099
+      },
+      "alcance_triagem_m": 8.0
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/archamps/PreEtroiture/holdout_indian_tunnel/pre_5cm_16cm/ramo_002_006/crop.json",
+      "falha_anterior": "escape_path_without_supported_voxels",
+      "grupo": "fechamento_anterior_falhou",
+      "levantamento": "archamps/PreEtroiture",
+      "recorte": "ramo_002_006",
+      "estacoes_do_recorte_m": [
+        40.689308975351224,
+        48.92317077042147
+      ],
+      "distancias_ao_no_m": {
+        "inicio": 40.689308975351224,
+        "fim": 16.627723590140498
+      },
+      "alcance_triagem_m": 8.0
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/cascadedemotiers/MainGallery/holdout_indian_tunnel/las5cm_16cm_rev/ramo_018_004/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "grupo": "aviso_de_passagem",
+      "levantamento": "cascadedemotiers/MainGallery",
+      "recorte": "ramo_018_004",
+      "estacoes_do_recorte_m": [
+        20.336670407421863,
+        26.79556054322915
+      ],
+      "distancias_ao_no_m": {
+        "inicio": 20.336670407421863,
+        "fim": null
+      },
+      "alcance_triagem_m": 8.0
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/cascadedemotiers/MainGallery/holdout_indian_tunnel/las5cm_16cm_rev/ramo_020_003/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "grupo": "aviso_de_passagem",
+      "levantamento": "cascadedemotiers/MainGallery",
+      "recorte": "ramo_020_003",
+      "estacoes_do_recorte_m": [
+        15.420233890551023,
+        22.890350835826535
+      ],
+      "distancias_ao_no_m": {
+        "inicio": 15.420233890551023,
+        "fim": 15.420233890551014
+      },
+      "alcance_triagem_m": 8.0
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/cascadedemotiers/MainGallery/holdout_indian_tunnel/las5cm_16cm_rev/ramo_020_004/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "grupo": "aviso_de_passagem",
+      "levantamento": "cascadedemotiers/MainGallery",
+      "recorte": "ramo_020_004",
+      "estacoes_do_recorte_m": [
+        22.890350835826535,
+        29.720467781102045
+      ],
+      "distancias_ao_no_m": {
+        "inicio": 22.890350835826535,
+        "fim": 8.590116945275504
+      },
+      "alcance_triagem_m": 8.0
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/markovspodmol/MainGallery/holdout_indian_tunnel/cortes_refitos_16cm/ramo_017_008/crop.json",
+      "falha_anterior": "escape_path_without_supported_voxels",
+      "grupo": "fechamento_anterior_falhou",
+      "levantamento": "markovspodmol/MainGallery",
+      "recorte": "ramo_017_008",
+      "estacoes_do_recorte_m": [
+        49.761727794702075,
+        58.40197462251666
+      ],
+      "distancias_ao_no_m": {
+        "inicio": 49.761727794702075,
+        "fim": 55.20197462251667
+      },
+      "alcance_triagem_m": 8.0
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/markovspodmol/MainGallery/holdout_indian_tunnel/cortes_refitos_16cm/ramo_017_009/crop.json",
+      "falha_anterior": "escape_path_without_supported_voxels",
+      "grupo": "fechamento_anterior_falhou",
+      "levantamento": "markovspodmol/MainGallery",
+      "recorte": "ramo_017_009",
+      "estacoes_do_recorte_m": [
+        58.40197462251666,
+        63.842221450331245
+      ],
+      "distancias_ao_no_m": {
+        "inicio": 58.40197462251666,
+        "fim": 49.76172779470209
+      },
+      "alcance_triagem_m": 8.0
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/markovspodmol/MainGallery/holdout_indian_tunnel/las5cm_16cm_rev/ramo_017_012/crop.json",
+      "falha_anterior": "escape_path_without_supported_voxels",
+      "grupo": "fechamento_anterior_falhou",
+      "levantamento": "markovspodmol/MainGallery",
+      "recorte": "ramo_017_012",
+      "estacoes_do_recorte_m": [
+        77.92271510596042,
+        84.96296193377499
+      ],
+      "distancias_ao_no_m": {
+        "inicio": 77.92271510596042,
+        "fim": 28.640987311258343
+      },
+      "alcance_triagem_m": 8.0
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/markovspodmol/MainGallery/holdout_indian_tunnel/las5cm_16cm_rev/ramo_018_003/crop.json",
+      "falha_anterior": "escape_path_without_supported_voxels",
+      "grupo": "fechamento_anterior_falhou",
+      "levantamento": "markovspodmol/MainGallery",
+      "recorte": "ramo_018_003",
+      "estacoes_do_recorte_m": [
+        13.64289687644102,
+        20.22434531466153
+      ],
+      "distancias_ao_no_m": {
+        "inicio": 13.64289687644102,
+        "fim": 13.64289687644101
+      },
+      "alcance_triagem_m": 8.0
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/markovspodmol/MainGallery/holdout_indian_tunnel/las5cm_16cm_rev/ramo_037_003/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "grupo": "aviso_de_passagem",
+      "levantamento": "markovspodmol/MainGallery",
+      "recorte": "ramo_037_003",
+      "estacoes_do_recorte_m": [
+        15.12064648079878,
+        22.44096972119817
+      ],
+      "distancias_ao_no_m": {
+        "inicio": 15.12064648079878,
+        "fim": 37.08161620199694
+      },
+      "alcance_triagem_m": 8.0
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/markovspodmol/MainGallery/holdout_indian_tunnel/las5cm_16cm_rev/ramo_037_004/crop.json",
+      "falha_anterior": "escape_path_without_supported_voxels",
+      "grupo": "fechamento_anterior_falhou",
+      "levantamento": "markovspodmol/MainGallery",
+      "recorte": "ramo_037_004",
+      "estacoes_do_recorte_m": [
+        22.44096972119817,
+        29.761292961597558
+      ],
+      "distancias_ao_no_m": {
+        "inicio": 22.44096972119817,
+        "fim": 29.76129296159755
+      },
+      "alcance_triagem_m": 8.0
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/markovspodmol/MainGallery/holdout_indian_tunnel/las5cm_16cm_rev/ramo_037_005/crop.json",
+      "falha_anterior": "escape_path_without_supported_voxels",
+      "grupo": "fechamento_anterior_falhou",
+      "levantamento": "markovspodmol/MainGallery",
+      "recorte": "ramo_037_005",
+      "estacoes_do_recorte_m": [
+        29.761292961597558,
+        37.081616201996944
+      ],
+      "distancias_ao_no_m": {
+        "inicio": 29.761292961597558,
+        "fim": 22.440969721198165
+      },
+      "alcance_triagem_m": 8.0
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/markovspodmol/MainGallery/holdout_indian_tunnel/las5cm_16cm_rev/ramo_037_006/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "grupo": "aviso_de_passagem",
+      "levantamento": "markovspodmol/MainGallery",
+      "recorte": "ramo_037_006",
+      "estacoes_do_recorte_m": [
+        37.081616201996944,
+        44.40193944239633
+      ],
+      "distancias_ao_no_m": {
+        "inicio": 37.081616201996944,
+        "fim": 15.120646480798776
+      },
+      "alcance_triagem_m": 8.0
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/markovspodmol/MainGallery/holdout_indian_tunnel/las5cm_16cm_rev/ramo_058_001/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "grupo": "aviso_de_passagem",
+      "levantamento": "markovspodmol/MainGallery",
+      "recorte": "ramo_058_001",
+      "estacoes_do_recorte_m": [
+        1.76,
+        5.3288828163327375
+      ],
+      "distancias_ao_no_m": {
+        "inicio": null,
+        "fim": 10.817765632665477
+      },
+      "alcance_triagem_m": 8.0
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/markovspodmol/MainGallery/holdout_indian_tunnel/cortes_refitos_16cm/ramo_065_003/crop.json",
+      "falha_anterior": "escape_path_without_supported_voxels",
+      "grupo": "fechamento_anterior_falhou",
+      "levantamento": "markovspodmol/MainGallery",
+      "recorte": "ramo_065_003",
+      "estacoes_do_recorte_m": [
+        12.828597967968726,
+        19.002896951953087
+      ],
+      "distancias_ao_no_m": {
+        "inicio": 12.828597967968726,
+        "fim": null
+      },
+      "alcance_triagem_m": 8.0
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/markovspodmol/MainGallery/holdout_indian_tunnel/las5cm_16cm_rev/ramo_065_004/crop.json",
+      "falha_anterior": "escape_path_without_supported_voxels",
+      "grupo": "fechamento_anterior_falhou",
+      "levantamento": "markovspodmol/MainGallery",
+      "recorte": "ramo_065_004",
+      "estacoes_do_recorte_m": [
+        19.002896951953087,
+        25.17719593593745
+      ],
+      "distancias_ao_no_m": {
+        "inicio": 19.002896951953087,
+        "fim": null
+      },
+      "alcance_triagem_m": 8.0
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/full10x_16cm_rev/ramo_002_003/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "grupo": "aviso_de_passagem",
+      "levantamento": "indian_tunnel/Full",
+      "recorte": "ramo_002_003",
+      "estacoes_do_recorte_m": [
+        12.451901871290229,
+        16.997852806935345
+      ],
+      "distancias_ao_no_m": {
+        "inicio": 12.451901871290229,
+        "fim": 44.527607485160914
+      },
+      "alcance_triagem_m": 8.0
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/full1x_16cm/ramo_002_004/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "grupo": "aviso_de_passagem",
+      "levantamento": "indian_tunnel/Full",
+      "recorte": "ramo_002_004",
+      "estacoes_do_recorte_m": [
+        16.997852806935345,
+        22.50380374258046
+      ],
+      "distancias_ao_no_m": {
+        "inicio": 16.997852806935345,
+        "fim": 39.0216565495158
+      },
+      "alcance_triagem_m": 8.0
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/full1x_16cm/ramo_002_005/crop.json",
+      "falha_anterior": "escape_path_without_supported_voxels",
+      "grupo": "fechamento_anterior_falhou",
+      "levantamento": "indian_tunnel/Full",
+      "recorte": "ramo_002_005",
+      "estacoes_do_recorte_m": [
+        22.50380374258046,
+        28.009754678225573
+      ],
+      "distancias_ao_no_m": {
+        "inicio": 22.50380374258046,
+        "fim": 33.51570561387068
+      },
+      "alcance_triagem_m": 8.0
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/full1x_16cm/ramo_002_008/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "grupo": "aviso_de_passagem",
+      "levantamento": "indian_tunnel/Full",
+      "recorte": "ramo_002_008",
+      "estacoes_do_recorte_m": [
+        39.0216565495158,
+        44.527607485160914
+      ],
+      "distancias_ao_no_m": {
+        "inicio": 39.0216565495158,
+        "fim": 16.99785280693534
+      },
+      "alcance_triagem_m": 8.0
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/full1x_16cm/ramo_002_009/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "grupo": "aviso_de_passagem",
+      "levantamento": "indian_tunnel/Full",
+      "recorte": "ramo_002_009",
+      "estacoes_do_recorte_m": [
+        44.527607485160914,
+        50.03355842080603
+      ],
+      "distancias_ao_no_m": {
+        "inicio": 44.527607485160914,
+        "fim": 11.491901871290224
+      },
+      "alcance_triagem_m": 8.0
+    }
+  ]
+}

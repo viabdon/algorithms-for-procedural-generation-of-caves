@@ -1,0 +1,189 @@
+{
+  "planos": [
+    {
+      "levantamento": "archamps/PreEtroiture",
+      "plano_anterior": "pre_5cm_16cm",
+      "plano": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/archamps/PreEtroiture/holdout_indian_tunnel/auto_pre_5cm_16cm/plan.json",
+      "resultado": "planejado",
+      "total": 21,
+      "completos_antes": 10,
+      "completos_depois": 13,
+      "recuperados": [
+        "ramo_001_001",
+        "ramo_001_004",
+        "ramo_002_008"
+      ],
+      "perderam_contorno": [],
+      "cortes": {
+        "moved": 3,
+        "refit": 16,
+        "pending": 5
+      },
+      "validacao_recuperados": {
+        "ramo_001_001": {
+          "resultado": "ambiguous_passage",
+          "busca_semente": "",
+          "motivo": "A semente ficou conectada ao exterior e o reparo não foi verificado.",
+          "relatorio": "data/processed/reference_sections/archamps/PreEtroiture/holdout_indian_tunnel/auto_pre_5cm_16cm/ramo_001_001/64x64x64_sem_volume/20261127T003525729054Z-f37ecabb/summary.csv"
+        },
+        "ramo_001_004": {
+          "resultado": "volume_salvo",
+          "ar_voxels": 6849,
+          "busca_semente": null,
+          "relatorio": "data/processed/reference_sections/archamps/PreEtroiture/holdout_indian_tunnel/auto_pre_5cm_16cm/ramo_001_004/64x64x64/relatorio_volume/summary.csv"
+        },
+        "ramo_002_008": {
+          "resultado": "ambiguous_passage",
+          "busca_semente": "",
+          "motivo": "A semente ficou conectada ao exterior e o reparo não foi verificado.",
+          "relatorio": "data/processed/reference_sections/archamps/PreEtroiture/holdout_indian_tunnel/auto_pre_5cm_16cm/ramo_002_008/65x66x64_sem_volume/20261127T003532150821Z-97a758a4/summary.csv"
+        }
+      }
+    },
+    {
+      "levantamento": "cascadedemotiers/MainGallery",
+      "plano_anterior": "las5cm_16cm_rev",
+      "plano": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/cascadedemotiers/MainGallery/holdout_indian_tunnel/auto_las5cm_16cm_rev/plan.json",
+      "resultado": "planejado",
+      "total": 63,
+      "completos_antes": 44,
+      "completos_depois": 44,
+      "recuperados": [],
+      "perderam_contorno": [],
+      "cortes": {
+        "fixed": 18,
+        "refit": 45,
+        "pending": 18,
+        "moved": 1
+      },
+      "validacao_recuperados": {}
+    },
+    {
+      "levantamento": "cascadedemotiers/MainGallery",
+      "plano_anterior": "ramos_adicionais_16cm",
+      "plano": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/cascadedemotiers/MainGallery/holdout_indian_tunnel/auto_ramos_adicionais_16cm/plan.json",
+      "resultado": "planejado",
+      "total": 14,
+      "completos_antes": 1,
+      "completos_depois": 3,
+      "recuperados": [
+        "ramo_025_001",
+        "ramo_033_001"
+      ],
+      "perderam_contorno": [],
+      "cortes": {
+        "moved": 9,
+        "pending": 15,
+        "refit": 4
+      },
+      "validacao_recuperados": {
+        "ramo_025_001": {
+          "resultado": "ambiguous_passage",
+          "busca_semente": "",
+          "motivo": "A semente ficou conectada ao exterior e o reparo não foi verificado.",
+          "relatorio": "data/processed/reference_sections/cascadedemotiers/MainGallery/holdout_indian_tunnel/auto_ramos_adicionais_16cm/ramo_025_001/64x64x64_sem_volume/20261127T003532996433Z-4e48e3f1/summary.csv"
+        },
+        "ramo_033_001": {
+          "resultado": "ambiguous_passage",
+          "busca_semente": "",
+          "motivo": "A semente ficou conectada ao exterior e o reparo não foi verificado.",
+          "relatorio": "data/processed/reference_sections/cascadedemotiers/MainGallery/holdout_indian_tunnel/auto_ramos_adicionais_16cm/ramo_033_001/65x64x66_sem_volume/20261127T003535321906Z-e39af8cc/summary.csv"
+        }
+      }
+    },
+    {
+      "levantamento": "markovspodmol/MainGallery",
+      "plano_anterior": "las5cm_16cm_rev",
+      "plano": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/markovspodmol/MainGallery/holdout_indian_tunnel/auto_las5cm_16cm_rev/plan.json",
+      "resultado": "planejado",
+      "total": 65,
+      "completos_antes": 46,
+      "completos_depois": 38,
+      "recuperados": [],
+      "perderam_contorno": [
+        "ramo_035_001",
+        "ramo_037_002",
+        "ramo_037_003",
+        "ramo_037_004",
+        "ramo_037_005",
+        "ramo_037_006",
+        "ramo_037_007",
+        "ramo_041_002"
+      ],
+      "cortes": {
+        "fixed": 17,
+        "refit": 36,
+        "pending": 26,
+        "moved": 1
+      },
+      "validacao_recuperados": {}
+    },
+    {
+      "levantamento": "markovspodmol/MainGallery",
+      "plano_anterior": "ramos_adicionais_16cm",
+      "plano": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/markovspodmol/MainGallery/holdout_indian_tunnel/auto_ramos_adicionais_16cm/plan.json",
+      "resultado": "planejado",
+      "total": 15,
+      "completos_antes": 0,
+      "completos_depois": 1,
+      "recuperados": [
+        "ramo_019_001"
+      ],
+      "perderam_contorno": [],
+      "cortes": {
+        "pending": 26,
+        "moved": 1,
+        "refit": 3
+      },
+      "validacao_recuperados": {
+        "ramo_019_001": {
+          "resultado": "ambiguous_passage",
+          "busca_semente": "",
+          "motivo": "A semente ficou conectada ao exterior e o reparo não foi verificado.",
+          "relatorio": "data/processed/reference_sections/markovspodmol/MainGallery/holdout_indian_tunnel/auto_ramos_adicionais_16cm/ramo_019_001/64x64x64_sem_volume/20261127T003536629668Z-361343a2/summary.csv"
+        }
+      }
+    },
+    {
+      "levantamento": "indian_tunnel/Full",
+      "plano_anterior": "full10x_16cm_rev",
+      "plano": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/auto_full10x_16cm_rev/plan.json",
+      "resultado": "planejado",
+      "total": 32,
+      "completos_antes": 9,
+      "completos_depois": 0,
+      "recuperados": [],
+      "perderam_contorno": [
+        "ramo_002_002",
+        "ramo_002_003",
+        "ramo_002_004",
+        "ramo_002_005",
+        "ramo_002_006",
+        "ramo_002_007",
+        "ramo_002_008",
+        "ramo_002_009",
+        "ramo_002_010"
+      ],
+      "cortes": {
+        "pending": 36,
+        "fixed": 1
+      },
+      "validacao_recuperados": {}
+    },
+    {
+      "levantamento": "indian_tunnel/Full",
+      "plano_anterior": "ramos_adicionais_16cm",
+      "plano": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/auto_ramos_adicionais_16cm/plan.json",
+      "resultado": "planejado",
+      "total": 2,
+      "completos_antes": 0,
+      "completos_depois": 0,
+      "recuperados": [],
+      "perderam_contorno": [],
+      "cortes": {
+        "pending": 4
+      },
+      "validacao_recuperados": {}
+    }
+  ]
+}

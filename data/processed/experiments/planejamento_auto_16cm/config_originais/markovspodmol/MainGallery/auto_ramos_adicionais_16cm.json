@@ -1,0 +1,31 @@
+{
+  "cave": "markovspodmol",
+  "survey": "MainGallery",
+  "fold": "holdout_indian_tunnel",
+  "units": "m",
+  "plan_id": "auto_ramos_adicionais_16cm",
+  "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/MarkovSpodmol/MainGallery/pointclouds/MarkovSpodmol_MainGallery_sampled_5cm_PCV_normals_classified_georef.las",
+  "centreline": "/run/media/midnavi/Pablo/TCC/DATA/RAW/MarkovSpodmol/MainGallery/centreline/MarkovSpodmol_MainGallery_nodes_from_LBC.txt",
+  "count": 15,
+  "passages": [
+    4,
+    19,
+    23,
+    26,
+    27,
+    32,
+    36,
+    51,
+    52,
+    57,
+    66,
+    69,
+    75,
+    80,
+    82
+  ],
+  "voxel_size": 0.16,
+  "batch_size": 131072,
+  "padding_voxels": 2,
+  "section_search_radius_voxels": 8
+}

@@ -5,6 +5,8 @@ data/processed/
 ├── experiments/
 │   └── experiment_elaphes-meshing/   # ensaios históricos do Elaphes
 ├── references/                      # superfícies e interiores candidatos de scans
+├── crop_plans/                      # PLYs, linhas centrais e configurações de recortes
+├── reference_sections/              # grades, máscaras e diagnósticos dos recortes
 ├── generated/
 │   ├── cellular_automata/
 │   │   ├── baseline_32/
@@ -34,8 +36,9 @@ relatórios; esta organização não altera sua validade científica.
 Para novos volumes, use `generated/<algoritmo>/<configuracao>/`.
 As pastas `baseline_32` e `baseline_64` correspondem aos experimentos em
 `configs/experiments/`, com os parâmetros da respectiva entrada em
-`algorithms`. Estão vazias, reservadas para volumes futuros. GAN e PCGRL
-ainda não têm uma configuração experimental definida.
+`algorithms`. Estão vazias, reservadas para volumes futuros. A GAN tem
+configurações propostas em `configs/gan` e código preparado para Colab, sem
+treino nas referências; PCGRL continua em planejamento.
 
 Dentro de cada configuração, separe execuções por `seed_<N>/` (ou por um
 identificador de execução se houver repetições). Salve o volume junto de uma
@@ -57,3 +60,33 @@ de ser aceito como ar da caverna. Os comandos, metadados e o protocolo de
 reprodução estão no [guia de preparação de volumes](../../docs/preparacao-volumes.md).
 A pasta antiga `data/references/`, que continha apenas um marcador versionado,
 foi substituída na estrutura por `data/processed/references/`.
+
+## Recortes de referência
+
+O menu grava propostas em `crop_plans/<caverna>/<levantamento>/<fold>/<plano>/`.
+A voxelização planejada guarda resultados em
+`reference_sections/<caverna>/<levantamento>/<fold>/<plano>/<recorte>/<resolucao>/`.
+Os recortes manuais sem ID de plano usam
+`reference_sections/<caverna>/<levantamento>/<recorte>/<resolucao>/`.
+Manter todos os trechos da mesma caverna no mesmo grupo do fold.
+
+- `surface.npz` guarda a parede observada. `masks.npz` guarda as tampas
+  em `caps` e as alterações inferidas em `repair`. Execuções anteriores
+  podem conter somente `caps`.
+- `interior.npz` guarda a componente de ar candidata. `run.json` registra
+  escala, seleção, transformação local, contagens e método, inclusive
+  quantos voxels de reparo foram necessários.
+- `diagnostics/` guarda `summary.csv` e `checks.csv`. Quando há
+  vazamento, guarda também as tabelas de sondagens, bins, trajetórias
+  e o NPZ compacto de inspeção. Tentativas rejeitadas ficam em
+  `<resolucao>.diagnostics/<tentativa>/` junto da pasta esperada,
+  sem publicar um interior. A opção 4 gera a inspeção em Plotly.
+
+Essas saídas preservam os NPZ globais da auditoria em `references/`.
+O significado das máscaras, o uso das tampas móveis e a revisão antes
+do treino estão no [guia de preparação](../../docs/preparacao-volumes.md#quando-o-flood-fill-encontra-o-exterior).
+
+## Planos de recortes
+
+As receitas dos recortes, os grafos usados pelos planos e as instruções para
+refazer a extração estão no [inventário de planos](crop_plans/README.md).

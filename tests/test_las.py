@@ -48,6 +48,19 @@ class LasReaderTests(unittest.TestCase):
             list(iterator)
             np.testing.assert_array_equal(first[0], expected[0])
 
+    def test_local_origin_preserves_offsets_smaller_than_a_global_float32_step(self):
+        with TemporaryDirectory() as d:
+            path = Path(d) / 'cloud.las'
+            offset = np.array([5_000_000., 8_000_000., 9_000_000.])
+            self.write_cloud(path, offsets=offset)
+            local = np.concatenate(list(iter_las_xyz(path, 2, origin_xyz=offset)))
+            self.assertEqual(local.dtype, np.float64)
+            np.testing.assert_allclose(
+                local, [[.01, .2, .003], [1., -1., .4], [-.2, 3., -.5]], atol=1e-12
+            )
+            with self.assertRaisesRegex(ValueError, 'origin_xyz'):
+                list(iter_las_xyz(path, 2, origin_xyz=np.array([np.nan, 0., 0.])))
+
     def test_empty_malformed_missing_and_truncated_clouds(self):
         with TemporaryDirectory() as d:
             path = Path(d) / 'cloud.las'
