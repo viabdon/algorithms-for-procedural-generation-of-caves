@@ -81,10 +81,23 @@ poucos pontos, que vêm de erros de medição, e a parede tem muitos. Se o
 caminhante está quase batendo na parede direita, o setor da direita fica
 cheio. Se ele está encostando no teto, o setor de cima fica cheio.
 
-Quando a contagem de um setor passa de um limiar, a direção desse setor
-perde peso e a direção oposta ganha. A correção é limitada pela inércia,
-para que o desvio não vire meia-volta. Quando o kernel está equilibrado,
-o caminhante está longe o suficiente das bordas e segue a guia.
+### Pesos que mudam com a proximidade da borda
+
+Os pesos não são fixos: eles mudam à medida que o caminhante se aproxima
+de uma borda.
+
+- **No centro**, com o kernel equilibrado, o peso positivo da direção
+  atual domina. O caminhante mantém o rumo que já tinha e segue a guia.
+- **Ao se aproximar de uma borda**, a contagem do setor daquele lado
+  cresce. O peso da parede cresce junto, aos poucos, e empurra o
+  caminhante de volta para o centro.
+- **De volta ao centro**, o peso da parede cai e a inércia volta a mandar.
+
+A transição gradual evita dois extremos. Um peso de parede forte demais
+joga o caminhante para a direção oposta e o faz atravessar a galeria em
+zigue-zague. Um peso fraco demais deixa o caminhante andar rente à
+parede, e um eixo colado na borda não serve para os cortes. A correção
+também é limitada pela inércia, para que o desvio nunca vire meia-volta.
 
 O mesmo mecanismo protege contra lacunas da nuvem. Uma falha no
 levantamento é sempre menor que a seção interna da galeria, então mesmo
@@ -149,9 +162,11 @@ serão definidas, depois de ver a etapa 1 em casos reais.
   duas folhas da árvore.
 - **Aleatório ou determinístico**: se o passo for sorteado, usar
   `numpy_rng(seed)` e registrar a semente, como no resto do projeto.
-- **Tamanho do kernel e do passo**: as galerias têm calibres diferentes.
-  Um raio fixo pode ser grande demais nas passagens estreitas. O passo
-  precisa ser comparável ao voxel de 16 cm usado nos recortes.
+- **Tamanho do kernel e do passo**: um kernel pequeno pode passar por uma
+  fresta achando que é galeria; um kernel grande custa mais por passo e
+  pode ser grande demais nas passagens estreitas. O passo precisa ser
+  comparável ao voxel de 16 cm usado nos recortes. O primeiro ensaio
+  varia o kernel para medir essa troca.
 - **Limiar de borda**: separar os pontos de ruído do interior da parede
   real. A densidade varia entre levantamentos (LAS de 5 cm, Indian
   Tunnel Full 1x e 10x).
@@ -168,6 +183,29 @@ serão definidas, depois de ver a etapa 1 em casos reais.
   deles é penalizado.
 - **Critério de parada**: chegar à extremidade final, ficar preso entre
   paredes ou se afastar demais do grafo.
+
+## Primeiro ensaio: um recorte com erro
+
+Antes do lote completo, o caminhante é testado num único recorte que
+está falhando, indicado pelo Pablo. O resultado é visto na mesma prévia
+Plotly que ele já usa para os recortes (`recorte.html`, gerado por
+[`crop_preview.py`](../../../src/cavegen/datastream/crop_preview.py)). A
+linha central do random walk entra como mais uma camada da figura, ao
+lado do eixo atual, sobre os mesmos pontos. A comparação é visual: onde
+cada eixo passa na junção e se algum deles atravessa a parede.
+
+Os primeiros erros devem ser de código, não necessariamente da lógica.
+Separar os dois casos antes de ajustar parâmetros. O ensaio varia:
+
+| Parâmetro | Sinal de que está pequeno | Sinal de que está grande |
+| --- | --- | --- |
+| Raio do kernel | Passa por frestas como se fossem galeria | Custo alto por passo; não cabe nas passagens estreitas |
+| Peso da parede | Eixo rente à parede | Zigue-zague ou desvio para a direção oposta |
+| Peso da ramificação | Entra no ramo lateral | Desvia demais na junção e sai do meio da galeria principal |
+
+O tempo de cada configuração entra no registro, medido com
+`track_resources`, para que o custo do kernel maior fique documentado
+com a mesma régua do resto do projeto.
 
 ## Como avaliar
 
