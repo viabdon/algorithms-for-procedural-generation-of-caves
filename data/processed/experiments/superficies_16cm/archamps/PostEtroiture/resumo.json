@@ -1,0 +1,40 @@
+{
+  "schema": "gan_observed_surface_sparse_v1",
+  "axis_order": "ZYX",
+  "coordinate_units": "m",
+  "voxel_size": 0.16,
+  "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/Archamps/PostEtroiture/pointclouds/Archamps_PostEtroiture_sampled_2mm_PCV_normals_classified_georef.las",
+  "source_size_bytes": 7890969315,
+  "source_mtime_ns": 1741111429719705100,
+  "source_points": 136051177,
+  "source_plan": "data/processed/crop_plans/archamps/PostEtroiture/holdout_indian_tunnel/piloto_2mm_6_trechos_revisao_tampas/plan.json",
+  "source_origin_xyz": [
+    943844.079,
+    6561936.867,
+    1044.824
+  ],
+  "bounds_source_xyz": [
+    [
+      943840.33496,
+      6561931.881,
+      1036.41895
+    ],
+    [
+      943885.60889,
+      6561971.876,
+      1051.59497
+    ]
+  ],
+  "grid_origin_xyz": [
+    943840.2390000001,
+    6561931.7469999995,
+    1036.344
+  ],
+  "shape_zyx": [
+    96,
+    251,
+    284
+  ],
+  "occupied_voxels": 45989,
+  "semantic": "indices of observed surface; missing indices have unknown occupancy"
+}

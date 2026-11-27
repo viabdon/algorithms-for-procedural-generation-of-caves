@@ -1,0 +1,56 @@
+[
+  {
+    "levantamento": "archamps/PreEtroiture",
+    "plano_anterior": "pre_5cm_16cm",
+    "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/planejamento_auto_16cm/config_originais/archamps/PreEtroiture/auto_pre_5cm_16cm.json",
+    "resultado": "fonte_indisponivel",
+    "motivo": "Fonte XYZ, LAS, PLY ou F32 inválida: /run/media/midnavi/Pablo/TCC/DATA/RAW/Archamps/PreEtroiture/pointclouds/Archamps_PreEtroiture_sampled_5cm_PCV_normals_classified_georef.las",
+    "linha_central_indisponivel": "/run/media/midnavi/Pablo/TCC/DATA/RAW/Archamps/PreEtroiture/centreline/Archamps_PreEtroiture_nodes_from_LBC.txt"
+  },
+  {
+    "levantamento": "cascadedemotiers/MainGallery",
+    "plano_anterior": "las5cm_16cm_rev",
+    "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/planejamento_auto_16cm/config_originais/cascadedemotiers/MainGallery/auto_las5cm_16cm_rev.json",
+    "resultado": "fonte_indisponivel",
+    "motivo": "Fonte XYZ, LAS, PLY ou F32 inválida: /run/media/midnavi/Pablo/TCC/DATA/RAW/CascadeDeMotiers/MainGallery/pointclouds/CascadeDeMotiers_MainGallery_sampled_5cm_PCV_normals_classified_georef.las",
+    "linha_central_indisponivel": "/run/media/midnavi/Pablo/TCC/DATA/RAW/CascadeDeMotiers/MainGallery/centreline/CascadeDeMotiers_MainGallery_nodes_from_LBC.txt"
+  },
+  {
+    "levantamento": "cascadedemotiers/MainGallery",
+    "plano_anterior": "ramos_adicionais_16cm",
+    "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/planejamento_auto_16cm/config_originais/cascadedemotiers/MainGallery/auto_ramos_adicionais_16cm.json",
+    "resultado": "fonte_indisponivel",
+    "motivo": "Fonte XYZ, LAS, PLY ou F32 inválida: /run/media/midnavi/Pablo/TCC/DATA/RAW/CascadeDeMotiers/MainGallery/pointclouds/CascadeDeMotiers_MainGallery_sampled_5cm_PCV_normals_classified_georef.las",
+    "linha_central_indisponivel": "/run/media/midnavi/Pablo/TCC/DATA/RAW/CascadeDeMotiers/MainGallery/centreline/CascadeDeMotiers_MainGallery_nodes_from_LBC.txt"
+  },
+  {
+    "levantamento": "markovspodmol/MainGallery",
+    "plano_anterior": "las5cm_16cm_rev",
+    "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/planejamento_auto_16cm/config_originais/markovspodmol/MainGallery/auto_las5cm_16cm_rev.json",
+    "resultado": "fonte_indisponivel",
+    "motivo": "Fonte XYZ, LAS, PLY ou F32 inválida: /run/media/midnavi/Pablo/TCC/DATA/RAW/MarkovSpodmol/MainGallery/pointclouds/MarkovSpodmol_MainGallery_sampled_5cm_PCV_normals_classified_georef.las",
+    "linha_central_indisponivel": "/run/media/midnavi/Pablo/TCC/DATA/RAW/MarkovSpodmol/MainGallery/centreline/MarkovSpodmol_MainGallery_nodes_from_LBC.txt"
+  },
+  {
+    "levantamento": "markovspodmol/MainGallery",
+    "plano_anterior": "ramos_adicionais_16cm",
+    "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/planejamento_auto_16cm/config_originais/markovspodmol/MainGallery/auto_ramos_adicionais_16cm.json",
+    "resultado": "fonte_indisponivel",
+    "motivo": "Fonte XYZ, LAS, PLY ou F32 inválida: /run/media/midnavi/Pablo/TCC/DATA/RAW/MarkovSpodmol/MainGallery/pointclouds/MarkovSpodmol_MainGallery_sampled_5cm_PCV_normals_classified_georef.las",
+    "linha_central_indisponivel": "/run/media/midnavi/Pablo/TCC/DATA/RAW/MarkovSpodmol/MainGallery/centreline/MarkovSpodmol_MainGallery_nodes_from_LBC.txt"
+  },
+  {
+    "levantamento": "indian_tunnel/Full",
+    "plano_anterior": "full10x_16cm_rev",
+    "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/planejamento_auto_16cm/config_originais/indian_tunnel/Full/auto_full10x_16cm_rev.json",
+    "resultado": "fonte_indisponivel",
+    "motivo": "Fonte XYZ, LAS, PLY ou F32 inválida: /run/media/midnavi/Pablo/TCC/DATA/RAW/IndianTunnel/IndianTunnel_cave/Full/IndianTunnel_full_10x.f32"
+  },
+  {
+    "levantamento": "indian_tunnel/Full",
+    "plano_anterior": "ramos_adicionais_16cm",
+    "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/planejamento_auto_16cm/config_originais/indian_tunnel/Full/auto_ramos_adicionais_16cm.json",
+    "resultado": "fonte_indisponivel",
+    "motivo": "Fonte XYZ, LAS, PLY ou F32 inválida: /run/media/midnavi/Pablo/TCC/DATA/RAW/IndianTunnel/IndianTunnel_cave/Full/IndianTunnel_full_10x.f32"
+  }
+]

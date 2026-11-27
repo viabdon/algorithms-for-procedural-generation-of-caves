@@ -1,0 +1,62 @@
+[
+  {
+    "check": "outside_fill_without_repair",
+    "result": "interior",
+    "expected": "interior",
+    "passed": true,
+    "voxel_count": null,
+    "z": null,
+    "y": null,
+    "x": null
+  },
+  {
+    "check": "outside_fill_final",
+    "result": "interior",
+    "expected": "interior",
+    "passed": true,
+    "voxel_count": null,
+    "z": null,
+    "y": null,
+    "x": null
+  },
+  {
+    "check": "candidate_air_component",
+    "result": "match",
+    "expected": "match",
+    "passed": true,
+    "voxel_count": 2427,
+    "z": null,
+    "y": null,
+    "x": null
+  },
+  {
+    "check": "repair_overlap",
+    "result": 0,
+    "expected": 0,
+    "passed": true,
+    "voxel_count": 0,
+    "z": null,
+    "y": null,
+    "x": null
+  },
+  {
+    "check": "remove_initial_cap",
+    "result": "exterior",
+    "expected": null,
+    "passed": null,
+    "voxel_count": null,
+    "z": null,
+    "y": null,
+    "x": null
+  },
+  {
+    "check": "remove_final_cap",
+    "result": "exterior",
+    "expected": null,
+    "passed": null,
+    "voxel_count": null,
+    "z": null,
+    "y": null,
+    "x": null
+  }
+]

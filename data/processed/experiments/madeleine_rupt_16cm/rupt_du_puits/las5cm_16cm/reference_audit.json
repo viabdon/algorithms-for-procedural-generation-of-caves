@@ -1,0 +1,61 @@
+{
+  "schema": "gan-gallery-reference-audit-v1",
+  "records": [
+    {
+      "path": "rupt_du_puits/Cascades/teste_externo/las5cm_16cm/ramo_001_001/64x64x64/interior.npz",
+      "group": "rupt_du_puits",
+      "sha256": "e9a62253f14449af2ae458a0976a2ee10870191f055220a356f286af31656427",
+      "voxel_sha256": "f6f9337c3200a18e60fd40fc4a480554961e4fa8176d924507aaa89c4e8d9458",
+      "gallery_evidence": {
+        "surface.npz": "d42823e535d90ad071ddbd07693c18ac4da011b2748a9a58e82323f11938a965",
+        "masks.npz": "1e359c6b9b08cd8ee87153b1c2558c3342b92026b6ba7f5722f9ae2437971d00"
+      },
+      "candidate": true,
+      "eligible_proxy": true,
+      "geometry_screen_passed": true,
+      "issues": [],
+      "shape_zyx": [
+        64,
+        64,
+        64
+      ],
+      "voxel_size": 0.16,
+      "crop_id": "ramo_001_001",
+      "structure": {
+        "structural_schema_version": "structural-v1",
+        "axis_order": "ZYX",
+        "shape_depth": 64,
+        "shape_height": 64,
+        "shape_width": 64,
+        "spacing_z": 1.0,
+        "spacing_y": 1.0,
+        "spacing_x": 1.0,
+        "distance_unit": "voxel",
+        "exterior_policy": "solid",
+        "distance_reference": "voxel_centers",
+        "connectivity": 6,
+        "total_voxels": 262144,
+        "open_voxels": 25987,
+        "open_ratio": 0.09913253784179688,
+        "component_count": 1,
+        "largest_component_voxels": 25987,
+        "largest_component_ratio": 1.0,
+        "dt_mean": 3.033278773973238,
+        "dt_median": 2.449489742783178,
+        "dt_max": 9.899494936611665,
+        "is_degenerate": false,
+        "degenerate_reason": null
+      },
+      "repair_voxels": 0,
+      "auxiliary_cap_voxels": 6,
+      "review_status": "pending_review"
+    }
+  ],
+  "plans": [
+    "rupt_du_puits/Cascades/teste_externo/las5cm_16cm"
+  ],
+  "resolution": 64,
+  "voxel_size": 0.16,
+  "interpretation": "audited candidate air awaiting geometric review",
+  "audit_id": "0b15df94e06ef7f6d2675174cc87d7b0dc0274eadfad881402edc29c5866c7d8"
+}

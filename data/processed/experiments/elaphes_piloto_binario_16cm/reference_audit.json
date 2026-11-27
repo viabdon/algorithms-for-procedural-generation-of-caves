@@ -1,0 +1,61 @@
+{
+  "schema": "gan-gallery-reference-audit-v1",
+  "records": [
+    {
+      "path": "elaphes/MainGallery/holdout_elaphes/galeria_piloto/ramo_006_002/64x64x64/interior.npz",
+      "group": "elaphes",
+      "sha256": "aa299383dc2dee58407b228a9022f139d25b2e7f55e2ab3efd1e89a01c5e8546",
+      "voxel_sha256": "964d6c74980d8b0ef2b1b87a11bd544e6a42da5d2cd6dfdc69cf3176aa5f316b",
+      "gallery_evidence": {
+        "surface.npz": "ec097819ae73d26f5e16ac0fbb6f97863fabc989b17eb0732959454548b495a7",
+        "masks.npz": "2e4e63799d81df10c0b8c7e7bb695f625d10386e6510d81423c774b74e675a34"
+      },
+      "candidate": true,
+      "eligible_proxy": true,
+      "geometry_screen_passed": true,
+      "issues": [],
+      "shape_zyx": [
+        64,
+        64,
+        64
+      ],
+      "voxel_size": 0.16,
+      "crop_id": "ramo_006_002",
+      "structure": {
+        "structural_schema_version": "structural-v1",
+        "axis_order": "ZYX",
+        "shape_depth": 64,
+        "shape_height": 64,
+        "shape_width": 64,
+        "spacing_z": 1.0,
+        "spacing_y": 1.0,
+        "spacing_x": 1.0,
+        "distance_unit": "voxel",
+        "exterior_policy": "solid",
+        "distance_reference": "voxel_centers",
+        "connectivity": 6,
+        "total_voxels": 262144,
+        "open_voxels": 7334,
+        "open_ratio": 0.02797698974609375,
+        "component_count": 1,
+        "largest_component_voxels": 7334,
+        "largest_component_ratio": 1.0,
+        "dt_mean": 2.1128848757098115,
+        "dt_median": 2.0,
+        "dt_max": 6.164414002968976,
+        "is_degenerate": false,
+        "degenerate_reason": null
+      },
+      "repair_voxels": 0,
+      "auxiliary_cap_voxels": 0,
+      "review_status": "pending_review"
+    }
+  ],
+  "plans": [
+    "elaphes/MainGallery/holdout_elaphes/galeria_piloto"
+  ],
+  "resolution": 64,
+  "voxel_size": 0.16,
+  "interpretation": "audited candidate air awaiting geometric review",
+  "audit_id": "23c4adc211b74c2cd46cbe1b4d465dbc7692fe659321c3990089ed760ab1f2b0"
+}

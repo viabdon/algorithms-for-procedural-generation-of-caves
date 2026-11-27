@@ -1,0 +1,380 @@
+{
+  "recortes": [
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/madeleine_rupt_16cm/madeleine/las2mm_16cm/recortes/ramo_001_001/crop.json",
+      "falha_anterior": "escape_path_without_supported_voxels",
+      "juncoes": [],
+      "resultado": "sem_juncao_proxima"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/madeleine_rupt_16cm/madeleine/las2mm_16cm/recortes/ramo_001_003/crop.json",
+      "falha_anterior": "missing_contour",
+      "juncoes": [],
+      "resultado": "sem_juncao_proxima"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/madeleine_rupt_16cm/madeleine/las2mm_16cm/recortes/ramo_001_004/crop.json",
+      "falha_anterior": "missing_contour",
+      "juncoes": [],
+      "resultado": "sem_juncao_proxima"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/madeleine_rupt_16cm/madeleine/las2mm_16cm/recortes/ramo_001_005/crop.json",
+      "falha_anterior": "seed_blocked",
+      "juncoes": [],
+      "resultado": "sem_juncao_proxima"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/madeleine_rupt_16cm/madeleine/las2mm_16cm/recortes/ramo_001_007/crop.json",
+      "falha_anterior": "escape_path_without_supported_voxels",
+      "juncoes": [],
+      "resultado": "sem_juncao_proxima"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/madeleine_rupt_16cm/madeleine/las2mm_16cm/recortes/ramo_001_009/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "1d74e508a073/juncao_002"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/madeleine_rupt_16cm/madeleine/las2mm_16cm/recortes/ramo_001_010/crop.json",
+      "falha_anterior": "missing_contour",
+      "juncoes": [
+        "1d74e508a073/juncao_002"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/madeleine_rupt_16cm/madeleine/las2mm_16cm/recortes/ramo_002_002/crop.json",
+      "falha_anterior": "escape_path_without_supported_voxels",
+      "juncoes": [],
+      "resultado": "sem_juncao_proxima"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/madeleine_rupt_16cm/madeleine/las2mm_16cm/recortes/ramo_002_004/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "1d74e508a073/juncao_001"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/madeleine_rupt_16cm/madeleine/las2mm_16cm/recortes/ramo_002_005/crop.json",
+      "falha_anterior": "missing_contour",
+      "juncoes": [
+        "1d74e508a073/juncao_001"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/madeleine_rupt_16cm/madeleine/las2mm_16cm/recortes/ramo_003_001/crop.json",
+      "falha_anterior": "missing_contour",
+      "juncoes": [
+        "1d74e508a073/juncao_002"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/madeleine_rupt_16cm/madeleine/las2mm_16cm/recortes/ramo_003_002/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "1d74e508a073/juncao_002"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/madeleine_rupt_16cm/madeleine/las2mm_16cm/recortes/ramo_004_001/crop.json",
+      "falha_anterior": "missing_contour",
+      "juncoes": [
+        "1d74e508a073/juncao_002",
+        "1d74e508a073/juncao_001"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/madeleine_rupt_16cm/madeleine/las2mm_16cm/recortes/ramo_005_001/crop.json",
+      "falha_anterior": "missing_contour",
+      "juncoes": [
+        "1d74e508a073/juncao_001"
+      ],
+      "resultado": "juncao_sem_volume"
+    }
+  ],
+  "juncoes": {
+    "1d74e508a073/juncao_001": {
+      "ramos": {
+        "2": {
+          "aceitos": 7,
+          "busca": "padrao",
+          "estacoes_do_no_m": [
+            1.28,
+            1.92,
+            2.56,
+            3.2,
+            3.84,
+            4.48,
+            5.12,
+            5.76,
+            6.4,
+            7.04,
+            7.68,
+            8.0
+          ],
+          "rejeicoes": {
+            "contorno": 3,
+            "eixo_na_parede": 2
+          },
+          "trajetorias_candidatas": [
+            {
+              "distancia_m": 2.56,
+              "voxels_de_parede_no_eixo": 0
+            },
+            {
+              "distancia_m": 3.2,
+              "voxels_de_parede_no_eixo": 0
+            },
+            {
+              "distancia_m": 5.76,
+              "voxels_de_parede_no_eixo": 4
+            },
+            {
+              "distancia_m": 6.4,
+              "voxels_de_parede_no_eixo": 4
+            },
+            {
+              "distancia_m": 7.04,
+              "voxels_de_parede_no_eixo": 4
+            },
+            {
+              "distancia_m": 7.68,
+              "voxels_de_parede_no_eixo": 4
+            },
+            {
+              "distancia_m": 8.0,
+              "voxels_de_parede_no_eixo": 4
+            }
+          ]
+        },
+        "4": {
+          "aceitos": 0,
+          "busca": "padrao",
+          "estacoes_do_no_m": [
+            1.28,
+            1.92,
+            2.2654813862712393
+          ],
+          "rejeicoes": {
+            "contorno": 3
+          },
+          "trajetorias_candidatas": []
+        },
+        "5": {
+          "aceitos": 3,
+          "busca": "padrao",
+          "estacoes_do_no_m": [
+            1.28,
+            1.92,
+            2.56,
+            3.1183818612841883
+          ],
+          "rejeicoes": {
+            "contorno": 1
+          },
+          "trajetorias_candidatas": [
+            {
+              "distancia_m": 1.92,
+              "voxels_de_parede_no_eixo": 0
+            },
+            {
+              "distancia_m": 2.56,
+              "voxels_de_parede_no_eixo": 0
+            },
+            {
+              "distancia_m": 3.1183818612841883,
+              "voxels_de_parede_no_eixo": 0
+            }
+          ]
+        }
+      },
+      "tentativas": [],
+      "resultado": "ramo_sem_tampa_valida",
+      "recentramento": {
+        "resultado": "sem_eixo_ajustado",
+        "ramos": {
+          "2": {
+            "voxels_de_parede_antes": 4,
+            "resultado": "sem_duas_ancoras",
+            "ancora_antes": false,
+            "ancora_depois": true
+          },
+          "4": {
+            "resultado": "eixo_sem_cruzamento"
+          },
+          "5": {
+            "resultado": "eixo_sem_cruzamento"
+          }
+        }
+      },
+      "no_xyz": [
+        3.8099999999999987,
+        -30.875,
+        186.26
+      ],
+      "source": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/madeleine_rupt_16cm/fontes/GrotteDeLaMadeleine/Filleul/pointclouds/GrotteDeLaMadeleine_Filleul_sampled_2mm_PCV_normals_classified.las",
+      "centreline": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/madeleine_rupt_16cm/fontes/GrotteDeLaMadeleine/Filleul/centreline/GrotteDeLaMadeleine_Filleul_nodes_from_LBC.txt",
+      "voxel_size": 0.16
+    },
+    "1d74e508a073/juncao_002": {
+      "ramos": {
+        "1": {
+          "aceitos": 8,
+          "busca": "padrao",
+          "estacoes_do_no_m": [
+            1.28,
+            1.92,
+            2.56,
+            3.2,
+            3.84,
+            4.48,
+            5.12,
+            5.76,
+            6.4,
+            7.04,
+            7.68,
+            8.0
+          ],
+          "rejeicoes": {
+            "contorno": 3,
+            "eixo_na_parede": 1
+          },
+          "trajetorias_candidatas": [
+            {
+              "distancia_m": 2.56,
+              "voxels_de_parede_no_eixo": 0
+            },
+            {
+              "distancia_m": 3.2,
+              "voxels_de_parede_no_eixo": 0
+            },
+            {
+              "distancia_m": 3.84,
+              "voxels_de_parede_no_eixo": 0
+            },
+            {
+              "distancia_m": 4.48,
+              "voxels_de_parede_no_eixo": 0
+            },
+            {
+              "distancia_m": 5.12,
+              "voxels_de_parede_no_eixo": 0
+            },
+            {
+              "distancia_m": 5.76,
+              "voxels_de_parede_no_eixo": 0
+            },
+            {
+              "distancia_m": 6.4,
+              "voxels_de_parede_no_eixo": 0
+            },
+            {
+              "distancia_m": 7.04,
+              "voxels_de_parede_no_eixo": 0
+            }
+          ]
+        },
+        "3": {
+          "aceitos": 5,
+          "busca": "padrao",
+          "estacoes_do_no_m": [
+            1.28,
+            1.92,
+            2.56,
+            3.2,
+            3.84,
+            4.48,
+            5.12,
+            5.76,
+            6.4,
+            7.04,
+            7.68,
+            8.0
+          ],
+          "rejeicoes": {
+            "contorno": 4,
+            "eixo_na_parede": 3
+          },
+          "trajetorias_candidatas": [
+            {
+              "distancia_m": 2.56,
+              "voxels_de_parede_no_eixo": 0
+            },
+            {
+              "distancia_m": 4.48,
+              "voxels_de_parede_no_eixo": 9
+            },
+            {
+              "distancia_m": 5.12,
+              "voxels_de_parede_no_eixo": 9
+            },
+            {
+              "distancia_m": 6.4,
+              "voxels_de_parede_no_eixo": 12
+            },
+            {
+              "distancia_m": 8.0,
+              "voxels_de_parede_no_eixo": 14
+            }
+          ]
+        },
+        "4": {
+          "aceitos": 0,
+          "busca": "padrao",
+          "estacoes_do_no_m": [
+            1.28,
+            1.92,
+            2.2654813862712393
+          ],
+          "rejeicoes": {
+            "contorno": 3
+          },
+          "trajetorias_candidatas": []
+        }
+      },
+      "tentativas": [],
+      "resultado": "ramo_sem_tampa_valida",
+      "recentramento": {
+        "resultado": "sem_eixo_ajustado",
+        "ramos": {
+          "1": {
+            "voxels_de_parede_antes": 5,
+            "resultado": "sem_duas_ancoras",
+            "ancora_antes": true,
+            "ancora_depois": false
+          },
+          "3": {
+            "voxels_de_parede_antes": 14,
+            "ancoras_do_no_m": [
+              1.76,
+              8.48
+            ],
+            "resultado": "fatia_sem_interior_sustentado",
+            "fatias_sem_candidata": 28
+          },
+          "4": {
+            "resultado": "eixo_sem_cruzamento"
+          }
+        }
+      },
+      "no_xyz": [
+        4.684000000000001,
+        -32.719,
+        185.336
+      ],
+      "source": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/madeleine_rupt_16cm/fontes/GrotteDeLaMadeleine/Filleul/pointclouds/GrotteDeLaMadeleine_Filleul_sampled_2mm_PCV_normals_classified.las",
+      "centreline": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/madeleine_rupt_16cm/fontes/GrotteDeLaMadeleine/Filleul/centreline/GrotteDeLaMadeleine_Filleul_nodes_from_LBC.txt",
+      "voxel_size": 0.16
+    }
+  }
+}

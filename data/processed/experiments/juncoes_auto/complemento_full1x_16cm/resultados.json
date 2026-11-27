@@ -1,0 +1,552 @@
+{
+  "recortes": [
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/juncoes_auto/inventario_complemento_full1x_16cm/ramo_001_009.json",
+      "falha_anterior": "missing_contour",
+      "juncoes": [
+        "5865abbe2035/juncao_001"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/juncoes_auto/inventario_complemento_full1x_16cm/ramo_001_010.json",
+      "falha_anterior": "missing_contour",
+      "juncoes": [
+        "5865abbe2035/juncao_001"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/juncoes_auto/inventario_complemento_full1x_16cm/ramo_002_001.json",
+      "falha_anterior": "missing_contour",
+      "juncoes": [
+        "5865abbe2035/juncao_002"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/juncoes_auto/inventario_complemento_full1x_16cm/ramo_007_001.json",
+      "falha_anterior": "missing_contour",
+      "juncoes": [
+        "5865abbe2035/juncao_003"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/juncoes_auto/inventario_complemento_full1x_16cm/ramo_007_002.json",
+      "falha_anterior": "missing_contour",
+      "juncoes": [
+        "5865abbe2035/juncao_003"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/juncoes_auto/inventario_complemento_full1x_16cm/ramo_007_003.json",
+      "falha_anterior": "missing_contour",
+      "juncoes": [
+        "5865abbe2035/juncao_003"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/juncoes_auto/inventario_complemento_full1x_16cm/ramo_008_001.json",
+      "falha_anterior": "missing_contour",
+      "juncoes": [
+        "5865abbe2035/juncao_003"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/juncoes_auto/inventario_complemento_full1x_16cm/ramo_008_002.json",
+      "falha_anterior": "missing_contour",
+      "juncoes": [
+        "5865abbe2035/juncao_003"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/juncoes_auto/inventario_complemento_full1x_16cm/ramo_008_004.json",
+      "falha_anterior": "missing_contour",
+      "juncoes": [
+        "5865abbe2035/juncao_007"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/juncoes_auto/inventario_complemento_full1x_16cm/ramo_008_005.json",
+      "falha_anterior": "missing_contour",
+      "juncoes": [
+        "5865abbe2035/juncao_007"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/juncoes_auto/inventario_complemento_full1x_16cm/ramo_009_002.json",
+      "falha_anterior": "missing_contour",
+      "juncoes": [
+        "5865abbe2035/juncao_004"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/juncoes_auto/inventario_complemento_full1x_16cm/ramo_009_003.json",
+      "falha_anterior": "missing_contour",
+      "juncoes": [
+        "5865abbe2035/juncao_004"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/juncoes_auto/inventario_complemento_full1x_16cm/ramo_006_001.json",
+      "falha_anterior": "missing_contour",
+      "juncoes": [
+        "5865abbe2035/juncao_003"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/juncoes_auto/inventario_complemento_full1x_16cm/ramo_018_001.json",
+      "falha_anterior": "missing_contour",
+      "juncoes": [
+        "5865abbe2035/juncao_011"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/juncoes_auto/inventario_complemento_full1x_16cm/ramo_002_002.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "5865abbe2035/juncao_002"
+      ],
+      "resultado": "juncao_sem_volume"
+    }
+  ],
+  "juncoes": {
+    "5865abbe2035/juncao_001": {
+      "ramos": {
+        "1": {
+          "aceitos": 0,
+          "busca": "padrao",
+          "estacoes_do_no_m": [
+            1.28,
+            1.92,
+            2.56,
+            3.2,
+            3.84,
+            4.48,
+            5.12,
+            5.76,
+            6.4,
+            7.04,
+            7.68,
+            8.0
+          ],
+          "rejeicoes": {
+            "contorno": 12
+          },
+          "trajetorias_candidatas": []
+        },
+        "3": {
+          "aceitos": 0,
+          "busca": "sem_estacao",
+          "estacoes_do_no_m": [],
+          "rejeicoes": {},
+          "trajetorias_candidatas": []
+        },
+        "5": {
+          "aceitos": 0,
+          "busca": "sem_estacao",
+          "estacoes_do_no_m": [],
+          "rejeicoes": {},
+          "trajetorias_candidatas": []
+        }
+      },
+      "tentativas": [],
+      "resultado": "ramo_sem_tampa_valida",
+      "recentramento": {
+        "resultado": "sem_eixo_ajustado",
+        "ramos": {
+          "1": {
+            "resultado": "eixo_sem_cruzamento"
+          },
+          "3": {
+            "resultado": "eixo_sem_cruzamento"
+          },
+          "5": {
+            "resultado": "eixo_sem_cruzamento"
+          }
+        }
+      },
+      "no_xyz": [
+        -18.5942245655856,
+        55.26071876082451,
+        1.3941528429845018
+      ],
+      "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/IndianTunnel/IndianTunnel_cave/Full/IndianTunnel_full_1x.f32",
+      "centreline": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/full10x_16cm/centreline.npz",
+      "voxel_size": 0.16
+    },
+    "5865abbe2035/juncao_002": {
+      "ramos": {
+        "2": {
+          "aceitos": 0,
+          "busca": "padrao",
+          "estacoes_do_no_m": [
+            1.28,
+            1.92,
+            2.56,
+            3.2,
+            3.84,
+            4.48,
+            5.12,
+            5.76,
+            6.4,
+            7.04,
+            7.68,
+            8.0
+          ],
+          "rejeicoes": {
+            "contorno": 12
+          },
+          "trajetorias_candidatas": []
+        },
+        "3": {
+          "aceitos": 0,
+          "busca": "sem_estacao",
+          "estacoes_do_no_m": [],
+          "rejeicoes": {},
+          "trajetorias_candidatas": []
+        },
+        "4": {
+          "aceitos": 0,
+          "busca": "sem_estacao",
+          "estacoes_do_no_m": [],
+          "rejeicoes": {},
+          "trajetorias_candidatas": []
+        }
+      },
+      "tentativas": [],
+      "resultado": "ramo_sem_tampa_valida",
+      "recentramento": {
+        "resultado": "sem_eixo_ajustado",
+        "ramos": {
+          "2": {
+            "resultado": "eixo_sem_cruzamento"
+          },
+          "3": {
+            "resultado": "eixo_sem_cruzamento"
+          },
+          "4": {
+            "resultado": "eixo_sem_cruzamento"
+          }
+        }
+      },
+      "no_xyz": [
+        -18.528799366316576,
+        54.86815706449709,
+        1.395393436230659
+      ],
+      "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/IndianTunnel/IndianTunnel_cave/Full/IndianTunnel_full_1x.f32",
+      "centreline": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/full10x_16cm/centreline.npz",
+      "voxel_size": 0.16
+    },
+    "5865abbe2035/juncao_003": {
+      "ramos": {
+        "6": {
+          "aceitos": 0,
+          "busca": "padrao",
+          "estacoes_do_no_m": [
+            1.28,
+            1.8730950732176528
+          ],
+          "rejeicoes": {
+            "contorno": 2
+          },
+          "trajetorias_candidatas": []
+        },
+        "7": {
+          "aceitos": 0,
+          "busca": "padrao",
+          "estacoes_do_no_m": [
+            1.28,
+            1.92,
+            2.56,
+            3.2,
+            3.84,
+            4.48,
+            5.12,
+            5.76,
+            6.4,
+            7.04,
+            7.68,
+            8.0
+          ],
+          "rejeicoes": {
+            "contorno": 12
+          },
+          "trajetorias_candidatas": []
+        },
+        "8": {
+          "aceitos": 0,
+          "busca": "padrao",
+          "estacoes_do_no_m": [
+            1.28,
+            1.92,
+            2.56,
+            3.2,
+            3.84,
+            4.48,
+            5.12,
+            5.76,
+            6.4,
+            7.04,
+            7.68,
+            8.0
+          ],
+          "rejeicoes": {
+            "contorno": 12
+          },
+          "trajetorias_candidatas": []
+        }
+      },
+      "tentativas": [],
+      "resultado": "ramo_sem_tampa_valida",
+      "recentramento": {
+        "resultado": "sem_eixo_ajustado",
+        "ramos": {
+          "6": {
+            "voxels_de_parede_antes": 4,
+            "resultado": "sem_duas_ancoras",
+            "ancora_antes": false,
+            "ancora_depois": false
+          },
+          "7": {
+            "resultado": "eixo_sem_cruzamento"
+          },
+          "8": {
+            "resultado": "eixo_sem_cruzamento"
+          }
+        }
+      },
+      "no_xyz": [
+        -10.742732694779662,
+        -28.174422980446593,
+        9.09460515384626
+      ],
+      "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/IndianTunnel/IndianTunnel_cave/Full/IndianTunnel_full_1x.f32",
+      "centreline": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/full10x_16cm/centreline.npz",
+      "voxel_size": 0.16
+    },
+    "5865abbe2035/juncao_004": {
+      "ramos": {
+        "9": {
+          "aceitos": 0,
+          "busca": "padrao",
+          "estacoes_do_no_m": [
+            1.28,
+            1.92,
+            2.56,
+            3.2,
+            3.84,
+            4.48,
+            5.12,
+            5.76,
+            6.4,
+            7.04,
+            7.68,
+            8.0
+          ],
+          "rejeicoes": {
+            "contorno": 12
+          },
+          "trajetorias_candidatas": []
+        },
+        "10": {
+          "aceitos": 0,
+          "busca": "sem_estacao",
+          "estacoes_do_no_m": [],
+          "rejeicoes": {},
+          "trajetorias_candidatas": []
+        },
+        "11": {
+          "aceitos": 0,
+          "busca": "padrao",
+          "estacoes_do_no_m": [
+            1.28,
+            1.8858244147395007
+          ],
+          "rejeicoes": {
+            "contorno": 2
+          },
+          "trajetorias_candidatas": []
+        }
+      },
+      "tentativas": [],
+      "resultado": "ramo_sem_tampa_valida",
+      "recentramento": {
+        "resultado": "sem_eixo_ajustado",
+        "ramos": {
+          "9": {
+            "resultado": "eixo_sem_cruzamento"
+          },
+          "10": {
+            "resultado": "eixo_sem_cruzamento"
+          },
+          "11": {
+            "resultado": "eixo_sem_cruzamento"
+          }
+        }
+      },
+      "no_xyz": [
+        -0.9371120319713384,
+        -6.424424485983906,
+        4.565454907370398
+      ],
+      "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/IndianTunnel/IndianTunnel_cave/Full/IndianTunnel_full_1x.f32",
+      "centreline": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/full10x_16cm/centreline.npz",
+      "voxel_size": 0.16
+    },
+    "5865abbe2035/juncao_007": {
+      "ramos": {
+        "8": {
+          "aceitos": 0,
+          "busca": "padrao",
+          "estacoes_do_no_m": [
+            1.28,
+            1.92,
+            2.56,
+            3.2,
+            3.84,
+            4.48,
+            5.12,
+            5.76,
+            6.4,
+            7.04,
+            7.68,
+            8.0
+          ],
+          "rejeicoes": {
+            "contorno": 12
+          },
+          "trajetorias_candidatas": []
+        },
+        "11": {
+          "aceitos": 0,
+          "busca": "padrao",
+          "estacoes_do_no_m": [
+            1.28,
+            1.8858244147395007
+          ],
+          "rejeicoes": {
+            "contorno": 2
+          },
+          "trajetorias_candidatas": []
+        },
+        "15": {
+          "aceitos": 0,
+          "busca": "ramo_curto",
+          "estacoes_do_no_m": [
+            1.2319761086974312,
+            1.12,
+            0.96,
+            0.8,
+            0.64,
+            0.48
+          ],
+          "rejeicoes": {
+            "contorno": 6
+          },
+          "trajetorias_candidatas": []
+        }
+      },
+      "tentativas": [],
+      "resultado": "ramo_sem_tampa_valida",
+      "recentramento": {
+        "resultado": "sem_eixo_ajustado",
+        "ramos": {
+          "8": {
+            "resultado": "eixo_sem_cruzamento"
+          },
+          "11": {
+            "resultado": "eixo_sem_cruzamento"
+          },
+          "15": {
+            "resultado": "eixo_sem_cruzamento"
+          }
+        }
+      },
+      "no_xyz": [
+        0.44781861096493714,
+        -7.23626767450213,
+        4.574225941900023
+      ],
+      "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/IndianTunnel/IndianTunnel_cave/Full/IndianTunnel_full_1x.f32",
+      "centreline": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/full10x_16cm/centreline.npz",
+      "voxel_size": 0.16
+    },
+    "5865abbe2035/juncao_011": {
+      "ramos": {
+        "15": {
+          "aceitos": 0,
+          "busca": "ramo_curto",
+          "estacoes_do_no_m": [
+            1.2319761086974312,
+            1.12,
+            0.96,
+            0.8,
+            0.64,
+            0.48
+          ],
+          "rejeicoes": {
+            "contorno": 6
+          },
+          "trajetorias_candidatas": []
+        },
+        "17": {
+          "aceitos": 0,
+          "busca": "sem_estacao",
+          "estacoes_do_no_m": [],
+          "rejeicoes": {},
+          "trajetorias_candidatas": []
+        },
+        "18": {
+          "aceitos": 0,
+          "busca": "padrao",
+          "estacoes_do_no_m": [
+            1.28,
+            1.92,
+            2.0533596311004976
+          ],
+          "rejeicoes": {
+            "contorno": 3
+          },
+          "trajetorias_candidatas": []
+        }
+      },
+      "tentativas": [],
+      "resultado": "ramo_sem_tampa_valida",
+      "recentramento": {
+        "resultado": "sem_eixo_ajustado",
+        "ramos": {
+          "15": {
+            "resultado": "eixo_sem_cruzamento"
+          },
+          "17": {
+            "resultado": "eixo_sem_cruzamento"
+          },
+          "18": {
+            "resultado": "eixo_sem_cruzamento"
+          }
+        }
+      },
+      "no_xyz": [
+        0.9350725370655297,
+        -5.915348175103148,
+        4.329400215145565
+      ],
+      "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/IndianTunnel/IndianTunnel_cave/Full/IndianTunnel_full_1x.f32",
+      "centreline": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/full10x_16cm/centreline.npz",
+      "voxel_size": 0.16
+    }
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "recortes": [
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/madeleine_rupt_16cm/rupt_du_puits/las5cm_16cm/recortes/ramo_001_002/crop.json",
+      "falha_anterior": "escape_path_without_supported_voxels",
+      "juncoes": [],
+      "resultado": "sem_juncao_proxima"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/madeleine_rupt_16cm/rupt_du_puits/las5cm_16cm/recortes/ramo_001_003/crop.json",
+      "falha_anterior": "escape_path_without_supported_voxels",
+      "juncoes": [],
+      "resultado": "sem_juncao_proxima"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/madeleine_rupt_16cm/rupt_du_puits/las5cm_16cm/recortes/ramo_001_004/crop.json",
+      "falha_anterior": "escape_path_without_supported_voxels",
+      "juncoes": [],
+      "resultado": "sem_juncao_proxima"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/madeleine_rupt_16cm/rupt_du_puits/las5cm_16cm/recortes/ramo_001_005/crop.json",
+      "falha_anterior": "escape_path_without_supported_voxels",
+      "juncoes": [],
+      "resultado": "sem_juncao_proxima"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/madeleine_rupt_16cm/rupt_du_puits/las5cm_16cm/recortes/ramo_001_006/crop.json",
+      "falha_anterior": "escape_path_without_supported_voxels",
+      "juncoes": [],
+      "resultado": "sem_juncao_proxima"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/madeleine_rupt_16cm/rupt_du_puits/las5cm_16cm/recortes/ramo_001_007/crop.json",
+      "falha_anterior": "escape_path_without_supported_voxels",
+      "juncoes": [],
+      "resultado": "sem_juncao_proxima"
+    }
+  ],
+  "juncoes": {}
+}

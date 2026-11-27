@@ -1,0 +1,17 @@
+{
+  "cave": "elaphes",
+  "survey": "MainGallery",
+  "fold": "holdout_elaphes",
+  "plan_id": "galeria_piloto",
+  "units": "m",
+  "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/Elaphes/elaphes_cave.ply",
+  "centreline": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/experiment_elaphes-meshing/elaphes_centreline_roi_x12_45_pruned_exploratory.npz",
+  "count": 3,
+  "passages": [
+    3,
+    6
+  ],
+  "voxel_size": 0.16,
+  "batch_size": 131072,
+  "section_search_radius_voxels": 8
+}

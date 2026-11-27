@@ -1,0 +1,266 @@
+{
+  "config": {
+    "cave": "vallorbe",
+    "survey": "GalerieSemiActive",
+    "crop_id": "ramo_004_004",
+    "plan_id": "las5cm_16cm",
+    "fold": "teste_externo",
+    "branch": "passagem_004",
+    "source": "cloud.ply",
+    "source_origin_xyz": [
+      2516274.164,
+      1172042.544,
+      813.459
+    ],
+    "units": "m",
+    "origin_xyz": [
+      -10.95299399987335,
+      -4.350571223153613,
+      -4.122017999999976
+    ],
+    "selection_min_xyz": [
+      -10.63459399987335,
+      -4.032171223153613,
+      -3.8036179999999753
+    ],
+    "selection_max_xyz": [
+      -3.192065131036787,
+      3.391598000005583,
+      3.651609000000068
+    ],
+    "shape_zyx": [
+      64,
+      64,
+      64
+    ],
+    "voxel_size": 0.16,
+    "sections": [
+      {
+        "point_xyz": [
+          -3.429000273018957,
+          -0.2896779892867315,
+          -0.2389975932420051
+        ],
+        "inward_normal_xyz": [
+          -0.9950276312835112,
+          -0.08432437538988627,
+          -0.05300389322899173
+        ],
+        "u_xyz": [
+          -0.0528145794837391,
+          -0.004475811813086082,
+          0.9985943056630003
+        ],
+        "polygon_uv": [
+          [
+            3.214337321421675,
+            0.639371446160774
+          ],
+          [
+            3.0502096796306173,
+            2.0380849491038466
+          ],
+          [
+            2.1245308796613847,
+            3.1795851574620086
+          ],
+          [
+            0.6789274338626976,
+            3.4131987005455984
+          ],
+          [
+            -0.7025139393724731,
+            3.531776071176139
+          ],
+          [
+            -1.6109300697790572,
+            2.4109272256824568
+          ],
+          [
+            -2.403188612446318,
+            1.6057592937275504
+          ],
+          [
+            -3.421000091431098,
+            0.6804792269925873
+          ],
+          [
+            -3.380700648280656,
+            -0.6724631693514501
+          ],
+          [
+            -1.935826090445052,
+            -1.2934776403622155
+          ],
+          [
+            -0.9443114648648467,
+            -1.4132619800678192
+          ],
+          [
+            -0.46833912022710883,
+            -2.3544997548252145
+          ],
+          [
+            0.5300527707409692,
+            -2.6647552272568023
+          ],
+          [
+            1.5806941291899026,
+            -2.3656759427571172
+          ],
+          [
+            2.3921716869605354,
+            -1.598398019462402
+          ],
+          [
+            2.950544188456084,
+            -0.5868997295840929
+          ]
+        ]
+      },
+      {
+        "point_xyz": [
+          -9.99146583263135,
+          -1.0557160829558567,
+          -0.19956529436892956
+        ],
+        "inward_normal_xyz": [
+          0.9841914560589384,
+          0.16092317956655475,
+          -0.07396558726040894
+        ],
+        "u_xyz": [
+          0.07299625076830678,
+          0.01193547119085134,
+          0.9972607943267512
+        ],
+        "polygon_uv": [
+          [
+            1.7273496333216447,
+            0.3435912048563934
+          ],
+          [
+            1.677581087448287,
+            1.1209238460103728
+          ],
+          [
+            1.156261944728978,
+            1.7304682896321952
+          ],
+          [
+            0.4526868974283897,
+            2.275810717009666
+          ],
+          [
+            -0.5981543466392469,
+            3.0071249692462136
+          ],
+          [
+            -1.6095609610949664,
+            2.40887820973613
+          ],
+          [
+            -3.0502879135821934,
+            2.038137223359049
+          ],
+          [
+            -3.2968772316945243,
+            0.6557896551164514
+          ],
+          [
+            -2.5574091385078113,
+            -0.5087003060989613
+          ],
+          [
+            -2.3153486235233385,
+            -1.5470664895741477
+          ],
+          [
+            -1.9887234370608755,
+            -2.9763349562532264
+          ],
+          [
+            -0.7197757838116406,
+            -3.618557223432099
+          ],
+          [
+            0.7153374834857619,
+            -3.5962443809258913
+          ],
+          [
+            1.436404355670651,
+            -2.149731036214505
+          ],
+          [
+            1.754596465691988,
+            -1.1723838765440884
+          ],
+          [
+            1.8238564149826817,
+            -0.36278759726478116
+          ]
+        ]
+      }
+    ],
+    "seed_xyz": [
+      -6.7185840210315515,
+      -0.6083704034286571,
+      -0.3274500779981955
+    ],
+    "batch_size": 65536,
+    "proposal": {
+      "crop_id": "ramo_004_004",
+      "status": "pending_review",
+      "review_reasons": [
+        "outra_passagem_ou_retorno_proximo"
+      ],
+      "retained_points": 66326,
+      "cut_stations": [
+        20.32077921638218,
+        26.934372288509575
+      ],
+      "section_bins_supported": [
+        16,
+        16
+      ],
+      "selection_radius": 3.964119036021447
+    },
+    "auxiliary_cap_radius_voxels": 4,
+    "seed_search_radius_voxels": 4,
+    "progress_every": 20000,
+    "leak_diagnostics": {
+      "raw_source": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/vallorbe_16cm/fontes/Vallorbe/GalerieSemiActive/pointclouds/Vallorbe_GalerieSemiActive_sampled_5cm_PCV_normals_classified_georef.las",
+      "centreline": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/vallorbe_16cm/fontes/Vallorbe/GalerieSemiActive/centreline/Vallorbe_GalerieSemiActive_nodes_from_LBC.txt"
+    },
+    "plane_tolerance": 1e-08
+  },
+  "partition": "test",
+  "source_path": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/vallorbe_16cm/vallorbe/las5cm_16cm/recortes/ramo_004_004/cloud.ply",
+  "source_size_bytes": 1591961,
+  "source_mtime_ns": 1795794660650402711,
+  "counts": {
+    "read": 66326,
+    "candidate": 66326,
+    "retained": 66326,
+    "outside_grid": 0
+  },
+  "axis_order": "ZYX",
+  "seed_zyx": [
+    23,
+    23,
+    26
+  ],
+  "surface_voxels": 9443,
+  "cap_voxels": [
+    1280,
+    1150
+  ],
+  "method": "reviewed_planar_caps_exterior_flood_fill_6",
+  "status": "pending_review",
+  "auxiliary_cap_voxels": 0,
+  "auxiliary_cap_radius_voxels": 0,
+  "repair_voxels": 0,
+  "air_voxels": 32256,
+  "candidate_volume": 132.12057600000003,
+  "diagnostics": "relatorio_volume/summary.csv"
+}

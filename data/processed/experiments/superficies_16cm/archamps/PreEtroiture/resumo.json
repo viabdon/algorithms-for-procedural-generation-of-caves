@@ -1,0 +1,40 @@
+{
+  "schema": "gan_observed_surface_sparse_v1",
+  "axis_order": "ZYX",
+  "coordinate_units": "m",
+  "voxel_size": 0.16,
+  "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/Archamps/PreEtroiture/pointclouds/Archamps_PreEtroiture_sampled_5cm_PCV_normals_classified_georef.las",
+  "source_size_bytes": 47810217,
+  "source_mtime_ns": 1741111724211846800,
+  "source_points": 824296,
+  "source_plan": "data/processed/crop_plans/archamps/PreEtroiture/holdout_indian_tunnel/pre_5cm_16cm/plan.json",
+  "source_origin_xyz": [
+    943833.256,
+    6562017.192,
+    1072.762
+  ],
+  "bounds_source_xyz": [
+    [
+      943775.03394,
+      6561973.584,
+      1039.26794
+    ],
+    [
+      943873.88599,
+      6562089.822,
+      1117.50696
+    ]
+  ],
+  "grid_origin_xyz": [
+    943775.0160000001,
+    6561973.512,
+    1039.162
+  ],
+  "shape_zyx": [
+    490,
+    727,
+    618
+  ],
+  "occupied_voxels": 144503,
+  "semantic": "indices of observed surface; missing indices have unknown occupancy"
+}

@@ -1,0 +1,632 @@
+{
+  "recortes": [
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/vallorbe_16cm/vallorbe/las5cm_16cm/recortes/ramo_001_001/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "463f1f3c5888/juncao_005"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/vallorbe_16cm/vallorbe/las5cm_16cm/recortes/ramo_001_002/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "463f1f3c5888/juncao_005"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/vallorbe_16cm/vallorbe/las5cm_16cm/recortes/ramo_001_007/crop.json",
+      "falha_anterior": "missing_contour",
+      "juncoes": [],
+      "resultado": "sem_juncao_proxima"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/vallorbe_16cm/vallorbe/las5cm_16cm/recortes/ramo_002_001/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "463f1f3c5888/juncao_005"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/vallorbe_16cm/vallorbe/las5cm_16cm/recortes/ramo_002_002/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "463f1f3c5888/juncao_005"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/vallorbe_16cm/vallorbe/las5cm_16cm/recortes/ramo_002_006/crop.json",
+      "falha_anterior": "escape_path_without_supported_voxels",
+      "juncoes": [],
+      "resultado": "sem_juncao_proxima"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/vallorbe_16cm/vallorbe/las5cm_16cm/recortes/ramo_002_009/crop.json",
+      "falha_anterior": "missing_contour",
+      "juncoes": [
+        "463f1f3c5888/juncao_004"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/vallorbe_16cm/vallorbe/las5cm_16cm/recortes/ramo_002_010/crop.json",
+      "falha_anterior": "missing_contour",
+      "juncoes": [
+        "463f1f3c5888/juncao_004"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/vallorbe_16cm/vallorbe/las5cm_16cm/recortes/ramo_004_001/crop.json",
+      "falha_anterior": "missing_contour",
+      "juncoes": [
+        "463f1f3c5888/juncao_004"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/vallorbe_16cm/vallorbe/las5cm_16cm/recortes/ramo_004_002/crop.json",
+      "falha_anterior": "missing_contour",
+      "juncoes": [
+        "463f1f3c5888/juncao_004"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/vallorbe_16cm/vallorbe/las5cm_16cm/recortes/ramo_004_005/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "463f1f3c5888/juncao_002"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/vallorbe_16cm/vallorbe/las5cm_16cm/recortes/ramo_006_001/crop.json",
+      "falha_anterior": "missing_contour",
+      "juncoes": [
+        "463f1f3c5888/juncao_002"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/vallorbe_16cm/vallorbe/las5cm_16cm/recortes/ramo_006_002/crop.json",
+      "falha_anterior": "missing_contour",
+      "juncoes": [
+        "463f1f3c5888/juncao_002"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/vallorbe_16cm/vallorbe/las5cm_16cm/recortes/ramo_007_001/crop.json",
+      "falha_anterior": "missing_contour",
+      "juncoes": [
+        "463f1f3c5888/juncao_002",
+        "463f1f3c5888/juncao_001"
+      ],
+      "resultado": "juncao_sem_volume"
+    },
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/vallorbe_16cm/vallorbe/las5cm_16cm/recortes/ramo_011_001/crop.json",
+      "falha_anterior": "missing_contour",
+      "juncoes": [
+        "463f1f3c5888/juncao_001"
+      ],
+      "resultado": "juncao_sem_volume"
+    }
+  ],
+  "juncoes": {
+    "463f1f3c5888/juncao_001": {
+      "ramos": {
+        "7": {
+          "aceitos": 0,
+          "busca": "padrao",
+          "estacoes_do_no_m": [
+            1.28,
+            1.92,
+            2.56,
+            3.2,
+            3.84,
+            4.48,
+            5.12,
+            5.76,
+            6.4,
+            6.5479351976097036
+          ],
+          "rejeicoes": {
+            "contorno": 10
+          },
+          "trajetorias_candidatas": []
+        },
+        "9": {
+          "aceitos": 0,
+          "busca": "padrao",
+          "estacoes_do_no_m": [
+            1.28,
+            1.743942502928271
+          ],
+          "rejeicoes": {
+            "contorno": 2
+          },
+          "trajetorias_candidatas": []
+        },
+        "11": {
+          "aceitos": 0,
+          "busca": "padrao",
+          "estacoes_do_no_m": [
+            1.28,
+            1.92,
+            2.56,
+            3.2,
+            3.84,
+            4.48,
+            4.912831695749329
+          ],
+          "rejeicoes": {
+            "contorno": 7
+          },
+          "trajetorias_candidatas": []
+        }
+      },
+      "tentativas": [],
+      "resultado": "ramo_sem_tampa_valida",
+      "recentramento": {
+        "resultado": "sem_eixo_ajustado",
+        "ramos": {
+          "7": {
+            "resultado": "eixo_sem_cruzamento"
+          },
+          "9": {
+            "resultado": "eixo_sem_cruzamento"
+          },
+          "11": {
+            "voxels_de_parede_antes": 7,
+            "resultado": "sem_duas_ancoras",
+            "ancora_antes": false,
+            "ancora_depois": false
+          }
+        }
+      },
+      "no_xyz": [
+        2516257.314,
+        1172042.7,
+        819.804
+      ],
+      "source": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/vallorbe_16cm/fontes/Vallorbe/GalerieSemiActive/pointclouds/Vallorbe_GalerieSemiActive_sampled_5cm_PCV_normals_classified_georef.las",
+      "centreline": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/vallorbe_16cm/fontes/Vallorbe/GalerieSemiActive/centreline/Vallorbe_GalerieSemiActive_nodes_from_LBC.txt",
+      "voxel_size": 0.16
+    },
+    "463f1f3c5888/juncao_002": {
+      "ramos": {
+        "4": {
+          "aceitos": 11,
+          "busca": "padrao",
+          "estacoes_do_no_m": [
+            1.28,
+            1.92,
+            2.56,
+            3.2,
+            3.84,
+            4.48,
+            5.12,
+            5.76,
+            6.4,
+            7.04,
+            7.68,
+            8.0
+          ],
+          "rejeicoes": {
+            "contorno": 1
+          },
+          "trajetorias_candidatas": [
+            {
+              "distancia_m": 1.92,
+              "voxels_de_parede_no_eixo": 0
+            },
+            {
+              "distancia_m": 2.56,
+              "voxels_de_parede_no_eixo": 0
+            },
+            {
+              "distancia_m": 3.2,
+              "voxels_de_parede_no_eixo": 0
+            },
+            {
+              "distancia_m": 3.84,
+              "voxels_de_parede_no_eixo": 0
+            },
+            {
+              "distancia_m": 4.48,
+              "voxels_de_parede_no_eixo": 0
+            },
+            {
+              "distancia_m": 5.12,
+              "voxels_de_parede_no_eixo": 0
+            },
+            {
+              "distancia_m": 5.76,
+              "voxels_de_parede_no_eixo": 0
+            },
+            {
+              "distancia_m": 6.4,
+              "voxels_de_parede_no_eixo": 0
+            },
+            {
+              "distancia_m": 7.04,
+              "voxels_de_parede_no_eixo": 0
+            },
+            {
+              "distancia_m": 7.68,
+              "voxels_de_parede_no_eixo": 0
+            },
+            {
+              "distancia_m": 8.0,
+              "voxels_de_parede_no_eixo": 0
+            }
+          ]
+        },
+        "6": {
+          "aceitos": 4,
+          "busca": "padrao",
+          "estacoes_do_no_m": [
+            1.28,
+            1.92,
+            2.56,
+            3.2,
+            3.84,
+            4.48,
+            5.12,
+            5.76,
+            6.4,
+            7.04,
+            7.68,
+            8.0
+          ],
+          "rejeicoes": {
+            "contorno": 8
+          },
+          "trajetorias_candidatas": [
+            {
+              "distancia_m": 2.56,
+              "voxels_de_parede_no_eixo": 0
+            },
+            {
+              "distancia_m": 3.2,
+              "voxels_de_parede_no_eixo": 0
+            },
+            {
+              "distancia_m": 3.84,
+              "voxels_de_parede_no_eixo": 0
+            },
+            {
+              "distancia_m": 4.48,
+              "voxels_de_parede_no_eixo": 0
+            }
+          ]
+        },
+        "7": {
+          "aceitos": 0,
+          "busca": "padrao",
+          "estacoes_do_no_m": [
+            1.28,
+            1.92,
+            2.56,
+            3.2,
+            3.84,
+            4.48,
+            5.12,
+            5.76,
+            6.4,
+            6.5479351976097036
+          ],
+          "rejeicoes": {
+            "contorno": 10
+          },
+          "trajetorias_candidatas": []
+        }
+      },
+      "tentativas": [],
+      "resultado": "ramo_sem_tampa_valida",
+      "recentramento": {
+        "resultado": "sem_eixo_ajustado",
+        "ramos": {
+          "4": {
+            "resultado": "eixo_sem_cruzamento"
+          },
+          "6": {
+            "voxels_de_parede_antes": 14,
+            "resultado": "sem_duas_ancoras",
+            "ancora_antes": false,
+            "ancora_depois": false
+          },
+          "7": {
+            "resultado": "eixo_sem_cruzamento"
+          }
+        }
+      },
+      "no_xyz": [
+        2516257.338,
+        1172039.963,
+        814.315
+      ],
+      "source": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/vallorbe_16cm/fontes/Vallorbe/GalerieSemiActive/pointclouds/Vallorbe_GalerieSemiActive_sampled_5cm_PCV_normals_classified_georef.las",
+      "centreline": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/vallorbe_16cm/fontes/Vallorbe/GalerieSemiActive/centreline/Vallorbe_GalerieSemiActive_nodes_from_LBC.txt",
+      "voxel_size": 0.16
+    },
+    "463f1f3c5888/juncao_004": {
+      "ramos": {
+        "2": {
+          "aceitos": 0,
+          "busca": "padrao",
+          "estacoes_do_no_m": [
+            1.28,
+            1.92,
+            2.56,
+            3.2,
+            3.84,
+            4.48,
+            5.12,
+            5.76,
+            6.4,
+            7.04,
+            7.68,
+            8.0
+          ],
+          "rejeicoes": {
+            "contorno": 12
+          },
+          "trajetorias_candidatas": []
+        },
+        "4": {
+          "aceitos": 1,
+          "busca": "padrao",
+          "estacoes_do_no_m": [
+            1.28,
+            1.92,
+            2.56,
+            3.2,
+            3.84,
+            4.48,
+            5.12,
+            5.76,
+            6.4,
+            7.04,
+            7.68,
+            8.0
+          ],
+          "rejeicoes": {
+            "contorno": 10,
+            "eixo_na_parede": 1
+          },
+          "trajetorias_candidatas": [
+            {
+              "distancia_m": 3.84,
+              "voxels_de_parede_no_eixo": 3
+            }
+          ]
+        },
+        "5": {
+          "aceitos": 0,
+          "busca": "sem_estacao",
+          "estacoes_do_no_m": [],
+          "rejeicoes": {},
+          "trajetorias_candidatas": []
+        }
+      },
+      "tentativas": [],
+      "resultado": "ramo_sem_tampa_valida",
+      "recentramento": {
+        "resultado": "sem_eixo_ajustado",
+        "ramos": {
+          "2": {
+            "voxels_de_parede_antes": 16,
+            "resultado": "sem_duas_ancoras",
+            "ancora_antes": false,
+            "ancora_depois": false
+          },
+          "4": {
+            "voxels_de_parede_antes": 9,
+            "resultado": "sem_duas_ancoras",
+            "ancora_antes": false,
+            "ancora_depois": false
+          },
+          "5": {
+            "resultado": "eixo_sem_cruzamento"
+          }
+        }
+      },
+      "no_xyz": [
+        2516289.711,
+        1172048.023,
+        814.105
+      ],
+      "source": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/vallorbe_16cm/fontes/Vallorbe/GalerieSemiActive/pointclouds/Vallorbe_GalerieSemiActive_sampled_5cm_PCV_normals_classified_georef.las",
+      "centreline": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/vallorbe_16cm/fontes/Vallorbe/GalerieSemiActive/centreline/Vallorbe_GalerieSemiActive_nodes_from_LBC.txt",
+      "voxel_size": 0.16
+    },
+    "463f1f3c5888/juncao_005": {
+      "ramos": {
+        "1": {
+          "aceitos": 12,
+          "busca": "padrao",
+          "estacoes_do_no_m": [
+            1.28,
+            1.92,
+            2.56,
+            3.2,
+            3.84,
+            4.48,
+            5.12,
+            5.76,
+            6.4,
+            7.04,
+            7.68,
+            8.0
+          ],
+          "rejeicoes": {},
+          "trajetorias_candidatas": [
+            {
+              "distancia_m": 1.28,
+              "voxels_de_parede_no_eixo": 0
+            },
+            {
+              "distancia_m": 1.92,
+              "voxels_de_parede_no_eixo": 0
+            },
+            {
+              "distancia_m": 2.56,
+              "voxels_de_parede_no_eixo": 0
+            },
+            {
+              "distancia_m": 3.2,
+              "voxels_de_parede_no_eixo": 0
+            },
+            {
+              "distancia_m": 3.84,
+              "voxels_de_parede_no_eixo": 0
+            },
+            {
+              "distancia_m": 4.48,
+              "voxels_de_parede_no_eixo": 0
+            },
+            {
+              "distancia_m": 5.12,
+              "voxels_de_parede_no_eixo": 0
+            },
+            {
+              "distancia_m": 5.76,
+              "voxels_de_parede_no_eixo": 0
+            },
+            {
+              "distancia_m": 6.4,
+              "voxels_de_parede_no_eixo": 0
+            },
+            {
+              "distancia_m": 7.04,
+              "voxels_de_parede_no_eixo": 0
+            },
+            {
+              "distancia_m": 7.68,
+              "voxels_de_parede_no_eixo": 0
+            },
+            {
+              "distancia_m": 8.0,
+              "voxels_de_parede_no_eixo": 0
+            }
+          ]
+        },
+        "2": {
+          "aceitos": 12,
+          "busca": "padrao",
+          "estacoes_do_no_m": [
+            1.28,
+            1.92,
+            2.56,
+            3.2,
+            3.84,
+            4.48,
+            5.12,
+            5.76,
+            6.4,
+            7.04,
+            7.68,
+            8.0
+          ],
+          "rejeicoes": {},
+          "trajetorias_candidatas": [
+            {
+              "distancia_m": 1.28,
+              "voxels_de_parede_no_eixo": 0
+            },
+            {
+              "distancia_m": 1.92,
+              "voxels_de_parede_no_eixo": 0
+            },
+            {
+              "distancia_m": 2.56,
+              "voxels_de_parede_no_eixo": 0
+            },
+            {
+              "distancia_m": 3.2,
+              "voxels_de_parede_no_eixo": 0
+            },
+            {
+              "distancia_m": 3.84,
+              "voxels_de_parede_no_eixo": 0
+            },
+            {
+              "distancia_m": 4.48,
+              "voxels_de_parede_no_eixo": 0
+            },
+            {
+              "distancia_m": 5.12,
+              "voxels_de_parede_no_eixo": 0
+            },
+            {
+              "distancia_m": 5.76,
+              "voxels_de_parede_no_eixo": 0
+            },
+            {
+              "distancia_m": 6.4,
+              "voxels_de_parede_no_eixo": 0
+            },
+            {
+              "distancia_m": 7.04,
+              "voxels_de_parede_no_eixo": 0
+            },
+            {
+              "distancia_m": 7.68,
+              "voxels_de_parede_no_eixo": 0
+            },
+            {
+              "distancia_m": 8.0,
+              "voxels_de_parede_no_eixo": 0
+            }
+          ]
+        },
+        "3": {
+          "aceitos": 0,
+          "busca": "ramo_curto",
+          "estacoes_do_no_m": [
+            0.49028879914214074,
+            0.48
+          ],
+          "rejeicoes": {
+            "contorno": 2
+          },
+          "trajetorias_candidatas": []
+        }
+      },
+      "tentativas": [],
+      "resultado": "ramo_sem_tampa_valida",
+      "recentramento": {
+        "resultado": "sem_eixo_ajustado",
+        "ramos": {
+          "1": {
+            "resultado": "eixo_sem_cruzamento"
+          },
+          "2": {
+            "resultado": "eixo_sem_cruzamento"
+          },
+          "3": {
+            "voxels_de_parede_antes": 3,
+            "resultado": "sem_duas_ancoras",
+            "ancora_antes": false,
+            "ancora_depois": false
+          }
+        }
+      },
+      "no_xyz": [
+        2516345.979,
+        1172072.636,
+        823.688
+      ],
+      "source": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/vallorbe_16cm/fontes/Vallorbe/GalerieSemiActive/pointclouds/Vallorbe_GalerieSemiActive_sampled_5cm_PCV_normals_classified_georef.las",
+      "centreline": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/vallorbe_16cm/fontes/Vallorbe/GalerieSemiActive/centreline/Vallorbe_GalerieSemiActive_nodes_from_LBC.txt",
+      "voxel_size": 0.16
+    }
+  }
+}

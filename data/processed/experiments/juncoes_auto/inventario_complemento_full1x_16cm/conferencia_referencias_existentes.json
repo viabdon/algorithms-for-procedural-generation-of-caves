@@ -1,0 +1,14 @@
+{
+  "totais": {
+    "auditados": 63,
+    "fora_do_manifesto": 2
+  },
+  "planos": 16,
+  "planos_sem_auditoria": {
+    "archamps/PostEtroiture/holdout_indian_tunnel/piloto_2mm_6_trechos": "Multiple versions of the same gallery: ('archamps', 'PostEtroiture', 'ramo_001_003')"
+  },
+  "candidatos": [
+    "archamps/PreEtroiture/holdout_indian_tunnel/auto_sementes_originais_16cm/ramo_001_008/64x64x64/interior.npz",
+    "archamps/PreEtroiture/holdout_indian_tunnel/auto_sementes_ply_16cm/ramo_001_008/64x64x64/interior.npz"
+  ]
+}

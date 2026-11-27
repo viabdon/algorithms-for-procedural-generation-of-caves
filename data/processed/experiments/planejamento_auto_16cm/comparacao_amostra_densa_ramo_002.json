@@ -1,0 +1,41 @@
+{
+  "amostra_base": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/secoes_indian_16cm/amostra_8cm.npz",
+  "plys_full1x": [
+    "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/full1x_16cm/ramo_002_001/cloud.ply",
+    "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/full1x_16cm/ramo_002_002/cloud.ply",
+    "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/full1x_16cm/ramo_002_003/cloud.ply",
+    "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/full1x_16cm/ramo_002_004/cloud.ply",
+    "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/full1x_16cm/ramo_002_005/cloud.ply",
+    "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/full1x_16cm/ramo_002_006/cloud.ply",
+    "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/full1x_16cm/ramo_002_007/cloud.ply",
+    "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/full1x_16cm/ramo_002_008/cloud.ply",
+    "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/full1x_16cm/ramo_002_009/cloud.ply",
+    "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/full1x_16cm/ramo_002_010/cloud.ply",
+    "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/full1x_16cm/ramo_002_011/cloud.ply"
+  ],
+  "passo_plys_full1x": 32,
+  "celula_amostral_m": 0.04,
+  "pontos": 1978286,
+  "total": 11,
+  "contornos_completos_original": 9,
+  "contornos_completos_controle_amostra": 9,
+  "contornos_completos_auto_amostra": 0,
+  "recortes_recuperados_frente_ao_original": [],
+  "ganhos_auto_frente_ao_controle_amostra": [],
+  "recortes_que_perderam_contorno_frente_ao_original": [
+    "ramo_002_002",
+    "ramo_002_003",
+    "ramo_002_004",
+    "ramo_002_005",
+    "ramo_002_006",
+    "ramo_002_007",
+    "ramo_002_008",
+    "ramo_002_009",
+    "ramo_002_010"
+  ],
+  "cortes_deslocados": 0,
+  "cortes_reajustados": 0,
+  "cortes_pendentes": 11,
+  "plan": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/auto_amostra_4cm_ramo_002/plan.json",
+  "validacao_recuperados": {}
+}

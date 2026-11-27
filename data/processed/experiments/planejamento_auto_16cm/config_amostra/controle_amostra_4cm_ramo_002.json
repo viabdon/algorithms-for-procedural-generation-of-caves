@@ -1,0 +1,25 @@
+{
+  "cave": "indian_tunnel",
+  "survey": "Full",
+  "fold": "holdout_indian_tunnel",
+  "units": "m",
+  "plan_id": "controle_amostra_4cm_ramo_002",
+  "source": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/planejamento_auto_16cm/indian_tunnel_amostra_4cm_ramo_002.ply",
+  "centreline": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/crop_plans/indian_tunnel/Full/holdout_indian_tunnel/full10x_16cm/centreline.npz",
+  "count": 11,
+  "voxel_size": 0.16,
+  "batch_size": 131072,
+  "padding_voxels": 2,
+  "section_overrides": [
+    {
+      "passage": 2,
+      "cut": 2,
+      "station": 12.451901871290229,
+      "contour": "connected"
+    }
+  ],
+  "section_search_radius_voxels": 0,
+  "passages": [
+    2
+  ]
+}

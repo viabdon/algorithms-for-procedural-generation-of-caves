@@ -1,0 +1,159 @@
+{
+  "schema": "gan-gallery-reference-audit-v1",
+  "records": [
+    {
+      "path": "rupt_du_puits/Cascades/teste_externo/las2mm_16cm/ramo_001_001/64x64x64/interior.npz",
+      "group": "rupt_du_puits",
+      "sha256": "e81cf57323ccb33f732949875d64cac03732549eade215fbf0eb8eb7d101e9fe",
+      "voxel_sha256": "0a636165a3d33255b4f08dac5b0e0d5449ad93dcd60c942dcde620abae33c861",
+      "gallery_evidence": {
+        "surface.npz": "0274a355c2da51062fb64cdfb12a334918dca54fa81988862e714404d0bb964b",
+        "masks.npz": "1c9bb2a6010dbf4f4d7608d97ba712af6d6460311b2aa832c8124240ef92ab19"
+      },
+      "candidate": true,
+      "eligible_proxy": true,
+      "geometry_screen_passed": true,
+      "issues": [],
+      "shape_zyx": [
+        64,
+        64,
+        64
+      ],
+      "voxel_size": 0.16,
+      "crop_id": "ramo_001_001",
+      "structure": {
+        "structural_schema_version": "structural-v1",
+        "axis_order": "ZYX",
+        "shape_depth": 64,
+        "shape_height": 64,
+        "shape_width": 64,
+        "spacing_z": 1.0,
+        "spacing_y": 1.0,
+        "spacing_x": 1.0,
+        "distance_unit": "voxel",
+        "exterior_policy": "solid",
+        "distance_reference": "voxel_centers",
+        "connectivity": 6,
+        "total_voxels": 262144,
+        "open_voxels": 25493,
+        "open_ratio": 0.09724807739257812,
+        "component_count": 1,
+        "largest_component_voxels": 25493,
+        "largest_component_ratio": 1.0,
+        "dt_mean": 3.0231517771384127,
+        "dt_median": 2.449489742783178,
+        "dt_max": 9.695359714832659,
+        "is_degenerate": false,
+        "degenerate_reason": null
+      },
+      "repair_voxels": 0,
+      "auxiliary_cap_voxels": 22,
+      "review_status": "pending_review"
+    },
+    {
+      "path": "rupt_du_puits/Cascades/teste_externo/las2mm_16cm/ramo_001_002/64x64x64/interior.npz",
+      "group": "rupt_du_puits",
+      "sha256": "43f5a9a9c4744f5f2edc0066740077f8fafe3b09d4668744343c77046cd57cdf",
+      "voxel_sha256": "83d472a0de54ebf331f16b4cc4912e64bede4981d3030312df9c94278f43388b",
+      "gallery_evidence": {
+        "surface.npz": "f8434f4c72be522e0fba7e6583e4859318b048f713397ba2794e1bb883e80182",
+        "masks.npz": "4951b1a10fe91f017ec44e157988b3dfc18f7fd4ccfff7b86bf8dd8f2d317415"
+      },
+      "candidate": true,
+      "eligible_proxy": true,
+      "geometry_screen_passed": true,
+      "issues": [],
+      "shape_zyx": [
+        64,
+        64,
+        64
+      ],
+      "voxel_size": 0.16,
+      "crop_id": "ramo_001_002",
+      "structure": {
+        "structural_schema_version": "structural-v1",
+        "axis_order": "ZYX",
+        "shape_depth": 64,
+        "shape_height": 64,
+        "shape_width": 64,
+        "spacing_z": 1.0,
+        "spacing_y": 1.0,
+        "spacing_x": 1.0,
+        "distance_unit": "voxel",
+        "exterior_policy": "solid",
+        "distance_reference": "voxel_centers",
+        "connectivity": 6,
+        "total_voxels": 262144,
+        "open_voxels": 24758,
+        "open_ratio": 0.09444427490234375,
+        "component_count": 1,
+        "largest_component_voxels": 24758,
+        "largest_component_ratio": 1.0,
+        "dt_mean": 3.0554366468613985,
+        "dt_median": 2.449489742783178,
+        "dt_max": 10.816653826391969,
+        "is_degenerate": false,
+        "degenerate_reason": null
+      },
+      "repair_voxels": 0,
+      "auxiliary_cap_voxels": 25,
+      "review_status": "pending_review"
+    },
+    {
+      "path": "rupt_du_puits/Cascades/teste_externo/las2mm_16cm/ramo_001_003/64x64x64/interior.npz",
+      "group": "rupt_du_puits",
+      "sha256": "b2806df0083f04455b0ea03e1694385357cbf04a734fd31228ff9c50f006807b",
+      "voxel_sha256": "e37f29fde06b8d947c257d288a6c843f5ad2c8dd385fd543b855d559474a8c7f",
+      "gallery_evidence": {
+        "surface.npz": "1a4f005aff1c2e47534d8aeeebfa18917d4299d14589ff60d2535c5c99eb1fa6",
+        "masks.npz": "9cc6e66de6b2aa8c151afe50e71d0e75277f2a4bc4b0a651cd3f1dbbdb308264"
+      },
+      "candidate": true,
+      "eligible_proxy": true,
+      "geometry_screen_passed": true,
+      "issues": [],
+      "shape_zyx": [
+        64,
+        64,
+        64
+      ],
+      "voxel_size": 0.16,
+      "crop_id": "ramo_001_003",
+      "structure": {
+        "structural_schema_version": "structural-v1",
+        "axis_order": "ZYX",
+        "shape_depth": 64,
+        "shape_height": 64,
+        "shape_width": 64,
+        "spacing_z": 1.0,
+        "spacing_y": 1.0,
+        "spacing_x": 1.0,
+        "distance_unit": "voxel",
+        "exterior_policy": "solid",
+        "distance_reference": "voxel_centers",
+        "connectivity": 6,
+        "total_voxels": 262144,
+        "open_voxels": 27305,
+        "open_ratio": 0.10416030883789062,
+        "component_count": 1,
+        "largest_component_voxels": 27305,
+        "largest_component_ratio": 1.0,
+        "dt_mean": 2.977898112598831,
+        "dt_median": 2.23606797749979,
+        "dt_max": 9.848857801796104,
+        "is_degenerate": false,
+        "degenerate_reason": null
+      },
+      "repair_voxels": 0,
+      "auxiliary_cap_voxels": 316,
+      "review_status": "pending_review"
+    }
+  ],
+  "plans": [
+    "rupt_du_puits/Cascades/teste_externo/las2mm_16cm"
+  ],
+  "resolution": 64,
+  "voxel_size": 0.16,
+  "interpretation": "audited candidate air awaiting geometric review",
+  "audit_id": "3794bc31bfd11b7d7d0e21a9684b00825236e0c2b1b291304b2a23f00c8a5512"
+}

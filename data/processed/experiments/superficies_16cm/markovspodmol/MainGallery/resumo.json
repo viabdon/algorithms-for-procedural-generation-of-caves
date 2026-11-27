@@ -1,0 +1,40 @@
+{
+  "schema": "gan_observed_surface_sparse_v1",
+  "axis_order": "ZYX",
+  "coordinate_units": "m",
+  "voxel_size": 0.16,
+  "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/MarkovSpodmol/MainGallery/pointclouds/MarkovSpodmol_MainGallery_sampled_5cm_PCV_normals_classified_georef.las",
+  "source_size_bytes": 322100859,
+  "source_mtime_ns": 1738080001706902500,
+  "source_points": 5553445,
+  "source_plan": "data/processed/crop_plans/markovspodmol/MainGallery/holdout_indian_tunnel/las5cm_16cm_rev/plan.json",
+  "source_origin_xyz": [
+    430842.428,
+    65788.001,
+    554.649
+  ],
+  "bounds_source_xyz": [
+    [
+      430725.499,
+      65762.572,
+      542.469
+    ],
+    [
+      430910.863,
+      66009.441,
+      569.615
+    ]
+  ],
+  "grid_origin_xyz": [
+    430725.468,
+    65762.561,
+    542.329
+  ],
+  "shape_zyx": [
+    171,
+    1543,
+    1159
+  ],
+  "occupied_voxels": 872604,
+  "semantic": "indices of observed surface; missing indices have unknown occupancy"
+}

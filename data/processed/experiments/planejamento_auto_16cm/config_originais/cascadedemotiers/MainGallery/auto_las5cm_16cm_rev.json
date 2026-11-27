@@ -1,0 +1,124 @@
+{
+  "cave": "cascadedemotiers",
+  "survey": "MainGallery",
+  "fold": "holdout_indian_tunnel",
+  "units": "m",
+  "plan_id": "auto_las5cm_16cm_rev",
+  "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/CascadeDeMotiers/MainGallery/pointclouds/CascadeDeMotiers_MainGallery_sampled_5cm_PCV_normals_classified_georef.las",
+  "centreline": "/run/media/midnavi/Pablo/TCC/DATA/RAW/CascadeDeMotiers/MainGallery/centreline/CascadeDeMotiers_MainGallery_nodes_from_LBC.txt",
+  "count": 63,
+  "voxel_size": 0.16,
+  "batch_size": 131072,
+  "padding_voxels": 2,
+  "section_overrides": [
+    {
+      "passage": 2,
+      "cut": 0,
+      "station": 1.6,
+      "contour": "connected"
+    },
+    {
+      "passage": 5,
+      "cut": 0,
+      "station": 2.24,
+      "contour": "connected"
+    },
+    {
+      "passage": 5,
+      "cut": 3,
+      "station": 16.22194885505873,
+      "contour": "connected"
+    },
+    {
+      "passage": 10,
+      "cut": 1,
+      "station": 5.270787304957624,
+      "contour": "connected"
+    },
+    {
+      "passage": 10,
+      "cut": 2,
+      "station": 9.101574609915247,
+      "contour": "connected"
+    },
+    {
+      "passage": 15,
+      "cut": 0,
+      "station": 1.28,
+      "contour": "connected"
+    },
+    {
+      "passage": 15,
+      "cut": 4,
+      "station": 28.22062835397128,
+      "contour": "connected"
+    },
+    {
+      "passage": 16,
+      "cut": 0,
+      "station": 1.28,
+      "contour": "connected"
+    },
+    {
+      "passage": 19,
+      "cut": 1,
+      "station": 7.872454633206278,
+      "contour": "connected"
+    },
+    {
+      "passage": 20,
+      "cut": 4,
+      "station": 29.720467781102045,
+      "contour": "connected"
+    },
+    {
+      "passage": 20,
+      "cut": 5,
+      "station": 37.030584726377555,
+      "contour": "connected"
+    },
+    {
+      "passage": 21,
+      "cut": 3,
+      "station": 20.64101031357183,
+      "contour": "connected"
+    },
+    {
+      "passage": 35,
+      "cut": 0,
+      "station": 0.96,
+      "contour": "connected"
+    },
+    {
+      "passage": 38,
+      "cut": 0,
+      "station": 1.92,
+      "contour": "connected"
+    },
+    {
+      "passage": 38,
+      "cut": 3,
+      "station": 26.15208363745889,
+      "contour": "connected"
+    },
+    {
+      "passage": 42,
+      "cut": 0,
+      "station": 0.96,
+      "contour": "connected"
+    },
+    {
+      "passage": 44,
+      "cut": 0,
+      "station": 1.44,
+      "contour": "connected"
+    },
+    {
+      "passage": 44,
+      "cut": 2,
+      "station": 8.834907381420324,
+      "contour": "connected"
+    }
+  ],
+  "section_search_radius_voxels": 8
+}

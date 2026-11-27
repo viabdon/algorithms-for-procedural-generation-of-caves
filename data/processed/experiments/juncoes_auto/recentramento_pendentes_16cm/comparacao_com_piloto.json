@@ -1,0 +1,188 @@
+{
+  "desfechos_recortes": {
+    "juncao_sem_volume": 125,
+    "sem_juncao_proxima": 39,
+    "volume_de_juncao_salvo": 3
+  },
+  "transicoes_recortes": {
+    "juncao_sem_volume -> juncao_sem_volume": 125,
+    "sem_juncao_proxima -> sem_juncao_proxima": 39,
+    "volume_de_juncao_salvo -> volume_de_juncao_salvo": 3
+  },
+  "desfechos_juncoes": {
+    "sem_fechamento": 9,
+    "ramo_sem_tampa_valida": 52,
+    "volume_salvo": 1
+  },
+  "transicoes_juncoes": {
+    "sem_fechamento -> sem_fechamento": 9,
+    "ramo_sem_tampa_valida -> ramo_sem_tampa_valida": 52,
+    "volume_salvo -> volume_salvo": 1
+  },
+  "recentramento_juncoes": {
+    "sem_eixo_ajustado": 61,
+    "fluxo_original_fechou": 1
+  },
+  "recentramento_ramos": {
+    "sem_duas_ancoras": 56,
+    "eixo_sem_cruzamento": 123,
+    "fatia_sem_interior_sustentado": 3,
+    "sem_caminho_entre_ancoras": 1
+  },
+  "por_fonte": {
+    "CascadeDeMotiers_MainGallery_sampled_5cm_PCV_normals_classified_georef.las": {
+      "sem_fechamento": 5,
+      "ramo_sem_tampa_valida": 18,
+      "volume_salvo": 1
+    },
+    "MarkovSpodmol_MainGallery_sampled_5cm_PCV_normals_classified_georef.las": {
+      "ramo_sem_tampa_valida": 24,
+      "sem_fechamento": 4
+    },
+    "IndianTunnel_full_10x.f32": {
+      "ramo_sem_tampa_valida": 7
+    },
+    "Archamps_PreEtroiture_sampled_5cm_PCV_normals_classified_georef.las": {
+      "ramo_sem_tampa_valida": 2
+    },
+    "IndianTunnel_full_1x.f32": {
+      "ramo_sem_tampa_valida": 1
+    }
+  },
+  "volumes": [
+    {
+      "juncao": "3c093c4f874a/juncao_023",
+      "fonte": "CascadeDeMotiers_MainGallery_sampled_5cm_PCV_normals_classified_georef.las",
+      "voxels_ar": 6421,
+      "grade_zyx": [
+        43,
+        46,
+        52
+      ],
+      "resultado_anterior": "volume_salvo",
+      "fluxo": "fluxo_original_fechou",
+      "recortes_associados": 3,
+      "replay": "3c093c4f874a/juncao_023/relatorio_volume/checks_replay.csv"
+    }
+  ],
+  "juncoes_com_eixo_ajustado": [],
+  "busca_ramificacoes_curtas": {
+    "3c093c4f874a/juncao_003": {
+      "ramos": {
+        "48": 0
+      },
+      "resultado": "ramo_sem_tampa_valida"
+    },
+    "3c093c4f874a/juncao_004": {
+      "ramos": {
+        "26": 2
+      },
+      "resultado": "ramo_sem_tampa_valida"
+    },
+    "3c093c4f874a/juncao_007": {
+      "ramos": {
+        "46": 0
+      },
+      "resultado": "ramo_sem_tampa_valida"
+    },
+    "3c093c4f874a/juncao_014": {
+      "ramos": {
+        "9": 0
+      },
+      "resultado": "ramo_sem_tampa_valida"
+    },
+    "3c093c4f874a/juncao_015": {
+      "ramos": {
+        "9": 0,
+        "43": 0
+      },
+      "resultado": "ramo_sem_tampa_valida"
+    },
+    "3c093c4f874a/juncao_017": {
+      "ramos": {
+        "3": 0
+      },
+      "resultado": "ramo_sem_tampa_valida"
+    },
+    "3c093c4f874a/juncao_021": {
+      "ramos": {
+        "13": 0
+      },
+      "resultado": "ramo_sem_tampa_valida"
+    },
+    "a8f087b5a82c/juncao_001": {
+      "ramos": {
+        "62": 0
+      },
+      "resultado": "ramo_sem_tampa_valida"
+    },
+    "a8f087b5a82c/juncao_002": {
+      "ramos": {
+        "2": 0
+      },
+      "resultado": "ramo_sem_tampa_valida"
+    },
+    "a8f087b5a82c/juncao_003": {
+      "ramos": {
+        "2": 0,
+        "3": 0
+      },
+      "resultado": "ramo_sem_tampa_valida"
+    },
+    "a8f087b5a82c/juncao_009": {
+      "ramos": {
+        "34": 0
+      },
+      "resultado": "ramo_sem_tampa_valida"
+    },
+    "a8f087b5a82c/juncao_020": {
+      "ramos": {
+        "74": 0,
+        "76": 0
+      },
+      "resultado": "ramo_sem_tampa_valida"
+    },
+    "a8f087b5a82c/juncao_025": {
+      "ramos": {
+        "43": 0
+      },
+      "resultado": "ramo_sem_tampa_valida"
+    },
+    "a8f087b5a82c/juncao_026": {
+      "ramos": {
+        "78": 0
+      },
+      "resultado": "ramo_sem_tampa_valida"
+    },
+    "a8f087b5a82c/juncao_033": {
+      "ramos": {
+        "63": 0
+      },
+      "resultado": "ramo_sem_tampa_valida"
+    },
+    "a8f087b5a82c/juncao_039": {
+      "ramos": {
+        "15": 0
+      },
+      "resultado": "ramo_sem_tampa_valida"
+    },
+    "67fe61f051ae/juncao_007": {
+      "ramos": {
+        "15": 0
+      },
+      "resultado": "ramo_sem_tampa_valida"
+    },
+    "67fe61f051ae/juncao_011": {
+      "ramos": {
+        "15": 0
+      },
+      "resultado": "ramo_sem_tampa_valida"
+    },
+    "ccc1794c10d5/juncao_002": {
+      "ramos": {
+        "5": 0
+      },
+      "resultado": "ramo_sem_tampa_valida"
+    }
+  }
+}

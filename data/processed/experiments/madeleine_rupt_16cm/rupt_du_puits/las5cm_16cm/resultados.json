@@ -1,0 +1,188 @@
+[
+  {
+    "recorte": "ramo_001_001",
+    "planejamento": {
+      "crop_id": "ramo_001_001",
+      "status": "pending_review",
+      "review_reasons": [],
+      "retained_points": 42029,
+      "cut_stations": [
+        0.16,
+        6.635469605286614
+      ],
+      "section_bins_supported": [
+        16,
+        16
+      ],
+      "selection_radius": 4.1914832266569
+    },
+    "grade": [
+      64,
+      64,
+      64
+    ],
+    "resultado": "volume_salvo",
+    "volume": "data/processed/reference_sections/rupt_du_puits/Cascades/teste_externo/las5cm_16cm/ramo_001_001/64x64x64",
+    "air_voxels": 25987,
+    "repair_voxels": 0,
+    "auxiliary_cap_voxels": 6,
+    "auxiliary_cap_radius_voxels": 2,
+    "candidate_volume": 106.44275200000001
+  },
+  {
+    "recorte": "ramo_001_002",
+    "planejamento": {
+      "crop_id": "ramo_001_002",
+      "status": "pending_review",
+      "review_reasons": [],
+      "retained_points": 41429,
+      "cut_stations": [
+        6.635469605286614,
+        13.110939210573228
+      ],
+      "section_bins_supported": [
+        16,
+        16
+      ],
+      "selection_radius": 4.019967194852633
+    },
+    "grade": [
+      64,
+      64,
+      64
+    ],
+    "resultado": "escape_path_without_supported_voxels",
+    "motivo": "A semente ficou conectada ao exterior e o reparo não foi verificado. Relatório: /home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/madeleine_rupt_16cm/rupt_du_puits/las5cm_16cm/data/processed/reference_sections/rupt_du_puits/Cascades/teste_externo/las5cm_16cm/ramo_001_002/64x64x64_sem_volume/20261127T101654422775Z-53f7c0b4/summary.csv"
+  },
+  {
+    "recorte": "ramo_001_003",
+    "planejamento": {
+      "crop_id": "ramo_001_003",
+      "status": "pending_review",
+      "review_reasons": [],
+      "retained_points": 44895,
+      "cut_stations": [
+        13.110939210573228,
+        19.586408815859844
+      ],
+      "section_bins_supported": [
+        16,
+        16
+      ],
+      "selection_radius": 4.439626133414753
+    },
+    "grade": [
+      64,
+      64,
+      64
+    ],
+    "resultado": "escape_path_without_supported_voxels",
+    "motivo": "A semente ficou conectada ao exterior e o reparo não foi verificado. Relatório: /home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/madeleine_rupt_16cm/rupt_du_puits/las5cm_16cm/data/processed/reference_sections/rupt_du_puits/Cascades/teste_externo/las5cm_16cm/ramo_001_003/64x64x64_sem_volume/20261127T101657958757Z-ffe26501/summary.csv"
+  },
+  {
+    "recorte": "ramo_001_004",
+    "planejamento": {
+      "crop_id": "ramo_001_004",
+      "status": "pending_review",
+      "review_reasons": [],
+      "retained_points": 45847,
+      "cut_stations": [
+        19.586408815859844,
+        26.061878421146456
+      ],
+      "section_bins_supported": [
+        16,
+        16
+      ],
+      "selection_radius": 4.718741464297364
+    },
+    "grade": [
+      64,
+      64,
+      64
+    ],
+    "resultado": "escape_path_without_supported_voxels",
+    "motivo": "A semente ficou conectada ao exterior e o reparo não foi verificado. Relatório: /home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/madeleine_rupt_16cm/rupt_du_puits/las5cm_16cm/data/processed/reference_sections/rupt_du_puits/Cascades/teste_externo/las5cm_16cm/ramo_001_004/64x64x64_sem_volume/20261127T101702227526Z-9ef60b42/summary.csv"
+  },
+  {
+    "recorte": "ramo_001_005",
+    "planejamento": {
+      "crop_id": "ramo_001_005",
+      "status": "pending_review",
+      "review_reasons": [
+        "grade_excede_64_com_voxel_escolhido"
+      ],
+      "retained_points": 52889,
+      "cut_stations": [
+        26.061878421146456,
+        32.85734802643306
+      ],
+      "section_bins_supported": [
+        16,
+        15
+      ],
+      "selection_radius": 6.262397392465749
+    },
+    "grade": [
+      69,
+      64,
+      64
+    ],
+    "resultado": "escape_path_without_supported_voxels",
+    "motivo": "A semente ficou conectada ao exterior e o reparo não foi verificado. Relatório: /home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/madeleine_rupt_16cm/rupt_du_puits/las5cm_16cm/data/processed/reference_sections/rupt_du_puits/Cascades/teste_externo/las5cm_16cm/ramo_001_005/69x64x64_sem_volume/20261127T101706583553Z-63c94e82/summary.csv"
+  },
+  {
+    "recorte": "ramo_001_006",
+    "planejamento": {
+      "crop_id": "ramo_001_006",
+      "status": "pending_review",
+      "review_reasons": [
+        "grade_excede_64_com_voxel_escolhido"
+      ],
+      "retained_points": 61214,
+      "cut_stations": [
+        32.85734802643306,
+        39.81281763171968
+      ],
+      "section_bins_supported": [
+        15,
+        16
+      ],
+      "selection_radius": 5.566601396650536
+    },
+    "grade": [
+      72,
+      64,
+      64
+    ],
+    "resultado": "escape_path_without_supported_voxels",
+    "motivo": "A semente ficou conectada ao exterior e o reparo não foi verificado. Relatório: /home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/madeleine_rupt_16cm/rupt_du_puits/las5cm_16cm/data/processed/reference_sections/rupt_du_puits/Cascades/teste_externo/las5cm_16cm/ramo_001_006/72x64x64_sem_volume/20261127T101712703776Z-cdb7a932/summary.csv"
+  },
+  {
+    "recorte": "ramo_001_007",
+    "planejamento": {
+      "crop_id": "ramo_001_007",
+      "status": "pending_review",
+      "review_reasons": [
+        "grade_excede_64_com_voxel_escolhido"
+      ],
+      "retained_points": 41796,
+      "cut_stations": [
+        39.81281763171968,
+        45.168287237006304
+      ],
+      "section_bins_supported": [
+        16,
+        15
+      ],
+      "selection_radius": 6.274232849275323
+    },
+    "grade": [
+      73,
+      64,
+      64
+    ],
+    "resultado": "escape_path_without_supported_voxels",
+    "motivo": "A semente ficou conectada ao exterior e o reparo não foi verificado. Relatório: /home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/madeleine_rupt_16cm/rupt_du_puits/las5cm_16cm/data/processed/reference_sections/rupt_du_puits/Cascades/teste_externo/las5cm_16cm/ramo_001_007/73x64x64_sem_volume/20261127T101716638710Z-98993dc8/summary.csv"
+  }
+]

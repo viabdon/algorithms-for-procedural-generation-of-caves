@@ -1,0 +1,87 @@
+{
+  "recortes": [
+    {
+      "config": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/planejamento_auto_16cm/config_sementes_originais/cascadedemotiers/MainGallery/ramo_027_004/crop.json",
+      "falha_anterior": "ambiguous_passage",
+      "juncoes": [
+        "3c093c4f874a/juncao_003"
+      ],
+      "resultado": "juncao_sem_volume"
+    }
+  ],
+  "juncoes": {
+    "3c093c4f874a/juncao_003": {
+      "ramos": {
+        "19": {
+          "aceitos": 2,
+          "rejeicoes": {
+            "contorno": 9,
+            "eixo_na_parede": 1
+          },
+          "trajetorias_candidatas": [
+            {
+              "distancia_m": 5.76,
+              "voxels_de_parede_no_eixo": 23
+            },
+            {
+              "distancia_m": 6.4,
+              "voxels_de_parede_no_eixo": 23
+            }
+          ]
+        },
+        "27": {
+          "aceitos": 7,
+          "rejeicoes": {
+            "contorno": 3,
+            "eixo_na_parede": 2
+          },
+          "trajetorias_candidatas": [
+            {
+              "distancia_m": 1.28,
+              "voxels_de_parede_no_eixo": 8
+            },
+            {
+              "distancia_m": 5.12,
+              "voxels_de_parede_no_eixo": 23
+            },
+            {
+              "distancia_m": 5.76,
+              "voxels_de_parede_no_eixo": 23
+            },
+            {
+              "distancia_m": 6.4,
+              "voxels_de_parede_no_eixo": 24
+            },
+            {
+              "distancia_m": 7.04,
+              "voxels_de_parede_no_eixo": 24
+            },
+            {
+              "distancia_m": 7.68,
+              "voxels_de_parede_no_eixo": 24
+            },
+            {
+              "distancia_m": 8.0,
+              "voxels_de_parede_no_eixo": 24
+            }
+          ]
+        },
+        "48": {
+          "aceitos": 0,
+          "rejeicoes": {},
+          "trajetorias_candidatas": []
+        }
+      },
+      "tentativas": [],
+      "resultado": "ramo_sem_tampa_valida",
+      "no_xyz": [
+        2537657.327,
+        1195235.534,
+        775.26
+      ],
+      "source": "/run/media/midnavi/Pablo/TCC/DATA/RAW/CascadeDeMotiers/MainGallery/pointclouds/CascadeDeMotiers_MainGallery_sampled_5cm_PCV_normals_classified_georef.las",
+      "centreline": "/run/media/midnavi/Pablo/TCC/DATA/RAW/CascadeDeMotiers/MainGallery/centreline/CascadeDeMotiers_MainGallery_nodes_from_LBC.txt",
+      "voxel_size": 0.16
+    }
+  }
+}

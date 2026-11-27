@@ -1,0 +1,609 @@
+{
+  "schema": "gan-gallery-reference-audit-v1",
+  "records": [
+    {
+      "path": "vallorbe/GalerieSemiActive/teste_externo/las5cm_16cm/ramo_001_003/64x64x64/interior.npz",
+      "group": "vallorbe",
+      "sha256": "f40e54dc6b27fef14e25a776a5da692b48f18b0e9c2f1ab91d8238309c63e7ce",
+      "voxel_sha256": "161a39dc7214622559f9a3036f277ff28094c56501bec6cde42ececf6e242e0d",
+      "gallery_evidence": {
+        "surface.npz": "8dab1599bd6b0187275b08d961a63523dc5424adefaf900903d82692558d081c",
+        "masks.npz": "df7d0fcaf3789c386a922ef65d7e205ef99dc5fd5b3f1aa854fad5c713bbcea1"
+      },
+      "candidate": true,
+      "eligible_proxy": true,
+      "geometry_screen_passed": true,
+      "issues": [],
+      "shape_zyx": [
+        64,
+        64,
+        64
+      ],
+      "voxel_size": 0.16,
+      "crop_id": "ramo_001_003",
+      "structure": {
+        "structural_schema_version": "structural-v1",
+        "axis_order": "ZYX",
+        "shape_depth": 64,
+        "shape_height": 64,
+        "shape_width": 64,
+        "spacing_z": 1.0,
+        "spacing_y": 1.0,
+        "spacing_x": 1.0,
+        "distance_unit": "voxel",
+        "exterior_policy": "solid",
+        "distance_reference": "voxel_centers",
+        "connectivity": 6,
+        "total_voxels": 262144,
+        "open_voxels": 28927,
+        "open_ratio": 0.11034774780273438,
+        "component_count": 1,
+        "largest_component_voxels": 28927,
+        "largest_component_ratio": 1.0,
+        "dt_mean": 3.606495680930291,
+        "dt_median": 3.0,
+        "dt_max": 11.74734012447073,
+        "is_degenerate": false,
+        "degenerate_reason": null
+      },
+      "repair_voxels": 0,
+      "auxiliary_cap_voxels": 35,
+      "review_status": "pending_review"
+    },
+    {
+      "path": "vallorbe/GalerieSemiActive/teste_externo/las5cm_16cm/ramo_001_004/64x64x64/interior.npz",
+      "group": "vallorbe",
+      "sha256": "fcbe474ca7f18ae3751d397c461efe6bba7a00b8df23ec278041ee9db20e9a6d",
+      "voxel_sha256": "d1a1507456c0114fc5d79d86cea59b4ec3ad807cf4b87491f5f97e351c6e2470",
+      "gallery_evidence": {
+        "surface.npz": "89b98dfd93fbd4f65bc4a891665d2777c2e51b0911f8841438323f85fd9d1211",
+        "masks.npz": "8da167d5ce96d78c8b9895106aaa0f6532de5455e59055016741d0d31191883d"
+      },
+      "candidate": true,
+      "eligible_proxy": true,
+      "geometry_screen_passed": true,
+      "issues": [],
+      "shape_zyx": [
+        64,
+        64,
+        64
+      ],
+      "voxel_size": 0.16,
+      "crop_id": "ramo_001_004",
+      "structure": {
+        "structural_schema_version": "structural-v1",
+        "axis_order": "ZYX",
+        "shape_depth": 64,
+        "shape_height": 64,
+        "shape_width": 64,
+        "spacing_z": 1.0,
+        "spacing_y": 1.0,
+        "spacing_x": 1.0,
+        "distance_unit": "voxel",
+        "exterior_policy": "solid",
+        "distance_reference": "voxel_centers",
+        "connectivity": 6,
+        "total_voxels": 262144,
+        "open_voxels": 36248,
+        "open_ratio": 0.138275146484375,
+        "component_count": 1,
+        "largest_component_voxels": 36248,
+        "largest_component_ratio": 1.0,
+        "dt_mean": 3.805989268881131,
+        "dt_median": 3.1622776601683795,
+        "dt_max": 12.529964086141668,
+        "is_degenerate": false,
+        "degenerate_reason": null
+      },
+      "repair_voxels": 0,
+      "auxiliary_cap_voxels": 11,
+      "review_status": "pending_review"
+    },
+    {
+      "path": "vallorbe/GalerieSemiActive/teste_externo/las5cm_16cm/ramo_001_005/64x64x64/interior.npz",
+      "group": "vallorbe",
+      "sha256": "337ed810e29c50460eb72e1e652c73fdb31bbc090ad897fe0e315a5d2da2d892",
+      "voxel_sha256": "64f5e584abaf6a9f5620f225d5048aa4b2cd481ac80a3dc6fbece79502d4792a",
+      "gallery_evidence": {
+        "surface.npz": "522b23f6d83bc3880943dcde65901b23171bf8bbd3c9d6fe51bf0fbd373411c4",
+        "masks.npz": "d63fe48ee335c06e18f11ec8a19edf14265c2424aeab4ec62e6a7fa0f7736504"
+      },
+      "candidate": true,
+      "eligible_proxy": true,
+      "geometry_screen_passed": true,
+      "issues": [],
+      "shape_zyx": [
+        64,
+        64,
+        64
+      ],
+      "voxel_size": 0.16,
+      "crop_id": "ramo_001_005",
+      "structure": {
+        "structural_schema_version": "structural-v1",
+        "axis_order": "ZYX",
+        "shape_depth": 64,
+        "shape_height": 64,
+        "shape_width": 64,
+        "spacing_z": 1.0,
+        "spacing_y": 1.0,
+        "spacing_x": 1.0,
+        "distance_unit": "voxel",
+        "exterior_policy": "solid",
+        "distance_reference": "voxel_centers",
+        "connectivity": 6,
+        "total_voxels": 262144,
+        "open_voxels": 39293,
+        "open_ratio": 0.14989089965820312,
+        "component_count": 1,
+        "largest_component_voxels": 39293,
+        "largest_component_ratio": 1.0,
+        "dt_mean": 4.130009898178977,
+        "dt_median": 3.3166247903554,
+        "dt_max": 14.177446878757825,
+        "is_degenerate": false,
+        "degenerate_reason": null
+      },
+      "repair_voxels": 0,
+      "auxiliary_cap_voxels": 55,
+      "review_status": "pending_review"
+    },
+    {
+      "path": "vallorbe/GalerieSemiActive/teste_externo/las5cm_16cm/ramo_001_006/64x66x64/interior.npz",
+      "group": "vallorbe",
+      "sha256": "d1a430196351ccf1cfdc833de68351beebbf029dc9d0be03cd550ab836e9f10e",
+      "voxel_sha256": "b0a0020ade8007e204e3f779284d292d4681ac41b18fc2e3ae79d635b5930a8e",
+      "gallery_evidence": {
+        "surface.npz": "9b994a67c005aa71df3ac07afddfde7099885494b029b6c2873b781de12b13ec",
+        "masks.npz": "88477885957936d714b6f360d2b87d6eceba038264e09e92387d08bc6ef38d36"
+      },
+      "candidate": true,
+      "eligible_proxy": true,
+      "geometry_screen_passed": true,
+      "issues": [],
+      "shape_zyx": [
+        64,
+        66,
+        64
+      ],
+      "voxel_size": 0.16,
+      "air_window": {
+        "method": "integer_window_v1",
+        "resolution": 64,
+        "native_shape_zyx": [
+          64,
+          66,
+          64
+        ],
+        "native_voxel_sha256": "392be919f71b956e5c15cb5a7e2721e7f539fe79e252ad7df0b4337742899c14",
+        "source_start_zyx": [
+          0,
+          1,
+          0
+        ],
+        "source_stop_zyx": [
+          64,
+          65,
+          64
+        ],
+        "target_start_zyx": [
+          0,
+          0,
+          0
+        ],
+        "air_voxels": 45883
+      },
+      "crop_id": "ramo_001_006",
+      "structure": {
+        "structural_schema_version": "structural-v1",
+        "axis_order": "ZYX",
+        "shape_depth": 64,
+        "shape_height": 64,
+        "shape_width": 64,
+        "spacing_z": 1.0,
+        "spacing_y": 1.0,
+        "spacing_x": 1.0,
+        "distance_unit": "voxel",
+        "exterior_policy": "solid",
+        "distance_reference": "voxel_centers",
+        "connectivity": 6,
+        "total_voxels": 262144,
+        "open_voxels": 45883,
+        "open_ratio": 0.17502975463867188,
+        "component_count": 1,
+        "largest_component_voxels": 45883,
+        "largest_component_ratio": 1.0,
+        "dt_mean": 4.5560654423595155,
+        "dt_median": 3.7416573867739413,
+        "dt_max": 15.165750888103101,
+        "is_degenerate": false,
+        "degenerate_reason": null
+      },
+      "repair_voxels": 0,
+      "auxiliary_cap_voxels": 30,
+      "review_status": "pending_review"
+    },
+    {
+      "path": "vallorbe/GalerieSemiActive/teste_externo/las5cm_16cm/ramo_002_003/64x68x64/interior.npz",
+      "group": "vallorbe",
+      "sha256": "567a00dc57b7f4b3cca7020d106662d0608fa919f12517fbb2d41f2d097f1c2d",
+      "voxel_sha256": "9e13578fb321e165e2eccae03366183c02330b6a6035d2b7ca0e9ca3dedc3eae",
+      "gallery_evidence": {
+        "surface.npz": "32656480697618ffaed6b9cc9bdd1d16a5fb0390cabf39fa7478db5c8e1e403b",
+        "masks.npz": "e5efa179f2508f35ac97f0e42d71b15aae7a87733d293b2672c1a9e1e59a9f64"
+      },
+      "candidate": true,
+      "eligible_proxy": false,
+      "geometry_screen_passed": false,
+      "issues": [
+        "air_window_exceeds_target_or_margin"
+      ],
+      "shape_zyx": [
+        64,
+        68,
+        64
+      ],
+      "voxel_size": 0.16,
+      "crop_id": "ramo_002_003",
+      "structure": {
+        "structural_schema_version": "structural-v1",
+        "axis_order": "ZYX",
+        "shape_depth": 64,
+        "shape_height": 68,
+        "shape_width": 64,
+        "spacing_z": 1.0,
+        "spacing_y": 1.0,
+        "spacing_x": 1.0,
+        "distance_unit": "voxel",
+        "exterior_policy": "solid",
+        "distance_reference": "voxel_centers",
+        "connectivity": 6,
+        "total_voxels": 278528,
+        "open_voxels": 33781,
+        "open_ratio": 0.12128403607536764,
+        "component_count": 1,
+        "largest_component_voxels": 33781,
+        "largest_component_ratio": 1.0,
+        "dt_mean": 3.8070026893454365,
+        "dt_median": 3.1622776601683795,
+        "dt_max": 12.083045973594572,
+        "is_degenerate": false,
+        "degenerate_reason": null
+      },
+      "repair_voxels": 0,
+      "auxiliary_cap_voxels": 14,
+      "review_status": "pending_review"
+    },
+    {
+      "path": "vallorbe/GalerieSemiActive/teste_externo/las5cm_16cm/ramo_002_004/64x64x64/interior.npz",
+      "group": "vallorbe",
+      "sha256": "111944ef418da850e0da474e7d93f1813233ec3f4cdc4ce514b22728b995ab96",
+      "voxel_sha256": "c2ea0260575a845b860db0ae987c2ded7dd73c9b48b927427bcb40194d604e8e",
+      "gallery_evidence": {
+        "surface.npz": "49365ce93d16636df431b85621a5e3e58d298416b6f11921ab0f1398fd511f49",
+        "masks.npz": "2ac260b00bf7ec6647be27186508c81bf5113e8b483d40d3a4e534317cdfceff"
+      },
+      "candidate": true,
+      "eligible_proxy": true,
+      "geometry_screen_passed": true,
+      "issues": [],
+      "shape_zyx": [
+        64,
+        64,
+        64
+      ],
+      "voxel_size": 0.16,
+      "crop_id": "ramo_002_004",
+      "structure": {
+        "structural_schema_version": "structural-v1",
+        "axis_order": "ZYX",
+        "shape_depth": 64,
+        "shape_height": 64,
+        "shape_width": 64,
+        "spacing_z": 1.0,
+        "spacing_y": 1.0,
+        "spacing_x": 1.0,
+        "distance_unit": "voxel",
+        "exterior_policy": "solid",
+        "distance_reference": "voxel_centers",
+        "connectivity": 6,
+        "total_voxels": 262144,
+        "open_voxels": 37167,
+        "open_ratio": 0.14178085327148438,
+        "component_count": 1,
+        "largest_component_voxels": 37167,
+        "largest_component_ratio": 1.0,
+        "dt_mean": 4.194312071173575,
+        "dt_median": 3.4641016151377544,
+        "dt_max": 13.638181696985855,
+        "is_degenerate": false,
+        "degenerate_reason": null
+      },
+      "repair_voxels": 0,
+      "auxiliary_cap_voxels": 4,
+      "review_status": "pending_review"
+    },
+    {
+      "path": "vallorbe/GalerieSemiActive/teste_externo/las5cm_16cm/ramo_002_005/64x70x64/interior.npz",
+      "group": "vallorbe",
+      "sha256": "03af6a69b1d38ea50aacdbd8020338ea6335e96c046a00be3b9d11a33508da25",
+      "voxel_sha256": "2ae9afa11e06ed02c09b6e45704866d86270daccc787e86d8480fe977102ce5f",
+      "gallery_evidence": {
+        "surface.npz": "8ce7412503665f1fab7712fc404117f9f6421b7e18d4d3fec4e95fd6a6aa850a",
+        "masks.npz": "e73857a9ec570866c402d3f0716d3a641402a899cefff747ec4fa5c4fc83293a"
+      },
+      "candidate": true,
+      "eligible_proxy": false,
+      "geometry_screen_passed": false,
+      "issues": [
+        "air_window_exceeds_target_or_margin"
+      ],
+      "shape_zyx": [
+        64,
+        70,
+        64
+      ],
+      "voxel_size": 0.16,
+      "crop_id": "ramo_002_005",
+      "structure": {
+        "structural_schema_version": "structural-v1",
+        "axis_order": "ZYX",
+        "shape_depth": 64,
+        "shape_height": 70,
+        "shape_width": 64,
+        "spacing_z": 1.0,
+        "spacing_y": 1.0,
+        "spacing_x": 1.0,
+        "distance_unit": "voxel",
+        "exterior_policy": "solid",
+        "distance_reference": "voxel_centers",
+        "connectivity": 6,
+        "total_voxels": 286720,
+        "open_voxels": 38552,
+        "open_ratio": 0.13445870535714285,
+        "component_count": 1,
+        "largest_component_voxels": 38552,
+        "largest_component_ratio": 1.0,
+        "dt_mean": 4.04754567070548,
+        "dt_median": 3.1622776601683795,
+        "dt_max": 13.638181696985855,
+        "is_degenerate": false,
+        "degenerate_reason": null
+      },
+      "repair_voxels": 0,
+      "auxiliary_cap_voxels": 160,
+      "review_status": "pending_review"
+    },
+    {
+      "path": "vallorbe/GalerieSemiActive/teste_externo/las5cm_16cm/ramo_002_007/64x68x66/interior.npz",
+      "group": "vallorbe",
+      "sha256": "5cf62ccb4d73e9933b4b9a656a6884d34c1776aa71668ca0db33a7f2fb0c2880",
+      "voxel_sha256": "cde6fca4b659e0e79252a5dd41d7a61662f861f1d26bc7b383ed16c812933929",
+      "gallery_evidence": {
+        "surface.npz": "1ed943518e34da712405a7d5f7f7671590727869218379db20e7bec8d95bf826",
+        "masks.npz": "2af239192ffc2b33622a772a7010db441654a9193eb065b4d4dd447bb8615905"
+      },
+      "candidate": true,
+      "eligible_proxy": true,
+      "geometry_screen_passed": true,
+      "issues": [],
+      "shape_zyx": [
+        64,
+        68,
+        66
+      ],
+      "voxel_size": 0.16,
+      "air_window": {
+        "method": "integer_window_v1",
+        "resolution": 64,
+        "native_shape_zyx": [
+          64,
+          68,
+          66
+        ],
+        "native_voxel_sha256": "08293a87a7942ac4ff22e5419e81625fcc2d1d27b65eada70c72756ad973030f",
+        "source_start_zyx": [
+          0,
+          1,
+          0
+        ],
+        "source_stop_zyx": [
+          64,
+          65,
+          64
+        ],
+        "target_start_zyx": [
+          0,
+          0,
+          0
+        ],
+        "air_voxels": 25984
+      },
+      "crop_id": "ramo_002_007",
+      "structure": {
+        "structural_schema_version": "structural-v1",
+        "axis_order": "ZYX",
+        "shape_depth": 64,
+        "shape_height": 64,
+        "shape_width": 64,
+        "spacing_z": 1.0,
+        "spacing_y": 1.0,
+        "spacing_x": 1.0,
+        "distance_unit": "voxel",
+        "exterior_policy": "solid",
+        "distance_reference": "voxel_centers",
+        "connectivity": 6,
+        "total_voxels": 262144,
+        "open_voxels": 25984,
+        "open_ratio": 0.09912109375,
+        "component_count": 1,
+        "largest_component_voxels": 25984,
+        "largest_component_ratio": 1.0,
+        "dt_mean": 3.0809825690815846,
+        "dt_median": 2.8284271247461903,
+        "dt_max": 8.12403840463596,
+        "is_degenerate": false,
+        "degenerate_reason": null
+      },
+      "repair_voxels": 0,
+      "auxiliary_cap_voxels": 20,
+      "review_status": "pending_review"
+    },
+    {
+      "path": "vallorbe/GalerieSemiActive/teste_externo/las5cm_16cm/ramo_002_008/64x76x72/interior.npz",
+      "group": "vallorbe",
+      "sha256": "55c3ae7ac9d1f1ed333adedd723ba1153d8ceed625f9fd916f9a4e9c2c1697ae",
+      "voxel_sha256": "e8143f9ac25cab52b42c2a6d5240a5de25be3117a31745d4b362b4cbbf7ce583",
+      "gallery_evidence": {
+        "surface.npz": "7565f921f2d1a5ebbc07c8fbd57079c6b9c5b9ef43e99d10dfcb4b85e85d72b3",
+        "masks.npz": "06767247aeb53076e5afe5b5d4832e84bb16cd30cb965d06fc9b34eb385cc949"
+      },
+      "candidate": true,
+      "eligible_proxy": false,
+      "geometry_screen_passed": false,
+      "issues": [
+        "air_window_exceeds_target_or_margin"
+      ],
+      "shape_zyx": [
+        64,
+        76,
+        72
+      ],
+      "voxel_size": 0.16,
+      "crop_id": "ramo_002_008",
+      "structure": {
+        "structural_schema_version": "structural-v1",
+        "axis_order": "ZYX",
+        "shape_depth": 64,
+        "shape_height": 76,
+        "shape_width": 72,
+        "spacing_z": 1.0,
+        "spacing_y": 1.0,
+        "spacing_x": 1.0,
+        "distance_unit": "voxel",
+        "exterior_policy": "solid",
+        "distance_reference": "voxel_centers",
+        "connectivity": 6,
+        "total_voxels": 350208,
+        "open_voxels": 26757,
+        "open_ratio": 0.07640316611842106,
+        "component_count": 1,
+        "largest_component_voxels": 26757,
+        "largest_component_ratio": 1.0,
+        "dt_mean": 3.143690423333768,
+        "dt_median": 2.8284271247461903,
+        "dt_max": 8.12403840463596,
+        "is_degenerate": false,
+        "degenerate_reason": null
+      },
+      "repair_voxels": 0,
+      "auxiliary_cap_voxels": 58,
+      "review_status": "pending_review"
+    },
+    {
+      "path": "vallorbe/GalerieSemiActive/teste_externo/las5cm_16cm/ramo_004_003/64x64x64/interior.npz",
+      "group": "vallorbe",
+      "sha256": "88988531b1d06a05f8cde95c4c4e775f733a24c5efe9df29f487b7afc1b19f08",
+      "voxel_sha256": "00543a80aa14d6f9314d74d470d0b70e3df5792c68facf02fffdf12d11ee4bbd",
+      "gallery_evidence": {
+        "surface.npz": "fe20e61c987e1c3ec630f8b9c7f75c9f4343393d3290f7dfaa72967e5556b686",
+        "masks.npz": "5d76b04aa90b00f1480649cc21520dbaec41d105454fb1c6732b83e8c1ceda24"
+      },
+      "candidate": true,
+      "eligible_proxy": true,
+      "geometry_screen_passed": true,
+      "issues": [],
+      "shape_zyx": [
+        64,
+        64,
+        64
+      ],
+      "voxel_size": 0.16,
+      "crop_id": "ramo_004_003",
+      "structure": {
+        "structural_schema_version": "structural-v1",
+        "axis_order": "ZYX",
+        "shape_depth": 64,
+        "shape_height": 64,
+        "shape_width": 64,
+        "spacing_z": 1.0,
+        "spacing_y": 1.0,
+        "spacing_x": 1.0,
+        "distance_unit": "voxel",
+        "exterior_policy": "solid",
+        "distance_reference": "voxel_centers",
+        "connectivity": 6,
+        "total_voxels": 262144,
+        "open_voxels": 36316,
+        "open_ratio": 0.1385345458984375,
+        "component_count": 1,
+        "largest_component_voxels": 36316,
+        "largest_component_ratio": 1.0,
+        "dt_mean": 4.117754346306734,
+        "dt_median": 3.3166247903554,
+        "dt_max": 14.212670403551895,
+        "is_degenerate": false,
+        "degenerate_reason": null
+      },
+      "repair_voxels": 0,
+      "auxiliary_cap_voxels": 8,
+      "review_status": "pending_review"
+    },
+    {
+      "path": "vallorbe/GalerieSemiActive/teste_externo/las5cm_16cm/ramo_004_004/64x64x64/interior.npz",
+      "group": "vallorbe",
+      "sha256": "324611a5182c91fbf2d531214796ac99b582861a8aa6b2c9df4cca4a3c759738",
+      "voxel_sha256": "a0dc30664fd4508639a9dffe1a269f734d3adff0e14022662978bd8169e14550",
+      "gallery_evidence": {
+        "surface.npz": "5ac23fd37463a27ca9dfdef8b99d9bbae8d0c708a8d02555ba78161aa4a1bb52",
+        "masks.npz": "997a874c0c4892001a2be236e6e4721215351674a351440e78f0c6aff3a98112"
+      },
+      "candidate": true,
+      "eligible_proxy": true,
+      "geometry_screen_passed": true,
+      "issues": [],
+      "shape_zyx": [
+        64,
+        64,
+        64
+      ],
+      "voxel_size": 0.16,
+      "crop_id": "ramo_004_004",
+      "structure": {
+        "structural_schema_version": "structural-v1",
+        "axis_order": "ZYX",
+        "shape_depth": 64,
+        "shape_height": 64,
+        "shape_width": 64,
+        "spacing_z": 1.0,
+        "spacing_y": 1.0,
+        "spacing_x": 1.0,
+        "distance_unit": "voxel",
+        "exterior_policy": "solid",
+        "distance_reference": "voxel_centers",
+        "connectivity": 6,
+        "total_voxels": 262144,
+        "open_voxels": 32256,
+        "open_ratio": 0.123046875,
+        "component_count": 1,
+        "largest_component_voxels": 32256,
+        "largest_component_ratio": 1.0,
+        "dt_mean": 3.7027606194884566,
+        "dt_median": 3.0,
+        "dt_max": 12.24744871391589,
+        "is_degenerate": false,
+        "degenerate_reason": null
+      },
+      "repair_voxels": 0,
+      "auxiliary_cap_voxels": 0,
+      "review_status": "pending_review"
+    }
+  ],
+  "plans": [
+    "vallorbe/GalerieSemiActive/teste_externo/las5cm_16cm"
+  ],
+  "resolution": 64,
+  "voxel_size": 0.16,
+  "interpretation": "audited candidate air awaiting geometric review",
+  "audit_id": "9ff25f86dc7a7a06476636180fb735debb5c02aedc877bddaa8daf0722287d89"
+}

@@ -1,0 +1,28 @@
+{
+  "status": "exploratory_not_validated",
+  "source": "data/processed/experiments/experiment_elaphes-meshing/elaphes_poisson_sample.npz",
+  "source_point_count": 1864,
+  "filtered_point_count": 1662,
+  "contracted_point_count": 1662,
+  "lbc": {
+    "package": "pc-skeletor",
+    "version": "1.0.0",
+    "init_contraction": 0.5,
+    "init_attraction": 0.5,
+    "down_sample": 0.4,
+    "max_iteration_steps": 5,
+    "filter_nb_neighbors": 20,
+    "filter_std_ratio": 2.0
+  },
+  "graph": {
+    "package": "mistree",
+    "version": "2.0.0",
+    "downsample_method": "Open3D voxel_down_sample (approximation, not CloudCompare spatial resampling)",
+    "voxel_size_xyz_units": 0.4,
+    "knn": 12,
+    "largest_component_filter": "not_applied"
+  },
+  "nodes": 114,
+  "edges": 113,
+  "warning": "sparse input and shortened extent; do not use as interior seeds"
+}
