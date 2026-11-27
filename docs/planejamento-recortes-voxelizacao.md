@@ -354,6 +354,16 @@ parciais por etapa, prioriza a menor soma das distâncias ao nó e
 voxeliza até oito combinações completas. Nesta versão, cada
 estação testa apenas a orientação da tangente local.
 
+Quando o comprimento do braço deixa a busca padrão sem estação,
+a rotina tenta um mínimo de três voxels a partir do nó. Reserva
+os mesmos dois voxels antes da outra extremidade. Testa primeiro
+o ponto mais afastado disponível e inclui as posições a partir de
+três voxels com passo de um voxel. Na comparação das combinações,
+favorece a maior distância ao nó para esses braços. Um ramo com
+estações padrão segue os limites habituais mesmo se seus contornos
+falharem. O relatório registra o modo, as estações e as rejeições
+por ramo. As checagens de contorno, tampas e ar permanecem aplicáveis.
+
 Se uma combinação vaza, o primeiro diagnóstico de fuga testa as
 extremidades com planos temporários completos e rastreia a rota
 até a borda. Quando a rota cruza o plano de uma ou mais saídas, é
@@ -364,6 +374,19 @@ componente de ar alcançar todas as tampas e a inundação a partir
 da borda reproduzir esse componente. Uma semente no nó pode ser
 reposicionada em até quatro voxels quando houver um único
 componente interno elegível.
+
+A checagem local dos dois voxels de aproximação à tampa é
+complementada por uma auditoria do eixo desde o nó. As amostras
+ao longo de cada ramo são feitas a passos de até um quarto de
+voxel. Apenas a sequência terminal sobre a própria tampa é
+omitida. Para uma combinação fechada, a auditoria registra as
+distâncias dos trechos que passam por parede, exterior, outra
+tampa ou outro compartimento. O resultado só é salvo se o
+percurso amostrado estiver no mesmo ar candidato. Os NPZs guardam
+as amostras para repetir a checagem. Quando falta uma tampa ou
+o volume ainda vaza, os pontos medidos no eixo podem indicar
+contato com a parede, mas fica em aberto quais trechos livres
+pertenceriam ao interior de uma junção fechada.
 
 As saídas ficam em `data/processed/experiments/juncoes_auto/`.
 O `resultados.json` separa desfechos dos recortes de entrada e
@@ -400,6 +423,42 @@ quando a semente ainda se conecta ao exterior. Para reparos, exigir
 evidência nos bins e revalidar o recorte inteiro com as tampas originais.
 Áreas sem suporte permanecem para revisão. O exterior da galeria
 delimitada pode conter cavidades além do trecho estudado.
+
+### Recentramento local por âncoras
+
+O ensaio optativo `--recenter-axes` usa a mesma nuvem local da
+tentativa de junção. Se o fluxo padrão fecha, mantém aquele eixo e
+volume. Caso contrário, procura segmentos do eixo que cruzam voxels
+de parede observada, em até 58 voxels de distância do nó.
+
+1. Amostrar a estação do eixo original a cada voxel e projetar
+   pontos de até um voxel de cada lado do plano transversal.
+   Rasterizar os pontos projetados em 2D e identificar as regiões
+   que a parede medida delimita. A busca usa regiões fechadas na
+   própria fatia, sem preenchimento morfológico da parede.
+2. Procurar uma âncora antes e outra depois dos cruzamentos.
+   Cada âncora é um ponto do eixo original com pelo menos dois
+   voxels de distância à parede numa região interna da fatia.
+   Entre as âncoras, reter até quatro regiões por fatia e, em
+   cada uma, considerar a posição elegível mais próxima do eixo
+   e a de maior folga. O deslocamento máximo lateral é de oito
+   voxels e a folga mínima é de dois.
+3. Ligar candidatas de fatias sucessivas a até quatro voxels.
+   Descartar a ligação se as amostras em passos de até um quarto
+   de voxel cruzarem parede observada. A busca por camadas
+   minimiza comprimento, deslocamento lateral e custo por
+   proximidade à parede. Se duas sequências de regiões tiverem
+   custos a até meio voxel uma da outra, deixar o eixo pendente.
+   A busca também para quando faltam âncoras ou fatias elegíveis.
+4. Substituir somente o intervalo entre as âncoras, preservando os
+   nós terminais e a identificação do ramo. Repetir a atribuição dos
+   pontos, a busca de tampas e a auditoria do exterior. A saída de
+   cada ramo só é confirmada se o eixo estiver no mesmo componente
+   de ar que alcança todas as tampas. O relatório compara os
+   desfechos com e sem ajuste e guarda os eixos locais alterados.
+
+Para rodar o ensaio, acrescente `--recenter-axes` ao comando do lote
+de junções e use uma pasta de saída nova.
 
 ### Busca automática quando a semente cai na barreira
 

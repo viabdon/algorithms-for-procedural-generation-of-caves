@@ -63,6 +63,7 @@ def test_junction_fallback_deduplicates_and_checks_all_incident_caps(tmp_path, a
             checks = {row["check"]: row for row in csv.DictReader(stream)}
         assert checks["candidate_air_component"]["result"] == "match"
         assert all(checks[f"air_reaches_cap_{i}"]["passed"] == "True" for i in range(1, arms + 1))
+        assert all(checks[f"branch_{i}_axis_in_air"]["passed"] == "True" for i in range(1, arms + 1))
 
 
 def test_oblique_cap_matches_voxel_centres_and_finite_intersection():
@@ -102,3 +103,35 @@ def test_unbranched_crop_never_reads_original_source(tmp_path):
         "sem_juncao_proxima", "falha_fora_da_triagem",
     ]
     assert result["juncoes"] == {}
+
+
+def test_axis_audit_detects_exit_and_reentry_even_when_endpoint_is_inside():
+    from cavegen.datastream.gallery_reports import audit_junction_axes, junction_axis_checks
+
+    air = np.zeros((9, 9, 9), dtype=bool)
+    air[3:6, 3:6, 3:6] = True
+    wall = binary_dilation(air) & ~air
+    caps = np.zeros((3, *air.shape), dtype=bool)
+    cells = [[4, 4, x] for x in [4, 3, 2, 1, 2, 3, 4]]
+    axes = [{"ramo": 19, "voxels_zyx": cells, "distancias_m": list(range(len(cells)))}]
+    evidence = audit_junction_axes(wall, caps, air, axes)
+    assert evidence[0]["desvios"] == [
+        {"estado": "parede", "de_m": 2, "ate_m": 2},
+        {"estado": "exterior", "de_m": 3, "ate_m": 3},
+        {"estado": "parede", "de_m": 4, "ate_m": 4},
+    ]
+    assert junction_axis_checks(evidence)[0]["passed"] is False
+
+
+@pytest.mark.parametrize("length,expected_mode,expected", [
+    (.949, "ramo_curto", [.629, .48]),
+    (.60, "sem_estacao", []),
+    (1.60, "padrao", [1.28]),
+])
+def test_short_branch_search_only_opens_when_default_stations_are_missing(length, expected_mode, expected):
+    from cavegen.datastream.gallery_junctions import _branch_stations
+
+    mode, stations = _branch_stations(length, .16)
+    assert mode == expected_mode
+    np.testing.assert_allclose(stations, expected)
+    assert (stations <= length - .32 + 1e-12).all()

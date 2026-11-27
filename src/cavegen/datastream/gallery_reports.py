@@ -6,6 +6,7 @@ import argparse
 import csv
 from datetime import datetime, timezone
 from importlib.metadata import version
+from itertools import groupby
 import os
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -46,6 +47,34 @@ def _seed_state(classification: np.ndarray, seed: tuple[int, int, int]) -> str:
     if classification[seed] == EXTERIOR:
         return "exterior"
     return "interior" if classification[seed] == INTERIOR else "blocked"
+
+
+def audit_junction_axes(surface, caps, air, axes):
+    """Classify the saved samples along each branch and report runs outside the air."""
+    barrier = surface | caps.any(axis=0)
+    outside = classify_surface_by_flood_fill(barrier) == EXTERIOR
+    evidence = []
+    for axis in axes:
+        cells = tuple(np.asarray(axis["voxels_zyx"], dtype=int).T)
+        states = np.select(
+            [air[cells], surface[cells], outside[cells], barrier[cells]],
+            ["ar_da_juncao", "parede", "exterior", "tampa"],
+            default="outro_interior",
+        )
+        distances = axis["distancias_m"]
+        intervals = []
+        for state, group in groupby(enumerate(states), key=lambda item: item[1]):
+            first, *rest = [i for i, _ in group]
+            if state != "ar_da_juncao":
+                intervals.append({"estado": str(state), "de_m": distances[first],
+                                  "ate_m": distances[rest[-1] if rest else first]})
+        evidence.append({"ramo": axis["ramo"], "amostras": len(distances), "desvios": intervals})
+    return evidence
+
+
+def junction_axis_checks(evidence):
+    return [check(f"branch_{axis['ramo']}_axis_in_air", bool(axis["amostras"]) and not axis["desvios"],
+                  True, count=axis["amostras"]) for axis in evidence]
 
 
 def audit_flood_fill(
@@ -290,6 +319,9 @@ def replay_checks(folder: Path) -> Path:
                 interior.metadata.get("seed_search", {}).get("selected_xyz")
             ),
         )
+        axes = interior.metadata.get("junction_axes")
+        if axes:
+            checks.extend(junction_axis_checks(audit_junction_axes(surface, masks["caps"], interior.data, axes)))
     reports = folder / REPORT_FOLDER
     legacy = folder / LEGACY_REPORT_FOLDER
     if not reports.exists() and (legacy / SUMMARY_FILE).is_file():

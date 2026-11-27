@@ -104,7 +104,7 @@ def _gather(context, targets, stage, progress):
     return files
 
 
-def attempt_failed_crops(cases, output=None, progress=print):
+def attempt_failed_crops(cases, output=None, progress=print, *, recenter_axes=False):
     """Process (config_path, failure_outcome) pairs without duplicating a junction."""
     if output is None:
         stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S")
@@ -171,7 +171,8 @@ def attempt_failed_crops(cases, output=None, progress=print):
                     if file.is_file():
                         points = np.memmap(file, mode="r", dtype="<f8").reshape(-1, 3)
                         record, volume = solve_junction(
-                            points, lines, index, np.asarray(point), incident[point], context.voxel_size
+                            points, lines, index, np.asarray(point), incident[point], context.voxel_size,
+                            recenter_axes=recenter_axes,
                         )
                     else:
                         record, volume = {"resultado": "sem_pontos"}, None
@@ -205,10 +206,11 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("inventory", type=Path, help="JSON com registros config e falha_anterior")
     parser.add_argument("--output", type=Path)
+    parser.add_argument("--recenter-axes", action="store_true", help="Testar recentramento local após falha.")
     args = parser.parse_args()
     rows = json.loads(args.inventory.read_text(encoding="utf-8"))
     attempt_failed_crops(((r["config"], r["falha_anterior"]) for r in rows), args.output,
-                         progress=lambda message: print(message, flush=True))
+                         progress=lambda message: print(message, flush=True), recenter_axes=args.recenter_axes)
 
 
 if __name__ == "__main__":

@@ -10,14 +10,18 @@ from tempfile import TemporaryDirectory
 
 import numpy as np
 from scipy.ndimage import binary_dilation
+from scipy.spatial import cKDTree
 
 from cavegen.core.surface_filling import INTERIOR, classify_surface_by_flood_fill
 from cavegen.core.volume import Volume3D
 from cavegen.datastream.centreline import CentrelineIndex, passages_from_graph, read_graph
+from cavegen.datastream.centreline_recentering import recenter_passage
 from cavegen.datastream.crop_planner import _Boundary, _fit_contour, _section, _section_frame, _set_boundary
 from cavegen.datastream.gallery_crop import Section, parse_section
 from cavegen.datastream.gallery_leaks import _enclosed_seeds, _escape_path, seed_component, touches_boundary
-from cavegen.datastream.gallery_reports import CHECK_COLUMNS, _write_csv, audit_flood_fill
+from cavegen.datastream.gallery_reports import (
+    CHECK_COLUMNS, _write_csv, audit_flood_fill, audit_junction_axes, junction_axis_checks,
+)
 from cavegen.datastream.point_cloud import iter_point_cloud_xyz
 from cavegen.datastream.surface_io import save_surface_npz
 from cavegen.datastream.voxel_io import save_volume_npz
@@ -25,6 +29,7 @@ from cavegen.tools.planar_caps import polygons_intersect, raster_cap_voxels, ver
 
 # Stations and bounds in voxels, independent of survey scale.
 MIN_STATION, MAX_STATION, STRIDE = 8, 50, 4
+SHORT_MIN_STATION, TIP_MARGIN = 3, 2
 CONTEXT, PADDING = 32, 8
 BEAM_WIDTH, MAX_VOLUME_TRIALS = 24, 8
 POINT_BATCH = 131072
@@ -60,10 +65,21 @@ def _measure_points(points, index, size):
 
 
 def _stations(length, size):
-    limit = min(length / size - 2, MAX_STATION)
+    limit = min(length / size - TIP_MARGIN, MAX_STATION)
     if limit < MIN_STATION:
         return np.empty(0)
     return np.unique(np.r_[np.arange(MIN_STATION, limit, STRIDE), limit]) * size
+
+
+def _branch_stations(length, size):
+    stations = _stations(length, size)
+    if stations.size:
+        return "padrao", stations
+    limit = length / size - TIP_MARGIN
+    if limit < SHORT_MIN_STATION:
+        return "sem_estacao", stations
+    short = np.unique(np.r_[np.arange(SHORT_MIN_STATION, limit, 1), limit])[::-1] * size
+    return "ramo_curto", short
 
 
 def _candidate(branch, tip, distance, line, points, along, wall_keys, size, tolerance):
@@ -133,7 +149,9 @@ def _combinations(candidates, size, tolerance):
             for item in group:
                 index = ids[id(item)]
                 if all(pair(*sorted((other, index))) for other in selected):
-                    expanded.append((score + item.distance, (*selected, index)))
+                    # For a short branch there is more room to separate the caps farther from the node.
+                    distance_score = item.distance if item.distance >= MIN_STATION * size else -item.distance
+                    expanded.append((score + distance_score, (*selected, index)))
         beams = sorted(expanded)[:BEAM_WIDTH]
     return [tuple(sorted((options[i] for i in indices), key=lambda cut: cut.branch)) for _, indices in beams]
 
@@ -208,13 +226,26 @@ def _trial(points, cuts, joint, size, tolerance, diagnose):
                               expected_original="interior", require_cap_contact=True)
     if any(c["passed"] is False for c in checks):
         return {**note, "resultado": "falha_na_auditoria"}, None
-    return {**note, "resultado": "volume_salvo"}, (wall, caps, air, seed, lower, checks)
+    axes = []
+    for cut, cap in zip(cuts, caps):
+        samples = _indices(cut.curve, size) - lower
+        distances = np.linspace(0, cut.distance, len(samples))
+        terminal = cap[tuple(samples.T)] & (distances >= cut.distance - 2 * size)
+        # Only omit the continuous terminal run on this branch's own cap.
+        keep = ~np.logical_and.accumulate(terminal[::-1])[::-1]
+        axes.append({"ramo": cut.branch + 1, "voxels_zyx": samples[keep].tolist(),
+                     "distancias_m": distances[keep].tolist()})
+    evidence = audit_junction_axes(wall, caps, air, axes)
+    note["validacao_eixos"] = evidence
+    axis_checks = junction_axis_checks(evidence)
+    if any(row["passed"] is False for row in axis_checks):
+        return {**note, "resultado": "eixo_fora_do_ar"}, None
+    checks.extend(axis_checks)
+    return {**note, "resultado": "volume_salvo"}, (wall, caps, air, seed, lower, checks, axes)
 
 
-def solve_junction(points, lines, index, joint, incident, size):
-    """Fit measured physical sections, then test at most eight compatible openings."""
+def _solve_measured(points, lines, joint, incident, size, owners, along, wall_keys):
     tolerance = size * 1e-6
-    owners, along, wall_keys = _measure_points(points, index, size)
     options = {}
     rejections = {}
     for branch, tip in incident:
@@ -222,7 +253,8 @@ def solve_junction(points, lines, index, joint, incident, size):
         rejected = Counter()
         same_branch = owners == branch
         branch_points, branch_stations = points[same_branch], along[same_branch]
-        for distance in _stations(lines[branch].stations[-1], size):
+        search, stations = _branch_stations(lines[branch].stations[-1], size)
+        for distance in stations:
             cut, reason = _candidate(branch, tip, distance, lines[branch], branch_points,
                                      branch_stations, wall_keys, size, tolerance)
             if cut is None:
@@ -230,7 +262,17 @@ def solve_junction(points, lines, index, joint, incident, size):
             else:
                 good.append(cut)
         options[branch] = good
-        rejections[str(branch + 1)] = {"aceitos": len(good), "rejeicoes": dict(rejected)}
+        rejections[str(branch + 1)] = {
+            "aceitos": len(good),
+            "busca": search,
+            "estacoes_do_no_m": stations.tolist(),
+            "rejeicoes": dict(rejected),
+            "trajetorias_candidatas": [
+                {"distancia_m": cut.distance,
+                 "voxels_de_parede_no_eixo": len(wall_keys.intersection(map(tuple, _indices(cut.curve, size))))}
+                for cut in good
+            ],
+        }
     record = {"ramos": rejections, "tentativas": []}
     if not all(options.values()):
         return {**record, "resultado": "ramo_sem_tampa_valida"}, None
@@ -258,15 +300,48 @@ def solve_junction(points, lines, index, joint, incident, size):
     return {**record, "resultado": "sem_fechamento"}, None
 
 
+def solve_junction(points, lines, index, joint, incident, size, *, recenter_axes=False):
+    """Try measured caps first; optionally retry with locally recentered axes."""
+    measurement = _measure_points(points, index, size)
+    baseline, volume = _solve_measured(points, lines, joint, incident, size, *measurement)
+    if not recenter_axes:
+        return baseline, volume
+    if volume is not None:
+        baseline["recentramento"] = {"resultado": "fluxo_original_fechou"}
+        return baseline, volume
+
+    tree = cKDTree(points)
+    corrected = list(lines)
+    reports = {}
+    changed = {}
+    for branch, tip in incident:
+        passage, report = recenter_passage(lines[branch], tip, points, measurement[2], size, tree=tree)
+        reports[str(branch + 1)] = report
+        if passage is not lines[branch]:
+            corrected[branch] = passage
+            changed[str(branch + 1)] = passage.xyz.tolist()
+    if not changed:
+        baseline["recentramento"] = {"resultado": "sem_eixo_ajustado", "ramos": reports}
+        return baseline, None
+
+    new_index = CentrelineIndex(corrected, size / 2)
+    result, volume = _solve_measured(
+        points, corrected, joint, incident, size, *_measure_points(points, new_index, size)
+    )
+    result["recentramento"] = {"resultado": "voxelizacao_repetida", "ramos": reports,
+                             "eixos_locais_xyz": changed, "ensaio_sem_ajuste": baseline}
+    return result, volume
+
+
 def save_junction(destination, record, volume, origin, source, graph, size):
-    wall, caps, air, seed, lower, checks = volume
+    wall, caps, air, seed, lower, checks, axes = volume
     metadata = {
         "junction": True, "status": "pending_review", "axis_order": "ZYX",
         "config": {"voxel_size": size, "sections": [r["secao"] for r in record["tampas"]]},
         "grid_origin_xyz": (origin + lower[::-1] * size).tolist(),
         "section_origin_xyz": origin.tolist(), "source_path": str(source), "centreline": str(graph),
         "seed_zyx": [int(i) for i in seed], "air_voxels": int(air.sum()),
-        "shape_zyx": list(air.shape), "junction_search": record,
+        "shape_zyx": list(air.shape), "junction_search": record, "junction_axes": axes,
     }
     with TemporaryDirectory(dir=destination.parent) as stage:
         result = Path(stage) / "volume"

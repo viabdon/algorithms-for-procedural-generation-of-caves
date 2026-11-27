@@ -470,3 +470,139 @@ As linhas usam o desfecho da configuração considerada para cada
 recorte no inventário. Há versões anteriores com desfechos
 diferentes, como o `ramo_042_002` de Cascade, cuja tentativa de tampa
 auxiliar antecedeu o alerta de passagem ambígua.
+
+#### Auditoria do eixo ao longo da junção
+
+Em Cascade de Môtiers, os planos usam a linha central fornecida
+com o levantamento MainGallery, nos arquivos de nós e arestas
+`*_from_LBC.txt`. As configurações desses planos têm
+`centreline_extraction` nulo. A inspeção da junção 003 motivou
+a checagem amostrada do percurso inteiro, do nó até a tampa,
+além da checagem de aproximação de dois voxels.
+
+Na nova execução, os dois contornos candidatos do ramo 19,
+a 5,76 m e 6,40 m do nó, tiveram 23 voxels de parede
+observada sobre cada trajetória amostrada. O ramo 48
+continuou sem estação elegível e a junção 003 ficou sem
+componente interno fechado para classificar os demais
+voxels livres do eixo. A hipótese de continuação física
+além da extremidade do grafo permanece em aberto.
+
+A junção 023 voltou a fechar. Na reprodução pelos NPZs, os
+eixos dos ramos 14, 15 e 16 ficaram no mesmo componente de
+ar até suas tampas. As novas execuções ficaram em
+`data/processed/experiments/juncoes_auto/auditoria_eixo_003_16cm/`
+e `auditoria_eixo_023_16cm/`.
+
+#### Eixos desviados e ramos curtos
+
+A junção 003 revelou dois bloqueios independentes. Os dois cortes
+candidatos do ramo 19 passaram na checagem da aproximação final,
+embora cada percurso amostrado cruzasse 23 voxels de parede
+observada. Um contorno local pode ter suporte mesmo quando o
+eixo se desvia antes de alcançá-lo. Como a junção ficou aberta,
+os relatórios confirmam o contato com a parede. A extensão do
+trajeto pelo exterior e a frequência desse problema nos demais
+recortes continuam por medir.
+
+O ramo 48 termina como folha no grafo fornecido de Cascade, a
+cerca de 0,95 m do nó da junção. A nuvem local sugere uma
+continuação vertical além da ponta do eixo. O motivo de o eixo
+terminar ali e a extensão da galeria permanecem incertos. A
+busca atual exige que a primeira tampa fique a pelo menos oito
+voxels do nó e reserva dois voxels antes da ponta do ramo.
+A 16 cm, esses limites deixam o último corte possível do ramo
+48 a cerca de 0,63 m, abaixo do mínimo de 1,28 m. O ramo ficou
+sem estações para testar.
+
+O artigo do catálogo relata que uma contração forte pode deslocar
+nós para fora da parede observada, por exemplo em curvas
+acentuadas. Essa limitação é compatível com o tipo de desvio
+observado, mas sua contribuição para o ramo 19 ainda precisa de
+verificação. A ferramenta do projeto também usa contração
+laplaciana, com parâmetros e preparação próprios. Uma nova
+extração permitiria comparar os eixos, mas a cobertura incompleta
+da nuvem e a topologia em árvore continuam limitando o resultado.
+[KarstConduitCatalogue, método de extração das linhas centrais](https://essd.copernicus.org/articles/17/4671/2025/#section3)
+
+O ensaio proposto começa pelos braços sem estação elegível.
+Mantém-se o voxel de 16 cm, a margem junto à extremidade e a
+validação geométrica. A busca tenta estações mais próximas do
+nó, começando pelas mais afastadas dentro do intervalo curto.
+No ramo 48, um mínimo experimental de três voxels abriria um
+intervalo aproximado de 0,48 a 0,63 m. A tampa precisaria de
+contorno sustentado, separação das outras tampas e continuidade
+do ar da junção até essa abertura. A junção 003 também precisaria
+resolver o desvio do ramo 19.
+
+Para investigar eixos desviados, o primeiro ensaio proposto é
+recentrar apenas os trechos problemáticos usando seções
+transversais sustentadas pela nuvem original. Preservam-se os nós
+de junção e a identificação dos ramos. A comparação registra o
+contato com a parede, a continuidade do eixo e a reprodução pelo
+exterior antes e depois do ajuste. A junção 023 serve de controle.
+Recalcular a linha inteira fica como comparação caso o diagnóstico
+encontre desvios recorrentes em trechos distantes.
+
+#### Busca alternativa de estações no ramo 48
+
+A busca de três voxels foi implementada para os ramos sem estação
+no intervalo padrão. A 16 cm, o ramo 48 ganhou duas estações na
+junção 003, a 0,629 m e 0,48 m do nó. Ambas chegaram à checagem
+vetorial da aproximação à tampa e foram rejeitadas porque o
+eixo cruzava voxels de parede observada. Diminuir a distância
+resolveu o bloqueio de comprimento, mas a junção continuou
+sem tampa aceita nesse ramo.
+
+A junção 023 serviu de controle. Seus três ramos mantiveram
+a busca padrão e o volume voltou a fechar. O novo resultado
+por estação e ramo ficou salvo em
+`data/processed/experiments/juncoes_auto/ramos_curtos_003_023_16cm/resultados.json`.
+A rodada foi limitada à junção 003 e ao controle 023.
+
+#### Ensaio de recentramento nas junções 003 e 023
+
+O ensaio usou a nuvem original e o grafo fornecido da galeria principal
+de Cascade de Môtiers, a 16 cm. O recentramento é acionado com
+`--recenter-axes` quando o fechamento padrão falha. Ele procura um
+trajeto entre dois pontos do eixo original que estejam em fatias
+delimitadas pela parede observada, com folga mínima de dois voxels.
+[Regras da busca e da validação](../../planejamento-recortes-voxelizacao.md#recentramento-local-por-âncoras)
+
+Na 003, faltou pelo menos uma âncora em cada ramo. Nenhum ajuste
+foi aplicado e a junção manteve o resultado `ramo_sem_tampa_valida`.
+
+| Ramo | Voxels de parede encontrados no eixo | Âncora antes | Âncora depois |
+| --- | ---: | --- | --- |
+| 19 | 41 | Ausente | Ausente |
+| 27 | 24 | Ausente | Encontrada |
+| 48 | 4 | Ausente | Ausente |
+
+Essas contagens abrangem até 58 voxels do eixo a partir do nó,
+ou até a ponta em ramos mais curtos. Os 23 voxels citados para o ramo
+19 na rodada anterior foram medidos em trajetórias que terminavam
+na tampa candidata. O ensaio confirma os cruzamentos, e a classificação
+do ar ao redor do eixo da 003 segue em aberto.
+
+Na 023, o fluxo padrão reproduziu **6.421 voxels de ar**. As matrizes
+de ar, parede e das três tampas coincidiram exatamente com as da rodada
+anterior. Na checagem dos NPZs pelo exterior, os eixos dos ramos 14,
+15 e 16 permaneceram no mesmo componente de ar, que alcançou as três
+tampas. Ao remover qualquer tampa isoladamente, o exterior alcançou
+a semente. O recentramento ficou reservado ao caso em que a tentativa
+padrão falhou.
+
+Para reproduzir a rodada, use um inventário com os dois registros abaixo,
+ambos com `falha_anterior: ambiguous_passage`, e execute
+`python -m cavegen.datastream.junction_fallback INVENTARIO.json --recenter-axes --output PASTA_NOVA`.
+
+| Junção | Caminho do `crop.json` a partir de `data/processed/` |
+| --- | --- |
+| 003 | `experiments/planejamento_auto_16cm/config_sementes_originais/cascadedemotiers/MainGallery/ramo_027_004/crop.json` |
+| 023 | `crop_plans/cascadedemotiers/MainGallery/holdout_indian_tunnel/las5cm_16cm_rev/ramo_015_001/crop.json` |
+
+O diagnóstico completo ficou em
+`data/processed/experiments/juncoes_auto/recentramento_ancoras_003_023_16cm/resultados.json`.
+Em testes sintéticos, o ajuste corrigiu um eixo que atravessava parede
+quando havia duas âncoras e preservou o eixo original quando faltava uma.
+O ensaio em nuvens reais se restringiu a essas duas junções.
