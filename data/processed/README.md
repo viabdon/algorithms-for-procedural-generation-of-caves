@@ -85,3 +85,8 @@ Manter todos os trechos da mesma caverna no mesmo grupo do fold.
 Essas saídas preservam os NPZ globais da auditoria em `references/`.
 O significado das máscaras, o uso das tampas móveis e a revisão antes
 do treino estão no [guia de preparação](../../docs/preparacao-volumes.md#quando-o-flood-fill-encontra-o-exterior).
+
+## Planos de recortes
+
+As receitas dos recortes, os grafos usados pelos planos e as instruções para
+refazer a extração estão no [inventário de planos](crop_plans/README.md).

@@ -1,0 +1,13 @@
+{
+  "previamente_planejadas": [],
+  "planejadas_neste_lote": {
+    "1": 95.807653,
+    "2": 64.590894,
+    "4": 9.014163
+  },
+  "abaixo_comprimento_minimo": {
+    "3": -0.192481,
+    "5": 0.44898
+  },
+  "comprimento_minimo_m": 1.28
+}

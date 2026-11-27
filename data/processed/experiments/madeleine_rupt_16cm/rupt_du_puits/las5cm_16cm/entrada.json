@@ -1,0 +1,17 @@
+{
+  "source": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/madeleine_rupt_16cm/fontes/RuptDuPuits/Cascades/pointclouds/RuptDuPuits_Cascades_sampled_5cm_PCV_normals_classified.las",
+  "centreline": "/home/midnavi/Documents/CESUPA/TCC/algorithms-for-procedural-generation-of-caves/data/processed/experiments/madeleine_rupt_16cm/fontes/RuptDuPuits/Cascades/centreline/RuptDuPuits_Cascades_nodes_from_LBC.txt",
+  "cave": "rupt_du_puits",
+  "survey": "Cascades",
+  "fold": "teste_externo",
+  "plan_id": "las5cm_16cm",
+  "units": "m",
+  "count": 7,
+  "passages": [
+    1
+  ],
+  "voxel_size": 0.16,
+  "section_search_radius_voxels": 8,
+  "batch_size": 65536,
+  "padding_voxels": 2
+}

@@ -1,0 +1,100 @@
+{
+  "cave": "cascadedemotiers",
+  "survey": "MainGallery",
+  "crop_id": "ramo_020_005",
+  "plan_id": "las5cm_16cm",
+  "fold": "holdout_indian_tunnel",
+  "branch": "passagem_020",
+  "source": "cloud.ply",
+  "source_origin_xyz": [
+    2537750.899,
+    1195208.176,
+    783.079
+  ],
+  "units": "m",
+  "origin_xyz": [
+    -64.75806200020867,
+    28.84482000002233,
+    -5.024976999999986
+  ],
+  "selection_min_xyz": [
+    -64.43966200020867,
+    29.16322000002233,
+    -4.706576999999985
+  ],
+  "selection_max_xyz": [
+    -53.529236000208634,
+    39.13370500002234,
+    5.604607000000048
+  ],
+  "shape_zyx": [
+    69,
+    67,
+    73
+  ],
+  "voxel_size": 0.16,
+  "sections": [
+    {
+      "point_xyz": [
+        -62.75781554383924,
+        35.26780300449313,
+        -1.034170008392268
+      ],
+      "inward_normal_xyz": [
+        0.8792113047574605,
+        -0.4073624892593448,
+        0.2470693909231055
+      ],
+      "u_xyz": [
+        -0.22417615799693316,
+        0.10386690578258512,
+        0.9689977895067077
+      ],
+      "polygon_uv": []
+    },
+    {
+      "point_xyz": [
+        -56.68138636779278,
+        31.776085964551736,
+        0.9610212546788011
+      ],
+      "inward_normal_xyz": [
+        -0.6077515475696356,
+        0.4999723040081723,
+        -0.6169811598837299
+      ],
+      "u_xyz": [
+        0.35085960531415883,
+        0.8660413934822977,
+        0.35618793092135076
+      ],
+      "polygon_uv": []
+    }
+  ],
+  "seed_xyz": [
+    -59.6218240449814,
+    33.65573300524567,
+    -0.07791404977115496
+  ],
+  "batch_size": 131072,
+  "proposal": {
+    "crop_id": "ramo_020_005",
+    "status": "pending_review",
+    "review_reasons": [
+      "tampa_com_cobertura_insuficiente",
+      "outra_passagem_ou_retorno_proximo",
+      "grade_excede_64_com_voxel_escolhido"
+    ],
+    "retained_points": 82164,
+    "cut_stations": [
+      30.360467781102045,
+      37.670584726377555
+    ],
+    "section_bins_supported": [
+      14,
+      9
+    ],
+    "selection_radius": 5.581890140548547
+  },
+  "auxiliary_cap_radius_voxels": 4
+}
